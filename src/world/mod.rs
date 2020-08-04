@@ -24,9 +24,9 @@ impl World {
 		// println!("local player {} {}", self.players[0].position.x, self.players[0].position.y);
 	}
 
-	pub fn render(&mut self, _w: &mut RenderWindow) {
-		for _p in self.players.iter_mut() {
-			// p.render(w); // TODO
+	pub fn render(&mut self, w: &mut RenderWindow) {
+		for p in self.players.iter_mut() {
+			p.render(w);
 		}
 	}
 
