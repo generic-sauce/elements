@@ -1,4 +1,5 @@
-use sfml::graphics::{RenderWindow, Color, RenderTarget};
+use sfml::system::{SfBox};
+use sfml::graphics::{RenderWindow, Color, RenderTarget, Texture};
 use sfml::window::{Style, VideoMode, Event, Key};
 
 use crate::world::World;
@@ -6,6 +7,7 @@ use crate::world::World;
 pub struct App {
 	window: RenderWindow,
 	world: World,
+    texture: SfBox<Texture>,
 }
 
 impl App {
@@ -14,6 +16,7 @@ impl App {
 		App {
 			window: RenderWindow::new(VideoMode::new(1280, 720, desktop.bits_per_pixel), "Elements 2", Style::CLOSE, &Default::default()),
 			world: World::new(),
+            texture: Texture::from_file("res/player_idle1.png").unwrap(),
 		}
 	}
 

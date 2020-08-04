@@ -1,3 +1,5 @@
+mod render;
+
 use sfml::system::Vector2f;
 
 pub struct Player {
