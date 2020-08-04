@@ -32,6 +32,7 @@ impl World {
 	}
 
 	pub fn render(&mut self, w: &mut RenderWindow, texture_state: &TextureState) {
+        self.tilemap.render(w, texture_state);
 		for p in self.players.iter_mut() {
 			p.render(w, texture_state);
 		}
