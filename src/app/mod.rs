@@ -3,11 +3,13 @@ use sfml::window::{Style, VideoMode, Event, Key};
 
 use crate::world::World;
 use crate::texture_state::TextureState;
+use crate::input::{Input, AdaptiveInput};
 
 pub struct App {
 	window: RenderWindow,
 	world: World,
 	texture_state: TextureState,
+	inputs: [Box<dyn Input>; 2],
 }
 
 impl App {
@@ -16,6 +18,7 @@ impl App {
 			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &Default::default()),
 			world: World::new(),
 			texture_state: TextureState::new(),
+			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))]
 		}
 	}
 
@@ -42,7 +45,7 @@ impl App {
 	}
 
 	pub fn tick(&mut self) {
-		self.world.tick();
+		self.world.tick(&mut self.inputs);
 	}
 
 	pub fn render(&mut self) {
