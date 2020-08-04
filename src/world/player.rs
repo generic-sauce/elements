@@ -1,8 +1,6 @@
 use sfml::system::Vector2f;
 
-const DEFAULT_PLAYER_SIZE: Vector2f = Vector2f::new(10.0, 20.0);
-
-struct Player {
+pub struct Player {
     // position is the center of the player
     pub position: Vector2f,
     // size.x is the half width of the player and size.y is the half height of the player
@@ -10,10 +8,14 @@ struct Player {
 }
 
 impl Player {
-    fn new(position: Vector2f) -> Player {
+    pub fn new(position: Vector2f) -> Player {
         return Player {
             position,
-            size: DEFAULT_PLAYER_SIZE,
+            size: Player::get_size(),
         }
+    }
+
+    pub fn get_size() -> Vector2f {
+        return Vector2f::new(10.0, 20.0);
     }
 }
