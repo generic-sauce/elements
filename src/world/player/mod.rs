@@ -20,12 +20,12 @@ impl Player {
 			direction: Vector2f::new(0.0, 0.0),
 		}
 	}
-
-	pub fn get_size() -> Vector2f {
-		Vector2f::new(100.0, 160.0)
-	}
+    pub fn get_size() -> Vector2f {
+        Vector2f::new(2.0, 2.0)
+    }
 
 	pub fn tick(&mut self) {
+        self.speed *= 0.9;
 		self.speed += self.direction;
 		self.position += self.speed;
 	}

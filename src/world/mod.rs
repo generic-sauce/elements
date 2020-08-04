@@ -20,7 +20,7 @@ impl World {
 		World {
 			players: [Player::new(Vector2f::new(0.0, 0.0)), Player::new(Vector2f::new(20.0, 0.0))],
 			tilemap: TileMap::new("res/map/map01.png"),
-			input: Box::new(GamePadInput::new(0)),
+			input: Box::new(KeyboardInput::new()),
 		}
 	}
 

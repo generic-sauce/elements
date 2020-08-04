@@ -12,9 +12,8 @@ pub struct App {
 
 impl App {
 	pub fn new() -> App {
-        let desktop = VideoMode::desktop_mode();
 		App {
-			window: RenderWindow::new(VideoMode::new(1280, 720, desktop.bits_per_pixel), "Elements 2", Style::CLOSE, &Default::default()),
+			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &Default::default()),
 			world: World::new(),
 			texture_state: TextureState::new(),
 		}
