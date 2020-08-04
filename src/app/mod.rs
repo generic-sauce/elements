@@ -44,6 +44,7 @@ impl App {
 	}
 
 	pub fn render(&mut self) {
-		self.world.render(&mut self.window, &self.texture_state);
+        let context = Context::new(&mut self.window, &self.texture_state);
+		self.world.render(&context);
 	}
 }
