@@ -22,7 +22,7 @@ impl Player {
     }
 
     pub fn get_size() -> Vector2f {
-        Vector2f::new(10.0, 20.0)
+        Vector2f::new(100.0, 160.0)
     }
 
     pub fn tick(&mut self) {
