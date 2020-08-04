@@ -1,4 +1,5 @@
 use sfml::system::Vector2f;
+use sfml::graphics::{RectangleShape, Texture};
 
 pub struct Player {
     // position is the center of the player
