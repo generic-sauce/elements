@@ -40,7 +40,7 @@ fn get_joystick_direction(index: u32) -> Vector2f {
 	}
 	Vector2f::new(
 		joystick::axis_position(index, joystick::Axis::X) * 0.01,
-		joystick::axis_position(index, joystick::Axis::Y) * 0.01,
+		joystick::axis_position(index, joystick::Axis::Y) * -0.01,
 	)
 }
 
