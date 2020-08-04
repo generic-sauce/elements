@@ -19,7 +19,7 @@ impl World {
 	pub fn new() -> World {
 		World {
 			players: [Player::new(Vector2f::new(0.0, 0.0)), Player::new(Vector2f::new(20.0, 0.0))],
-			tilemap: TileMap::new("res/todo-add-path"),
+			tilemap: TileMap::new("res/map/map01.png"),
 			input: Box::new(KeyboardInput::new()),
 		}
 	}
