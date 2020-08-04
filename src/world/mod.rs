@@ -18,8 +18,8 @@ impl World {
 		}
 	}
 
-	pub fn tick(&mut self) {
-		self.handle_local_player();
+	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+		self.handle_player_inputs(inputs);
 		for p in self.players.iter_mut() {
 			p.tick();
 		}
@@ -32,7 +32,10 @@ impl World {
 		}
 	}
 
-	fn handle_local_player(&mut self) {
+	fn handle_player_inputs(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+		for (player, input) in self.players.iter_mut().zip(inputs.iter()) {
+			player.direction = input.get_direction();
+		}
 		if !self.input.is_connected() {
 			println!("joystick not connected");
 		}
