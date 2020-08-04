@@ -44,7 +44,7 @@ impl App {
 	}
 
 	pub fn draw(&mut self) {
-        let context = Context::new(&mut self.window, &self.texture_state);
+        let context = Context::new(&mut self.window, &self.texture_state, self.world.tilemap.size);
 		self.world.draw(&context);
 	}
 }

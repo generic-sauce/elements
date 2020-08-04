@@ -10,7 +10,7 @@ pub enum Tile {
 
 pub struct TileMap {
 	tiles: Vec<Tile>,
-    size: Vec2u,
+    pub size: Vec2u,
 }
 
 impl TileMap {
@@ -20,7 +20,7 @@ impl TileMap {
         let s = image.size();
 		let mut tiles = Vec::with_capacity((s.x * s.y) as usize);
 
-		for y in 0..s.y {
+		for y in (0..s.y).rev() {
 			for x in 0..s.x {
 				let tile = match image.pixel_at(x as u32, y as u32) {
 					Color { r: 255, g: 255, b: 255, a: 255 } => Tile::Void,

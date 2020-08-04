@@ -9,7 +9,7 @@ impl TileMap {
     pub fn draw(&mut self, context: &Context) {
         for (index, tile) in self.tiles.iter().enumerate() {
             let index = index as u32;
-            let position = Vec2f::new((index % self.size.x) as f32, (index / self.size.x) as f32);
+            let position = Vec2f::new((index % self.size.x) as f32, (index / self.size.x) as f32) + Vec2f::new(0.5, 0.5);
 
             let color = match tile {
                 Tile::Void => Color::rgb(32, 32, 32),

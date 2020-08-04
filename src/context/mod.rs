@@ -3,13 +3,15 @@ use crate::prelude::*;
 pub struct Context<'a> {
     window: &'a mut RenderWindow,
     texture_state: &'a TextureState,
+    tilemap_size: Vec2u,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(window: &'a mut RenderWindow, texture_state: &'a TextureState) -> Context<'a> {
+    pub fn new(window: &'a mut RenderWindow, texture_state: &'a TextureState, tilemap_size: Vec2u) -> Context<'a> {
         Context {
             window,
             texture_state,
+            tilemap_size,
         }
     }
 
@@ -25,10 +27,10 @@ impl<'a> Context<'a> {
 
         let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
         // let ratio = size.x / size.y;
-        let height = 64 as f32;
+        let height = self.tilemap_size.y as f32;
         let tile = size.y / height;
         shape.set_scale(Vector2f::new(tile, tile));
-        shape.set_position(shape.position() * Vector2f::new(tile, -tile) + size / 2.0);
+        shape.set_position(shape.position() * Vector2f::new(tile, -tile) + Vector2f::new(0.0, size.y));
 
         self.window.draw_rectangle_shape(&shape, RenderStates::default());
     }
