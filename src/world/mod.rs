@@ -3,20 +3,20 @@ mod player;
 use sfml::system::Vector2f;
 use sfml::graphics::RenderWindow;
 
-use crate::input::{Input, KeyboardInput};
+use crate::input::{Input, KeyboardInput, GamePadInput};
 use crate::world::player::Player;
 use crate::texture_state::TextureState;
 
 pub struct World {
 	pub players: [Player; 2],
-    pub input: Box<dyn Input>,
+	pub input: Box<dyn Input>,
 }
 
 impl World {
 	pub fn new() -> World {
 		World {
-			players: [Player::new(Vector2f::new(0.0, 0.0)), Player::new(Vector2f::new(20.0, 0.0))],
-			input: Box::new(KeyboardInput::new()),
+			players: [Player::new(Vector2f::new(400.0, 400.0)), Player::new(Vector2f::new(400.0, 400.0))],
+			input: Box::new(GamePadInput::new(0)),
 		}
 	}
 
@@ -34,6 +34,9 @@ impl World {
 	}
 
 	fn handle_local_player(&mut self) {
+		if !self.input.is_connected() {
+			println!("joystick not connected");
+		}
 		self.players[0].direction = self.input.get_direction();
 	}
 }
