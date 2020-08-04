@@ -1,7 +1,7 @@
 use sfml::system::{Vector2f};
-use sfml::graphics::{RenderWindow, Color, RenderStates, RenderTarget, Shape, RectangleShape, Texture, Transformable, Transform};
+use sfml::graphics::{RenderWindow, Color, RenderStates, RenderTarget, Shape, RectangleShape, Transformable};
 
-use crate::texture_state::{TextureId, TextureState};
+use crate::texture_state::TextureState;
 use super::TileMap;
 use super::Tile;
 

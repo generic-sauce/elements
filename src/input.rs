@@ -56,6 +56,7 @@ pub struct KeyboardInput {
 	pub index: u32,
 }
 
+#[allow(dead_code)]
 impl KeyboardInput {
 	pub fn new(index: u32) -> KeyboardInput {
 		KeyboardInput { index }
@@ -72,6 +73,7 @@ pub struct GamePadInput {
 	pub index: u32,
 }
 
+#[allow(dead_code)]
 impl GamePadInput {
 	pub fn new(index: u32) -> GamePadInput {
 		GamePadInput { index }
