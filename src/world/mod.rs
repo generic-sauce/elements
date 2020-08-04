@@ -4,7 +4,7 @@ mod tilemap;
 use sfml::system::Vector2f;
 use sfml::graphics::RenderWindow;
 
-use crate::input::{Input, KeyboardInput, GamePadInput};
+use crate::input::{Input, AdaptiveInput};
 use crate::world::player::Player;
 use crate::world::tilemap::TileMap;
 use crate::texture_state::TextureState;
@@ -20,7 +20,7 @@ impl World {
 		World {
 			players: [Player::new(Vector2f::new(0.0, 0.0)), Player::new(Vector2f::new(20.0, 0.0))],
 			tilemap: TileMap::new("res/map/map01.png"),
-			input: Box::new(KeyboardInput::new()),
+			input: Box::new(AdaptiveInput::new(0)),
 		}
 	}
 

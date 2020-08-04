@@ -1,5 +1,5 @@
 use sfml::system::{Vector2f};
-use sfml::graphics::{RenderWindow, Color, RenderStates, RenderTarget, Shape, RectangleShape, Texture, Transformable, Transform};
+use sfml::graphics::{RenderWindow, RenderStates, RenderTarget, RectangleShape, Transformable};
 
 use crate::texture_state::{TextureId, TextureState};
 use super::Player;
@@ -13,7 +13,7 @@ impl Player {
 
         let size = Vector2f::new(w.size().x as f32, w.size().y as f32);
         // let ratio = size.x / size.y;
-        let height = 32 as f32;
+        let height = 64 as f32;
         let tile = size.y / height;
         shape.set_scale(Vector2f::new(tile, tile));
         shape.set_position(shape.position() * Vector2f::new(tile, -tile) + size / 2.0);
