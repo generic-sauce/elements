@@ -17,7 +17,7 @@ impl Player {
         let height = 32 as f32;
         let tile = size.y / height;
         shape.set_scale(Vector2f::new(tile, tile));
-        shape.set_position(shape.position() + size / 2.0);
+        shape.set_position(shape.position() * Vector2f::new(1.0, -1.0) + size / 2.0);
         w.draw_rectangle_shape(&shape, RenderStates::default());
     }
 }
