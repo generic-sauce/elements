@@ -12,12 +12,12 @@ impl Player {
         shape.set_origin(self.size);
         shape.set_position(self.position);
 
-        let size = w.size();
-        let ratio = size.x as f32 / size.y as f32;
+        let size = Vector2f::new(w.size().x as f32, w.size().y as f32);
+        let ratio = size.x / size.y;
         let height = 32 as f32;
-        let tile = size.y as f32 / height;
+        let tile = size.y / height;
         shape.set_scale(Vector2f::new(tile, tile));
-        shape.set_position(Vector2f::new(shape.position().x, -shape.position().y));
+        shape.set_position(shape.position() + size / 2.0);
         w.draw_rectangle_shape(&shape, RenderStates::default());
     }
 }
