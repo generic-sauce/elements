@@ -29,13 +29,21 @@ impl App {
                 }
 			}
 
-			// self.tick();
-			// self.render();
+			self.tick();
+			self.render();
 
 			self.window.display();
 			self.window.clear(Color::rgb(0, 0, 0));
 
 			std::thread::sleep(std::time::Duration::from_millis(10));
 		}
+	}
+
+	pub fn tick(&mut self) {
+		self.world.tick();
+	}
+
+	pub fn render(&mut self) {
+		self.world.render(&mut self.window);
 	}
 }
