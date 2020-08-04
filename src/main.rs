@@ -1,5 +1,6 @@
 mod app;
 mod world;
+mod texture_state;
 
 use app::App;
 

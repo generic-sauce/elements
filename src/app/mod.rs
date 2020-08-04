@@ -2,10 +2,12 @@ use sfml::graphics::{RenderWindow, Color, RenderTarget};
 use sfml::window::{Style, VideoMode, Event, Key};
 
 use crate::world::World;
+use crate::texture_state::TextureState;
 
 pub struct App {
 	window: RenderWindow,
 	world: World,
+	texture_state: TextureState,
 }
 
 impl App {
@@ -14,6 +16,7 @@ impl App {
 		App {
 			window: RenderWindow::new(VideoMode::new(1280, 720, desktop.bits_per_pixel), "Elements 2", Style::CLOSE, &Default::default()),
 			world: World::new(),
+			texture_state: TextureState::new(),
 		}
 	}
 
@@ -44,6 +47,6 @@ impl App {
 	}
 
 	pub fn render(&mut self) {
-		self.world.render(&mut self.window);
+		self.world.render(&mut self.window, &self.texture_state);
 	}
 }
