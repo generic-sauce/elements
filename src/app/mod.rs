@@ -1,4 +1,5 @@
-use sfml::graphics::{RenderWindow, Color, RenderTarget};
+use sfml::system::{SfBox};
+use sfml::graphics::{RenderWindow, Color, RenderTarget, Texture};
 use sfml::window::{Style, VideoMode, Event, Key};
 
 use crate::world::World;
