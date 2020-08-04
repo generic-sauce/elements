@@ -1,5 +1,4 @@
-use sfml::system::SfBox;
-use sfml::graphics::Texture;
+use crate::prelude::*;
 
 macro_rules! setup {
 	($($x:ident : $y:expr),*) => {

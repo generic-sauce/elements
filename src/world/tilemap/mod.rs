@@ -1,7 +1,6 @@
 mod render;
 
-use sfml::system::Vector2u;
-use sfml::graphics::{Color, Texture};
+use crate::prelude::*;
 
 #[derive(Clone, Copy)]
 pub enum Tile {

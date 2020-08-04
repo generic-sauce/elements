@@ -1,5 +1,4 @@
-use sfml::system::Vector2f;
-use sfml::window::joystick;
+use crate::prelude::*;
 
 fn get_keyboard_direction(index: u32) -> Vector2f {
 	let mut direction = Vector2f::new(0.0, 0.0);

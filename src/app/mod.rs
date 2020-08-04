@@ -1,8 +1,4 @@
-use sfml::graphics::{RenderWindow, Color, RenderTarget};
-use sfml::window::{Style, VideoMode, Event, Key};
-
-use crate::world::World;
-use crate::texture_state::TextureState;
+use crate::prelude::*;
 
 pub struct App {
 	window: RenderWindow,

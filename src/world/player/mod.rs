@@ -1,6 +1,6 @@
 mod render;
 
-use sfml::system::Vector2f;
+use crate::prelude::*;
 
 pub struct Player {
 	// position is the center of the player

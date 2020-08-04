@@ -1,8 +1,4 @@
-use sfml::system::{Vector2f};
-use sfml::graphics::{RenderWindow, RenderStates, RenderTarget, RectangleShape, Transformable};
-
-use crate::texture_state::{TextureId, TextureState};
-use super::Player;
+use crate::prelude::*;
 
 impl Player {
     pub fn render(&mut self, w: &mut RenderWindow, texture_state: &TextureState) {

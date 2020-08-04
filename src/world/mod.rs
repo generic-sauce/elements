@@ -1,13 +1,7 @@
-mod player;
-mod tilemap;
+pub mod player;
+pub mod tilemap;
 
-use sfml::system::Vector2f;
-use sfml::graphics::RenderWindow;
-
-use crate::input::{Input, AdaptiveInput};
-use crate::world::player::Player;
-use crate::world::tilemap::TileMap;
-use crate::texture_state::TextureState;
+use crate::prelude::*;
 
 pub struct World {
 	pub players: [Player; 2],
