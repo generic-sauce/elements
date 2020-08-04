@@ -26,7 +26,7 @@ impl Player {
 
 	pub fn tick(&mut self) {
         self.speed *= 0.9;
-		self.speed += self.direction;
+		self.speed += self.direction * 0.05;
 		self.position += self.speed;
 	}
 }

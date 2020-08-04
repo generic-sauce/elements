@@ -1,3 +1,5 @@
+mod render;
+
 use sfml::system::Vector2i;
 use sfml::graphics::{Color, Texture};
 
@@ -9,6 +11,7 @@ pub enum Tile {
 
 pub struct TileMap {
 	tiles: Vec<Tile>,
+    size: Vector2i,
 }
 
 impl TileMap {
@@ -31,7 +34,8 @@ impl TileMap {
 		}
 
 		TileMap {
-			tiles
+			tiles,
+            size: s,
 		}
 	}
 
