@@ -1,3 +1,4 @@
+mod input;
 mod app;
 mod world;
 

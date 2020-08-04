@@ -3,16 +3,19 @@ mod player;
 use sfml::system::Vector2f;
 use sfml::graphics::RenderWindow;
 
+use crate::input::{Input, KeyboardInput};
 use crate::world::player::Player;
 
 pub struct World {
 	pub players: [Player; 2],
+    pub input: Box<dyn Input>,
 }
 
 impl World {
 	pub fn new() -> World {
 		World {
 			players: [Player::new(Vector2f::new(0.0, 0.0)), Player::new(Vector2f::new(20.0, 0.0))],
+			input: Box::new(KeyboardInput::new()),
 		}
 	}
 
@@ -31,20 +34,6 @@ impl World {
 	}
 
 	fn handle_local_player(&mut self) {
-		let mut direction = Vector2f::new(0.0, 0.0);
-		if sfml::window::Key::W.is_pressed() {
-			direction.y += 1.0;
-		}
-		if sfml::window::Key::S.is_pressed() {
-			direction.y -= 1.0;
-		}
-
-		if sfml::window::Key::D.is_pressed() {
-			direction.x += 1.0;
-		}
-		if sfml::window::Key::A.is_pressed() {
-			direction.x -= 1.0;
-		}
-        self.players[0].direction = direction;
+		self.players[0].direction = self.input.get_direction();
 	}
 }
