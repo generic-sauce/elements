@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-fn get_keyboard_direction(index: u32) -> Vector2f {
-	let mut direction = Vector2f::new(0.0, 0.0);
+fn get_keyboard_direction(index: u32) -> Vec2f {
+	let mut direction = Vec2f::new(0.0, 0.0);
 	if index == 0 {
 		if sfml::window::Key::W.is_pressed() {
 			direction.y += 1.0;
@@ -34,18 +34,18 @@ fn get_keyboard_direction(index: u32) -> Vector2f {
 	direction
 }
 
-fn get_joystick_direction(index: u32) -> Vector2f {
+fn get_joystick_direction(index: u32) -> Vec2f {
 	if !joystick::is_connected(index) {
-		return Vector2f::new(0.0, 0.0);
+		return Vec2f::new(0.0, 0.0);
 	}
-	Vector2f::new(
+	Vec2f::new(
 		joystick::axis_position(index, joystick::Axis::X) * 0.01,
 		joystick::axis_position(index, joystick::Axis::Y) * -0.01,
 	)
 }
 
 pub trait Input {
-	fn get_direction(&self) -> Vector2f;
+	fn get_direction(&self) -> Vec2f;
 	fn is_connected(&self) -> bool {
 		true
 	}
@@ -63,7 +63,7 @@ impl KeyboardInput {
 }
 
 impl Input for KeyboardInput {
-	fn get_direction(&self) -> Vector2f {
+	fn get_direction(&self) -> Vec2f {
 		get_keyboard_direction(self.index)
 	}
 }
@@ -80,7 +80,7 @@ impl GamePadInput {
 }
 
 impl Input for GamePadInput {
-	fn get_direction(&self) -> Vector2f {
+	fn get_direction(&self) -> Vec2f {
 		get_joystick_direction(self.index)
 	}
 
@@ -100,7 +100,7 @@ impl AdaptiveInput {
 }
 
 impl Input for AdaptiveInput {
-	fn get_direction(&self) -> Vector2f {
+	fn get_direction(&self) -> Vec2f {
 		let mut direction = get_keyboard_direction(self.index);
 		direction += get_joystick_direction(self.index);
 		if direction.x < -1.0 {

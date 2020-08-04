@@ -10,7 +10,7 @@ pub enum Tile {
 
 pub struct TileMap {
 	tiles: Vec<Tile>,
-    size: Vector2u,
+    size: Vec2u,
 }
 
 impl TileMap {
@@ -33,15 +33,15 @@ impl TileMap {
 
 		TileMap {
 			tiles,
-            size: s,
+            size: s.into(),
 		}
 	}
 
-	pub fn get_mut(&mut self, v: Vector2u) -> &'_ mut Tile {
+	pub fn get_mut(&mut self, v: Vec2u) -> &'_ mut Tile {
 		&mut self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 
-	pub fn get(&self, v: Vector2u) -> Tile {
+	pub fn get(&self, v: Vec2u) -> Tile {
 		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 }
