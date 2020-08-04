@@ -37,10 +37,12 @@ impl TileMap {
 		}
 	}
 
+	#[allow(unused)]
 	pub fn get_mut(&mut self, v: Vec2u) -> &'_ mut Tile {
 		&mut self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 
+	#[allow(unused)]
 	pub fn get(&self, v: Vec2u) -> Tile {
 		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}

@@ -1,10 +1,5 @@
 use crate::prelude::*;
 
-use crate::texture_state::TextureState;
-use super::TileMap;
-use super::Tile;
-use crate::context::Context;
-
 impl TileMap {
     pub fn draw(&mut self, context: &Context) {
         for (index, tile) in self.tiles.iter().enumerate() {

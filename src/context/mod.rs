@@ -17,8 +17,8 @@ impl<'a> Context<'a> {
 
     pub fn draw_sprite(&self, position: Vec2f, radius: Vec2f, color: Color, texture_id: Option<TextureId>) {
         let mut shape = RectangleShape::new();
-        if let Some(textureId) = texture_id {
-            shape.set_texture(self.texture_state.get_texture(textureId), true);
+        if let Some(texture_id) = texture_id {
+            shape.set_texture(self.texture_state.get_texture(texture_id), true);
         }
         shape.set_size(radius * 2.0);
         shape.set_origin(radius);
