@@ -13,7 +13,7 @@ impl World {
 	pub fn new() -> World {
 		World {
 			players: [Player::new(Vec2f::new(0.0, 0.0)), Player::new(Vec2f::new(20.0, 0.0))],
-			tilemap: TileMap::new("res/map/map01.png"),
+			tilemap: TileMap::new("res/map/map02.png"),
 			input: Box::new(AdaptiveInput::new(0)),
 		}
 	}
