@@ -30,7 +30,7 @@ impl App {
 			}
 
 			self.tick();
-			self.render();
+			self.draw();
 
 			self.window.display();
 			self.window.clear(Color::rgb(0, 0, 0));
@@ -43,7 +43,8 @@ impl App {
 		self.world.tick(&mut self.inputs);
 	}
 
-	pub fn render(&mut self) {
-		self.world.render(&mut self.window, &self.texture_state);
+	pub fn draw(&mut self) {
+        let context = Context::new(&mut self.window, &self.texture_state);
+		self.world.draw(&context);
 	}
 }

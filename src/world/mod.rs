@@ -25,10 +25,10 @@ impl World {
 		}
 	}
 
-	pub fn render(&mut self, w: &mut RenderWindow, texture_state: &TextureState) {
-        self.tilemap.render(w, texture_state);
+	pub fn draw(&mut self, context: &Context) {
+        self.tilemap.draw(context);
 		for p in self.players.iter_mut() {
-			p.render(w, texture_state);
+			p.draw(context);
 		}
 	}
 
