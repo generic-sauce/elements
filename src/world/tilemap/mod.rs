@@ -1,6 +1,6 @@
 mod render;
 
-use sfml::system::Vector2i;
+use sfml::system::Vector2u;
 use sfml::graphics::{Color, Texture};
 
 #[derive(Clone, Copy)]
@@ -11,16 +11,15 @@ pub enum Tile {
 
 pub struct TileMap {
 	tiles: Vec<Tile>,
-    size: Vector2i,
+    size: Vector2u,
 }
 
 impl TileMap {
 	pub fn new(filename: &str) -> TileMap {
-		let s = TileMap::size();
-		let mut tiles = Vec::with_capacity((s.x * s.y) as usize);
-
 		let texture = Texture::from_file(filename).unwrap();
 		let image = texture.copy_to_image().unwrap();
+        let s = image.size();
+		let mut tiles = Vec::with_capacity((s.x * s.y) as usize);
 
 		for y in 0..s.y {
 			for x in 0..s.x {
@@ -39,15 +38,11 @@ impl TileMap {
 		}
 	}
 
-	pub fn size() -> Vector2i {
-		Vector2i::new(20, 20)
+	pub fn get_mut(&mut self, v: Vector2u) -> &'_ mut Tile {
+		&mut self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 
-	pub fn get_mut(&mut self, v: Vector2i) -> &'_ mut Tile {
-		&mut self.tiles[(v.x + v.y * TileMap::size().x) as usize]
-	}
-
-	pub fn get(&self, v: Vector2i) -> Tile {
-		self.tiles[(v.x + v.y * TileMap::size().x) as usize]
+	pub fn get(&self, v: Vector2u) -> Tile {
+		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 }
