@@ -22,7 +22,7 @@ impl TileMap {
 		for y in 0..s.y {
 			for x in 0..s.x {
 				let tile = match image.pixel_at(x as u32, y as u32) {
-					Color { r, g, b, a } => Tile::Void,
+					Color { r, g, b, a } => Tile::Void, // TODO do anything else than void!
 				};
 				tiles.push(tile);
 			}
