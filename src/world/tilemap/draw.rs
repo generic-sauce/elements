@@ -6,7 +6,7 @@ use super::Tile;
 use crate::context::Context;
 
 impl TileMap {
-    pub fn render(&mut self, context: &Context) {
+    pub fn draw(&mut self, context: &Context) {
         for (index, tile) in self.tiles.iter().enumerate() {
             let index = index as u32;
             let position = Vector2f::new((index % self.size.x) as f32, (index / self.size.x) as f32);
