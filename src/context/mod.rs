@@ -1,9 +1,4 @@
-use sfml::system::{Vector2f};
-use sfml::graphics::{RenderWindow, Color, RenderStates, RenderTarget, Shape, RectangleShape, Texture, Transformable, Transform};
-
-use crate::texture_state::{TextureId, TextureState};
-use crate::world::player::Player;
-use crate::world::tilemap::TileMap;
+use crate::prelude::*;
 
 pub struct Context<'a> {
     window: &'a mut RenderWindow,
