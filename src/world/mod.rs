@@ -12,7 +12,7 @@ pub struct World {
 impl World {
 	pub fn new() -> World {
 		World {
-			players: [Player::new(Vec2i::new(38 * TILESIZE, 45 * TILESIZE)), Player::new(Vec2i::new(64 * TILESIZE, 32 * TILESIZE))],
+			players: [Player::new(Vec2i::new(38 * TILESIZE, 45 * TILESIZE)), Player::new(Vec2i::new(64 * TILESIZE, 40 * TILESIZE))],
 			tilemap: TileMap::new("res/map/map02.png"),
 			input: Box::new(AdaptiveInput::new(0)),
 		}
