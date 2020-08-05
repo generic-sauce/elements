@@ -50,7 +50,7 @@ impl<'a> Context<'a> {
                 fluids.push((f32::sin(n2) * 255.0) as u8);
                 fluids.push((f32::sin(n3) * 255.0) as u8);
                 fluids.push(0 as u8);
-                fluids.push((n1 < 0.5) as u8);
+                fluids.push((n1 < 0.3) as u8);
             }
         }
 
@@ -60,7 +60,6 @@ impl<'a> Context<'a> {
         let x: *mut Texture = &mut *texture_sfbox;
         let texture: &'static mut Texture;
         unsafe { texture = &mut *x; }
-        mem::forget(texture_sfbox);
 
         let mut shader = shader;
         shader.set_uniform_texture("fluid_tex", &texture);
@@ -74,7 +73,5 @@ impl<'a> Context<'a> {
         rect.set_texture(&texture, true);
         rect.set_size(Vector2f::new(size.x as f32, size.y as f32));
         self.window.draw_rectangle_shape(&rect, states);
-
-        unsafe { drop(Box::from_raw(x)); }
     }
 }
