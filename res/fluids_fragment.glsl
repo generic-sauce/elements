@@ -7,7 +7,7 @@ uniform sampler2D fluid_tex;
 
 in vec2 uv;
 
-out vec4 gl_FragColor;
+out vec4 color;
 
 float n21(vec2 uv) {
 	return fract(9232.43 * sin(dot(uv, vec2(123.42, 642.332))));
@@ -44,5 +44,5 @@ void main() {
 	c += vec3(.1, .2, .5) * (2. - wave);
 
 	float alpha = smoothstep(r/4, r/5, d);
-	gl_FragColor = vec4(c, alpha);
+	color = vec4(c, alpha);
 }
