@@ -1,5 +1,5 @@
-#version 300 es
-precision mediump float;
+#version 130
+/* precision mediump float; */
 
 uniform float elapsed_time;
 uniform vec2 fluid_tex_size;

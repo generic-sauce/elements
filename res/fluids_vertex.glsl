@@ -1,7 +1,7 @@
-/* #version 300 es */
+#version 130
 /* precision mediump float; */
 
-varying vec2 uv;
+out vec2 uv;
 
 void main()
 {
