@@ -43,6 +43,6 @@ void main() {
 	float wave = smoothstep(1., 0., d) * abs(sin(d - t));
 	c += vec3(.1, .2, .5) * (2. - wave);
 
-	float alpha = smoothstep(.5, .0, d);
+	float alpha = smoothstep(r/4, r/5, d);
 	gl_FragColor = vec4(c, alpha);
 }
