@@ -36,7 +36,7 @@ void main() {
 			float team_ = tile.b;
 			if (tile.a > 0.) {
 				float l = length(glv);
-				team += (team_ - .5) * 2. * max(0., r*.8 - l);
+				team += (team_ - .5) * max(0., r - l);
 				d = smin(d, l, r);
 			}
 		}
@@ -45,10 +45,11 @@ void main() {
 	team = clamp(team * .5, -1., 1.) * .5 + .5;
 	float team0 = pow(team, 3.);
 	float team1 = pow(1. - team, 3.);
-	float teams = pow(team0 + team1, 3.) * .5;
+	float teams = pow(team0 + team1, 5.) * .5;
 
 	float t = sin((uv.y + uv.x * -.7) * 50.) + elapsed_time;
 	float wave = smoothstep(1., 0., d) * abs(sin(d - t));
+	vec3 teams3 = vec3(team0, team1, teams);
 	c += vec3(team0, teams, team1) * (2. - wave);
 
 	float alpha = smoothstep(r/4., r/5., d);
