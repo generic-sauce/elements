@@ -2,6 +2,7 @@ pub use crate::app::*;
 pub use crate::input::*;
 pub use crate::texture_state::*;
 pub use crate::shader_state::*;
+pub use crate::font_state::*;
 pub use crate::world::*;
 pub use crate::world::player::*;
 pub use crate::world::tilemap::*;

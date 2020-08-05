@@ -4,15 +4,22 @@ pub struct Context<'a> {
     window: &'a mut RenderWindow,
     texture_state: &'a TextureState,
     shader_state: &'a mut ShaderState,
+    font_state: &'a FontState,
     tilemap_size: Vec2u,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(window: &'a mut RenderWindow, texture_state: &'a TextureState, shader_state: &'a mut ShaderState, tilemap_size: Vec2u) -> Context<'a> {
+    pub fn new(window: &'a mut RenderWindow,
+        texture_state: &'a TextureState,
+        shader_state: &'a mut ShaderState,
+        font_state: &'a FontState,
+        tilemap_size: Vec2u) -> Context<'a>
+    {
         Context {
             window,
             texture_state,
             shader_state,
+            font_state,
             tilemap_size,
         }
     }
@@ -74,7 +81,7 @@ impl<'a> Context<'a> {
     }
 
     pub fn draw_text(&self, position: Vec2f, size: u32, text: &str) {
-        let font = Font::from_file("res/dashing_unicorn.ttf").unwrap();
+        let font = self.font_state.get_font(FontId::DefaultFont);
         let mut text = Text::new(text, &font, size);
         text.set_position(position);
         self.window.draw_text(&text, RenderStates::default());

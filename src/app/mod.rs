@@ -5,6 +5,7 @@ pub struct App {
 	world: World,
 	texture_state: TextureState,
 	shader_state: ShaderState,
+	font_state: FontState,
 	inputs: [Box<dyn Input>; 2],
 }
 
@@ -16,6 +17,7 @@ impl App {
 			world: World::new(),
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
+            font_state: FontState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))]
 		}
 	}
@@ -47,8 +49,8 @@ impl App {
 	}
 
 	pub fn draw(&mut self) {
-        let mut context = Context::new(&mut self.window, &self.texture_state, &mut self.shader_state, self.world.tilemap.size);
+        let mut context = Context::new(&mut self.window, &self.texture_state, &mut self.shader_state, &self.font_state, self.world.tilemap.size);
 		self.world.draw(&mut context);
-        context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, "Draw some text (but load the font every frame LoL)");
+        context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, "Draw some text LoL");
 	}
 }
