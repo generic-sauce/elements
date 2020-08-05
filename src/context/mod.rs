@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use std::mem;
 
 pub struct Context<'a> {
     window: &'a mut RenderWindow,
@@ -36,23 +37,44 @@ impl<'a> Context<'a> {
     }
 
     pub fn draw_fluids(&self) {
-        let shader = Shader::from_file(Some("res/fluids_vertex.glsl"), None, Some("res/fluids_fragment.glsl"));
-        if let Some(mut shader) = shader {
-            let mut fluids = Vec::new();
-            fluids.push(Vec2f::new(4.0, 4.0));
-            fluids.push(Vec2f::new(9.0, 4.0));
-            fluids.push(Vec2f::new(7.0, 8.0));
+        let shader: Option<Shader<'static>> = Shader::from_file(Some("res/fluids_vertex.glsl"), None, Some("res/fluids_fragment.glsl"));
+        let shader: Shader<'static> = if let Some(shader) = shader { shader } else { return; };
 
-            shader.set_uniform_texture("fluid_tex", self.texture_state.get_texture(TextureId::PlayerIdle1));
-
-            let mut states = RenderStates::default();
-            states.shader = Some(&shader);
-
-            let size = self.window.size();
-            let mut rect = RectangleShape::default();
-            rect.set_texture(self.texture_state.get_texture(TextureId::PlayerIdle1), true);
-            rect.set_size(Vector2f::new(size.x as f32, size.y as f32 / 2.0));
-            self.window.draw_rectangle_shape(&rect, states);
+        let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
+        let mut fluids = Vec::new();
+        for y in 0..self.tilemap_size.y {
+            for x in 0..self.tilemap_size.x {
+                let n1 = n21(Vec2f::new(x as f32, y as f32));
+                let n2 = n21(Vec2f::new(x as f32 + 10.0, y as f32 - 20.0));
+                let n3 = n21(Vec2f::new(y as f32 + 10.0, x as f32 - 20.0));
+                fluids.push((f32::sin(n2) * 255.0) as u8);
+                fluids.push((f32::sin(n3) * 255.0) as u8);
+                fluids.push(0 as u8);
+                fluids.push((n1 < 0.5) as u8);
+            }
         }
+
+        // create 
+        let image = Image::create_from_pixels(self.tilemap_size.x, self.tilemap_size.y, &fluids).unwrap();
+        let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
+        let x: *mut Texture = &mut *texture_sfbox;
+        let texture: &'static mut Texture;
+        unsafe { texture = &mut *x; }
+        mem::forget(texture_sfbox);
+
+        let mut shader = shader;
+        shader.set_uniform_texture("fluid_tex", &texture);
+        shader.set_uniform_vec2("fluid_tex_size", self.tilemap_size.to_f().into());
+
+        let mut states = RenderStates::default();
+        states.shader = Some(&shader);
+
+        let size = self.window.size();
+        let mut rect = RectangleShape::default();
+        rect.set_texture(&texture, true);
+        rect.set_size(Vector2f::new(size.x as f32, size.y as f32));
+        self.window.draw_rectangle_shape(&rect, states);
+
+        unsafe { drop(Box::from_raw(x)); }
     }
 }
