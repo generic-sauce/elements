@@ -4,7 +4,7 @@ use crate::prelude::*;
 
 // The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
 pub const TILESIZE: i32 = 256; // TODO move this where it belongs
-pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 3 * TILESIZE); // TODO set correct player size
+pub const PLAYER_SIZE: Vec2i = Vec2i::new(4 * TILESIZE, 6 * TILESIZE);
 
 pub struct Player {
 	pub left_bot: Vec2i,
