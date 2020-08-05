@@ -1,4 +1,8 @@
-#version 300 es
+#version 130
+
+// TODO un-comment, and reset shader version to 300 es
+
+/*
 precision mediump float;
 
 uniform float elapsed_time;
@@ -17,8 +21,10 @@ float smin(float a, float b, float k) {
     float h = clamp(0.5+0.5*(b-a)/k, 0.0, 1.0);
     return mix(b, a, h) - k*h*(1.0-h);
 }
+*/
 
 void main() {
+/*
 	vec3 c = vec3(0);
 
 	vec2 id = floor(uv * fluid_tex_size);
@@ -45,4 +51,5 @@ void main() {
 
 	float alpha = smoothstep(r/4., r/5., d);
 	color = vec4(c, alpha);
+*/
 }
