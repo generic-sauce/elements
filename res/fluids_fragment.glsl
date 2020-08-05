@@ -25,6 +25,7 @@ void main() {
 	vec2 lv = fract(uv * fluid_tex_size) - .5;
 	float r = 2.;
 	float d = r * .5;
+	float team = 0.;
 	for (float x = -r; x < r+1.; ++x) {
 		for (float y = -r; y < r+1.; ++y) {
 			vec2 o = vec2(x, y);
@@ -32,16 +33,23 @@ void main() {
 			vec2 guv = gid / fluid_tex_size;
 			vec4 tile = texture(fluid_tex, guv);
 			vec2 glv = lv - o + (tile.xy - .5);
+			float team_ = tile.b;
 			if (tile.a > 0.) {
 				float l = length(glv);
+				team += (team_ - .5) * 2. * max(0., r*.8 - l);
 				d = smin(d, l, r);
 			}
 		}
 	}
 
+	team = clamp(team * .5, -1., 1.) * .5 + .5;
+	float team0 = pow(team, 3.);
+	float team1 = pow(1. - team, 3.);
+	float teams = pow(team0 + team1, 3.) * .5;
+
 	float t = sin((uv.y + uv.x * -.7) * 50.) + elapsed_time;
 	float wave = smoothstep(1., 0., d) * abs(sin(d - t));
-	c += vec3(.1, .2, .5) * (2. - wave);
+	c += vec3(team0, teams, team1) * (2. - wave);
 
 	float alpha = smoothstep(r/4., r/5., d);
 	color = vec4(c, alpha);

@@ -59,9 +59,10 @@ impl<'a> Context<'a> {
                 let n1 = n21(Vec2f::new(x as f32, y as f32));
                 let n2 = n21(Vec2f::new(x as f32 + 10.0, y as f32 - 20.0));
                 let n3 = n21(Vec2f::new(y as f32 + 10.0, x as f32 - 20.0));
+                let n4 = n21(Vec2f::new(x as f32 * 324.23, 0.0));
                 fluids.push((f32::sin(n2 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
                 fluids.push((f32::sin(n3 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
-                fluids.push(255 as u8);
+                fluids.push((n4 < 0.5) as u8 * 255);
                 fluids.push((n1 < 0.5 * (y as f32 / self.tilemap_size.y as f32).powf(5.0)) as u8);
             }
         }
