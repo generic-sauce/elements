@@ -42,7 +42,6 @@ void main() {
 		}
 	}
 
-	/* c += n21(i); */
 	c += smoothstep(.5, .0, d);
 
 	gl_FragColor = vec4(c, .1);

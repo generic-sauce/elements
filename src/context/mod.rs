@@ -1,17 +1,18 @@
 use crate::prelude::*;
-use std::mem;
 
 pub struct Context<'a> {
     window: &'a mut RenderWindow,
     texture_state: &'a TextureState,
+    shader_state: &'a mut ShaderState,
     tilemap_size: Vec2u,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(window: &'a mut RenderWindow, texture_state: &'a TextureState, tilemap_size: Vec2u) -> Context<'a> {
+    pub fn new(window: &'a mut RenderWindow, texture_state: &'a TextureState, shader_state: &'a mut ShaderState, tilemap_size: Vec2u) -> Context<'a> {
         Context {
             window,
             texture_state,
+            shader_state,
             tilemap_size,
         }
     }
@@ -36,9 +37,8 @@ impl<'a> Context<'a> {
         self.window.draw_rectangle_shape(&shape, RenderStates::default());
     }
 
-    pub fn draw_fluids(&self) {
-        let shader: Option<Shader<'static>> = Shader::from_file(Some("res/fluids_vertex.glsl"), None, Some("res/fluids_fragment.glsl"));
-        let shader: Shader<'static> = if let Some(shader) = shader { shader } else { return; };
+    pub fn draw_fluids(&mut self) {
+        let shader = &mut self.shader_state.get_shader(ShaderId::FluidShader);
 
         let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
         let mut fluids = Vec::new();
@@ -54,15 +54,13 @@ impl<'a> Context<'a> {
             }
         }
 
-        // create 
         let image = Image::create_from_pixels(self.tilemap_size.x, self.tilemap_size.y, &fluids).unwrap();
         let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
         let x: *mut Texture = &mut *texture_sfbox;
         let texture: &'static mut Texture;
         unsafe { texture = &mut *x; }
 
-        let mut shader = shader;
-        shader.set_uniform_texture("fluid_tex", &texture);
+        shader.set_uniform_texture("fluid_tex", texture);
         shader.set_uniform_vec2("fluid_tex_size", self.tilemap_size.to_f().into());
 
         let mut states = RenderStates::default();

@@ -4,6 +4,7 @@ pub struct App {
 	window: RenderWindow,
 	world: World,
 	texture_state: TextureState,
+	shader_state: ShaderState,
 	inputs: [Box<dyn Input>; 2],
 }
 
@@ -14,6 +15,7 @@ impl App {
 			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &context_settings),
 			world: World::new(),
 			texture_state: TextureState::new(),
+			shader_state: ShaderState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))]
 		}
 	}
@@ -45,7 +47,7 @@ impl App {
 	}
 
 	pub fn draw(&mut self) {
-        let context = Context::new(&mut self.window, &self.texture_state, self.world.tilemap.size);
-		self.world.draw(&context);
+        let mut context = Context::new(&mut self.window, &self.texture_state, &mut self.shader_state, self.world.tilemap.size);
+		self.world.draw(&mut context);
 	}
 }
