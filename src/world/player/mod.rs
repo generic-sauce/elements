@@ -25,13 +25,45 @@ impl Player {
 	}
 
 	fn apply_forces(&mut self, input: &dyn Input) {
+		// user input
 		if !input.is_connected() { println!("joystick not connected"); }
-		self.velocity += input.get_direction().to_i() * 20;
+		self.velocity += (input.get_direction() * 20.).to_i();
+
+		// gravity
 		self.velocity.y -= 2;
+
+		// drag
+		self.velocity -= self.velocity / 20;
 	}
 
 	fn move_by_velocity(&mut self, t: &TileMap) {
-		self.velocity -= self.velocity / 10;
-		self.left_bot += self.velocity;
+		let old_lb = self.left_bot;
+		let n = self.velocity.x.abs() + self.velocity.y.abs();
+
+		for i in 0..n {
+			let lb = old_lb + self.velocity * i / n;
+			if is_colliding(lb, t) {
+				self.velocity = 0.into(); // TODO nicely reduce velocity!
+				break;
+			}
+			else { self.left_bot = lb; }
+		}
 	}
+
+}
+
+fn is_colliding(left_bot: Vec2i, t: &TileMap) -> bool {
+	let x_min = left_bot.x / TILESIZE;
+	let x_max = (left_bot.x + PLAYER_SIZE.x - 1) / TILESIZE + 1;
+
+	let y_min = left_bot.y / TILESIZE;
+	let y_max = (left_bot.y + PLAYER_SIZE.y - 1) / TILESIZE + 1;
+
+	// TODO write this using .any()?
+	for x in x_min..=x_max {
+		for y in y_min..=y_max {
+			if t.get((x as u32, y as u32).into()).is_solid() { return true; }
+		}
+	}
+	false
 }

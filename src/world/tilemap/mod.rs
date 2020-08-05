@@ -47,3 +47,12 @@ impl TileMap {
 		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 }
+
+impl Tile {
+	pub fn is_solid(self) -> bool {
+		match self {
+			Tile::Void => false,
+			Tile::Ground => true,
+		}
+	}
+}
