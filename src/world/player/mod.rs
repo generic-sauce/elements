@@ -37,6 +37,8 @@ impl Player {
 	}
 
 	fn move_by_velocity(&mut self, t: &TileMap) {
+		assert!(!is_colliding(self.left_bot, t));
+
 		let old_lb = self.left_bot;
 		let n = self.velocity.x.abs() + self.velocity.y.abs();
 
