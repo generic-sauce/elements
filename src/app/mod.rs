@@ -49,5 +49,6 @@ impl App {
 	pub fn draw(&mut self) {
         let mut context = Context::new(&mut self.window, &self.texture_state, &mut self.shader_state, self.world.tilemap.size);
 		self.world.draw(&mut context);
+        context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, "Draw some text (but load the font every frame LoL)");
 	}
 }

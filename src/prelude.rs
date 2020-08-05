@@ -9,5 +9,5 @@ pub use crate::vec::*;
 pub use crate::context::Context;
 
 pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox};
-pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, Transformable, Shader, Sprite, Rect, IntRect, Image};
+pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, Transformable, Shader, Sprite, Rect, IntRect, Image, Text, Font};
 pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};

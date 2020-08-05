@@ -50,7 +50,7 @@ impl<'a> Context<'a> {
                 fluids.push((f32::sin(n2) * 255.0) as u8);
                 fluids.push((f32::sin(n3) * 255.0) as u8);
                 fluids.push(0 as u8);
-                fluids.push((n1 < 0.3) as u8);
+                fluids.push((n1 < 0.1) as u8);
             }
         }
 
@@ -71,5 +71,12 @@ impl<'a> Context<'a> {
         rect.set_texture(&texture, true);
         rect.set_size(Vector2f::new(size.x as f32, size.y as f32));
         self.window.draw_rectangle_shape(&rect, states);
+    }
+
+    pub fn draw_text(&self, position: Vec2f, size: u32, text: &str) {
+        let font = Font::from_file("res/dashing_unicorn.ttf").unwrap();
+        let mut text = Text::new(text, &font, size);
+        text.set_position(position);
+        self.window.draw_text(&text, RenderStates::default());
     }
 }
