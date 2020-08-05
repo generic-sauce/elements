@@ -25,9 +25,15 @@ impl Player {
 	}
 
 	fn apply_forces(&mut self, input: &dyn Input) {
-		// user input
 		if !input.is_connected() { println!("joystick not connected"); }
-		self.velocity += (input.get_direction() * 20.).to_i();
+
+		// walk
+		self.velocity.x += input.get_direction().x as i32 * 20;
+
+		// jump
+		if input.get_direction().y > 0.0 && self.velocity.y <= 0 {
+			self.velocity.y = 200;
+		}
 
 		// gravity
 		self.velocity.y -= 2;
