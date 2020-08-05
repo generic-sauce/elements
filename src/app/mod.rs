@@ -9,9 +9,9 @@ pub struct App {
 
 impl App {
 	pub fn new() -> App {
-        let contextSettings = ContextSettings::default();
+        let context_settings = ContextSettings::default();
 		App {
-			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &contextSettings),
+			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &context_settings),
 			world: World::new(),
 			texture_state: TextureState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))]

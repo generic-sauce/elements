@@ -30,7 +30,7 @@ impl<T> From<Vector2<T>> for Vec2t<T> {
 
 #[allow(dead_code)]
 impl Vec2f {
-	pub fn to_i(self) -> Vec2i { self.map(|x| x as i32) }
+	pub fn to_i(self) -> Vec2i { self.map(|i| i as i32) }
 	pub fn to_u(self) -> Vec2u { self.map(|x| x as u32) }
 }
 
