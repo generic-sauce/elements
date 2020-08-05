@@ -19,9 +19,8 @@ impl World {
 	}
 
 	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
-		self.handle_player_inputs(inputs);
-		for p in self.players.iter_mut() {
-			p.tick();
+		for (p, input) in self.players.iter_mut().zip(inputs.iter()) {
+			p.tick(&self.tilemap, input.as_ref());
 		}
 	}
 
@@ -31,16 +30,5 @@ impl World {
 			p.draw(context);
 		}
         context.draw_fluids();
-	}
-
-	fn handle_player_inputs(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
-		for (player, input) in self.players.iter_mut().zip(inputs.iter()) {
-			player.velocity += input.get_direction().to_i(); // TODO make nicer
-		}
-		if !self.input.is_connected() {
-			println!("joystick not connected");
-		}
-
-		// self.players[0].velocity += self.input.get_direction().to_i(); // TODO isn't that redundant?
 	}
 }

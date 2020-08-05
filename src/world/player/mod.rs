@@ -19,8 +19,19 @@ impl Player {
 		}
 	}
 
-	pub fn tick(&mut self) {
-        self.velocity -= self.velocity / 10;
+	pub fn tick(&mut self, t: &TileMap, input: &dyn Input) {
+		self.apply_forces(input);
+		self.move_by_velocity(t);
+	}
+
+	fn apply_forces(&mut self, input: &dyn Input) {
+		if !input.is_connected() { println!("joystick not connected"); }
+		self.velocity += input.get_direction().to_i() * 20;
+		self.velocity.y -= 2;
+	}
+
+	fn move_by_velocity(&mut self, t: &TileMap) {
+		self.velocity -= self.velocity / 10;
 		self.left_bot += self.velocity;
 	}
 }
