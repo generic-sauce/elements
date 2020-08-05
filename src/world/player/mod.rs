@@ -2,31 +2,25 @@ mod draw;
 
 use crate::prelude::*;
 
+// The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
+pub const TILESIZE: i32 = 256; // TODO move this where it belongs
+pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 3 * TILESIZE); // TODO set correct player size
+
 pub struct Player {
-	// position is the center of the player
-	pub position: Vec2f,
-	// size.x is the half width of the player and size.y is the half height of the player
-	pub size: Vec2f,
-	pub speed: Vec2f,
-	pub direction: Vec2f,
+	pub left_bot: Vec2i,
+	pub velocity: Vec2i,
 }
 
 impl Player {
-	pub fn new(position: Vec2f) -> Player {
+	pub fn new(left_bot: Vec2i) -> Player {
 		Player {
-			position,
-			size: Player::get_size(),
-			speed: Vec2f::new(0.0, 0.0),
-			direction: Vec2f::new(0.0, 0.0),
+			left_bot,
+			velocity: Vec2i::new(0, 0),
 		}
 	}
-    pub fn get_size() -> Vec2f {
-        Vec2f::new(2.0, 2.0)
-    }
 
 	pub fn tick(&mut self) {
-        self.speed *= 0.9;
-		self.speed += self.direction * 0.05;
-		self.position += self.speed;
+        self.velocity -= self.velocity / 10;
+		self.left_bot += self.velocity;
 	}
 }

@@ -12,7 +12,7 @@ pub struct World {
 impl World {
 	pub fn new() -> World {
 		World {
-			players: [Player::new(Vec2f::new(32.0, 32.0)), Player::new(Vec2f::new(64.0, 32.0))],
+			players: [Player::new(Vec2i::new(32 * TILESIZE, 32 * TILESIZE)), Player::new(Vec2i::new(64 * TILESIZE, 32 * TILESIZE))],
 			tilemap: TileMap::new("res/map/map02.png"),
 			input: Box::new(AdaptiveInput::new(0)),
 		}
@@ -35,11 +35,12 @@ impl World {
 
 	fn handle_player_inputs(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
 		for (player, input) in self.players.iter_mut().zip(inputs.iter()) {
-			player.direction = input.get_direction();
+			player.velocity += input.get_direction().to_i(); // TODO make nicer
 		}
 		if !self.input.is_connected() {
 			println!("joystick not connected");
 		}
-		self.players[0].direction = self.input.get_direction();
+
+		// self.players[0].velocity += self.input.get_direction().to_i(); // TODO isn't that redundant?
 	}
 }
