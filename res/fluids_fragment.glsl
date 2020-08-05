@@ -1,6 +1,7 @@
 #version 130
 /* precision mediump float; */
 
+uniform float elapsed_time;
 uniform vec2 fluid_tex_size;
 uniform sampler2D fluid_tex;
 
@@ -12,11 +13,9 @@ float n21(vec2 uv) {
 	return fract(9232.43 * sin(dot(uv, vec2(123.42, 642.332))));
 }
 
-// polynomial smooth min (k = 0.1);
-float smin( float a, float b, float k )
-{
-    float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
-    return mix( b, a, h ) - k*h*(1.0-h);
+float smin(float a, float b, float k) {
+    float h = clamp(0.5+0.5*(b-a)/k, 0.0, 1.0);
+    return mix(b, a, h) - k*h*(1.0-h);
 }
 
 void main() {
@@ -24,9 +23,8 @@ void main() {
 
 	vec2 id = floor(uv * fluid_tex_size);
 	vec2 lv = fract(uv * fluid_tex_size) - .5;
-	float d = 1.;
-
 	float r = 2.;
+	float d = r * .5;
 	for (float x = -r; x < r+1; ++x) {
 		for (float y = -r; y < r+1; ++y) {
 			vec2 o = vec2(x, y);

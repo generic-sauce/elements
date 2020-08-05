@@ -6,14 +6,18 @@ pub struct Context<'a> {
     shader_state: &'a mut ShaderState,
     font_state: &'a FontState,
     tilemap_size: Vec2u,
+    elapsed_time: Time,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(window: &'a mut RenderWindow,
+    pub fn new(
+        window: &'a mut RenderWindow,
         texture_state: &'a TextureState,
         shader_state: &'a mut ShaderState,
         font_state: &'a FontState,
-        tilemap_size: Vec2u) -> Context<'a>
+        tilemap_size: Vec2u,
+        elapsed_time: Time,
+        ) -> Context<'a>
     {
         Context {
             window,
@@ -21,6 +25,7 @@ impl<'a> Context<'a> {
             shader_state,
             font_state,
             tilemap_size,
+            elapsed_time,
         }
     }
 
@@ -54,8 +59,8 @@ impl<'a> Context<'a> {
                 let n1 = n21(Vec2f::new(x as f32, y as f32));
                 let n2 = n21(Vec2f::new(x as f32 + 10.0, y as f32 - 20.0));
                 let n3 = n21(Vec2f::new(y as f32 + 10.0, x as f32 - 20.0));
-                fluids.push((f32::sin(n2) * 255.0) as u8);
-                fluids.push((f32::sin(n3) * 255.0) as u8);
+                fluids.push((f32::sin(n2 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
+                fluids.push((f32::sin(n3 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
                 fluids.push(0 as u8);
                 fluids.push((n1 < 0.1) as u8);
             }
@@ -67,6 +72,7 @@ impl<'a> Context<'a> {
         let texture: &'static mut Texture;
         unsafe { texture = &mut *x; }
 
+        shader.set_uniform_float("elapsed_time", self.elapsed_time.as_seconds());
         shader.set_uniform_texture("fluid_tex", texture);
         shader.set_uniform_vec2("fluid_tex_size", self.tilemap_size.to_f().into());
 

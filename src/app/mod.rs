@@ -7,6 +7,7 @@ pub struct App {
 	shader_state: ShaderState,
 	font_state: FontState,
 	inputs: [Box<dyn Input>; 2],
+    clock: Clock,
 }
 
 impl App {
@@ -18,7 +19,8 @@ impl App {
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
             font_state: FontState::new(),
-			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))]
+			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
+            clock: Clock::start(),
 		}
 	}
 
@@ -49,8 +51,17 @@ impl App {
 	}
 
 	pub fn draw(&mut self) {
-        let mut context = Context::new(&mut self.window, &self.texture_state, &mut self.shader_state, &self.font_state, self.world.tilemap.size);
+        let mut context = Context::new(
+            &mut self.window,
+            &self.texture_state,
+            &mut self.shader_state,
+            &self.font_state,
+            self.world.tilemap.size,
+            self.clock.elapsed_time());
 		self.world.draw(&mut context);
         context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, "Draw some text LoL");
+        let mut elapsed_time = String::from("Elapsed time: ");
+        elapsed_time.push_str(&self.clock.elapsed_time().as_seconds().floor().to_string());
+        context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &elapsed_time);
 	}
 }
