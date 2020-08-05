@@ -25,11 +25,12 @@ impl World {
 		}
 	}
 
-	pub fn draw(&mut self, context: &Context) {
+	pub fn draw(&mut self, context: &mut Context) {
         self.tilemap.draw(context);
 		for p in self.players.iter_mut() {
 			p.draw(context);
 		}
+        context.draw_fluids();
 	}
 
 	fn handle_player_inputs(&mut self, inputs: &mut [Box<dyn Input>; 2]) {

@@ -9,8 +9,9 @@ pub struct App {
 
 impl App {
 	pub fn new() -> App {
+        let contextSettings = ContextSettings::default();
 		App {
-			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &Default::default()),
+			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &contextSettings),
 			world: World::new(),
 			texture_state: TextureState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))]
@@ -44,7 +45,7 @@ impl App {
 	}
 
 	pub fn draw(&mut self) {
-        let context = Context::new(&mut self.window, &self.texture_state, self.world.tilemap.size);
-		self.world.draw(&context);
+        let mut context = Context::new(&mut self.window, &self.texture_state, self.world.tilemap.size);
+		self.world.draw(&mut context);
 	}
 }

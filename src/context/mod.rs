@@ -34,4 +34,21 @@ impl<'a> Context<'a> {
 
         self.window.draw_rectangle_shape(&shape, RenderStates::default());
     }
+
+    pub fn draw_fluids(&mut self) {
+        let shader = Shader::from_file(Some("res/fluids_vertex.glsl"), None, Some("res/fluids_fragment.glsl"));
+        if let Some(mut shader) = shader {
+            // shader.set_uniform_float("c", 0.1);
+            shader.set_uniform_texture("fluid_tex", self.texture_state.get_texture(TextureId::PlayerIdle1));
+
+            let mut states = RenderStates::default();
+            states.shader = Some(&shader);
+
+            let size = self.window.size();
+            let mut rect = RectangleShape::default();
+            rect.set_texture(self.texture_state.get_texture(TextureId::PlayerIdle1), true);
+            rect.set_size(Vector2f::new(size.x as f32, size.y as f32 / 2.0));
+            self.window.draw_with_renderstates(&rect, states);
+        }
+    }
 }
