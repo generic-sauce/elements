@@ -35,10 +35,14 @@ impl<'a> Context<'a> {
         self.window.draw_rectangle_shape(&shape, RenderStates::default());
     }
 
-    pub fn draw_fluids(&mut self) {
+    pub fn draw_fluids(&self) {
         let shader = Shader::from_file(Some("res/fluids_vertex.glsl"), None, Some("res/fluids_fragment.glsl"));
         if let Some(mut shader) = shader {
-            // shader.set_uniform_float("c", 0.1);
+            let mut fluids = Vec::new();
+            fluids.push(Vec2f::new(4.0, 4.0));
+            fluids.push(Vec2f::new(9.0, 4.0));
+            fluids.push(Vec2f::new(7.0, 8.0));
+
             shader.set_uniform_texture("fluid_tex", self.texture_state.get_texture(TextureId::PlayerIdle1));
 
             let mut states = RenderStates::default();
@@ -48,7 +52,7 @@ impl<'a> Context<'a> {
             let mut rect = RectangleShape::default();
             rect.set_texture(self.texture_state.get_texture(TextureId::PlayerIdle1), true);
             rect.set_size(Vector2f::new(size.x as f32, size.y as f32 / 2.0));
-            self.window.draw_with_renderstates(&rect, states);
+            self.window.draw_rectangle_shape(&rect, states);
         }
     }
 }

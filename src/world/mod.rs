@@ -25,7 +25,7 @@ impl World {
 		}
 	}
 
-	pub fn draw(&mut self, context: &mut Context) {
+	pub fn draw(&mut self, context: &Context) {
         self.tilemap.draw(context);
 		for p in self.players.iter_mut() {
 			p.draw(context);
