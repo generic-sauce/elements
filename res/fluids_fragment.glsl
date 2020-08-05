@@ -1,5 +1,5 @@
-#version 130
-/* precision mediump float; */
+#version 300 es
+precision mediump float;
 
 uniform float elapsed_time;
 uniform vec2 fluid_tex_size;
@@ -25,8 +25,8 @@ void main() {
 	vec2 lv = fract(uv * fluid_tex_size) - .5;
 	float r = 2.;
 	float d = r * .5;
-	for (float x = -r; x < r+1; ++x) {
-		for (float y = -r; y < r+1; ++y) {
+	for (float x = -r; x < r+1.; ++x) {
+		for (float y = -r; y < r+1.; ++y) {
 			vec2 o = vec2(x, y);
 			vec2 gid = id + o;
 			vec2 guv = gid / fluid_tex_size;
@@ -43,6 +43,6 @@ void main() {
 	float wave = smoothstep(1., 0., d) * abs(sin(d - t));
 	c += vec3(.1, .2, .5) * (2. - wave);
 
-	float alpha = smoothstep(r/4, r/5, d);
+	float alpha = smoothstep(r/4., r/5., d);
 	color = vec4(c, alpha);
 }
