@@ -36,11 +36,13 @@ void main() {
 				float l = length(glv);
 				d = smin(d, l, r);
 			}
-			
 		}
 	}
 
-	c += smoothstep(.5, .0, d);
+	float t = sin((uv.y + uv.x * -.7) * 50.) + elapsed_time;
+	float wave = smoothstep(1., 0., d) * abs(sin(d - t));
+	c += vec3(.1, .2, .5) * (2. - wave);
 
-	gl_FragColor = vec4(c, .1);
+	float alpha = smoothstep(.5, .0, d);
+	gl_FragColor = vec4(c, alpha);
 }

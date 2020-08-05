@@ -62,7 +62,7 @@ impl<'a> Context<'a> {
                 fluids.push((f32::sin(n2 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
                 fluids.push((f32::sin(n3 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
                 fluids.push(0 as u8);
-                fluids.push((n1 < 0.1) as u8);
+                fluids.push((n1 < 0.5 * (y as f32 / self.tilemap_size.y as f32).powf(5.0)) as u8);
             }
         }
 
