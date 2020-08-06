@@ -4,7 +4,7 @@ pub use crate::texture_state::*;
 pub use crate::shader_state::*;
 pub use crate::font_state::*;
 pub use crate::world::*;
-pub use crate::world::player::*;
+pub use crate::world::player::{*, sensor::*};
 pub use crate::world::tilemap::*;
 pub use crate::vec::*;
 pub use crate::context::Context;
