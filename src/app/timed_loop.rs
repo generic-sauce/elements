@@ -8,10 +8,9 @@ pub struct TimedLoop {
 
 impl TimedLoop {
 	pub fn new(interval: Duration) -> TimedLoop {
-		let now = SystemTime::now();
 		TimedLoop {
 			interval,
-			current: now,
+			current: SystemTime::now(),
 		}
 	}
 

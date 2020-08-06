@@ -1,6 +1,7 @@
 pub mod timed_loop;
 
 use crate::prelude::*;
+use std::time::SystemTime;
 
 pub struct App {
 	window: RenderWindow,
@@ -10,6 +11,7 @@ pub struct App {
 	font_state: FontState,
 	inputs: [Box<dyn Input>; 2],
     clock: Clock,
+	last_frame_time: SystemTime,
 }
 
 impl App {
@@ -23,6 +25,7 @@ impl App {
             font_state: FontState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
             clock: Clock::start(),
+			last_frame_time: SystemTime::now(),
 		}
 	}
 
@@ -53,6 +56,7 @@ impl App {
 			if !self.window.is_open() {
 				break;
 			}
+
 		}
 	}
 
@@ -73,5 +77,11 @@ impl App {
         let mut elapsed_time = String::from("Elapsed time: ");
         elapsed_time.push_str(&self.clock.elapsed_time().as_seconds().floor().to_string());
         context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &elapsed_time);
+
+		// draw fps
+		let now = SystemTime::now();
+		let fps = 1000/now.duration_since(self.last_frame_time).expect("this should not happen :(").as_millis();
+		self.last_frame_time = now;
+		context.draw_text(Vec2f::new(20.0, 100.0), 32 as u32, &format!("fps: {}", fps));
 	}
 }
