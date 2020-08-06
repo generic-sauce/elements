@@ -8,35 +8,43 @@ impl Player {
 			let xroute = route(remaining_vel.x, self.left_bot.x, PLAYER_SIZE.x);
 			let yroute = route(remaining_vel.y, self.left_bot.y, PLAYER_SIZE.y);
 
-			assert!(xroute != 0);
-			assert!(yroute != 0);
-
-			if xroute.abs() > remaining_vel.x.abs() && yroute.abs() > remaining_vel.y.abs() { // if no more collisions can happen!
+			if xroute.abs() >= remaining_vel.x.abs() && yroute.abs() >= remaining_vel.y.abs() { // if no more collisions can happen!
 				self.left_bot += remaining_vel;
 				break;
-			} else if (xroute * self.velocity.y).abs() < (yroute * self.velocity.x).abs() { //    <->    xdist / self.velocity.x < ydist / self.velocity.y    <->    xtime < ytime
-				assert!(false);
-
+			} else if (xroute * self.velocity.y).abs() < (yroute * self.velocity.x).abs() { //    <->    xroute / self.velocity.x < yroute / self.velocity.y    <->    xtime < ytime
 				let ychange = xroute.abs() * remaining_vel.y / remaining_vel.x.abs();
 				let change = Vec2i::new(xroute, ychange);
 
-				remaining_vel -= change;
-				self.left_bot += change;
+				let change_ex = change + (remaining_vel.x.signum(), remaining_vel.y.signum());
+				if is_colliding(self.left_bot + change_ex, t) {
+					assert!(!is_colliding(self.left_bot + change, t));
 
-				// TODO this should only happen upon collision!
-				// remaining_vel.x = 0;
-				// self.velocity.x = 0;
+					remaining_vel -= change;
+					self.left_bot += change;
+
+					remaining_vel.x = 0;
+					self.velocity.x = 0;
+				} else {
+					remaining_vel -= change_ex;
+					self.left_bot += change_ex;
+				}
 			} else {
 				let xchange = yroute.abs() * remaining_vel.x / remaining_vel.y.abs();
 				let change = Vec2i::new(xchange, yroute);
 
-				assert!(change != 0.into());
+				let change_ex = change + (remaining_vel.x.signum(), remaining_vel.y.signum());
+				if is_colliding(self.left_bot + change_ex, t) {
+					assert!(!is_colliding(self.left_bot + change, t));
 
-				remaining_vel -= change;
-				self.left_bot += change;
+					remaining_vel -= change;
+					self.left_bot += change;
 
-				// remaining_vel.y = 0;
-				// self.velocity.y = 0;
+					remaining_vel.y = 0;
+					self.velocity.y = 0;
+				} else {
+					remaining_vel -= change_ex;
+					self.left_bot += change_ex;
+				}
 			}
 		}
 	}
@@ -58,11 +66,12 @@ fn is_colliding(left_bot: Vec2i, t: &TileMap) -> bool {
 	false
 }
 
+// returns the change required to touch, but not collide the next tile
 fn route(velocity: i32, min: i32, size: i32) -> i32 {
 	if velocity < 0 {
-		-(min % TILESIZE) - 1
+		-(min % TILESIZE)
 	} else {
 		let max = min + size - 1;
-		(max / TILESIZE) + 1
+		(TILESIZE-1) - (max % TILESIZE)
 	}
 }
