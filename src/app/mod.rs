@@ -1,7 +1,6 @@
 pub mod timed_loop;
 
 use crate::prelude::*;
-use std::time::SystemTime;
 
 pub struct App {
 	window: RenderWindow,
@@ -11,7 +10,6 @@ pub struct App {
 	font_state: FontState,
 	inputs: [Box<dyn Input>; 2],
 	clock: Clock,
-	last_frame_time: SystemTime,
 	smooth_fps: f32,
 	smooth_perf: f32,
 }
@@ -27,7 +25,6 @@ impl App {
 			font_state: FontState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
 			clock: Clock::start(),
-			last_frame_time: SystemTime::now(),
 			smooth_fps: 0.0,
 			smooth_perf: 0.0,
 		}
