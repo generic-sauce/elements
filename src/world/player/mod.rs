@@ -8,11 +8,11 @@ use crate::prelude::*;
 pub const TILESIZE: i32 = 256; // TODO move this where it belongs
 pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 6 * TILESIZE);
 
-const X_DRAG: i32 = 50;
-const MAX_X_VEL: i32 = 500;
-const JUMP_POWER: i32 = 1000;
-const GRAVITY: i32 = 160;
-const X_ACCELERATION: i32 = 200;
+const X_DRAG: i32 = 30;
+const MAX_X_VEL: i32 = 120;
+const JUMP_POWER: i32 = 300;
+const GRAVITY: i32 = 15;
+const X_ACCELERATION: i32 = 55;
 
 static GROUND_SENSOR: Sensor = Sensor {
 	left_bot_offset: Vec2i::new(0, -1),
@@ -40,11 +40,13 @@ impl Player {
 	fn apply_forces(&mut self, input: &dyn Input, t: &TileMap) {
 		if !input.is_connected() { println!("joystick not connected"); }
 
+		// drag
+		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
+		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
+
 		// walk
 		self.velocity.x += (input.get_direction().x * X_ACCELERATION as f32) as i32;
-		if self.velocity.x.abs() > MAX_X_VEL {
-			self.velocity.x = MAX_X_VEL * self.velocity.x.signum();
-		}
+		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
 		if self.is_grounded(t) && input.get_direction().y > 0.0 && self.velocity.y <= 0 {
@@ -53,10 +55,6 @@ impl Player {
 
 		// gravity
 		self.velocity.y -= GRAVITY;
-
-		// drag
-		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
-		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
 	}
 
 	fn is_grounded(&self, t: &TileMap) -> bool {
