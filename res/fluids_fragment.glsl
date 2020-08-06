@@ -26,15 +26,15 @@ void main() {
 	float r = 2.;
 	float d = r * .5;
 	float team = 0.;
-	for (float x = -r; x < r+1.; ++x) {
-		for (float y = -r; y < r+1.; ++y) {
+	for (float x = -r; x < r+.5; ++x) {
+		for (float y = -r; y < r+.5; ++y) {
 			vec2 o = vec2(x, y);
-			vec2 gid = id + o;
+			vec2 gid = floor(id + o);
 			vec2 guv = gid / fluid_tex_size;
 			vec4 tile = texture(fluid_tex, guv);
-			vec2 glv = lv - o + (tile.xy - .5);
+			vec2 glv = lv - o - (tile.xy - .5);
 			float team_ = tile.b;
-			if (tile.a > 0.) {
+			if (tile.a > .5) {
 				float l = length(glv);
 				team += (team_ - .5) * max(0., r - l);
 				d = smin(d, l, r);

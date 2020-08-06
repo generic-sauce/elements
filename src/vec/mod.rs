@@ -15,6 +15,8 @@ pub type Vec2f = Vec2t<f32>;
 pub type Vec2i = Vec2t<i32>;
 #[allow(dead_code)]
 pub type Vec2u = Vec2t<u32>;
+#[allow(dead_code)]
+pub type Vec2u8 = Vec2t<u8>;
 
 impl<T> From<Vec2t<T>> for Vector2<T> {
 	fn from(t: Vec2t<T>) -> Vector2<T> {
@@ -32,18 +34,28 @@ impl<T> From<Vector2<T>> for Vec2t<T> {
 impl Vec2f {
 	pub fn to_i(self) -> Vec2i { self.map(|i| i as i32) }
 	pub fn to_u(self) -> Vec2u { self.map(|x| x as u32) }
+	pub fn to_u8(self) -> Vec2u8 { self.map(|x| x as u8) }
 }
 
 #[allow(dead_code)]
 impl Vec2i {
 	pub fn to_f(self) -> Vec2f { self.map(|x| x as f32) }
 	pub fn to_u(self) -> Vec2u { self.map(|x| x as u32) }
+	pub fn to_u8(self) -> Vec2u8 { self.map(|x| x as u8) }
 }
 
 #[allow(dead_code)]
 impl Vec2u {
 	pub fn to_f(self) -> Vec2f { self.map(|x| x as f32) }
 	pub fn to_i(self) -> Vec2i { self.map(|x| x as i32) }
+	pub fn to_u8(self) -> Vec2u8 { self.map(|x| x as u8) }
+}
+
+#[allow(dead_code)]
+impl Vec2u8 {
+	pub fn to_f(self) -> Vec2f { self.map(|x| x as f32) }
+	pub fn to_i(self) -> Vec2i { self.map(|x| x as i32) }
+	pub fn to_u(self) -> Vec2u { self.map(|x| x as u32) }
 }
 
 impl<T> Vec2t<T> {

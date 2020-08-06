@@ -14,7 +14,7 @@ const JUMP_POWER: i32 = 300;
 const X_ACCELERATION: i32 = 55;
 
 // also required for fluids!
-pub const GRAVITY: i32 = 15;
+pub const GRAVITY: i32 = 1;
 
 static GROUND_SENSOR: Sensor = Sensor {
 	left_bot_offset: Vec2i::new(0, -1),

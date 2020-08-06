@@ -4,7 +4,7 @@ use crate::prelude::*;
 mod force;
 mod physics;
 
-pub const NUM_FLUID_CELLS: Vec2i = Vec2i::new(20, 20);
+pub const NUM_FLUID_CELLS: Vec2i = Vec2i::new(200, 200);
 
 pub enum FluidState {
 	Owned,
@@ -32,7 +32,7 @@ impl FluidMap {
 			state: FluidState::Free,
 			owner: 0,
 			velocity: 0.into(),
-			position: 4500.into(),
+			position: 13000.into(),
 		});
 
 		m

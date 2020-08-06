@@ -8,7 +8,7 @@ in vec2 uv;
 out vec4 color;
 
 void main() {
-	vec4 tile = texture(tilemap_tex, vec2(0, 1) - vec2(0, uv.y) + vec2(uv.x, 0));
+	vec4 tile = texture(tilemap_tex, uv);
 	float ground = tile.r;
 	float team = tile.g;
 	float ratio = tile.b;
