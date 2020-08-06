@@ -201,8 +201,8 @@ impl<T: Copy, U: Into<Vec2t<T>>> DivAssign<U> for Vec2t<T> where T: Div<Output=T
 }
 
 impl<T: Copy> Vec2t<T> where T: Add<Output=T> + Mul<Output=T> {
-    pub fn dot(self, other: impl Into<Vec2t<T>>) -> T {
-        let other = other.into();
-        self.x * other.x + self.y * other.y
-    }
+	pub fn dot(self, other: impl Into<Vec2t<T>>) -> T {
+		let other = other.into();
+		self.x * other.x + self.y * other.y
+	}
 }

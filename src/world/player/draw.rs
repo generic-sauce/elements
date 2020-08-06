@@ -22,7 +22,7 @@ impl Player {
 		(PLAYER_SIZE.to_f() / TILESIZE as f32) / 2.0 * Vec2f::new(FACTOR_X, FACTOR_Y)
 	}
 
-    pub fn draw(&mut self, context: &Context) {
-        context.draw_sprite(self.texture_center(), self.texture_radius(), Color::WHITE, Some(TextureId::PlayerIdle1));
-    }
+	pub fn draw(&mut self, context: &Context) {
+		context.draw_sprite(self.texture_center(), self.texture_radius(), Color::WHITE, Some(TextureId::PlayerIdle1));
+	}
 }
