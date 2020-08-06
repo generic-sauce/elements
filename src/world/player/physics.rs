@@ -20,7 +20,7 @@ impl Player {
 				let ychange = xroute.abs() * remaining_vel.y / remaining_vel.x.abs();
 				let change = Vec2i::new(xroute, ychange);
 
-				let change_ex = change + (remaining_vel.x.signum(), remaining_vel.y.signum());
+				let change_ex = change + (remaining_vel.x.signum(), 0);
 				if is_colliding(self.left_bot + change_ex, t) {
 					assert!(!is_colliding(self.left_bot + change, t));
 
@@ -39,7 +39,7 @@ impl Player {
 				let xchange = yroute.abs() * remaining_vel.x / remaining_vel.y.abs();
 				let change = Vec2i::new(xchange, yroute);
 
-				let change_ex = change + (remaining_vel.x.signum(), remaining_vel.y.signum());
+				let change_ex = change + (0, remaining_vel.y.signum());
 				if is_colliding(self.left_bot + change_ex, t) {
 					assert!(!is_colliding(self.left_bot + change, t));
 
