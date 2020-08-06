@@ -11,6 +11,7 @@ pub enum Tile {
 pub struct TileMap {
 	pub tiles: Vec<Tile>,
     pub size: Vec2u,
+    pub texture: SfBox<Texture>,
 }
 
 impl TileMap {
@@ -30,10 +31,12 @@ impl TileMap {
 				tiles.push(tile);
 			}
 		}
+        let texture = TileMap::create_texture(&tiles, s.into());
 
 		TileMap {
 			tiles,
             size: s.into(),
+            texture: texture,
 		}
 	}
 
@@ -46,6 +49,30 @@ impl TileMap {
 	pub fn get(&self, v: Vec2u) -> Tile {
 		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
+
+    fn create_texture(tiles: &Vec<Tile>, size: Vec2u) -> SfBox<Texture> {
+        let mut pixels = Vec::new();
+        for (index, tile) in tiles.iter().enumerate() {
+            let index = index as u32;
+            let position = Vec2f::new((index % size.x) as f32, (index / size.x) as f32) + Vec2f::new(0.5, 0.5);
+            let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
+
+            let team = 0 as u8;
+            let ground: u8 = match tile {
+                Tile::Void => 0,
+                Tile::Ground => 255,
+            };
+            let ratio = 0 as u8;
+
+            pixels.push(ground);
+            pixels.push(team);
+            pixels.push(ratio);
+            pixels.push(255 as u8);
+        }
+
+        let image = Image::create_from_pixels(size.x, size.y, &pixels).unwrap();
+        Texture::from_image(&image).unwrap()
+    }
 }
 
 impl Tile {

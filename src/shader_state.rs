@@ -32,5 +32,6 @@ impl ShaderState {
 }
 
 setup!(
-	FluidShader: (Some("res/fluids_vertex.glsl"), None, Some("res/fluids_fragment.glsl"))
+	Fluid: (Some("res/vertex.glsl"), None, Some("res/fluids_fragment.glsl")),
+	Tilemap: (Some("res/vertex.glsl"), None, Some("res/tilemap_fragment.glsl"))
 );
