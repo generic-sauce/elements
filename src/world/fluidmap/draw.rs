@@ -5,31 +5,21 @@ impl FluidMap {
 		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
-		let mut fluid_grid = Vec::with_capacity(size);
-		fluid_grid.resize(size, Vec2u8::new(0, 0));
+		let mut pixels = Vec::with_capacity(size);
+		pixels.resize(size * 4, 0 as u8);
 
 		for fluids in self.grid.iter() {
 			for fluid in fluids.iter() {
 				let cell_id = fluid.position / 256;
 				let local_position = Vec2u8::new((fluid.position.x % 256) as u8, (fluid.position.y % 256) as u8);
 				let cell_index = cell_id.x + cell_id.y * context.tilemap_size.x as i32;
-				fluid_grid[cell_index as usize] = local_position;
-			}
-		}
+				// fluid_grid[cell_index as usize] = local_position;
 
-		let mut pixels = Vec::<u8>::new();
-		for fluid in fluid_grid.iter() {
-			if *fluid == Vec2u8::new(0, 0) {
-				pixels.push(0);
-				pixels.push(0);
-				pixels.push(0);
-				pixels.push(0);
-
-			} else {
-				pixels.push(fluid.x as u8);
-				pixels.push(fluid.y as u8);
-				pixels.push(0);
-				pixels.push(255);
+				let cell_index = 4 * (cell_id.x + cell_id.y * context.tilemap_size.x as i32) as usize;
+				pixels[cell_index+0] = local_position.x as u8;
+				pixels[cell_index+1] = local_position.y as u8;
+				pixels[cell_index+2] = 0;
+				pixels[cell_index+3] = 255;
 			}
 		}
 

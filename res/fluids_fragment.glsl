@@ -29,8 +29,8 @@ void main() {
 	for (float x = -r; x < r+.5; ++x) {
 		for (float y = -r; y < r+.5; ++y) {
 			vec2 o = vec2(x, y);
-			vec2 gid = floor(id + o);
-			vec2 guv = gid / fluid_tex_size;
+			/* vec2 gid = id + o; */
+			vec2 guv = uv + o / fluid_tex_size;
 			vec4 tile = texture(fluid_tex, guv);
 			vec2 glv = lv - o - (tile.xy - .5);
 			float team_ = tile.b;

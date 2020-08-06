@@ -12,6 +12,7 @@ pub struct App {
 	inputs: [Box<dyn Input>; 2],
 	clock: Clock,
 	last_frame_time: SystemTime,
+	smooth_fps: f32,
 }
 
 impl App {
@@ -26,6 +27,7 @@ impl App {
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
 			clock: Clock::start(),
 			last_frame_time: SystemTime::now(),
+			smooth_fps: 0.0,
 		}
 	}
 
@@ -72,16 +74,18 @@ impl App {
 			&self.font_state,
 			self.world.tilemap.size,
 			self.clock.elapsed_time());
+
+		// draw game
 		self.world.draw(&mut context);
-		context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, "Draw some text LoL");
+
+		// draw time
 		let mut elapsed_time = String::from("Elapsed time: ");
 		elapsed_time.push_str(&self.clock.elapsed_time().as_seconds().floor().to_string());
-		context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &elapsed_time);
-
-		// draw fps
+		context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, &elapsed_time);
 		let now = SystemTime::now();
-		let fps = 1000/now.duration_since(self.last_frame_time).expect("this should not happen :(").as_millis();
+		let fps = 1000.0 / now.duration_since(self.last_frame_time).expect("this should not happen :(").as_millis() as f32;
+		self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
 		self.last_frame_time = now;
-		context.draw_text(Vec2f::new(20.0, 100.0), 32 as u32, &format!("fps: {}", fps));
+		context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &format!("fps: {}", self.smooth_fps as u32));
 	}
 }

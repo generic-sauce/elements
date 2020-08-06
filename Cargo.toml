@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 sfml = "0.15"
+
+[profile.release]
+debug = true
