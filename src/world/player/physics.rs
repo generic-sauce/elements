@@ -8,10 +8,15 @@ impl Player {
 			let xroute = route(remaining_vel.x, self.left_bot.x, PLAYER_SIZE.x);
 			let yroute = route(remaining_vel.y, self.left_bot.y, PLAYER_SIZE.y);
 
+			let xroute_ex = xroute + remaining_vel.x.signum();
+			let yroute_ex = yroute + remaining_vel.y.signum();
+
 			if xroute.abs() >= remaining_vel.x.abs() && yroute.abs() >= remaining_vel.y.abs() { // if no more collisions can happen!
 				self.left_bot += remaining_vel;
 				break;
-			} else if (xroute * self.velocity.y).abs() < (yroute * self.velocity.x).abs() { //    <->    xroute / self.velocity.x < yroute / self.velocity.y    <->    xtime < ytime
+			} else if (remaining_vel.y == 0 && yroute_ex == 0) /* edge case */ || (xroute_ex * remaining_vel.y).abs() < (yroute_ex * remaining_vel.x).abs() { //    <->    xroute / self.velocity.x < yroute / self.velocity.y    <->    xtime < ytime
+				assert!(remaining_vel.x != 0);
+
 				let ychange = xroute.abs() * remaining_vel.y / remaining_vel.x.abs();
 				let change = Vec2i::new(xroute, ychange);
 
@@ -29,6 +34,8 @@ impl Player {
 					self.left_bot += change_ex;
 				}
 			} else {
+				assert!(remaining_vel.y != 0);
+
 				let xchange = yroute.abs() * remaining_vel.x / remaining_vel.y.abs();
 				let change = Vec2i::new(xchange, yroute);
 
