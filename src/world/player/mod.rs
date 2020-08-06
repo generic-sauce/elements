@@ -9,8 +9,8 @@ pub const TILESIZE: i32 = 256; // TODO move this where it belongs
 pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 6 * TILESIZE);
 
 static GROUND_SENSOR: Sensor = Sensor {
-	left_bot: Vec2i::new(-10, 0),
-	size: Vec2i::new(PLAYER_SIZE.x, 20),
+	left_bot_offset: Vec2i::new(0, -1),
+	size: Vec2i::new(PLAYER_SIZE.x, 2),
 };
 
 pub struct Player {

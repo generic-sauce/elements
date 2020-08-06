@@ -1,13 +1,13 @@
 use crate::prelude::*;
 
 pub struct Sensor {
-	pub left_bot: Vec2i,
+	pub left_bot_offset: Vec2i,
 	pub size: Vec2i,
 }
 
 impl Player {
 	pub(in super) fn check_sensor(&self, s: &'static Sensor, t: &TileMap) -> bool {
-		let lb = self.left_bot + s.left_bot;
+		let lb = self.left_bot + s.left_bot_offset;
 		let x_min = lb.x / TILESIZE;
 		let x_max = (lb.x + s.size.x - 1) / TILESIZE; // recall that size.x = 1, means that x_min = x_max
 
