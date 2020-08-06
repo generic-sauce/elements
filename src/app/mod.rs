@@ -13,6 +13,7 @@ pub struct App {
 	clock: Clock,
 	last_frame_time: SystemTime,
 	smooth_fps: f32,
+	smooth_perf: f32,
 }
 
 impl App {
@@ -28,6 +29,7 @@ impl App {
 			clock: Clock::start(),
 			last_frame_time: SystemTime::now(),
 			smooth_fps: 0.0,
+			smooth_perf: 0.0,
 		}
 	}
 
@@ -45,7 +47,12 @@ impl App {
 				}
 			}
 
-			if delta_time != target_interval {
+			let delta_time_f = delta_time.as_millis() as f32 + 1.0;
+			let fps = 1000.0 / delta_time_f;
+			self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
+			let perf = delta_time_f / target_interval.as_millis() as f32;
+			self.smooth_perf = self.smooth_perf * 0.99 + perf * 0.01;
+			if delta_time > target_interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), target_interval.as_millis());
 			}
 
@@ -82,10 +89,7 @@ impl App {
 		let mut elapsed_time = String::from("Elapsed time: ");
 		elapsed_time.push_str(&self.clock.elapsed_time().as_seconds().floor().to_string());
 		context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, &elapsed_time);
-		let now = SystemTime::now();
-		let fps = 1000.0 / now.duration_since(self.last_frame_time).expect("this should not happen :(").as_millis() as f32;
-		self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
-		self.last_frame_time = now;
 		context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &format!("fps: {}", self.smooth_fps as u32));
+		context.draw_text(Vec2f::new(20.0, 100.0), 32 as u32, &format!("perf: {:.0}%", self.smooth_perf * 100.0));
 	}
 }

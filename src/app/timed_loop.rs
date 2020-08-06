@@ -32,7 +32,7 @@ impl Iterator for TimedLoop {
 			Ok(duration) => {
 				self.current = next;
 				sleep(duration);
-				self.interval
+				self.interval - duration
 			},
 			Err(err) => {
 				self.current = now;

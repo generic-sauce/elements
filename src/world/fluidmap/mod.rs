@@ -4,7 +4,7 @@ use crate::prelude::*;
 mod force;
 mod physics;
 
-pub const NUM_FLUID_CELLS: Vec2i = Vec2i::new(200, 200);
+pub const NUM_FLUID_CELLS: Vec2i = Vec2i::new(20, 20);
 
 pub enum FluidState {
 	Owned,
