@@ -9,7 +9,7 @@ pub enum Tile {
 }
 
 pub struct TileMap {
-	tiles: Vec<Tile>,
+	pub tiles: Vec<Tile>,
     pub size: Vec2u,
 }
 
