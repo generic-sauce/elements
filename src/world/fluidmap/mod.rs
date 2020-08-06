@@ -45,10 +45,10 @@ impl FluidMap {
 	}
 
 	fn update_grid(&mut self, t: &TileMap) {
-		let mut fluids = Vec::new();
-		for grid_entry in self.grid.iter_mut() {
-			fluids.extend(grid_entry.drain(..));
-		}
+		let fluids: Vec<Fluid> = self.grid.iter_mut().map(|cell|
+				cell.drain(..)
+			).flatten()
+			.collect();
 
 		for f in fluids {
 			let cell_pos = f.position * NUM_FLUID_CELLS / t.size.to_i() / TILESIZE;
