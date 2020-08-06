@@ -28,7 +28,7 @@ impl FluidMap {
 		let mut m = FluidMap { grid: (0..(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y)).map(|_| Vec::new()).collect() };
 
 		// TODO remove
-		m.grid[(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y / 3) as usize].push(Fluid {
+		m.grid[0].push(Fluid {
 			state: FluidState::Free,
 			owner: 0,
 			velocity: 0.into(),
@@ -41,10 +41,19 @@ impl FluidMap {
 	pub fn tick(&mut self, t: &TileMap) {
 		self.apply_forces();
 		self.move_by_velocity(t);
-		self.update_grid();
+		self.update_grid(t);
 	}
 
-	fn update_grid(&mut self) {
-		// TODO
+	fn update_grid(&mut self, t: &TileMap) {
+		let mut fluids = Vec::new();
+		for grid_entry in self.grid.iter_mut() {
+			fluids.extend(grid_entry.drain(..));
+		}
+
+		for f in fluids {
+			let cell_pos = f.position * NUM_FLUID_CELLS / t.size.to_i() / TILESIZE;
+			let i = (cell_pos.x + cell_pos.y * NUM_FLUID_CELLS.x) as usize;
+			self.grid[i].push(f);
+		}
 	}
 }
