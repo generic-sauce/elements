@@ -1,7 +1,6 @@
 pub mod timed_loop;
 
 use crate::prelude::*;
-use std::time::SystemTime;
 
 pub struct App {
 	window: RenderWindow,
@@ -11,7 +10,6 @@ pub struct App {
 	font_state: FontState,
 	inputs: [Box<dyn Input>; 2],
 	clock: Clock,
-	last_frame_time: SystemTime,
 	smooth_fps: f32,
 	smooth_perf: f32,
 }
@@ -27,9 +25,8 @@ impl App {
 			font_state: FontState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
 			clock: Clock::start(),
-			last_frame_time: SystemTime::now(),
-			smooth_fps: 0.0,
-			smooth_perf: 0.0,
+			smooth_fps: 60.0,
+			smooth_perf: 1.0,
 		}
 	}
 
@@ -47,11 +44,12 @@ impl App {
 				}
 			}
 
+			println!("{}", delta_time.as_millis());
 			let delta_time_f = delta_time.as_millis() as f32 + 1.0;
 			let fps = 1000.0 / delta_time_f;
 			self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
 			let perf = delta_time_f / target_interval.as_millis() as f32;
-			self.smooth_perf = self.smooth_perf * 0.99 + perf * 0.01;
+			self.smooth_perf = self.smooth_perf * 0.95 + perf * 0.05;
 			if delta_time > target_interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), target_interval.as_millis());
 			}
