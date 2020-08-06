@@ -24,18 +24,21 @@ impl Iterator for TimedLoop {
 	type Item = Duration;
 
 	fn next(&mut self) -> Option<Duration> {
+		let now = SystemTime::now();
 		let next = self.current + self.interval;
 
-		let sleep_duration = next.duration_since(SystemTime::now());
-
-		self.current = next;
+		let sleep_duration = next.duration_since(now);
 
 		Some(match sleep_duration {
 			Ok(duration) => {
+				self.current = next;
 				sleep(duration);
 				self.interval
 			},
-			Err(err) => err.duration() + self.interval,
+			Err(err) => {
+				self.current = now;
+				err.duration() + self.interval
+			},
 		})
 	}
 }

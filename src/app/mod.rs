@@ -27,7 +27,7 @@ impl App {
 	}
 
 	pub fn run(&mut self) {
-		let mut timed_loop = TimedLoop::with_fps(60);
+		let timed_loop = TimedLoop::with_fps(60);
 		let target_interval = timed_loop.interval;
 		for delta_time in timed_loop {
 			while let Some(event) = self.window.poll_event() {
@@ -49,8 +49,6 @@ impl App {
 
 			self.window.display();
 			self.window.clear(Color::rgb(0, 0, 0));
-
-			std::thread::sleep(std::time::Duration::from_millis(10));
 
 			if !self.window.is_open() {
 				break;
