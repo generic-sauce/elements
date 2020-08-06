@@ -8,6 +8,12 @@ use crate::prelude::*;
 pub const TILESIZE: i32 = 256; // TODO move this where it belongs
 pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 6 * TILESIZE);
 
+const X_DRAG: i32 = 50;
+const MAX_X_VEL: i32 = 500;
+const JUMP_POWER: i32 = 1000;
+const GRAVITY: i32 = 160;
+const X_ACCELERATION: i32 = 200;
+
 static GROUND_SENSOR: Sensor = Sensor {
 	left_bot_offset: Vec2i::new(0, -1),
 	size: Vec2i::new(PLAYER_SIZE.x, 2),
@@ -35,18 +41,22 @@ impl Player {
 		if !input.is_connected() { println!("joystick not connected"); }
 
 		// walk
-		self.velocity.x += input.get_direction().x as i32 * 20;
+		self.velocity.x += (input.get_direction().x * X_ACCELERATION as f32) as i32;
+		if self.velocity.x.abs() > MAX_X_VEL {
+			self.velocity.x = MAX_X_VEL * self.velocity.x.signum();
+		}
 
 		// jump
 		if self.is_grounded(t) && input.get_direction().y > 0.0 && self.velocity.y <= 0 {
-			self.velocity.y = 200;
+			self.velocity.y = JUMP_POWER;
 		}
 
 		// gravity
-		self.velocity.y -= 2;
+		self.velocity.y -= GRAVITY;
 
 		// drag
-		self.velocity -= self.velocity / 20;
+		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
+		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
 	}
 
 	fn is_grounded(&self, t: &TileMap) -> bool {
