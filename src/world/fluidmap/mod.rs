@@ -1,5 +1,8 @@
 use crate::prelude::*;
 
+mod force;
+mod physics;
+
 const NUM_FLUID_CELLS: Vec2i = Vec2i::new(20, 20);
 
 pub enum FluidState {
@@ -36,5 +39,15 @@ impl FluidMap {
 
 	pub fn draw(&self, context: &mut Context) {
 		context.draw_fluids(self);
+	}
+
+	pub fn tick(&mut self, t: &TileMap) {
+		self.apply_forces();
+		self.move_by_velocity(t);
+		self.update_grid();
+	}
+
+	fn update_grid(&mut self) {
+		// TODO
 	}
 }
