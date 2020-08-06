@@ -93,4 +93,31 @@ impl<'a> Context<'a> {
         text.set_position(position);
         self.window.draw_text(&text, RenderStates::default());
     }
+
+    pub fn draw_tilemap(&self, tilemap: &TileMap) {
+        let mut shape = RectangleShape::new();
+        let radius = Vec2f::new(0.5, 0.5);
+        shape.set_size(radius * 2.0);
+        shape.set_origin(radius);
+
+        let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
+        // let ratio = size.x / size.y;
+        let height = self.tilemap_size.y as f32;
+        let tile_size = size.y / height;
+        shape.set_scale(Vector2f::new(tile_size, tile_size));
+
+        for (index, tile) in tilemap.tiles.iter().enumerate() {
+            let index = index as u32;
+            let position = Vec2f::new((index % self.tilemap_size.x) as f32, (index / self.tilemap_size.x) as f32) + Vec2f::new(0.5, 0.5);
+            let color = match tile {
+                Tile::Void => Color::rgb(115, 158, 65),
+                Tile::Ground => Color::rgb(51, 26, 26),
+            };
+
+            shape.set_fill_color(color);
+            shape.set_position(position);
+            shape.set_position(shape.position() * Vector2f::new(tile_size, -tile_size) + Vector2f::new(0.0, size.y));
+            self.window.draw_rectangle_shape(&shape, RenderStates::default());
+        }
+    }
 }
