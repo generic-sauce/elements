@@ -21,8 +21,16 @@ pub struct FluidMap {
 
 impl FluidMap {
 	pub fn new() -> FluidMap {
-		FluidMap {
-			grid: (0..(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y)).map(|_| Vec::new()).collect()
-		}
+		let mut m = FluidMap { grid: (0..(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y)).map(|_| Vec::new()).collect() };
+
+		// TODO remove
+		m.grid[0].push(Fluid {
+			state: FluidState::Free,
+			owner: 0,
+			velocity: 0.into(),
+			position: 20.into(),
+		});
+
+		m
 	}
 }
