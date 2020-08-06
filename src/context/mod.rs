@@ -50,7 +50,7 @@ impl<'a> Context<'a> {
     }
 
     pub fn draw_fluids(&mut self) {
-        let shader = &mut self.shader_state.get_shader(ShaderId::FluidShader);
+        let shader = &mut self.shader_state.get_shader(ShaderId::Fluid);
 
         let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
         let mut fluids = Vec::new();
@@ -94,31 +94,9 @@ impl<'a> Context<'a> {
         self.window.draw_text(&text, RenderStates::default());
     }
 
-    pub fn draw_tilemap(&mut self, tilemap: &TileMap) {
-        let shader = &mut self.shader_state.get_shader(ShaderId::TilemapShader);
-
-        let mut tiles = Vec::new();
-        for (index, tile) in tilemap.tiles.iter().enumerate() {
-            let index = index as u32;
-            let position = Vec2f::new((index % self.tilemap_size.x) as f32, (index / self.tilemap_size.x) as f32) + Vec2f::new(0.5, 0.5);
-            let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
-
-            let team = 0 as u8;
-            let ground: u8 = match tile {
-                Tile::Void => 0,
-                Tile::Ground => 255,
-            };
-            let ratio = 0 as u8;
-
-            tiles.push(ground);
-            tiles.push(team);
-            tiles.push(ratio);
-            tiles.push(255 as u8);
-        }
-
-        let image = Image::create_from_pixels(self.tilemap_size.x, self.tilemap_size.y, &tiles).unwrap();
-        let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
-        let x: *mut Texture = &mut *texture_sfbox;
+    pub fn draw_tilemap(&mut self, tilemap: &mut TileMap) {
+        let shader = &mut self.shader_state.get_shader(ShaderId::Tilemap);
+        let x: *mut Texture = &mut *tilemap.texture;
         let texture: &'static mut Texture;
         unsafe { texture = &mut *x; }
 
