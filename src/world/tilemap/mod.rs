@@ -52,10 +52,7 @@ impl TileMap {
 
     fn create_texture(tiles: &Vec<Tile>, size: Vec2u) -> SfBox<Texture> {
         let mut pixels = Vec::new();
-        for (index, tile) in tiles.iter().enumerate() {
-            let index = index as u32;
-            let position = Vec2f::new((index % size.x) as f32, (index / size.x) as f32) + Vec2f::new(0.5, 0.5);
-            let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
+        for tile in tiles.iter() {
 
             let team = 0 as u8;
             let ground: u8 = match tile {

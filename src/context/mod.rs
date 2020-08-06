@@ -49,7 +49,7 @@ impl<'a> Context<'a> {
         self.window.draw_rectangle_shape(&shape, RenderStates::default());
     }
 
-    pub fn draw_fluids(&mut self) {
+    pub fn draw_fluids(&mut self, fluidmap: &FluidMap) { // TODO sven!
         let shader = &mut self.shader_state.get_shader(ShaderId::Fluid);
 
         let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));

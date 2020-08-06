@@ -33,4 +33,8 @@ impl FluidMap {
 
 		m
 	}
+
+	pub fn draw(&self, context: &mut Context) {
+		context.draw_fluids(self);
+	}
 }
