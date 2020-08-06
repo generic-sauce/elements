@@ -29,7 +29,6 @@ impl World {
 		for p in self.players.iter_mut() {
 			p.draw(context);
 		}
-		// TODO re-add
-        // context.draw_fluids();
+        context.draw_fluids();
 	}
 }
