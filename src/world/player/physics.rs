@@ -18,7 +18,7 @@ impl Player {
 				assert!(remaining_vel.x != 0);
 
 				let ychange = xroute.abs() * remaining_vel.y / remaining_vel.x.abs();
-				let change = Vec2i::new(xroute, ychange);
+				let change = GameVec::new(xroute, ychange);
 
 				let change_ex = change + (remaining_vel.x.signum(), 0);
 				if is_colliding(self.left_bot + change_ex, t) {
@@ -37,7 +37,7 @@ impl Player {
 				assert!(remaining_vel.y != 0);
 
 				let xchange = yroute.abs() * remaining_vel.x / remaining_vel.y.abs();
-				let change = Vec2i::new(xchange, yroute);
+				let change = GameVec::new(xchange, yroute);
 
 				let change_ex = change + (0, remaining_vel.y.signum());
 				if is_colliding(self.left_bot + change_ex, t) {
@@ -57,7 +57,7 @@ impl Player {
 	}
 }
 
-fn is_colliding(left_bot: Vec2i, t: &TileMap) -> bool {
+fn is_colliding(left_bot: GameVec, t: &TileMap) -> bool {
 	let x_min = left_bot.x / TILESIZE;
 	let x_max = (left_bot.x + PLAYER_SIZE.x - 1) / TILESIZE; // recall that PLAYER_SIZE = 1, means that x_min = x_max
 

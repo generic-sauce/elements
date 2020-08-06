@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
 pub struct Sensor {
-	pub left_bot_offset: Vec2i,
-	pub size: Vec2i,
+	pub left_bot_offset: GameVec,
+	pub size: GameVec,
 }
 
 impl Player {

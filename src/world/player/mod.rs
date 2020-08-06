@@ -5,8 +5,7 @@ pub mod sensor;
 use crate::prelude::*;
 
 // The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
-pub const TILESIZE: i32 = 256; // TODO move this where it belongs
-pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 6 * TILESIZE);
+pub const PLAYER_SIZE: GameVec = TileVec::new(2, 6).to_game();
 
 const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;
@@ -17,20 +16,20 @@ const X_ACCELERATION: i32 = 55;
 pub const GRAVITY: i32 = 15;
 
 static GROUND_SENSOR: Sensor = Sensor {
-	left_bot_offset: Vec2i::new(0, -1),
-	size: Vec2i::new(PLAYER_SIZE.x, 2),
+	left_bot_offset: GameVec::new(0, -1),
+	size: GameVec::new(PLAYER_SIZE.x, 2),
 };
 
 pub struct Player {
-	pub left_bot: Vec2i,
-	pub velocity: Vec2i,
+	pub left_bot: GameVec,
+	pub velocity: GameVec,
 }
 
 impl Player {
-	pub fn new(left_bot: Vec2i) -> Player {
+	pub fn new(left_bot: GameVec) -> Player {
 		Player {
 			left_bot,
-			velocity: Vec2i::new(0, 0),
+			velocity: GameVec::new(0, 0),
 		}
 	}
 
