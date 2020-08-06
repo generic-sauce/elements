@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub struct Context<'a> {
+pub struct DrawContext<'a> {
 	pub window: &'a mut RenderWindow,
 	pub texture_state: &'a TextureState,
 	pub shader_state: &'a mut ShaderState,
@@ -9,7 +9,7 @@ pub struct Context<'a> {
 	pub elapsed_time: Time,
 }
 
-impl<'a> Context<'a> {
+impl<'a> DrawContext<'a> {
 	pub fn new(
 		window: &'a mut RenderWindow,
 		texture_state: &'a TextureState,
@@ -17,9 +17,9 @@ impl<'a> Context<'a> {
 		font_state: &'a FontState,
 		tilemap_size: Vec2u,
 		elapsed_time: Time,
-		) -> Context<'a>
+		) -> DrawContext<'a>
 	{
-		Context {
+		DrawContext {
 			window,
 			texture_state,
 			shader_state,

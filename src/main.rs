@@ -6,7 +6,7 @@ mod shader_state;
 mod font_state;
 mod vec;
 mod prelude;
-mod context;
+mod draw_context;
 
 use app::App;
 

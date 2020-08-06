@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 impl FluidMap {
-	pub fn draw(&self, context: &mut Context) {
+	pub fn draw(&self, context: &mut DrawContext) {
 		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let mut pixels = Vec::new();

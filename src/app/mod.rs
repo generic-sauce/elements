@@ -65,7 +65,7 @@ impl App {
 	}
 
 	pub fn draw(&mut self) {
-		let mut context = Context::new(
+		let mut context = DrawContext::new(
 			&mut self.window,
 			&self.texture_state,
 			&mut self.shader_state,
