@@ -1,3 +1,5 @@
+pub mod timed_loop;
+
 use crate::prelude::*;
 
 pub struct App {
@@ -25,7 +27,9 @@ impl App {
 	}
 
 	pub fn run(&mut self) {
-        while self.window.is_open() {
+		let mut timed_loop = TimedLoop::with_fps(60);
+		let target_interval = timed_loop.interval;
+		for delta_time in timed_loop {
 			while let Some(event) = self.window.poll_event() {
                 match event {
                     Event::Closed | Event::KeyPressed { code: Key::Q, .. } => {
@@ -36,6 +40,10 @@ impl App {
                 }
 			}
 
+			if delta_time != target_interval {
+				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), target_interval.as_millis());
+			}
+
 			self.tick();
 			self.draw();
 
@@ -43,6 +51,10 @@ impl App {
 			self.window.clear(Color::rgb(0, 0, 0));
 
 			std::thread::sleep(std::time::Duration::from_millis(10));
+
+			if !self.window.is_open() {
+				break;
+			}
 		}
 	}
 
