@@ -1,6 +1,7 @@
 pub mod player;
 pub mod tilemap;
 pub mod fluidmap;
+mod draw;
 
 use crate::prelude::*;
 
@@ -23,14 +24,6 @@ impl World {
 		self.fluidmap.tick(&self.tilemap);
 		for (p, input) in self.players.iter_mut().zip(inputs.iter()) {
 			p.tick(&self.tilemap, input.as_ref());
-		}
-	}
-
-	pub fn draw(&mut self, context: &mut DrawContext) {
-		self.tilemap.draw(context);
-		self.fluidmap.draw(context);
-		for p in self.players.iter_mut() {
-			p.draw(context);
 		}
 	}
 }

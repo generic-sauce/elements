@@ -55,22 +55,4 @@ impl<'a> DrawContext<'a> {
 		text.set_position(position);
 		self.window.draw_text(&text, RenderStates::default());
 	}
-
-	pub fn draw_tilemap(&mut self, tilemap: &mut TileMap) {
-		let shader = &mut self.shader_state.get_shader(ShaderId::Tilemap);
-		let x: *mut Texture = &mut *tilemap.texture;
-		let texture: &'static mut Texture;
-		unsafe { texture = &mut *x; }
-
-		shader.set_uniform_texture("tilemap_tex", texture);
-
-		let mut states = RenderStates::default();
-		states.shader = Some(&shader);
-
-		let size = self.window.size();
-		let mut rect = RectangleShape::default();
-		rect.set_texture(&texture, true);
-		rect.set_size(Vector2f::new(size.x as f32, size.y as f32));
-		self.window.draw_rectangle_shape(&rect, states);
-	}
 }
