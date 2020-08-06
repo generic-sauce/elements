@@ -6,7 +6,6 @@ use crate::prelude::*;
 pub struct World {
 	pub players: [Player; 2],
 	pub tilemap: TileMap,
-	pub input: Box<dyn Input>, // TODO move this to App
 }
 
 impl World {
@@ -14,7 +13,6 @@ impl World {
 		World {
 			players: [Player::new(Vec2i::new(38 * TILESIZE, 45 * TILESIZE)), Player::new(Vec2i::new(64 * TILESIZE, 40 * TILESIZE))],
 			tilemap: TileMap::new("res/map/map02.png"),
-			input: Box::new(AdaptiveInput::new(0)),
 		}
 	}
 
