@@ -1,12 +1,12 @@
 use crate::prelude::*;
 
 pub struct Context<'a> {
-	window: &'a mut RenderWindow,
-	texture_state: &'a TextureState,
-	shader_state: &'a mut ShaderState,
-	font_state: &'a FontState,
-	tilemap_size: Vec2u,
-	elapsed_time: Time,
+	pub window: &'a mut RenderWindow,
+	pub texture_state: &'a TextureState,
+	pub shader_state: &'a mut ShaderState,
+	pub font_state: &'a FontState,
+	pub tilemap_size: Vec2u,
+	pub elapsed_time: Time,
 }
 
 impl<'a> Context<'a> {
@@ -47,44 +47,6 @@ impl<'a> Context<'a> {
 		shape.set_position(shape.position() * Vector2f::new(tile, -tile) + Vector2f::new(0.0, size.y));
 
 		self.window.draw_rectangle_shape(&shape, RenderStates::default());
-	}
-
-	pub fn draw_fluids(&mut self, fluidmap: &FluidMap) { // TODO sven!
-		let shader = &mut self.shader_state.get_shader(ShaderId::Fluid);
-
-		let n21 = |v: Vec2f| f32::fract(9923.236 * f32::fract(v.dot(Vec2f::new(293.42, 122.332))));
-		let mut fluids = Vec::new();
-		for y in 0..self.tilemap_size.y {
-			for x in 0..self.tilemap_size.x {
-				let n1 = n21(Vec2f::new(x as f32, y as f32));
-				let n2 = n21(Vec2f::new(x as f32 + 10.0, y as f32 - 20.0));
-				let n3 = n21(Vec2f::new(y as f32 + 10.0, x as f32 - 20.0));
-				let n4 = n21(Vec2f::new(x as f32 * 324.23, 0.0));
-				fluids.push((f32::sin(n2 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
-				fluids.push((f32::sin(n3 * self.elapsed_time.as_seconds()) * 128.0 + 128.0) as u8);
-				fluids.push((n4 < 0.5) as u8 * 255);
-				fluids.push((n1 < 0.5 * f32::max(0.0, (y as f32 - x as f32 + 10.0) / self.tilemap_size.y as f32).powf(3.0)) as u8);
-			}
-		}
-
-		let image = Image::create_from_pixels(self.tilemap_size.x, self.tilemap_size.y, &fluids).unwrap();
-		let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
-		let x: *mut Texture = &mut *texture_sfbox;
-		let texture: &'static mut Texture;
-		unsafe { texture = &mut *x; }
-
-		shader.set_uniform_float("elapsed_time", self.elapsed_time.as_seconds());
-		shader.set_uniform_texture("fluid_tex", texture);
-		shader.set_uniform_vec2("fluid_tex_size", self.tilemap_size.to_f().into());
-
-		let mut states = RenderStates::default();
-		states.shader = Some(&shader);
-
-		let size = self.window.size();
-		let mut rect = RectangleShape::default();
-		rect.set_texture(&texture, true);
-		rect.set_size(Vector2f::new(size.x as f32, size.y as f32));
-		self.window.draw_rectangle_shape(&rect, states);
 	}
 
 	pub fn draw_text(&self, position: Vec2f, size: u32, text: &str) {

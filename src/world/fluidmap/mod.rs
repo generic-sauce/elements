@@ -1,9 +1,10 @@
+mod draw;
 use crate::prelude::*;
 
 mod force;
 mod physics;
 
-const NUM_FLUID_CELLS: Vec2i = Vec2i::new(20, 20);
+pub const NUM_FLUID_CELLS: Vec2i = Vec2i::new(20, 20);
 
 pub enum FluidState {
 	Owned,
@@ -27,7 +28,7 @@ impl FluidMap {
 		let mut m = FluidMap { grid: (0..(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y)).map(|_| Vec::new()).collect() };
 
 		// TODO remove
-		m.grid[0].push(Fluid {
+		m.grid[(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y / 3) as usize].push(Fluid {
 			state: FluidState::Free,
 			owner: 0,
 			velocity: 0.into(),
@@ -35,10 +36,6 @@ impl FluidMap {
 		});
 
 		m
-	}
-
-	pub fn draw(&self, context: &mut Context) {
-		context.draw_fluids(self);
 	}
 
 	pub fn tick(&mut self, t: &TileMap) {
