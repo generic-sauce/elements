@@ -11,8 +11,10 @@ pub const PLAYER_SIZE: Vec2i = Vec2i::new(2 * TILESIZE, 6 * TILESIZE);
 const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;
 const JUMP_POWER: i32 = 300;
-const GRAVITY: i32 = 15;
 const X_ACCELERATION: i32 = 55;
+
+// also required for fluids!
+pub const GRAVITY: i32 = 15;
 
 static GROUND_SENSOR: Sensor = Sensor {
 	left_bot_offset: Vec2i::new(0, -1),
