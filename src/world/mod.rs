@@ -20,6 +20,7 @@ impl World {
 	}
 
 	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+		self.fluidmap.tick(&self.tilemap);
 		for (p, input) in self.players.iter_mut().zip(inputs.iter()) {
 			p.tick(&self.tilemap, input.as_ref());
 		}

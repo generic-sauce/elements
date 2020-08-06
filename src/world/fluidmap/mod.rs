@@ -31,7 +31,7 @@ impl FluidMap {
 			state: FluidState::Free,
 			owner: 0,
 			velocity: 0.into(),
-			position: 20.into(),
+			position: 4500.into(),
 		});
 
 		m
