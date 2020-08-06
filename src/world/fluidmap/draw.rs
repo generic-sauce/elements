@@ -14,8 +14,11 @@ impl FluidMap {
 
 			} else {
 				let fluid = &fluids[0];
-				pixels.push(fluid.position.x as u8);
-				pixels.push(fluid.position.y as u8);
+				let id = Vec2i::new(index as i32 % NUM_FLUID_CELLS.x, index as i32 / NUM_FLUID_CELLS.y);
+				let lv = fluid.position / 255 - id;
+				println!("{} {}", id, lv);
+				pixels.push(lv.x as u8);
+				pixels.push(lv.y as u8);
 				pixels.push((fluid.owner * 255) as u8);
 				pixels.push(255);
 			}
