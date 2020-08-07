@@ -1,10 +1,10 @@
-mod draw;
 use crate::prelude::*;
 
-mod force;
+mod draw;
 mod physics;
 
-pub const NUM_FLUID_CELLS: Vec2i = Vec2i::new(20, 20);
+pub mod force;
+pub use self::force::*;
 
 pub enum FluidState {
 	Owned,
@@ -15,8 +15,8 @@ pub enum FluidState {
 pub struct Fluid {
 	pub state: FluidState,
 	pub owner: usize,
-	pub velocity: Vec2i,
-	pub position: Vec2i,
+	pub velocity: GameVec,
+	pub position: GameVec,
 }
 
 pub struct FluidMap {
@@ -24,8 +24,9 @@ pub struct FluidMap {
 }
 
 impl FluidMap {
-	pub fn new() -> FluidMap {
-		let mut m = FluidMap { grid: (0..(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y)).map(|_| Vec::new()).collect() };
+	pub fn new(tilesize: Vec2u) -> FluidMap { // TODO accept a TileVec here!
+		let fluidmap_size = fluidmap_size(tilesize);
+		let mut m = FluidMap { grid: (0..(fluidmap_size.x * fluidmap_size.y)).map(|_| Vec::new()).collect() };
 
 		// TODO remove
 		m.grid[0].push(Fluid {
@@ -45,15 +46,16 @@ impl FluidMap {
 	}
 
 	fn update_grid(&mut self, t: &TileMap) {
-		let mut grid: Vec<Vec<Fluid>> = (0..(NUM_FLUID_CELLS.x * NUM_FLUID_CELLS.y)).map(|_| Vec::new()).collect();
+		let fluidmap_size = fluidmap_size(t.size);
+		let mut grid: Vec<Vec<Fluid>> = (0..(fluidmap_size.x * fluidmap_size.y)).map(|_| Vec::new()).collect();
 
 		let fluids = self.grid.iter_mut().map(|cell|
 				cell.drain(..)
 			).flatten();
 
 		for f in fluids {
-			let cell_pos = f.position * NUM_FLUID_CELLS / t.size.to_i() / TILESIZE;
-			let i = (cell_pos.x + cell_pos.y * NUM_FLUID_CELLS.x) as usize;
+			let fluid_pos = f.position.to_fluid();
+			let i = (fluid_pos.x + fluid_pos.y * fluidmap_size.x) as usize;
 			grid[i].push(f);
 		}
 
@@ -65,4 +67,11 @@ impl FluidMap {
 			.map(|x| x.iter())
 			.flatten()
 	}
+}
+
+fn fluidmap_size(tilemap_size: Vec2u) -> FluidVec {
+	let tilemap_size = TileVec::new(tilemap_size.x as i32, tilemap_size.y as i32); // number of tiles
+	let gamesize = tilemap_size.to_game(); // number of game-tiles
+	let fluidmap_size = gamesize.to_fluid(); // number of fluid-tiles
+	fluidmap_size
 }

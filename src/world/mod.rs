@@ -13,10 +13,11 @@ pub struct World {
 
 impl World {
 	pub fn new() -> World {
+		let tilemap = TileMap::new("res/map/map02.png");
 		World {
 			players: [Player::new(TileVec::new(38, 45).into()), Player::new(TileVec::new(64, 40).into())],
-			tilemap: TileMap::new("res/map/map02.png"),
-			fluidmap: FluidMap::new(),
+			fluidmap: FluidMap::new(tilemap.size),
+			tilemap,
 		}
 	}
 
