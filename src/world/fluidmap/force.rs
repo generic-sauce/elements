@@ -35,8 +35,8 @@ fn affect(f: &Fluid, n: &Fluid) -> GameVec {
 	let v = (n.position - f.position);
 
 	if v.magnitude_sqr() <= 200 * 200 {
-		v / 10
+		v / 30
 	} else {
-		(v / 20) * (-1)
+		(v / 50) * (-1)
 	}
 }
