@@ -6,7 +6,7 @@ pub struct DrawContext<'a> {
 	pub shader_state: &'a mut ShaderState,
 	pub font_state: &'a FontState,
 	pub animation_state: &'a AnimationState,
-	pub tilemap_size: Vec2u,
+	pub tilemap_size: TileVec,
 	pub elapsed_time: Time,
 }
 
@@ -17,7 +17,7 @@ impl<'a> DrawContext<'a> {
 		shader_state: &'a mut ShaderState,
 		font_state: &'a FontState,
 		animation_state: &'a AnimationState,
-		tilemap_size: Vec2u,
+		tilemap_size: TileVec,
 		elapsed_time: Time,
 		) -> DrawContext<'a>
 	{

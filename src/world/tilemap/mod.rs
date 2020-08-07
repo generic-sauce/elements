@@ -10,8 +10,8 @@ pub enum Tile {
 
 pub struct TileMap {
 	pub tiles: Vec<Tile>,
-	pub size: Vec2u,
 	pub texture: SfBox<Texture>,
+	pub size: TileVec,
 }
 
 impl TileMap {
@@ -35,18 +35,18 @@ impl TileMap {
 
 		TileMap {
 			tiles,
-			size: s.into(),
+			size: TileVec::new(s.x as i32, s.y as i32), // TODO make nicer
 			texture: texture,
 		}
 	}
 
 	#[allow(unused)]
-	pub fn get_mut(&mut self, v: Vec2u) -> &'_ mut Tile { // TODO accept TileVec here!
+	pub fn get_mut(&mut self, v: TileVec) -> &'_ mut Tile {
 		&mut self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 
 	#[allow(unused)]
-	pub fn get(&self, v: Vec2u) -> Tile { // TODO accept TileVec here!
+	pub fn get(&self, v: TileVec) -> Tile {
 		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 

@@ -8,16 +8,14 @@ pub struct Sensor {
 impl Player {
 	pub(in super) fn check_sensor(&self, s: &'static Sensor, t: &TileMap) -> bool {
 		let lb = self.left_bot + s.left_bot_offset;
-		let x_min = lb.x / TILESIZE;
-		let x_max = (lb.x + s.size.x - 1) / TILESIZE; // recall that size.x = 1, means that x_min = x_max
-
-		let y_min = lb.y / TILESIZE;
-		let y_max = (lb.y + s.size.y - 1) / TILESIZE;
+		let min = GameVec::new(lb.x, lb.y).to_tile();
+		let max = GameVec::new(lb.x + s.size.x - 1, lb.y + s.size.y - 1).to_tile();
 
 		// TODO write this using .any()?
-		for x in x_min..=x_max {
-			for y in y_min..=y_max {
-				if t.get((x as u32, y as u32).into()).is_solid() { return true; }
+		for x in min.x..=max.x {
+			for y in min.y..=max.y {
+				let p = TileVec::new(x, y);
+				if t.get(p).is_solid() { return true; }
 			}
 		}
 		false

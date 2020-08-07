@@ -58,16 +58,14 @@ impl Player {
 }
 
 fn is_colliding(left_bot: GameVec, t: &TileMap) -> bool {
-	let x_min = left_bot.x / TILESIZE;
-	let x_max = (left_bot.x + PLAYER_SIZE.x - 1) / TILESIZE; // recall that PLAYER_SIZE = 1, means that x_min = x_max
-
-	let y_min = left_bot.y / TILESIZE;
-	let y_max = (left_bot.y + PLAYER_SIZE.y - 1) / TILESIZE;
+	let min = GameVec::new(left_bot.x, left_bot.y).to_tile();
+	let max = GameVec::new(left_bot.x + PLAYER_SIZE.x - 1, left_bot.y + PLAYER_SIZE.y - 1).to_tile();
 
 	// TODO write this using .any()?
-	for x in x_min..=x_max {
-		for y in y_min..=y_max {
-			if t.get((x as u32, y as u32).into()).is_solid() { return true; }
+	for x in min.x..=max.x {
+		for y in min.y..=max.y {
+			let p = TileVec::new(x, y);
+			if t.get(p).is_solid() { return true; }
 		}
 	}
 	false

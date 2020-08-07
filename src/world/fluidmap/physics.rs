@@ -67,9 +67,7 @@ fn move_fluid_by_velocity(f: &mut Fluid, t: &TileMap) {
 
 
 fn is_colliding(point: GameVec, t: &TileMap) -> bool {
-	let point = point.to_tile();
-	let point = Vec2u::new(point.x as u32, point.y as u32);
-	t.get(point).is_solid()
+	t.get(point.to_tile()).is_solid()
 }
 
 // returns the change required to touch, but not collide the next tile

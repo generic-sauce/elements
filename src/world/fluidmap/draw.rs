@@ -27,7 +27,8 @@ impl FluidMap {
 
 		shader.set_uniform_float("elapsed_time", context.elapsed_time.as_seconds());
 		shader.set_uniform_texture("fluid_tex", texture);
-		shader.set_uniform_vec2("fluid_tex_size", context.tilemap_size.to_f().into());
+		let v = Vector2f::new(context.tilemap_size.x as f32, context.tilemap_size.y as f32); // TODO make nicer
+		shader.set_uniform_vec2("fluid_tex_size", v);
 
 		let mut states = RenderStates::default();
 		states.shader = Some(&shader);

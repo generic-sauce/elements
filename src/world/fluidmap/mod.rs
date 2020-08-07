@@ -24,8 +24,8 @@ pub struct FluidMap {
 }
 
 impl FluidMap {
-	pub fn new(tilesize: Vec2u) -> FluidMap { // TODO accept a TileVec here!
-		let fluidmap_size = fluidmap_size(tilesize);
+	pub fn new(tilemap_size: TileVec) -> FluidMap {
+		let fluidmap_size = fluidmap_size(tilemap_size);
 		let mut m = FluidMap { grid: (0..(fluidmap_size.x * fluidmap_size.y)).map(|_| Vec::new()).collect() };
 
 		// TODO remove
@@ -69,7 +69,7 @@ impl FluidMap {
 	}
 }
 
-fn fluidmap_size(tilemap_size: Vec2u) -> FluidVec {
+fn fluidmap_size(tilemap_size: TileVec) -> FluidVec {
 	let tilemap_size = TileVec::new(tilemap_size.x as i32, tilemap_size.y as i32); // number of tiles
 	let gamesize = tilemap_size.to_game(); // number of game-tiles
 	let fluidmap_size = gamesize.to_fluid(); // number of fluid-tiles
