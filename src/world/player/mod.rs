@@ -63,7 +63,7 @@ impl Player {
 		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
-		if self.is_grounded(t) && input.up() && self.velocity.y <= 0 {
+		if self.is_grounded(t) && input.just_up() && self.velocity.y <= 0 {
 			self.velocity.y = JUMP_POWER;
 			self.walljumped = false;
 		}

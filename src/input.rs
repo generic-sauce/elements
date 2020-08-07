@@ -4,50 +4,6 @@ const CONTROLLER_MAX: i32 = 100;
 const DEADZONE_MIN: i32 = 35;
 const DEADZONE_MAX: i32 = CONTROLLER_MAX - DEADZONE_MIN;
 
-fn get_keyboard_direction(index: u32) -> Vec2f {
-	let mut direction = Vec2f::new(0.0, 0.0);
-	if index == 0 {
-		if sfml::window::Key::W.is_pressed() {
-			direction.y += 1.0;
-		}
-		if sfml::window::Key::S.is_pressed() {
-			direction.y -= 1.0;
-		}
-
-		if sfml::window::Key::D.is_pressed() {
-			direction.x += 1.0;
-		}
-		if sfml::window::Key::A.is_pressed() {
-			direction.x -= 1.0;
-		}
-	} else if index == 1 {
-		if sfml::window::Key::Up.is_pressed() {
-			direction.y += 1.0;
-		}
-		if sfml::window::Key::Down.is_pressed() {
-			direction.y -= 1.0;
-		}
-
-		if sfml::window::Key::Right.is_pressed() {
-			direction.x += 1.0;
-		}
-		if sfml::window::Key::Left.is_pressed() {
-			direction.x -= 1.0;
-		}
-	}
-	direction
-}
-
-fn get_joystick_direction(index: u32) -> Vec2i {
-	if !joystick::is_connected(index) {
-		return Vec2i::new(0, 0);
-	}
-	Vec2i::new(
-		joystick::axis_position(index, joystick::Axis::X) as i32,
-		joystick::axis_position(index, joystick::Axis::Y) as i32,
-	)
-}
-
 fn apply_deadzone(value: i32) -> i32 {
 	let sign = value.signum();
 	if value.abs() < DEADZONE_MIN {
@@ -64,7 +20,9 @@ pub trait Input {
 	fn vertical_dir(&self) -> i32;
 
 	fn up(&self) -> bool { self.vertical_dir() >= DEADZONE_MIN }
+	fn just_up(&self) -> bool;
 	fn down(&self) -> bool { self.vertical_dir() <= -DEADZONE_MIN }
+	fn just_down(&self) -> bool;
 	fn right(&self) -> bool { self.horizontal_dir() >= DEADZONE_MIN }
 	fn left(&self) -> bool { self.horizontal_dir() <= -DEADZONE_MIN }
 	fn attack1(&self) -> bool;
@@ -82,6 +40,8 @@ pub struct AdaptiveInput {
 	index: u32,
 
 	direction: Vec2i,
+	just_up: bool,
+	just_down: bool,
 	special1: bool,
 	special2: bool,
 	attack1: bool,
@@ -94,6 +54,8 @@ impl AdaptiveInput {
 		AdaptiveInput {
 			index,
 			direction: Vec2i::new(0, 0),
+			just_up: false,
+			just_down: false,
 			special1: false,
 			special2: false,
 			attack1: false,
@@ -110,6 +72,14 @@ impl Input for AdaptiveInput {
 
 	fn vertical_dir(&self) -> i32 {
 		self.direction.y
+	}
+
+	fn just_up(&self) -> bool {
+		self.just_up
+	}
+
+	fn just_down(&self) -> bool {
+		self.just_down
 	}
 
 	fn attack1(&self) -> bool {
@@ -140,6 +110,9 @@ impl Input for AdaptiveInput {
 		let right_key = if self.index == 0 { sfml::window::Key::D } else { sfml::window::Key::Right };
 		let left_key = if self.index == 0 { sfml::window::Key::A } else { sfml::window::Key::Left };
 
+		let last_frame_up = self.up();
+		let last_frame_down = self.down();
+
 		self.direction.x = 0;
 		self.direction.y = 0;
 
@@ -165,5 +138,8 @@ impl Input for AdaptiveInput {
 		if !key_pressed && controller_connected {
 			self.direction.x = apply_deadzone(joystick::axis_position(self.index, joystick::Axis::X) as i32)
 		}
+
+		self.just_up = !last_frame_up && self.up();
+		self.just_down = !last_frame_down && self.down();
 	}
 }
