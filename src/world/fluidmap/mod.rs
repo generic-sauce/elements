@@ -29,20 +29,15 @@ pub struct FluidMap {
 impl FluidMap {
 	pub fn new(tilemap_size: TileVec) -> FluidMap {
 		let iter =
-			Some(Fluid {
-				state: FluidState::Free,
-				owner: 0,
-				velocity: 0.into(),
-				position: 13000.into(),
-			}).into_iter()
-			.chain(
-				Some(Fluid {
+			(0..1000).map(|offset| {
+				let position = GameVec::new(13000 + offset * 10, 13000 + (offset % 200));
+				Fluid {
 					state: FluidState::Free,
 					owner: 0,
 					velocity: 0.into(),
-					position: 13003.into(),
-				}).into_iter()
-			);
+					position,
+				}
+			});
 
 		let tilemap_size = TileVec::new(tilemap_size.x as i32, tilemap_size.y as i32); // number of tiles
 		let gamemap_size = tilemap_size.to_game(); // number of game-tiles
@@ -80,7 +75,7 @@ impl FluidMap {
 
 	fn index(&self, t: FluidVec) -> &'_ [Fluid] {
 		let i = (t.x + t.y * self.size.x) as usize;
-		&self.grid[i][..]
+		self.grid.get(i).map(|v| &v[..]).unwrap_or(&[])
 	}
 
 	pub fn neighbours<'s>(&'s self, f: &'s Fluid) -> impl Iterator<Item=&Fluid> + 's {

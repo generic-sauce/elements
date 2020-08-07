@@ -30,9 +30,11 @@ impl FluidMap {
 }
 
 fn affect(f: &Fluid, n: &Fluid) -> GameVec {
-	let x = (n.position - f.position) / 3;
+	let v = (n.position - f.position);
 
-	if x == GameVec::new(0, 0) { return GameVec::new(1, 0); }
-
-	x * 100 / x.magnitude_sqr()
+	if v.magnitude_sqr() <= 200 * 200 {
+		v / 10
+	} else {
+		(v / 20) * (-1)
+	}
 }
