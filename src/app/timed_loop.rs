@@ -28,7 +28,7 @@ impl TimedLoop {
 	}
 
 	pub fn with_fps(fps: u32) -> TimedLoop {
-		TimedLoop::new(Duration::from_millis((1000/fps) as u64))
+		TimedLoop::new(Duration::from_micros(1000000 / fps as u64))
 	}
 
 	pub fn elapsed_time(&self) -> Duration {
@@ -51,7 +51,7 @@ impl Iterator for TimedLoop {
 			},
 			Err(err) => {
 				self.current = now;
-				err.duration() + self.interval
+				self.interval + err.duration()
 			},
 		};
 
@@ -61,13 +61,14 @@ impl Iterator for TimedLoop {
 				self.fps = self.frames_since_prev_second;
 				self.frames_since_prev_second = 0;
 
-				self.perf = self.duration_since_prev_second.as_secs_f32();;
+				self.perf = self.duration_since_prev_second.as_secs_f32();
 				self.duration_since_prev_second = Duration::from_secs(0);
 
 				self.prev_second = next_second;
 			},
 			_ => {},
 		}
+
 		self.duration_since_prev_second += delta_time;
 		self.frames_since_prev_second += 1;
 		Some((self.elapsed_time(), delta_time, self.fps, self.perf))
