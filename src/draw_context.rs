@@ -69,4 +69,20 @@ impl<'a> DrawContext<'a> {
 		text.set_position(position);
 		self.window.draw_text(&text, RenderStates::default());
 	}
+
+	pub fn draw_circle(&self, position: Vec2f, radius: f32, color: Color) {
+		let mut shape = CircleShape::new(radius, 32);
+		shape.set_position(position);
+		shape.set_origin(position * 0.5);
+		shape.set_fill_color(color);
+
+		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
+		// let ratio = size.x / size.y;
+		let height = self.tilemap_size.y as f32;
+		let tile = size.y / height;
+		shape.set_scale(Vector2f::new(tile, tile));
+		shape.set_position(shape.position() * Vector2f::new(tile, -tile) + Vector2f::new(0.0, size.y));
+
+		self.window.draw_circle_shape(&shape, RenderStates::default());
+	}
 }
