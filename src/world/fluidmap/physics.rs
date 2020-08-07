@@ -2,15 +2,13 @@ use crate::prelude::*;
 
 impl FluidMap {
 	pub(in super) fn move_by_velocity(&mut self, t: &TileMap) {
-		for grid_entry in self.grid.iter_mut() {
-			for fluid in grid_entry.iter_mut() {
-				move_fluid_by_velocity(fluid, t);
-			}
-		}
+		let iter = self.iter()
+			.map(|f| move_fluid_by_velocity(f.clone(), t));
+		*self = Self { grid: FluidMap::mk_grid(iter, t.size) };
 	}
 }
 
-fn move_fluid_by_velocity(f: &mut Fluid, t: &TileMap) {
+fn move_fluid_by_velocity(mut f: Fluid, t: &TileMap) -> Fluid {
 	let mut remaining_vel = f.velocity;
 
 	while remaining_vel != 0.into() {
@@ -63,6 +61,8 @@ fn move_fluid_by_velocity(f: &mut Fluid, t: &TileMap) {
 			}
 		}
 	}
+
+	f
 }
 
 

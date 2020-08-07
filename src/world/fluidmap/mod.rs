@@ -6,12 +6,14 @@ mod physics;
 pub mod force;
 pub use self::force::*;
 
+#[derive(Clone)]
 pub enum FluidState {
 	Owned,
 	AtHand,
 	Free,
 }
 
+#[derive(Clone)]
 pub struct Fluid {
 	pub state: FluidState,
 	pub owner: usize,
@@ -25,33 +27,27 @@ pub struct FluidMap {
 
 impl FluidMap {
 	pub fn new(tilemap_size: TileVec) -> FluidMap {
-		let fluidmap_size = fluidmap_size(tilemap_size);
-		let mut m = FluidMap { grid: (0..(fluidmap_size.x * fluidmap_size.y)).map(|_| Vec::new()).collect() };
+		let iter =
+			Some(Fluid {
+				state: FluidState::Free,
+				owner: 0,
+				velocity: 0.into(),
+				position: 13000.into(),
+			}).into_iter();
 
-		// TODO remove
-		m.grid[0].push(Fluid {
-			state: FluidState::Free,
-			owner: 0,
-			velocity: 0.into(),
-			position: 13000.into(),
-		});
-
-		m
+		FluidMap {
+			grid: FluidMap::mk_grid(iter, tilemap_size),
+		}
 	}
 
 	pub fn tick(&mut self, t: &TileMap) {
 		self.apply_forces();
 		self.move_by_velocity(t);
-		self.update_grid(t);
 	}
 
-	fn update_grid(&mut self, t: &TileMap) {
-		let fluidmap_size = fluidmap_size(t.size);
+	fn mk_grid(fluids: impl Iterator<Item=Fluid>, tilemap_size: TileVec) -> Vec<Vec<Fluid>> {
+		let fluidmap_size = fluidmap_size(tilemap_size);
 		let mut grid: Vec<Vec<Fluid>> = (0..(fluidmap_size.x * fluidmap_size.y)).map(|_| Vec::new()).collect();
-
-		let fluids = self.grid.iter_mut().map(|cell|
-				cell.drain(..)
-			).flatten();
 
 		for f in fluids {
 			let fluid_pos = f.position.to_fluid();
@@ -59,13 +55,18 @@ impl FluidMap {
 			grid[i].push(f);
 		}
 
-		self.grid = grid;
+		grid
 	}
 
 	pub fn iter(&self) -> impl Iterator<Item=&Fluid> + '_ {
 		self.grid.iter()
 			.map(|x| x.iter())
 			.flatten()
+	}
+
+	pub fn neighbours(&self, f: &Fluid) -> impl Iterator<Item=&Fluid> + '_ {
+		// TODO only find neighbours which have distance <= FLUID_AFFECT_DIST
+		self.iter()
 	}
 }
 

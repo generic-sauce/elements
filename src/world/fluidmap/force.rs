@@ -12,6 +12,16 @@ impl FluidMap {
 			}
 		}
 
+/* // TODO
+		for f in self.iter() {
+			for n in f.neighbours() {
+				let new_f = affect(f, n);
+			}
+		}
+*/
+
 		// TODO push & pull fluid reactions
 	}
 }
+
+// fn affect(f: &Fluid, neighbours: impl Iterator<Item=&Fluid>) -> Fluid { unimplemented!() }
