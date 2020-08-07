@@ -16,6 +16,6 @@ impl Animation {
 
 	pub fn draw(&mut self, position: Vec2f, radius: Vec2f, context: &DrawContext) {
 		context.draw_animation(position, radius, *self);
-		self.index = (self.index + 1) % context.animation_state.get_frame_count(*self);
+		self.index = (self.index + 1) % (context.animation_state.get_frame_count(*self) * context.animation_state.get_interval(*self));
 	}
 }
