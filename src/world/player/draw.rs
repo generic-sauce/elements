@@ -23,6 +23,6 @@ impl Player {
 	}
 
 	pub fn draw(&mut self, context: &DrawContext) {
-		context.draw_sprite(self.texture_center(), self.texture_radius(), Color::WHITE, Some(TextureId::PlayerIdle1));
+		context.draw_sprite(self.texture_center(), self.texture_radius(), Color::WHITE, Some(TextureId::BluePlayerIdle1));
 	}
 }

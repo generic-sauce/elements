@@ -32,5 +32,9 @@ impl TextureState {
 }
 
 setup!(
-	PlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png"
+	BluePlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png",
+	BluePlayerIdle2: "res/images/player_blue/player_idle/player_idle2.png",
+	BluePlayerIdle3: "res/images/player_blue/player_idle/player_idle3.png",
+	BluePlayerIdle4: "res/images/player_blue/player_idle/player_idle4.png",
+	BluePlayerIdle5: "res/images/player_blue/player_idle/player_idle5.png"
 );

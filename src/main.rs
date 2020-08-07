@@ -1,3 +1,4 @@
+mod animation_state;
 mod input;
 mod app;
 mod world;
