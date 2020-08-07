@@ -54,29 +54,27 @@ impl Player {
 	}
 
 	fn apply_forces(&mut self, input: &dyn Input, t: &TileMap) {
-		if !input.is_connected() { println!("joystick not connected"); }
-
 		// drag
 		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
 		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
 
 		// walk
-		self.velocity.x += (input.get_direction().x * X_ACCELERATION as f32) as i32;
+		self.velocity.x += input.horizontal_dir() * X_ACCELERATION;
 		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
-		if self.is_grounded(t) && input.get_direction().y > 0.0 && self.velocity.y <= 0 {
+		if self.is_grounded(t) && input.up() && self.velocity.y <= 0 {
 			self.velocity.y = JUMP_POWER;
 			self.walljumped = false;
 		}
 
 		// walljump
-		if !self.walljumped && !self.is_grounded(t) && input.get_direction().y > 0.0 && (
-				self.is_left_walled(t) && input.get_direction().x > 0.0 ||
-				self.is_right_walled(t) && input.get_direction().x < 0.0) {
-			let force = input.get_direction().normalize() * WALLJUMP_POWER as f32;
-			self.velocity = GameVec::new(force.x as i32, force.y as i32);
-			self.walljumped = true;
+		if !self.walljumped && !self.is_grounded(t) && input.up() && (
+				self.is_left_walled(t) && input.horizontal_dir() > 0 ||
+				self.is_right_walled(t) && input.horizontal_dir() < 0) {
+			// let force = input.get_direction().normalize() * WALLJUMP_POWER as f32;
+			// self.velocity = GameVec::new(force.x as i32, force.y as i32);
+			// self.walljumped = true;
 		}
 
 		// gravity
