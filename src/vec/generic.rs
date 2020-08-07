@@ -159,3 +159,12 @@ impl<T: Copy, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> {
 		self.x * other.x + self.y * other.y
 	}
 }
+
+impl<T, P> Vec2t<T, P> where T: Copy + Ord {
+	pub fn clamped(self, min: T, max: T) -> Vec2t<T, P> {
+		Vec2t::new(
+			if self.x < min { min } else if self.x > max { max } else { self.x },
+			if self.y < min { min } else if self.y > max { max } else { self.y },
+		)
+	}
+}

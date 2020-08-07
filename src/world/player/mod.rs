@@ -41,18 +41,16 @@ impl Player {
 	}
 
 	fn apply_forces(&mut self, input: &dyn Input, t: &TileMap) {
-		if !input.is_connected() { println!("joystick not connected"); }
-
 		// drag
 		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
 		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
 
 		// walk
-		self.velocity.x += (input.get_direction().x * X_ACCELERATION as f32) as i32;
+		self.velocity.x += input.horizontal_dir() * X_ACCELERATION;
 		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
-		if self.is_grounded(t) && input.get_direction().y > 0.0 && self.velocity.y <= 0 {
+		if self.is_grounded(t) && input.up() && self.velocity.y <= 0 {
 			self.velocity.y = JUMP_POWER;
 		}
 
