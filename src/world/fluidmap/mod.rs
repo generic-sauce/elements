@@ -59,4 +59,10 @@ impl FluidMap {
 
 		self.grid = grid;
 	}
+
+	pub fn iter(&self) -> impl Iterator<Item=&Fluid> + '_ {
+		self.grid.iter()
+			.map(|x| x.iter())
+			.flatten()
+	}
 }
