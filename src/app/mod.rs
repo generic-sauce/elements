@@ -44,7 +44,6 @@ impl App {
 				}
 			}
 
-			println!("{}", delta_time.as_millis());
 			let delta_time_f = delta_time.as_millis() as f32 + 1.0;
 			let fps = 1000.0 / delta_time_f;
 			self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
