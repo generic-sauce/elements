@@ -25,7 +25,7 @@ impl FluidMap {
 		let texture: &'static mut Texture;
 		unsafe { texture = &mut *x; }
 
-		shader.set_uniform_float("elapsed_time", context.elapsed_time.as_seconds());
+		shader.set_uniform_float("elapsed_time", context.elapsed_time.as_secs_f32());
 		shader.set_uniform_texture("fluid_tex", texture);
 		let v = Vector2f::new(context.tilemap_size.x as f32, context.tilemap_size.y as f32); // TODO make nicer
 		shader.set_uniform_vec2("fluid_tex_size", v);
