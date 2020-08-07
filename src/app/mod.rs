@@ -34,8 +34,7 @@ impl App {
 
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
-		let target_interval = timed_loop.interval;
-		for delta_time in timed_loop {
+		for delta_time in timed_loop.clone() {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Q, .. } => {
@@ -49,10 +48,10 @@ impl App {
 			let delta_time_f = delta_time.as_millis() as f32 + 1.0;
 			let fps = 1000.0 / delta_time_f;
 			self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
-			let perf = delta_time_f / target_interval.as_millis() as f32;
+			let perf = delta_time_f / timed_loop.interval.as_millis() as f32;
 			self.smooth_perf = self.smooth_perf * 0.95 + perf * 0.05;
-			if delta_time > target_interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), target_interval.as_millis());
+			if delta_time > timed_loop.interval {
+				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), timed_loop.interval.as_millis());
 			}
 
 			self.tick();

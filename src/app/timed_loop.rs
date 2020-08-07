@@ -1,6 +1,7 @@
 use std::time::{Duration, SystemTime};
 use std::thread::sleep;
 
+#[derive(Clone)]
 pub struct TimedLoop {
 	pub interval: Duration,
 	current: SystemTime,
