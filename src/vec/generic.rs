@@ -2,6 +2,7 @@ use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 use std::fmt::{Display, Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
+use std::iter::Sum;
 
 use super::Vec2t;
 
@@ -166,5 +167,21 @@ impl<T, P> Vec2t<T, P> where T: Copy + Ord {
 			if self.x < min { min } else if self.x > max { max } else { self.x },
 			if self.y < min { min } else if self.y > max { max } else { self.y },
 		)
+	}
+}
+impl<T: Default, P> Default for Vec2t<T, P> {
+	fn default() -> Self {
+		Vec2t::new(
+			Default::default(),
+			Default::default()
+		)
+	}
+}
+
+// this could be written by only requiring Sum!
+impl<T: Add<Output=T> + Default, P> Sum<Self> for Vec2t<T, P> {
+	fn sum<I>(iter: I) -> Self where I: Iterator<Item = Self> {
+		let null: Vec2t<T, P> = Default::default();
+		iter.fold(null, |a, b| Vec2t::new(a.x + b.x, a.y + b.y))
 	}
 }

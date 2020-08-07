@@ -56,4 +56,8 @@ impl Vec2f {
 	pub fn magnitude(self) -> f32 {
 		(self.x * self.x + self.y * self.y).sqrt()
 	}
+
+	pub fn normalize(self) -> Vec2f {
+		self / self.magnitude()
+	}
 }
