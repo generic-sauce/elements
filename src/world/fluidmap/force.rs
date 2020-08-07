@@ -21,6 +21,8 @@ impl FluidMap {
 				.map(|n| affect(f, n))
 				.sum::<GameVec>();
 
+			let velocity = velocity.clamped(-200, 200);
+
 			Fluid {
 				velocity,
 				..f.clone()
