@@ -70,10 +70,10 @@ impl<'a> DrawContext<'a> {
 		self.window.draw_text(&text, RenderStates::default());
 	}
 
-	pub fn draw_circle(&self, position: Vec2f, radius: f32, color: Color) {
+	pub fn draw_circle(&self, position: GameVec, radius: f32, color: Color) {
 		let mut shape = CircleShape::new(radius, 32);
-		shape.set_position(position);
-		shape.set_origin(position * 0.5);
+		shape.set_position(position.to_f());
+		shape.set_origin(position.to_f() * 0.5);
 		shape.set_fill_color(color);
 
 		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);

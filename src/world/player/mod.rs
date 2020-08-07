@@ -69,12 +69,13 @@ impl Player {
 		}
 
 		// walljump
-		if !self.walljumped && !self.is_grounded(t) && input.up() && (
+		if !self.walljumped && !self.is_grounded(t) && input.just_up() && (
 				self.is_left_walled(t) && input.horizontal_dir() > 0 ||
 				self.is_right_walled(t) && input.horizontal_dir() < 0) {
-			// let force = input.get_direction().normalize() * WALLJUMP_POWER as f32;
-			// self.velocity = GameVec::new(force.x as i32, force.y as i32);
-			// self.walljumped = true;
+			let horizontal_dir = i32::signum(input.horizontal_dir()) * 100;
+			let force = GameVec::new(horizontal_dir, JUMP_POWER);
+			self.velocity = force;
+			self.walljumped = true;
 		}
 
 		// gravity
