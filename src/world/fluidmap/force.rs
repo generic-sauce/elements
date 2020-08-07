@@ -13,6 +13,9 @@ impl FluidMap {
 			// gravity
 			let velocity = velocity - GameVec::new(0, GRAVITY);
 
+			// drag
+			let velocity = velocity - velocity / 10;
+
 			// neighbour-affection
 			let velocity = velocity + neighbours
 				.map(|n| affect(f, n))
@@ -23,10 +26,13 @@ impl FluidMap {
 				..f.clone()
 			}
 		})
-		// TODO push & pull fluid reactions
 	}
 }
 
 fn affect(f: &Fluid, n: &Fluid) -> GameVec {
-	(f.position - n.position) / 3
+	let x = (n.position - f.position) / 3;
+
+	if x == GameVec::new(0, 0) { return GameVec::new(1, 0); }
+
+	x * 100 / x.magnitude_sqr()
 }
