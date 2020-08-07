@@ -2,6 +2,7 @@ use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 use std::fmt::{Display, Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
+use std::iter::Sum;
 
 use super::Vec2t;
 
@@ -157,5 +158,22 @@ impl<T: Copy, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> {
 	pub fn dot(self, other: impl Into<Vec2t<T, P>>) -> T {
 		let other = other.into();
 		self.x * other.x + self.y * other.y
+	}
+}
+
+impl<T: Default, P> Default for Vec2t<T, P> {
+	fn default() -> Self {
+		Vec2t::new(
+			Default::default(),
+			Default::default()
+		)
+	}
+}
+
+// this could be written by only requiring Sum!
+impl<T: Add<Output=T> + Default, P> Sum<Self> for Vec2t<T, P> {
+	fn sum<I>(iter: I) -> Self where I: Iterator<Item = Self> {
+		let null: Vec2t<T, P> = Default::default();
+		iter.fold(null, |a, b| Vec2t::new(a.x + b.x, a.y + b.y))
 	}
 }

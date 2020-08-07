@@ -33,7 +33,15 @@ impl FluidMap {
 				owner: 0,
 				velocity: 0.into(),
 				position: 13000.into(),
-			}).into_iter();
+			}).into_iter()
+			.chain(
+				Some(Fluid {
+					state: FluidState::Free,
+					owner: 0,
+					velocity: 0.into(),
+					position: 17003.into(),
+				}).into_iter()
+			);
 
 		FluidMap {
 			grid: FluidMap::mk_grid(iter, tilemap_size),
