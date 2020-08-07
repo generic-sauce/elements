@@ -12,6 +12,7 @@ const MAX_X_VEL: i32 = 120;
 const JUMP_POWER: i32 = 300;
 const WALLJUMP_POWER: i32 = JUMP_POWER;
 const X_ACCELERATION: i32 = 55;
+pub const CURSOR_INDICATOR_RADIUS: i32 = TILESIZE / 2;
 
 // also required for fluids!
 pub const GRAVITY: i32 = 15;
@@ -35,6 +36,7 @@ pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
 	pub animation: Animation,
+	pub cursor: GameVec,
 	walljumped: bool,
 }
 
@@ -44,6 +46,7 @@ impl Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
 			animation: Animation::new(AnimationId::BluePlayerIdle),
+			cursor: GameVec::new(0, 0),
 			walljumped: true,
 		}
 	}
@@ -69,12 +72,13 @@ impl Player {
 		}
 
 		// walljump
-		if !self.walljumped && !self.is_grounded(t) && input.up() && (
+		if !self.walljumped && !self.is_grounded(t) && input.just_up() && (
 				self.is_left_walled(t) && input.horizontal_dir() > 0 ||
 				self.is_right_walled(t) && input.horizontal_dir() < 0) {
-			// let force = input.get_direction().normalize() * WALLJUMP_POWER as f32;
-			// self.velocity = GameVec::new(force.x as i32, force.y as i32);
-			// self.walljumped = true;
+			let horizontal_dir = i32::signum(input.horizontal_dir()) * 100;
+			let force = GameVec::new(horizontal_dir, JUMP_POWER);
+			self.velocity = force;
+			self.walljumped = true;
 		}
 
 		// gravity
@@ -91,5 +95,9 @@ impl Player {
 
 	fn is_right_walled(&self, t: &TileMap) -> bool {
 		self.check_sensor(&RIGHT_SENSOR, t)
+	}
+
+	fn center_position(&self) -> GameVec {
+		self.left_bot + PLAYER_SIZE / 2
 	}
 }

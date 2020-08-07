@@ -24,5 +24,6 @@ impl Player {
 
 	pub fn draw(&mut self, context: &DrawContext) {
 		self.animation.draw(self.texture_center(), self.texture_radius(), context);
+		context.draw_circle(self.center_position() + self.cursor, CURSOR_INDICATOR_RADIUS, Color::BLACK);
 	}
 }
