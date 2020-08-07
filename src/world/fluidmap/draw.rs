@@ -2,13 +2,6 @@ use crate::prelude::*;
 
 impl FluidMap {
 	pub fn draw(&self, context: &mut DrawContext) {
-		#[cfg(debug_assertions)] {
-			for fluid in self.iter() {
-				context.draw_circle(fluid.position, TILESIZE, Color::BLUE);
-			}
-		}
-
-		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
 		let mut pixels = Vec::with_capacity(size);
@@ -24,6 +17,8 @@ impl FluidMap {
 			pixels[cell_index+1] = local_position.y as u8;
 			pixels[cell_index+0] = local_position.x as u8;
 		}
+
+		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let image = Image::create_from_pixels(context.tilemap_size.x as u32, context.tilemap_size.y as u32, &pixels).unwrap();
 		let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
@@ -44,5 +39,10 @@ impl FluidMap {
 		rect.set_texture(&texture, true);
 		rect.set_size(Vector2f::new(size.x as f32, size.y as f32));
 		context.window.draw_rectangle_shape(&rect, states);
+
+		#[cfg(debug_assertions)]
+		for fluid in self.iter() {
+			context.draw_circle(fluid.position, TILESIZE / 3, Color::RED);
+		}
 	}
 }
