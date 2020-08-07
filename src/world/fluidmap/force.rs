@@ -28,5 +28,5 @@ impl FluidMap {
 }
 
 fn affect(f: &Fluid, n: &Fluid) -> GameVec {
-	(f.position - n.position) / 100
+	(f.position - n.position) / 3
 }
