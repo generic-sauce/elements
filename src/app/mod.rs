@@ -10,9 +10,6 @@ pub struct App {
 	font_state: FontState,
 	animation_state: AnimationState,
 	inputs: [Box<dyn Input>; 2],
-	clock: Clock,
-	smooth_fps: f32,
-	smooth_perf: f32,
 }
 
 impl App {
@@ -26,16 +23,13 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
-			clock: Clock::start(),
-			smooth_fps: 60.0,
-			smooth_perf: 1.0,
 		}
 	}
 
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
-		let target_interval = timed_loop.interval;
-		for delta_time in timed_loop {
+		let interval = timed_loop.interval;
+		for (elapsed_time, delta_time, fps, perf) in timed_loop {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Q, .. } => {
@@ -46,17 +40,12 @@ impl App {
 				}
 			}
 
-			let delta_time_f = delta_time.as_millis() as f32 + 1.0;
-			let fps = 1000.0 / delta_time_f;
-			self.smooth_fps = self.smooth_fps * 0.95 + fps * 0.05;
-			let perf = delta_time_f / target_interval.as_millis() as f32;
-			self.smooth_perf = self.smooth_perf * 0.95 + perf * 0.05;
-			if delta_time > target_interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), target_interval.as_millis());
+			if delta_time > interval {
+				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
 			}
 
 			self.tick();
-			self.draw();
+			self.draw(elapsed_time, fps, perf);
 
 			self.window.display();
 			self.window.clear(Color::rgb(0, 0, 0));
@@ -72,7 +61,7 @@ impl App {
 		self.world.tick(&mut self.inputs);
 	}
 
-	pub fn draw(&mut self) {
+	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {
 		let mut context = DrawContext::new(
 			&mut self.window,
 			&self.texture_state,
@@ -80,16 +69,14 @@ impl App {
 			&self.font_state,
 			&self.animation_state,
 			self.world.tilemap.size,
-			self.clock.elapsed_time());
+			elapsed_time);
 
 		// draw game
 		self.world.draw(&mut context);
 
 		// draw time
-		let mut elapsed_time = String::from("Elapsed time: ");
-		elapsed_time.push_str(&self.clock.elapsed_time().as_seconds().floor().to_string());
-		context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, &elapsed_time);
-		context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &format!("fps: {}", self.smooth_fps as u32));
-		context.draw_text(Vec2f::new(20.0, 100.0), 32 as u32, &format!("perf: {:.0}%", self.smooth_perf * 100.0));
+		context.draw_text(Vec2f::new(20.0, 20.0), 32 as u32, &format!("elapsed time: {}", elapsed_time.as_secs()));
+		context.draw_text(Vec2f::new(20.0, 60.0), 32 as u32, &format!("fps: {}", fps as u32));
+		context.draw_text(Vec2f::new(20.0, 100.0), 32 as u32, &format!("perf: {:.2}%", perf));
 	}
 }

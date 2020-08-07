@@ -7,7 +7,7 @@ pub struct DrawContext<'a> {
 	pub font_state: &'a FontState,
 	pub animation_state: &'a AnimationState,
 	pub tilemap_size: TileVec,
-	pub elapsed_time: Time,
+	pub elapsed_time: Duration,
 }
 
 impl<'a> DrawContext<'a> {
@@ -18,7 +18,7 @@ impl<'a> DrawContext<'a> {
 		font_state: &'a FontState,
 		animation_state: &'a AnimationState,
 		tilemap_size: TileVec,
-		elapsed_time: Time,
+		elapsed_time: Duration,
 		) -> DrawContext<'a>
 	{
 		DrawContext {

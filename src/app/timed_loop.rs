@@ -1,34 +1,49 @@
-use std::time::{Duration, SystemTime};
-use std::thread::sleep;
+use crate::prelude::*;
 
+#[derive(Clone)]
 pub struct TimedLoop {
 	pub interval: Duration,
 	current: SystemTime,
+	start_time: SystemTime,
+	prev_second: SystemTime,
+	frames_since_prev_second: u32,
+	duration_since_prev_second: Duration,
+	fps: u32,
+	perf: f32,
 }
 
 impl TimedLoop {
 	pub fn new(interval: Duration) -> TimedLoop {
+		let now = SystemTime::now();
 		TimedLoop {
 			interval,
-			current: SystemTime::now(),
+			current: now,
+			start_time: now,
+			prev_second: now,
+			frames_since_prev_second: 0,
+			duration_since_prev_second: Duration::from_secs(0),
+			fps: 0,
+			perf: 0.0,
 		}
 	}
 
 	pub fn with_fps(fps: u32) -> TimedLoop {
 		TimedLoop::new(Duration::from_millis((1000/fps) as u64))
 	}
+
+	pub fn elapsed_time(&self) -> Duration {
+		(SystemTime::now().duration_since(self.start_time)).unwrap()
+	}
 }
 
 impl Iterator for TimedLoop {
-	type Item = Duration;
+	type Item = (Duration, Duration, u32, f32);
 
-	fn next(&mut self) -> Option<Duration> {
+	fn next(&mut self) -> Option<Self::Item> {
 		let now = SystemTime::now();
 		let next = self.current + self.interval;
-
 		let sleep_duration = next.duration_since(now);
-
-		Some(match sleep_duration {
+		let delta_time = match sleep_duration {
 			Ok(duration) => {
 				self.current = next;
 				sleep(duration);
@@ -38,6 +53,23 @@ impl Iterator for TimedLoop {
 				self.current = now;
 				err.duration() + self.interval
 			},
-		})
+		};
+
+		let next_second = self.prev_second + Duration::from_secs(1);
+		match now.duration_since(next_second) {
+			Ok(_) => {
+				self.fps = self.frames_since_prev_second;
+				self.frames_since_prev_second = 0;
+
+				self.perf = self.duration_since_prev_second.as_secs_f32();;
+				self.duration_since_prev_second = Duration::from_secs(0);
+
+				self.prev_second = next_second;
+			},
+			_ => {},
+		}
+		self.duration_since_prev_second += delta_time;
+		self.frames_since_prev_second += 1;
+		Some((self.elapsed_time(), delta_time, self.fps, self.perf))
 	}
 }
