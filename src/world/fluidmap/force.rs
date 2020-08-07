@@ -15,7 +15,7 @@ impl FluidMap {
 
 			// neighbour-affection
 			let velocity = velocity + neighbours
-				.map(|n| (f.position - n.position) / 100)
+				.map(|n| affect(f, n))
 				.sum::<GameVec>();
 
 			Fluid {
@@ -25,4 +25,8 @@ impl FluidMap {
 		})
 		// TODO push & pull fluid reactions
 	}
+}
+
+fn affect(f: &Fluid, n: &Fluid) -> GameVec {
+	(f.position - n.position) / 3
 }
