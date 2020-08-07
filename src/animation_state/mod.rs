@@ -1,4 +1,4 @@
-mod animation;
+pub mod animation;
 
 use crate::prelude::*;
 use std::fs::read_dir;
@@ -52,6 +52,16 @@ impl AnimationBuffer {
 
 pub struct AnimationState {
 	animation_buffers: Vec<AnimationBuffer>,
+}
+
+impl AnimationState {
+	pub fn get_animation_texture(&self, animation: Animation) -> &'_ Texture {
+		&self.animation_buffers[animation.animation_id as usize].frames[animation.index as usize]
+	}
+
+	pub fn get_frame_count(&self, animation: Animation) -> usize {
+		self.animation_buffers[animation.animation_id as usize].frames.len()
+	}
 }
 
 struct AnimationBuffer {

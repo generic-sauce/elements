@@ -23,6 +23,7 @@ static GROUND_SENSOR: Sensor = Sensor {
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
+	pub animation: Animation,
 }
 
 impl Player {
@@ -30,6 +31,7 @@ impl Player {
 		Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
+			animation: Animation::new(AnimationId::BluePlayerIdle),
 		}
 	}
 

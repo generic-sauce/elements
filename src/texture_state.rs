@@ -5,6 +5,7 @@ macro_rules! setup {
 
 		#[derive(Copy, Clone, Debug)]
 		#[repr(usize)]
+		#[allow(unused)]
 		pub enum TextureId {
 			$($x),*
 		}
@@ -26,15 +27,12 @@ pub struct TextureState {
 }
 
 impl TextureState {
+	#[allow(unused)]
 	pub fn get_texture(&self, id: TextureId) -> &'_ Texture {
 		&*self.textures[id as usize]
 	}
 }
 
 setup!(
-	BluePlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png",
-	BluePlayerIdle2: "res/images/player_blue/player_idle/player_idle2.png",
-	BluePlayerIdle3: "res/images/player_blue/player_idle/player_idle3.png",
-	BluePlayerIdle4: "res/images/player_blue/player_idle/player_idle4.png",
-	BluePlayerIdle5: "res/images/player_blue/player_idle/player_idle5.png"
+	BluePlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png"
 );

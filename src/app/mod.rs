@@ -79,6 +79,7 @@ impl App {
 			&self.texture_state,
 			&mut self.shader_state,
 			&self.font_state,
+			&self.animation_state,
 			self.world.tilemap.size,
 			self.clock.elapsed_time());
 

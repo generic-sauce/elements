@@ -13,6 +13,7 @@ pub use crate::vec::*;
 pub use crate::draw_context::*;
 pub use crate::app::timed_loop::*;
 pub use crate::animation_state::*;
+pub use crate::animation_state::animation::*;
 
 pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, Transformable, Shader, Sprite, Rect, IntRect, Image, Text, Font};
