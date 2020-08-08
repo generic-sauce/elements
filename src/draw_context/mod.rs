@@ -49,11 +49,6 @@ impl<'a> DrawContext<'a> {
 		shape.set_origin(radius);
 		shape.set_position(position);
 		shape.set_fill_color(color);
-
-		// let ratio = size.x / size.y;
-		// let height = self.tilemap_size.y as f32;
-		// let tile = size.y / height;
-		// shape.set_scale(Vector2f::new(1.0, -1.0));
 		shape.set_position(shape.position() * Vector2f::new(1.0, -1.0) + Vector2f::new(0.0, size.y));
 
 		self.window.draw_rectangle_shape(&shape, RenderStates::default());
