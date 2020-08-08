@@ -13,7 +13,7 @@ impl FluidMap {
 
 			let cell_index = 4 * (cell_id.x + cell_id.y * context.tilemap_size.x as i32) as usize;
 			pixels[cell_index+3] = 255;
-			pixels[cell_index+2] = 0;
+			pixels[cell_index+2] = (fluid.owner * 255) as u8;
 			pixels[cell_index+1] = local_position.y as u8;
 			pixels[cell_index+0] = local_position.x as u8;
 		}
