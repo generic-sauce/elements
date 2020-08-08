@@ -1,5 +1,9 @@
 use crate::prelude::*;
 
+mod canvas_vec;
+
+pub use canvas_vec::*;
+
 pub struct DrawContext<'a> {
 	pub window: &'a mut RenderWindow,
 	pub texture_state: &'a TextureState,
