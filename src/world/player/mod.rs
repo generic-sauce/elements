@@ -10,7 +10,6 @@ pub const PLAYER_SIZE: GameVec = TileVec::new(2, 6).to_game();
 const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;
 const JUMP_POWER: i32 = 300;
-const WALLJUMP_POWER: i32 = JUMP_POWER;
 const X_ACCELERATION: i32 = 55;
 pub const CURSOR_INDICATOR_RADIUS: i32 = TILESIZE / 2;
 
