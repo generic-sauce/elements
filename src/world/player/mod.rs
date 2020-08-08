@@ -72,8 +72,8 @@ impl Player {
 
 		// walljump
 		if !self.walljumped && !self.is_grounded(t) && input.just_up() && (
-				self.is_left_walled(t) && input.horizontal_dir() > 0 ||
-				self.is_right_walled(t) && input.horizontal_dir() < 0) {
+				self.is_left_walled(t) && input.right() ||
+				self.is_right_walled(t) && input.left()) {
 			let horizontal_dir = i32::signum(input.horizontal_dir()) * 100;
 			let force = GameVec::new(horizontal_dir, JUMP_POWER);
 			self.velocity = force;
@@ -85,8 +85,8 @@ impl Player {
 
 		// wall friction
 		if self.velocity.y < 0 &&
-			(self.is_left_walled(t) && input.horizontal_dir() < 0 ||
-			self.is_right_walled(t) && input.horizontal_dir() > 0) {
+			(self.is_left_walled(t) && input.left() ||
+			self.is_right_walled(t) && input.right()) {
 			self.velocity.y = (self.velocity.y as f32 * 0.8) as i32;
 		}
 	}
