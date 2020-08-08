@@ -67,10 +67,12 @@ impl<'a> DrawContext<'a> {
 		self.draw_texture(position, radius, Color::WHITE, Some(texture));
 	}
 
-	pub fn draw_text(&self, position: Vec2f, size: u32, text: &str) {
+	pub fn draw_text<T: IntoCanvasVec>(&self, position: T, size: u32, text: &str) {
+		let position = position.to_canvas(self.tilemap_size);
+
 		let font = self.font_state.get_font(FontId::DefaultFont);
 		let mut text = Text::new(text, &font, size);
-		text.set_position(position);
+		text.set_position(position * (self.window.size().y as f32));
 		self.window.draw_text(&text, RenderStates::default());
 	}
 

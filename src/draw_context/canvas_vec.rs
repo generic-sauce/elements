@@ -21,3 +21,7 @@ impl IntoCanvasVec for TileVec {
 		self.to_game().to_canvas(tilemap_size)
 	}
 }
+
+impl IntoCanvasVec for CanvasVec {
+	fn to_canvas(self, _tilemap_size: TileVec) -> CanvasVec { self }
+}
