@@ -70,17 +70,18 @@ impl<'a> DrawContext<'a> {
 		self.window.draw_text(&text, RenderStates::default());
 	}
 
-	pub fn draw_circle(&self, position: GameVec, radius: f32, color: Color) {
+	pub fn draw_circle(&self, position: GameVec, radius: i32, color: Color) {
+		let radius = radius as f32 / TILESIZE as f32;
 		let mut shape = CircleShape::new(radius, 32);
-		shape.set_position(position.to_f());
-		shape.set_origin(position.to_f() * 0.5);
+		shape.set_position(position.to_f() / TILESIZE as f32);
+		shape.set_origin(Vec2f::new(radius, radius));
 		shape.set_fill_color(color);
 
 		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
-		// let ratio = size.x / size.y;
 		let height = self.tilemap_size.y as f32;
 		let tile = size.y / height;
-		shape.set_scale(Vector2f::new(tile, tile));
+		shape.set_radius(shape.radius() * tile);
+		shape.set_origin(shape.origin() * tile);
 		shape.set_position(shape.position() * Vector2f::new(tile, -tile) + Vector2f::new(0.0, size.y));
 
 		self.window.draw_circle_shape(&shape, RenderStates::default());
