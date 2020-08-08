@@ -59,11 +59,11 @@ impl<'a> DrawContext<'a> {
 		self.window.draw_rectangle_shape(&shape, RenderStates::default());
 	}
 
-	// #[allow(unused)]
-	// pub fn draw_sprite(&self, position: Vec2f, radius: Vec2f, color: Color, texture_id: Option<TextureId>) {
-	// 	let texture = texture_id.map(|texture_id| self.texture_state.get_texture(texture_id));
-	// 	self.draw_texture(position, radius, color, texture);
-	// }
+	#[allow(unused)]
+	pub fn draw_sprite<T: IntoCanvasVec>(&self, position: T, radius: T, color: Color, texture_id: Option<TextureId>) {
+		let texture = texture_id.map(|texture_id| self.texture_state.get_texture(texture_id));
+		self.draw_texture(position, radius, color, texture);
+	}
 
 	pub fn draw_animation<T: IntoCanvasVec>(&self, position: T, radius: T, animation: Animation) {
 		let texture = self.animation_state.get_animation_texture(animation);
@@ -79,19 +79,17 @@ impl<'a> DrawContext<'a> {
 		self.window.draw_text(&text, RenderStates::default());
 	}
 
-	pub fn draw_circle(&self, position: GameVec, radius: i32, color: Color) {
-		let radius = radius as f32 / TILESIZE as f32;
+	pub fn draw_circle<T: IntoCanvasVec> (&self, position: T, radius: i32 /* GameVec coordinate system */, color: Color) {
+		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
+		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size)) * size.y;
+		let radius = radius as f32 * size.y / (TILESIZE * self.tilemap_size.y) as f32;
+
 		let mut shape = CircleShape::new(radius, 32);
-		shape.set_position(position.to_f() / TILESIZE as f32);
-		shape.set_origin(Vec2f::new(radius, radius));
+		shape.set_position(position);
+		shape.set_origin(Vector2f::new(radius, radius));
 		shape.set_fill_color(color);
 
-		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
-		let height = self.tilemap_size.y as f32;
-		let tile = size.y / height;
-		shape.set_radius(shape.radius() * tile);
-		shape.set_origin(shape.origin() * tile);
-		shape.set_position(shape.position() * Vector2f::new(tile, -tile) + Vector2f::new(0.0, size.y));
+		shape.set_position(shape.position() * Vector2f::new(1.0, -1.0) + Vector2f::new(0.0, size.y));
 
 		self.window.draw_circle_shape(&shape, RenderStates::default());
 	}

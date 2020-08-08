@@ -2,7 +2,6 @@ use crate::prelude::*;
 
 impl FluidMap {
 	pub fn draw(&self, context: &mut DrawContext) {
-
 		let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
 		let mut pixels = Vec::with_capacity(size);
 		pixels.resize(size * 4, 0 as u8);
