@@ -36,7 +36,11 @@ impl<'a> DrawContext<'a> {
 		}
 	}
 
-	pub fn draw_texture(&self, position: Vec2f, radius: Vec2f, color: Color, texture: Option<&Texture>) {
+	pub fn draw_texture<T: IntoCanvasVec>(&self, position: T, radius: T, color: Color, texture: Option<&Texture>) {
+		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
+		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size)) * size.y;
+		let radius: Vector2f = Into::<Vector2f>::into(radius.to_canvas(self.tilemap_size)) * size.y;
+
 		let mut shape = RectangleShape::new();
 		if let Some(texture) = texture {
 			shape.set_texture(texture, true);
@@ -46,23 +50,22 @@ impl<'a> DrawContext<'a> {
 		shape.set_position(position);
 		shape.set_fill_color(color);
 
-		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
 		// let ratio = size.x / size.y;
-		let height = self.tilemap_size.y as f32;
-		let tile = size.y / height;
-		shape.set_scale(Vector2f::new(tile, tile));
-		shape.set_position(shape.position() * Vector2f::new(tile, -tile) + Vector2f::new(0.0, size.y));
+		// let height = self.tilemap_size.y as f32;
+		// let tile = size.y / height;
+		// shape.set_scale(Vector2f::new(1.0, -1.0));
+		shape.set_position(shape.position() * Vector2f::new(1.0, -1.0) + Vector2f::new(0.0, size.y));
 
 		self.window.draw_rectangle_shape(&shape, RenderStates::default());
 	}
 
-	#[allow(unused)]
-	pub fn draw_sprite(&self, position: Vec2f, radius: Vec2f, color: Color, texture_id: Option<TextureId>) {
-		let texture = texture_id.map(|texture_id| self.texture_state.get_texture(texture_id));
-		self.draw_texture(position, radius, color, texture);
-	}
+	// #[allow(unused)]
+	// pub fn draw_sprite(&self, position: Vec2f, radius: Vec2f, color: Color, texture_id: Option<TextureId>) {
+	// 	let texture = texture_id.map(|texture_id| self.texture_state.get_texture(texture_id));
+	// 	self.draw_texture(position, radius, color, texture);
+	// }
 
-	pub fn draw_animation(&self, position: Vec2f, radius: Vec2f, animation: Animation) {
+	pub fn draw_animation<T: IntoCanvasVec>(&self, position: T, radius: T, animation: Animation) {
 		let texture = self.animation_state.get_animation_texture(animation);
 		self.draw_texture(position, radius, Color::WHITE, Some(texture));
 	}
