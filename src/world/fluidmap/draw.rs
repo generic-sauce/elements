@@ -2,6 +2,12 @@ use crate::prelude::*;
 
 impl FluidMap {
 	pub fn draw(&self, context: &mut DrawContext) {
+		#[cfg(debug_assertions)] {
+			for fluid in self.iter() {
+				context.draw_circle(fluid.position, TILESIZE, Color::BLUE);
+			}
+		}
+
 		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
