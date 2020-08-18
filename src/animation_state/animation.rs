@@ -14,7 +14,7 @@ impl Animation {
 		}
 	}
 
-	pub fn draw<T: IntoCanvasVec>(&mut self, position: T, radius: T, context: &DrawContext) {
+	pub fn draw(&mut self, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, context: &DrawContext) {
 		context.draw_animation(position, radius, *self);
 		self.index = (self.index + 1) % (context.animation_state.get_frame_count(*self) * context.animation_state.get_interval(*self));
 	}

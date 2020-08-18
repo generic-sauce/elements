@@ -36,7 +36,7 @@ impl<'a> DrawContext<'a> {
 		}
 	}
 
-	pub fn draw_texture<T: IntoCanvasVec>(&self, position: T, radius: T, color: Color, texture: Option<&Texture>) {
+	pub fn draw_texture(&self, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture: Option<&Texture>) {
 		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
 		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size)) * size.y;
 		let radius: Vector2f = Into::<Vector2f>::into(radius.to_canvas(self.tilemap_size)) * size.y;
@@ -55,17 +55,17 @@ impl<'a> DrawContext<'a> {
 	}
 
 	#[allow(unused)]
-	pub fn draw_sprite<T: IntoCanvasVec>(&self, position: T, radius: T, color: Color, texture_id: Option<TextureId>) {
+	pub fn draw_sprite(&self, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture_id: Option<TextureId>) {
 		let texture = texture_id.map(|texture_id| self.texture_state.get_texture(texture_id));
 		self.draw_texture(position, radius, color, texture);
 	}
 
-	pub fn draw_animation<T: IntoCanvasVec>(&self, position: T, radius: T, animation: Animation) {
+	pub fn draw_animation(&self, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, animation: Animation) {
 		let texture = self.animation_state.get_animation_texture(animation);
 		self.draw_texture(position, radius, Color::WHITE, Some(texture));
 	}
 
-	pub fn draw_text<T: IntoCanvasVec>(&self, position: T, size: u32, text: &str) {
+	pub fn draw_text(&self, position: impl IntoCanvasVec, size: u32, text: &str) {
 		let position = position.to_canvas(self.tilemap_size);
 
 		let font = self.font_state.get_font(FontId::DefaultFont);
@@ -74,7 +74,7 @@ impl<'a> DrawContext<'a> {
 		self.window.draw_text(&text, RenderStates::default());
 	}
 
-	pub fn draw_circle<T: IntoCanvasVec> (&self, position: T, radius: i32 /* GameVec coordinate system */, color: Color) {
+	pub fn draw_circle(&self, position: impl IntoCanvasVec, radius: i32 /* GameVec coordinate system */, color: Color) {
 		let size = Vector2f::new(self.window.size().x as f32, self.window.size().y as f32);
 		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size)) * size.y;
 		let radius = radius as f32 * size.y / (TILESIZE * self.tilemap_size.y) as f32;
