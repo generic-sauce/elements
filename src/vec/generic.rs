@@ -5,6 +5,7 @@ use std::marker::PhantomData;
 use std::iter::Sum;
 
 use super::Vec2t;
+use num_traits::ToPrimitive;
 
 impl<T, P> Vec2t<T, P> {
 	pub const fn new(x: T, y: T) -> Vec2t<T, P> {
@@ -161,14 +162,40 @@ impl<T: Copy, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> {
 	}
 }
 
-impl<T, P> Vec2t<T, P> where T: Copy + Ord {
+impl<T, P> Vec2t<T, P> where T: Copy + Ord + Mul<T, Output=T> + Add<T, Output=T> + Div<T, Output=T> + num_traits::cast::NumCast + Default {
 	pub fn clamped(self, min: T, max: T) -> Vec2t<T, P> {
 		Vec2t::new(
 			if self.x < min { min } else if self.x > max { max } else { self.x },
 			if self.y < min { min } else if self.y > max { max } else { self.y },
 		)
 	}
+
+	pub fn length_clamped(self, max: T) -> Vec2t<T, P> {
+		if self.length_squared() > max*max {
+			self.with_length(max)
+		} else {
+			self
+		}
+	}
+
+	pub fn length_squared(self) -> T where T: Mul<T> + Add<T> {
+		self.x * self.x + self.y * self.y
+	}
+
+	pub fn length(self) -> T {
+		let ls = self.length_squared().to_f64().unwrap();
+		T::from::<f64>(ls.sqrt().floor()).unwrap()
+	}
+
+	pub fn with_length(self, l: T) -> Vec2t<T, P> {
+		let orig_len_sqr = self.x * self.x + self.y * self.y;
+		let orig_len = T::from::<f64>((orig_len_sqr.to_f64().unwrap()).sqrt().floor()).unwrap();
+		if orig_len == Default::default() { return Vec2t::default(); }
+		(self * l) / orig_len
+	}
 }
+
+
 impl<T: Default, P> Default for Vec2t<T, P> {
 	fn default() -> Self {
 		Vec2t::new(
