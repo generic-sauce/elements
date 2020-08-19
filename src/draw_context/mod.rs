@@ -20,6 +20,12 @@ pub enum Flip {
 	Horizontal,
 }
 
+#[derive(PartialEq, Eq)]
+pub enum Center {
+	LeftBottom,
+	LeftTop,
+}
+
 impl<'a> DrawContext<'a> {
 	pub fn new(
 		window: &'a mut RenderWindow,
@@ -73,18 +79,21 @@ impl<'a> DrawContext<'a> {
 		self.draw_texture(position, radius, Color::WHITE, Some(texture), flip);
 	}
 
-	pub fn draw_text(&self, position: impl IntoCanvasVec, size: u32, text: &str) {
-		let position = position.to_canvas(self.tilemap_size);
+	pub fn draw_text(&self, position: impl IntoCanvasVec, size: u32, text: &str, center: Center) {
+		let mut position = position.to_canvas(self.tilemap_size);
 
 		let font = self.font_state.get_font(FontId::DefaultFont);
 		let mut text = Text::new(text, &font, size);
-		let center = Vector2f::new(0.0, text.local_bounds().height + font.underline_position(size));
-		text.set_position(center);
-		// text.set_position(Vector2f::new(100.0, 100.0));
-		text.set_position(position * (self.window.size().y as f32) + center);
+
+		position *= self.window.size().y as f32;
+		position.y += font.underline_position(size);
+
+		if center == Center::LeftBottom {
+			position.y += text.local_bounds().height;
+		}
 
 		let window_height = self.window.size().y as f32;
-		text.set_position(text.position() * Vector2f::new(1.0, -1.0) + Vector2f::new(0.0, window_height));
+		text.set_position(position * Vector2f::new(1.0, -1.0) + Vector2f::new(0.0, window_height));
 		self.window.draw_text(&text, RenderStates::default());
 	}
 
@@ -93,7 +102,7 @@ impl<'a> DrawContext<'a> {
 		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size)) * size.y;
 		let radius = radius as f32 * size.y / (TILESIZE * self.tilemap_size.y) as f32;
 
-		let mut shape = CircleShape::new(radius, 32);
+		let mut shape = CircleShape::new(radius, 8);
 		shape.set_position(position);
 		shape.set_origin(Vector2f::new(radius, radius));
 		shape.set_fill_color(color);

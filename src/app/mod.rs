@@ -75,8 +75,8 @@ impl App {
 		self.world.draw(&mut context);
 
 		// draw time
-		context.draw_text(CanvasVec::new(0.0, 0.010), 32 as u32, &format!("elapsed time: {}", elapsed_time.as_secs()));
-		context.draw_text(CanvasVec::new(0.0, 0.040), 32 as u32, &format!("fps: {}", fps as u32));
-		context.draw_text(CanvasVec::new(0.0, 0.070), 32 as u32, &format!("perf: {:.2}%", perf));
+		context.draw_text(CanvasVec::new(0.0, 1.0), 32 as u32, &format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
+		context.draw_text(CanvasVec::new(0.0, 1.0 - 0.030), 32 as u32, &format!("fps: {}", fps as u32), Center::LeftTop);
+		context.draw_text(CanvasVec::new(0.0, 1.0 - 0.060), 32 as u32, &format!("perf: {:.2}%", perf), Center::LeftTop);
 	}
 }
