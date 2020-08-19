@@ -27,23 +27,12 @@ pub struct FluidMap {
 
 impl FluidMap {
 	pub fn new(tilemap_size: TileVec) -> FluidMap {
-		let iter =
-			(0..500).map(|offset| {
-				let position = GameVec::new(13000 + offset * 10, 13000 + (offset % 200));
-				Fluid {
-					state: FluidState::Free,
-					owner: 1,
-					velocity: 0.into(),
-					position,
-				}
-			});
-
 		let tilemap_size = TileVec::new(tilemap_size.x as i32, tilemap_size.y as i32); // number of tiles
 		let gamemap_size = tilemap_size.to_game(); // number of game-tiles
 		let size = gamemap_size.to_fluid(); // number of fluid-tiles // TODO this may round down and not cover the full size, right?
 
 		FluidMap {
-			grid: FluidMap::mk_grid(iter, size),
+			grid: FluidMap::mk_grid(None.into_iter(), size),
 			size,
 		}
 	}
