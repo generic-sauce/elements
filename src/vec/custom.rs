@@ -36,3 +36,15 @@ impl From<GameVec> for TileVec {
 		t.to_tile()
 	}
 }
+
+impl From<FluidVec> for GameVec {
+	fn from(t: FluidVec) -> GameVec {
+		t.to_game()
+	}
+}
+
+impl From<GameVec> for FluidVec {
+	fn from(t: GameVec) -> FluidVec {
+		t.to_fluid()
+	}
+}

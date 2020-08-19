@@ -109,7 +109,7 @@ impl Player {
 		self.check_sensor(&RIGHT_SENSOR, t)
 	}
 
-	fn center_position(&self) -> GameVec {
+	pub fn center_position(&self) -> GameVec {
 		self.left_bot + PLAYER_SIZE / 2
 	}
 

@@ -8,7 +8,6 @@ pub use self::force::*;
 
 #[derive(Clone)]
 pub enum FluidState {
-	Owned,
 	AtHand,
 	Free,
 }
@@ -29,10 +28,10 @@ pub struct FluidMap {
 impl FluidMap {
 	pub fn new(tilemap_size: TileVec) -> FluidMap {
 		let iter =
-			(0..1000).map(|offset| {
+			(0..500).map(|offset| {
 				let position = GameVec::new(13000 + offset * 10, 13000 + (offset % 200));
 				Fluid {
-					state: FluidState::AtHand,
+					state: FluidState::Free,
 					owner: 1,
 					velocity: 0.into(),
 					position,
@@ -88,5 +87,11 @@ impl FluidMap {
 			.map(move |t| self.index(t))
 			.flatten()
 			.filter(move |n| (f.position - n.position).magnitude_sqr() <= FLUID_AFFECT_DIST * FLUID_AFFECT_DIST)
+	}
+
+	pub fn add_fluid(&mut self, fluid: Fluid) {
+		let tile_pos: FluidVec = fluid.position.into();
+		let index = (tile_pos.x + tile_pos.y * self.size.x) as usize;
+		self.grid[index].push(fluid);
 	}
 }
