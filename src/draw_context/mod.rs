@@ -78,7 +78,13 @@ impl<'a> DrawContext<'a> {
 
 		let font = self.font_state.get_font(FontId::DefaultFont);
 		let mut text = Text::new(text, &font, size);
-		text.set_position(position * (self.window.size().y as f32));
+		let center = Vector2f::new(0.0, text.local_bounds().height + font.underline_position(size));
+		text.set_position(center);
+		// text.set_position(Vector2f::new(100.0, 100.0));
+		text.set_position(position * (self.window.size().y as f32) + center);
+
+		let window_height = self.window.size().y as f32;
+		text.set_position(text.position() * Vector2f::new(1.0, -1.0) + Vector2f::new(0.0, window_height));
 		self.window.draw_text(&text, RenderStates::default());
 	}
 
