@@ -78,5 +78,10 @@ impl App {
 		context.draw_text(CanvasVec::new(0.0, 1.0), 32 as u32, &format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
 		context.draw_text(CanvasVec::new(0.0, 1.0 - 0.030), 32 as u32, &format!("fps: {}", fps as u32), Center::LeftTop);
 		context.draw_text(CanvasVec::new(0.0, 1.0 - 0.060), 32 as u32, &format!("perf: {:.2}%", perf), Center::LeftTop);
+		let fluid_count = self.world.fluidmap.grid.iter()
+			.map(|x| x.iter())
+			.flatten()
+			.count();
+		context.draw_text(CanvasVec::new(0.0, 1.0 - 0.090), 32 as u32, &format!("fluid count: {}", fluid_count), Center::LeftTop);
 	}
 }
