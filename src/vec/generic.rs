@@ -5,7 +5,6 @@ use std::marker::PhantomData;
 use std::iter::Sum;
 
 use super::Vec2t;
-use num_traits::ToPrimitive;
 
 impl<T, P> Vec2t<T, P> {
 	pub const fn new(x: T, y: T) -> Vec2t<T, P> {
