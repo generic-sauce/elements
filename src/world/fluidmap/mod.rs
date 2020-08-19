@@ -33,7 +33,7 @@ impl FluidMap {
 				let position = GameVec::new(13000 + offset * 10, 13000 + (offset % 200));
 				Fluid {
 					state: FluidState::Free,
-					owner: 0,
+					owner: 1,
 					velocity: 0.into(),
 					position,
 				}
