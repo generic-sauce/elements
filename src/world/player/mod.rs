@@ -89,6 +89,9 @@ impl Player {
 			self.is_right_walled(t) && input.right()) {
 			self.velocity.y = (self.velocity.y as f32 * 0.8) as i32;
 		}
+
+		// aim
+		self.cursor = GameVec::new(input.aim().x, input.aim().y);
 	}
 
 	fn is_grounded(&self, t: &TileMap) -> bool {

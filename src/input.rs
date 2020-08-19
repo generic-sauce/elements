@@ -3,6 +3,7 @@ use crate::prelude::*;
 const CONTROLLER_MAX: i32 = 100;
 const DEADZONE_MIN: i32 = 35;
 const DEADZONE_MAX: i32 = CONTROLLER_MAX - DEADZONE_MIN;
+const JOYSTICK_DISTANCE: i32 = 1500;
 
 fn apply_deadzone(value: i32) -> i32 {
 	let sign = value.signum();
@@ -141,5 +142,9 @@ impl Input for AdaptiveInput {
 
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
+
+		self.aim.x = joystick::axis_position(self.index, joystick::Axis::U) as i32 * 20;
+		self.aim.y = -joystick::axis_position(self.index, joystick::Axis::V) as i32 * 20;
+		self.aim = self.aim.length_clamped(JOYSTICK_DISTANCE);
 	}
 }
