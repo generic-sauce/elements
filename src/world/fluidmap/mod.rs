@@ -32,7 +32,7 @@ impl FluidMap {
 			(0..1000).map(|offset| {
 				let position = GameVec::new(13000 + offset * 10, 13000 + (offset % 200));
 				Fluid {
-					state: FluidState::Free,
+					state: FluidState::AtHand,
 					owner: 1,
 					velocity: 0.into(),
 					position,
@@ -49,8 +49,8 @@ impl FluidMap {
 		}
 	}
 
-	pub fn tick(&mut self, t: &TileMap) {
-		let iter = self.apply_forces(t)
+	pub fn tick(&mut self, t: &TileMap, players: &[Player; 2]) {
+		let iter = self.apply_forces(t, players)
 			.map(|f| FluidMap::move_fluid_by_velocity(f, t));
 		self.grid = FluidMap::mk_grid(iter, self.size);
 	}

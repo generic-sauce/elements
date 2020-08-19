@@ -4,7 +4,7 @@ use crate::prelude::*;
 pub const FLUID_AFFECT_DIST: i32 = 500; // in game coordinates
 
 impl FluidMap {
-	pub(in super) fn apply_forces<'a>(&'a self, t: &'a TileMap) -> impl Iterator<Item=Fluid> + 'a {
+	pub(in super) fn apply_forces<'a>(&'a self, t: &'a TileMap, players: &'a [Player; 2]) -> impl Iterator<Item=Fluid> + 'a {
 		self.iter().map(move |f| {
 			let neighbours = self.neighbours(f);
 
@@ -16,13 +16,19 @@ impl FluidMap {
 			// drag
 			let velocity = velocity - velocity / 10;
 
+
 			// neighbour-affection
 			let velocity = velocity + neighbours
 				.map(|n| affect(f, n))
 				.sum::<GameVec>();
 
 			// tilemap-affection
-			let velocity = velocity + tilemap_affect(f, t);
+			let mut velocity = velocity + tilemap_affect(f, t);
+
+			if let FluidState::AtHand = f.state {
+				let cursor = players[f.owner].left_bot + PLAYER_SIZE / 2 + players[f.owner].cursor;
+				velocity = velocity * 9 / 10 + (cursor - f.position).with_length(30);
+			}
 
 			let velocity = velocity.clamped(-200, 200);
 
