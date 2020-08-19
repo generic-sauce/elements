@@ -40,7 +40,8 @@ impl World {
 											&& player.left_bot.y <= p.y && p.y <= player.left_bot.x + PLAYER_SIZE.y - 1;
 			let mut dmg = 0;
 			for v in self.fluidmap.grid.iter_mut() {
-				for _ in v.drain_filter(|x| collides_player(x.position)) { dmg += 10; }
+				v.drain_filter(|x| x.owner != i && collides_player(x.position))
+				 .for_each(|_| dmg += 10 )
 			}
 			if dmg > 0 { player.damage(dmg); }
 		}
