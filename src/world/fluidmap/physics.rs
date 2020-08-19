@@ -59,7 +59,7 @@ impl FluidMap {
 	}
 }
 
-fn is_colliding(point: GameVec, t: &TileMap) -> bool {
+pub(in super) fn is_colliding(point: GameVec, t: &TileMap) -> bool {
 	t.get(point.to_tile()).is_solid()
 }
 

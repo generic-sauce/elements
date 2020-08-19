@@ -50,7 +50,7 @@ impl FluidMap {
 	}
 
 	pub fn tick(&mut self, t: &TileMap) {
-		let iter = self.apply_forces()
+		let iter = self.apply_forces(t)
 			.map(|f| FluidMap::move_fluid_by_velocity(f, t));
 		self.grid = FluidMap::mk_grid(iter, self.size);
 	}

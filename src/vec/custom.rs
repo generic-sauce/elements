@@ -36,3 +36,12 @@ impl From<GameVec> for TileVec {
 		t.to_tile()
 	}
 }
+
+impl GameVec {
+	pub fn with_length(self, l: i32) -> GameVec {
+		let orig_len_sqr = self.x * self.x + self.y * self.y;
+		let orig_len = (orig_len_sqr as f32).sqrt() as i32;
+		if orig_len == 0 { return GameVec::new(0, 0); }
+		(self * l) / orig_len
+	}
+}
