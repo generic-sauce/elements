@@ -7,7 +7,7 @@ use crate::prelude::*;
 
 // The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
 pub const PLAYER_SIZE: GameVec = TileVec::new(2, 6).to_game();
-const MAX_HEALTH: i32 = 100;
+pub const MAX_HEALTH: i32 = 100;
 
 const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;
@@ -116,5 +116,6 @@ impl Player {
 
 	pub fn damage(&mut self, dmg: i32) {
 		self.health -= dmg;
+		self.health = i32::max(0, self.health);
 	}
 }

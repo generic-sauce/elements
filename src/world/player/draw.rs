@@ -22,5 +22,14 @@ impl Player {
 	pub fn draw(&mut self, index: usize, context: &DrawContext) {
 		self.animation.draw(index, self.texture_center(), self.texture_radius(), context);
 		context.draw_circle(self.center_position() + self.cursor, CURSOR_INDICATOR_RADIUS, Color::BLACK);
+		self.draw_health(context);
+	}
+
+	pub fn draw_health(&mut self, context: &DrawContext) {
+		let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 4);
+		let offset = GameVec::new(0, PLAYER_SIZE.y / 2 + TILESIZE);
+		context.draw_sprite(self.center_position() + offset, size, Color::BLACK, None, Flip::Normal);
+		size.x = (size.x as f32 * (self.health as f32 / MAX_HEALTH as f32)) as i32;
+		context.draw_sprite(self.center_position() + offset, size, Color::GREEN, None, Flip::Normal);
 	}
 }
