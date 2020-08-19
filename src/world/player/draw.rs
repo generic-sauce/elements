@@ -19,8 +19,8 @@ impl Player {
 		PLAYER_SIZE * GameVec::new(IMG_SIZE, IMG_SIZE) / IMG_PLAYER_SIZE / 2
 	}
 
-	pub fn draw(&mut self, context: &DrawContext) {
-		self.animation.draw(self.texture_center(), self.texture_radius(), context);
+	pub fn draw(&mut self, index: usize, context: &DrawContext) {
+		self.animation.draw(index, self.texture_center(), self.texture_radius(), context);
 		context.draw_circle(self.center_position() + self.cursor, CURSOR_INDICATOR_RADIUS, Color::BLACK);
 	}
 }
