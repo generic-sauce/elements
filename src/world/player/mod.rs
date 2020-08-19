@@ -1,11 +1,13 @@
 mod draw;
 mod physics;
+mod damage;
 pub mod sensor;
 
 use crate::prelude::*;
 
 // The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
 pub const PLAYER_SIZE: GameVec = TileVec::new(2, 6).to_game();
+const MAX_HEALTH: i32 = 100;
 
 const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;
@@ -36,6 +38,7 @@ pub struct Player {
 	pub velocity: GameVec,
 	pub animation: Animation,
 	pub cursor: GameVec,
+	pub health: i32,
 	walljumped: bool,
 }
 
@@ -46,6 +49,7 @@ impl Player {
 			velocity: GameVec::new(0, 0),
 			animation: Animation::new(AnimationId::BluePlayerIdle),
 			cursor: GameVec::new(0, 0),
+			health: MAX_HEALTH,
 			walljumped: true,
 		}
 	}
@@ -108,5 +112,9 @@ impl Player {
 
 	fn center_position(&self) -> GameVec {
 		self.left_bot + PLAYER_SIZE / 2
+	}
+
+	pub fn damage(&mut self, dmg: i32) {
+		self.health -= dmg;
 	}
 }
