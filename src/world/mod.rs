@@ -41,7 +41,7 @@ impl World {
 			let mut dmg = 0;
 			for v in self.fluidmap.grid.iter_mut() {
 				v.drain_filter(|x| x.owner != i && collides_player(x.position))
-				 .for_each(|_| dmg += 10 )
+				 .for_each(|_| dmg += 1 )
 			}
 			if dmg > 0 { player.damage(dmg); }
 		}
