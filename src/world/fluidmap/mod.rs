@@ -22,8 +22,8 @@ pub struct Fluid {
 }
 
 pub struct FluidMap {
-	grid: Vec<Vec<Fluid>>,
-	size: FluidVec,
+	pub grid: Vec<Vec<Fluid>>,
+	pub size: FluidVec,
 }
 
 impl FluidMap {

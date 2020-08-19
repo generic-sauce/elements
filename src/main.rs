@@ -1,3 +1,5 @@
+#![feature(drain_filter)]
+
 mod animation_state;
 mod input;
 mod app;
