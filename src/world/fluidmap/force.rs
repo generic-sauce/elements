@@ -37,7 +37,9 @@ impl FluidMap {
 fn affect(f: &Fluid, n: &Fluid) -> GameVec {
 	let v = n.position - f.position;
 
-	if v.magnitude_sqr() <= 200 * 200 {
+	if v.magnitude_sqr() <= 30 * 30 {
+		v.with_length(-30)
+	} else if v.magnitude_sqr() <= 200 * 200 {
 		v.with_length(-10)
 	} else {
 		(v * (-1)).with_length(2)
@@ -45,10 +47,27 @@ fn affect(f: &Fluid, n: &Fluid) -> GameVec {
 }
 
 fn tilemap_affect(f: &Fluid, t: &TileMap) -> GameVec {
+	let mut affect = GameVec::new(0, 0);
+
 	let p = f.position + TileVec::new(0, -1).to_game();
 	if super::physics::is_colliding(p, t) {
-		GameVec::new(0, 40)
-	} else {
-		GameVec::new(0, 0)
+		affect += GameVec::new(0, 40);
 	}
+
+	let p = f.position + TileVec::new(0, 1).to_game();
+	if super::physics::is_colliding(p, t) {
+		affect += GameVec::new(0, -10);
+	}
+
+	let p = f.position + TileVec::new(-1, 0).to_game();
+	if super::physics::is_colliding(p, t) {
+		affect += GameVec::new(10, 0);
+	}
+
+	let p = f.position + TileVec::new(1, 0).to_game();
+	if super::physics::is_colliding(p, t) {
+		affect += GameVec::new(-10, 0);
+	}
+
+	affect
 }
