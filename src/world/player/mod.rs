@@ -1,6 +1,5 @@
 mod draw;
 mod physics;
-mod damage;
 pub mod sensor;
 
 use crate::prelude::*;
