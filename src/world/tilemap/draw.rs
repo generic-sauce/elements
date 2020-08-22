@@ -13,9 +13,11 @@ impl TileMap {
 		states.shader = Some(&shader);
 
 		let size = Vector2f::new(context.window.size().x as f32, context.window.size().y as f32);
+		let aspect_ratio = size.x / size.y;
 		let mut rect = RectangleShape::default();
 		rect.set_texture(&texture, true);
-		rect.set_size(Vector2f::new(size.x, size.y));
+		rect.set_scale(Vector2f::new(1.0, -1.0));
+		rect.set_size(Vector2f::new(aspect_ratio, -1.0));
 		context.window.draw_rectangle_shape(&rect, states);
 	}
 }

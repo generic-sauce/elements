@@ -20,8 +20,13 @@ impl Player {
 	}
 
 	pub fn draw(&mut self, index: usize, context: &DrawContext) {
+		// character
 		self.animation.draw(index, self.texture_center(), self.texture_radius(), context);
+
+		// cursor
 		context.draw_circle(self.center_position() + self.cursor, CURSOR_INDICATOR_RADIUS, Color::BLACK);
+
+		// health
 		self.draw_health(context);
 	}
 
