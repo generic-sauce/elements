@@ -22,10 +22,10 @@ impl World {
 			.for_each(|f| f.state = FluidState::Free)
 	}
 
-    fn handle_ice(&mut self, p: usize) {
+	fn handle_ice(&mut self, p: usize) {
 		// TODO decrease fluids count
 		let player = &self.players[p];
-        let cursor_tile: TileVec = player.cursor_position().into();
+		let cursor_tile: TileVec = player.cursor_position().into();
 		let tile = self.tilemap.get(cursor_tile);
 
 		if tile != Tile::Void { return; }

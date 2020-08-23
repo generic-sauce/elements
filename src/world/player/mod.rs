@@ -128,13 +128,13 @@ impl Player {
 	}
 
 	pub fn collides_tile(&self, t: TileVec) -> bool {
-        let t_lb = t.to_game();
+		let t_lb = t.to_game();
 		let t_rt = (t + (1,1)).to_game() - (1,1);
 
 		let p_lb = self.left_bot;
 		let p_rt = self.left_bot + PLAYER_SIZE - (1,1);
 
-        t_lb.x <= p_rt.x &&
+		t_lb.x <= p_rt.x &&
 		t_lb.y <= p_rt.y &&
 		p_lb.x <= t_rt.x &&
 		p_lb.y <= t_rt.y

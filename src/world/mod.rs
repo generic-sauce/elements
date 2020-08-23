@@ -30,7 +30,7 @@ impl World {
 		self.handle_skills(inputs);
 		self.spawn_fluids();
 		self.despawn_fluids();
-        self.despawn_walls();
+		self.despawn_walls();
 		self.check_damage();
 	}
 
