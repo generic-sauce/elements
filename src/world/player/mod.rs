@@ -68,13 +68,13 @@ impl Player {
 		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
-		if self.is_grounded(t) && input.just_up() && self.velocity.y <= 0 {
+		if self.is_grounded(t) && input.up() && self.velocity.y <= 0 {
 			self.velocity.y = JUMP_POWER;
 			self.walljumped = false;
 		}
 
 		// walljump
-		if !self.walljumped && !self.is_grounded(t) && input.just_up() && (
+		if !self.walljumped && !self.is_grounded(t) && input.up() && (
 				self.is_left_walled(t) && input.right() ||
 				self.is_right_walled(t) && input.left()) {
 			let horizontal_dir = i32::signum(input.horizontal_dir()) * 100;
