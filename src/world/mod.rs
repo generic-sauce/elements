@@ -15,6 +15,7 @@ pub struct World {
 impl World {
 	pub fn new() -> World {
 		let tilemap = TileMap::new("res/map/map02.png");
+
 		World {
 			players: [Player::new(TileVec::new(38, 45).into()), Player::new(TileVec::new(64, 40).into())],
 			fluidmap: FluidMap::new(tilemap.size),
@@ -29,6 +30,7 @@ impl World {
 		self.handle_skills(inputs);
 		self.spawn_fluids();
 		self.despawn_fluids();
+        self.despawn_walls();
 		self.check_damage();
 	}
 
@@ -70,6 +72,16 @@ impl World {
 				let r = rand::random::<u8>();
 				r < 2
 			});
+		}
+	}
+
+	fn despawn_walls(&mut self) {
+		for tile in self.tilemap.tiles.iter_mut() {
+			if let Tile::Wall { remaining_lifetime, owner } = tile {
+				*tile = remaining_lifetime.checked_sub(1)
+					.map(|lifetime| Tile::Wall { remaining_lifetime: lifetime, owner: *owner })
+					.unwrap_or(Tile::Void);
+			}
 		}
 	}
 
