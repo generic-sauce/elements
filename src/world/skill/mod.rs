@@ -7,6 +7,12 @@ impl World {
 				self.fluidmap.iter_mut_notranslate()
 					.for_each(|f| f.state = FluidState::Free)
 			}
+
+			if inputs[p].attack2() {
+				self.fluidmap.iter_mut_notranslate()
+					.take(3)
+					.for_each(|f| f.state = FluidState::Free)
+			}
 		}
 	}
 }
