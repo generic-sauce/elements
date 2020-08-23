@@ -56,22 +56,22 @@ fn tilemap_affect(f: &Fluid, t: &TileMap) -> GameVec {
 	let mut affect = GameVec::new(0, 0);
 
 	let p = f.position + TileVec::new(0, -1).to_game();
-	if super::physics::is_colliding(p, t) {
+	if t.check_solid(p) {
 		affect += GameVec::new(0, 40);
 	}
 
 	let p = f.position + TileVec::new(0, 1).to_game();
-	if super::physics::is_colliding(p, t) {
+	if t.check_solid(p) {
 		affect += GameVec::new(0, -10);
 	}
 
 	let p = f.position + TileVec::new(-1, 0).to_game();
-	if super::physics::is_colliding(p, t) {
+	if t.check_solid(p) {
 		affect += GameVec::new(10, 0);
 	}
 
 	let p = f.position + TileVec::new(1, 0).to_game();
-	if super::physics::is_colliding(p, t) {
+	if t.check_solid(p) {
 		affect += GameVec::new(-10, 0);
 	}
 

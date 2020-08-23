@@ -53,7 +53,7 @@ impl Player {
 		}
 	}
 
-	pub fn tick(&mut self, t: &TileMap, input: &dyn Input) {
+	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input) {
 		self.apply_forces(input, t);
 		self.move_by_velocity(t);
 	}

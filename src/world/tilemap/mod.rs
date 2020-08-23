@@ -2,16 +2,19 @@ mod draw;
 
 use crate::prelude::*;
 
-#[derive(Clone, Copy)]
+pub const WALL_LIFETIME: u32 = 20;
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Tile {
 	Void,
 	Ground,
+	Wall { owner: usize, remaining_lifetime: u32 }, // TODO this feels terrible.
 }
 
 pub struct TileMap {
 	pub tiles: Vec<Tile>,
-	pub texture: SfBox<Texture>,
 	pub size: TileVec,
+	pub texture: SfBox<Texture>,
 }
 
 impl TileMap {
@@ -31,11 +34,12 @@ impl TileMap {
 				tiles.push(tile);
 			}
 		}
-		let texture = TileMap::create_texture(&tiles, s.into());
+		let s = TileVec::new(s.x as i32, s.y as i32); // TODO make nicer
+		let texture = TileMap::create_texture(&tiles, s);
 
 		TileMap {
 			tiles,
-			size: TileVec::new(s.x as i32, s.y as i32), // TODO make nicer
+			size: s,
 			texture: texture,
 		}
 	}
@@ -50,16 +54,28 @@ impl TileMap {
 		self.tiles[(v.x + v.y * self.size.x) as usize]
 	}
 
-	fn create_texture(tiles: &Vec<Tile>, size: Vec2u) -> SfBox<Texture> {
-		let mut pixels = Vec::new();
-		for tile in tiles.iter() {
+	#[allow(unused)]
+	pub fn set(&mut self, v: TileVec, tile: Tile) {
+		self.tiles[(v.x + v.y * self.size.x) as usize] = tile;
+		self.texture = TileMap::create_texture(&self.tiles, self.size);
+	}
 
-			let team = 0 as u8;
+	fn create_texture(tiles: &Vec<Tile>, size: TileVec) -> SfBox<Texture> {
+		let mut pixels = Vec::new();
+		for &tile in tiles.iter() {
+
+			let team: u8 = match tile {
+				Tile::Wall { owner, .. } => owner as u8 * 255, // TODO maybe owner should be u8 generally
+				 _ => 0,
+			};
 			let ground: u8 = match tile {
 				Tile::Void => 0,
-				Tile::Ground => 255,
+				_ => 255,
 			};
-			let ratio = 0 as u8;
+			let ratio: u8 = match tile {
+				Tile::Wall { .. } => 255, // TODO correct?
+				_ => 0,
+			};
 
 			pixels.push(ground);
 			pixels.push(team);
@@ -67,8 +83,12 @@ impl TileMap {
 			pixels.push(255 as u8);
 		}
 
-		let image = Image::create_from_pixels(size.x, size.y, &pixels).unwrap();
+		let image = Image::create_from_pixels(size.x as u32, size.y as u32, &pixels).unwrap();
 		Texture::from_image(&image).unwrap()
+	}
+
+	pub fn check_solid(&self, v: impl Into<TileVec>) -> bool {
+		self.get(v.into()).is_solid()
 	}
 }
 
@@ -76,7 +96,7 @@ impl Tile {
 	pub fn is_solid(self) -> bool {
 		match self {
 			Tile::Void => false,
-			Tile::Ground => true,
+			_ => true,
 		}
 	}
 }

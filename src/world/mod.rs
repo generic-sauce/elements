@@ -35,19 +35,32 @@ impl World {
 	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
 		for (player, input) in self.players.iter_mut().zip(inputs.iter_mut()) {
 			input.update(player, gilrs);
-			player.tick(&self.tilemap, input.as_ref());
+			player.tick(&mut self.tilemap, input.as_ref());
 		}
 	}
 
 	fn spawn_fluids(&mut self) {
 		for i in 0..2 {
 			let p = &self.players[i];
-			self.fluidmap.add_fluid(Fluid{
-				state: FluidState::AtHand,
-				owner: i,
-				velocity: 0.into(),
-				position: p.cursor_position(),
-			});
+
+			let calc_spawn_pos = |from: GameVec, to: GameVec| {
+				let accuracy = |v: GameVec| (v.x.abs() + v.y.abs()) / 40 + 2; // TODO is this a good choice?
+				let n = accuracy(from - to);
+				for i in 0..n {
+					let current = from * (n-1-i) / (n-1) + to * i / (n-1);
+					if !self.tilemap.check_solid(current) { return current; }
+				}
+				panic!("this implies that the player is glitched actually!");
+			};
+
+			let position = calc_spawn_pos(p.cursor_position(), p.center_position());
+
+			// self.fluidmap.add_fluid(Fluid{
+			// 	state: FluidState::AtHand,
+			// 	owner: i,
+			// 	velocity: 0.into(),
+			// 	position,
+			// });
 		}
 	}
 
