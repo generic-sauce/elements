@@ -164,8 +164,6 @@ impl Input for AdaptiveInput {
 		self.special1 = R.is_pressed() && has_keyboard;
 		self.special2 = F.is_pressed() && has_keyboard;
 
-		let mut cursor_set_by_gamepad = false;
-
 		if let Some(gamepad) = gamepad {
 			let cx = (gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32;
 			let cy = (gamepad.value(gilrs::Axis::RightStickY) * 2000.0) as i32;
@@ -175,7 +173,6 @@ impl Input for AdaptiveInput {
 					cy,
 				);
 				self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
-				cursor_set_by_gamepad = true;
 			}
 
 			self.attack1 |= gamepad.is_pressed(gilrs::Button::RightTrigger2);
