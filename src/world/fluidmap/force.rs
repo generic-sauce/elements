@@ -26,7 +26,7 @@ impl FluidMap {
 			let mut velocity = velocity + tilemap_affect(f, t);
 
 			if let FluidState::AtHand = f.state {
-				let cursor = players[f.owner].left_bot + PLAYER_SIZE / 2 + players[f.owner].cursor;
+				let cursor = players[f.owner].cursor_position();
 				velocity = velocity * 9 / 10 + (cursor - f.position).with_length(30);
 			}
 

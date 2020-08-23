@@ -31,37 +31,37 @@ pub trait Input {
 	fn special1(&self) -> bool;
 	fn special2(&self) -> bool;
 
-	fn aim(&self) -> Vec2i;
+	fn cursor(&self) -> GameVec;
 
-	fn update(&mut self);
+	fn update(&mut self, player: &Player);
 }
 
 // TODO: use bitmask instead of booleans
 pub struct AdaptiveInput {
 	index: u32,
 
-	direction: Vec2i,
+	direction: GameVec,
 	just_up: bool,
 	just_down: bool,
 	special1: bool,
 	special2: bool,
 	attack1: bool,
 	attack2: bool,
-	aim: Vec2i,
+	cursor: GameVec,
 }
 
 impl AdaptiveInput {
 	pub fn new(index: u32) -> AdaptiveInput {
 		AdaptiveInput {
 			index,
-			direction: Vec2i::new(0, 0),
+			direction: GameVec::new(0, 0),
 			just_up: false,
 			just_down: false,
 			special1: false,
 			special2: false,
 			attack1: false,
 			attack2: false,
-			aim: Vec2i::new(0, 0),
+			cursor: GameVec::new(0, 0),
 		}
 	}
 }
@@ -99,11 +99,11 @@ impl Input for AdaptiveInput {
 		self.special2
 	}
 
-	fn aim(&self) -> Vec2i {
-		self.aim
+	fn cursor(&self) -> GameVec {
+		self.cursor
 	}
 
-	fn update(&mut self) {
+	fn update(&mut self, _player: &Player) {
 		let controller_connected = joystick::is_connected(self.index);
 
 		let up_key = if self.index == 0 { sfml::window::Key::W } else { sfml::window::Key::Up };
@@ -143,8 +143,10 @@ impl Input for AdaptiveInput {
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 
-		self.aim.x = joystick::axis_position(self.index, joystick::Axis::U) as i32 * 20;
-		self.aim.y = -joystick::axis_position(self.index, joystick::Axis::V) as i32 * 20;
-		self.aim = self.aim.length_clamped(JOYSTICK_DISTANCE);
+		self.cursor = GameVec::new(
+			joystick::axis_position(self.index, joystick::Axis::U) as i32 * 20,
+			-joystick::axis_position(self.index, joystick::Axis::V) as i32 * 20
+		);
+		self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
 	}
 }

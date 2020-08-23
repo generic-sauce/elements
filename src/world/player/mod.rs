@@ -94,7 +94,7 @@ impl Player {
 		}
 
 		// aim
-		self.cursor = GameVec::new(input.aim().x, input.aim().y);
+		self.cursor = input.cursor();
 	}
 
 	fn is_grounded(&self, t: &TileMap) -> bool {
@@ -111,6 +111,10 @@ impl Player {
 
 	pub fn center_position(&self) -> GameVec {
 		self.left_bot + PLAYER_SIZE / 2
+	}
+
+	pub fn cursor_position(&self) -> GameVec {
+		self.center_position() + self.cursor
 	}
 
 	pub fn damage(&mut self, dmg: i32) {
