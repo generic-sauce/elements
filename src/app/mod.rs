@@ -10,19 +10,22 @@ pub struct App {
 	font_state: FontState,
 	animation_state: AnimationState,
 	inputs: [Box<dyn Input>; 2],
+	gilrs: gilrs::Gilrs,
 }
 
 impl App {
 	pub fn new() -> App {
 		let context_settings = ContextSettings::default();
+		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 		App {
-			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::FULLSCREEN, &context_settings),
+			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings),
 			world: World::new(),
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
-			inputs: [Box::new(AdaptiveInput::new(0)), Box::new(AdaptiveInput::new(1))],
+			inputs: [Box::new(AdaptiveInput::new(0, &gilrs)), Box::new(AdaptiveInput::new(1, &gilrs))],
+			gilrs,
 		}
 	}
 
@@ -39,6 +42,9 @@ impl App {
 					_ => {},
 				}
 			}
+
+			// process gilrs events
+			while let Some(_) = self.gilrs.next_event() {}
 
 			if delta_time > interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
@@ -58,7 +64,7 @@ impl App {
 	}
 
 	pub fn tick(&mut self) {
-		self.world.tick(&mut self.inputs);
+		self.world.tick(&mut self.inputs, &self.gilrs);
 	}
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {

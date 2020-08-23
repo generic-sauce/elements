@@ -11,6 +11,7 @@ sfml = "0.15"
 itertools = "0.9"
 num-traits = "0.2"
 rand = "0.7"
+gilrs = "0.7.2"
 
 [profile.release]
 debug = true

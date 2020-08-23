@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use gilrs::GamepadId;
 
 const CONTROLLER_MAX: i32 = 100;
 const DEADZONE_MIN: i32 = 35;
@@ -33,7 +34,7 @@ pub trait Input {
 
 	fn cursor(&self) -> GameVec;
 
-	fn update(&mut self, player: &Player);
+	fn update(&mut self, player: &Player, gilrs: &gilrs::Gilrs);
 }
 
 // TODO: use bitmask instead of booleans
@@ -48,10 +49,17 @@ pub struct AdaptiveInput {
 	attack1: bool,
 	attack2: bool,
 	cursor: GameVec,
+	gamepad_id: Option<GamepadId>,
+}
+
+fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
+	gilrs.gamepads()
+		.map(|(gamepad_id, _)| gamepad_id)
+		.find(|gamepad_id| Into::<usize>::into(*gamepad_id) == index as usize)
 }
 
 impl AdaptiveInput {
-	pub fn new(index: u32) -> AdaptiveInput {
+	pub fn new(index: u32, gilrs: &gilrs::Gilrs) -> AdaptiveInput {
 		AdaptiveInput {
 			index,
 			direction: GameVec::new(0, 0),
@@ -62,6 +70,7 @@ impl AdaptiveInput {
 			attack1: false,
 			attack2: false,
 			cursor: GameVec::new(0, 0),
+			gamepad_id: get_gamepad(index, gilrs),
 		}
 	}
 }
@@ -103,8 +112,8 @@ impl Input for AdaptiveInput {
 		self.cursor
 	}
 
-	fn update(&mut self, _player: &Player) {
-		let controller_connected = joystick::is_connected(self.index);
+	fn update(&mut self, _player: &Player, gilrs: &gilrs::Gilrs) {
+		let gamepad = self.gamepad_id.map(|x| gilrs.gamepad(x));
 
 		let up_key = if self.index == 0 { sfml::window::Key::W } else { sfml::window::Key::Up };
 		let down_key = if self.index == 0 { sfml::window::Key::S } else { sfml::window::Key::Down };
@@ -121,8 +130,8 @@ impl Input for AdaptiveInput {
 			CONTROLLER_MAX
 		} else if down_key.is_pressed() {
 			-CONTROLLER_MAX
-		} else if controller_connected {
-			apply_deadzone(-joystick::axis_position(self.index, joystick::Axis::Y) as i32)
+		} else if let Some(gamepad) = gamepad {
+			apply_deadzone((gamepad.value(gilrs::Axis::LeftStickY) * 100.0) as i32)
 		} else {
 			0
 		};
@@ -136,17 +145,21 @@ impl Input for AdaptiveInput {
 			self.direction.x -= CONTROLLER_MAX;
 			key_pressed = true;
 		}
-		if !key_pressed && controller_connected {
-			self.direction.x = apply_deadzone(joystick::axis_position(self.index, joystick::Axis::X) as i32)
+		if !key_pressed {
+			if let Some(gamepad) = gamepad {
+				self.direction.x = apply_deadzone((gamepad.value(gilrs::Axis::LeftStickX) * 100.0) as i32)
+			}
 		}
 
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 
-		self.cursor = GameVec::new(
-			joystick::axis_position(self.index, joystick::Axis::U) as i32 * 20,
-			-joystick::axis_position(self.index, joystick::Axis::V) as i32 * 20
-		);
-		self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
+		if let Some(gamepad) = gamepad {
+			self.cursor = GameVec::new(
+				(gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32,
+				(gamepad.value(gilrs::Axis::RightStickY) * 2000.0) as i32,
+			);
+			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
+		}
 	}
 }

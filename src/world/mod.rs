@@ -22,19 +22,19 @@ impl World {
 		}
 	}
 
-	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
 		// sub-tick
 		self.fluidmap.tick(&self.tilemap, &self.players);
-		self.tick_players(inputs);
+		self.tick_players(inputs, gilrs);
 		self.handle_skills(inputs);
 		self.spawn_fluids();
 		self.despawn_fluids();
 		self.check_damage();
 	}
 
-	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
 		for (player, input) in self.players.iter_mut().zip(inputs.iter_mut()) {
-			input.update(player);
+			input.update(player, gilrs);
 			player.tick(&self.tilemap, input.as_ref());
 		}
 	}
