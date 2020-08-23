@@ -27,8 +27,12 @@ impl World {
 		let player = &self.players[p];
         let cursor_tile: TileVec = player.cursor_position().into();
 		let tile = self.tilemap.get(cursor_tile);
-		if tile == Tile::Void {
-			self.tilemap.set(cursor_tile, Tile::Wall { owner: p, remaining_lifetime: WALL_LIFETIME });
+
+		if tile != Tile::Void { return; }
+		if (0..2).any(|i| self.players[i].collides_tile(cursor_tile)) {
+			return;
 		}
+
+		self.tilemap.set(cursor_tile, Tile::Wall { owner: p, remaining_lifetime: WALL_LIFETIME });
 	}
 }

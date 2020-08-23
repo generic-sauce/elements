@@ -76,11 +76,9 @@ impl World {
 	fn check_damage(&mut self) {
 		for i in 0..2 {
 			let player = &mut self.players[i];
-			let collides_player = |p: GameVec| player.left_bot.x <= p.x && p.x <= player.left_bot.x + PLAYER_SIZE.x - 1
-											&& player.left_bot.y <= p.y && p.y <= player.left_bot.y + PLAYER_SIZE.y - 1;
 			let mut dmg = 0;
 			for v in self.fluidmap.grid.iter_mut() {
-				v.drain_filter(|x| x.owner != i && collides_player(x.position))
+				v.drain_filter(|x| x.owner != i && player.collides_point(x.position))
 				 .for_each(|_| dmg += 1 )
 			}
 			if dmg > 0 { player.damage(dmg); }
