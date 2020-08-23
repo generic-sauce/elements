@@ -35,7 +35,7 @@ impl World {
 	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
 		for (player, input) in self.players.iter_mut().zip(inputs.iter_mut()) {
 			input.update(player);
-			player.tick(&self.tilemap, input.as_ref());
+			player.tick(&mut self.tilemap, input.as_ref());
 		}
 	}
 

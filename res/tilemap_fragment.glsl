@@ -15,7 +15,8 @@ void main() {
 	float alpha = tile.a;
 
 	vec3 ground_color = mix(vec3(.45, .62, .22), vec3(.2, .1, .1), ground);
-	vec3 team_color = mix(vec3(1, 0, 0), vec3(0, 0, 1), team);
+	vec2 wall_color = vec2(.8, .2);
+	vec3 team_color = mix(wall_color.yyx, wall_color.xyy, team);
 	vec3 c = mix(ground_color, team_color, ratio);
 	color = vec4(c, alpha);
 }

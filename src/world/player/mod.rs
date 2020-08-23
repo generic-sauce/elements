@@ -53,9 +53,15 @@ impl Player {
 		}
 	}
 
-	pub fn tick(&mut self, t: &TileMap, input: &dyn Input) {
+	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input) {
 		self.apply_forces(input, t);
 		self.move_by_velocity(t);
+
+		let cursor_pos: TileVec = self.cursor_position().into();
+		let cursor_tile = t.get(cursor_pos);
+		if input.special1() && cursor_tile == Tile::Void {
+			t.set(cursor_pos, Tile::Wall);
+		}
 	}
 
 	fn apply_forces(&mut self, input: &dyn Input, t: &TileMap) {
