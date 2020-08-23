@@ -2,11 +2,13 @@ mod draw;
 
 use crate::prelude::*;
 
+pub const WALL_LIFETIME: u32 = 20;
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Tile {
 	Void,
 	Ground,
-	Wall,
+	Wall { owner: usize, remaining_lifetime: u32 }, // TODO this feels terrible.
 }
 
 pub struct TileMap {
@@ -60,15 +62,18 @@ impl TileMap {
 
 	fn create_texture(tiles: &Vec<Tile>, size: TileVec) -> SfBox<Texture> {
 		let mut pixels = Vec::new();
-		for tile in tiles.iter() {
+		for &tile in tiles.iter() {
 
-			let team: u8 = 0;
+			let team: u8 = match tile {
+				Tile::Wall { owner, .. } => owner as u8, // TODO maybe owner should be u8 generally
+				 _ => 0,
+			};
 			let ground: u8 = match tile {
 				Tile::Void => 0,
 				_ => 255,
 			};
 			let ratio: u8 = match tile {
-				Tile::Wall => 255,
+				Tile::Wall { .. } => 255, // TODO correct?
 				_ => 0,
 			};
 

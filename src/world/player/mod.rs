@@ -53,14 +53,14 @@ impl Player {
 		}
 	}
 
-	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input) {
+	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input, id: usize) {
 		self.apply_forces(input, t);
 		self.move_by_velocity(t);
 
 		let cursor_pos: TileVec = self.cursor_position().into();
 		let cursor_tile = t.get(cursor_pos);
 		if input.special1() && cursor_tile == Tile::Void {
-			t.set(cursor_pos, Tile::Wall);
+			t.set(cursor_pos, Tile::Wall { owner: id, remaining_lifetime: WALL_LIFETIME });
 		}
 	}
 

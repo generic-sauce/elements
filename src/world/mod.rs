@@ -33,9 +33,9 @@ impl World {
 	}
 
 	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
-		for (player, input) in self.players.iter_mut().zip(inputs.iter_mut()) {
+		for (i, (player, input)) in self.players.iter_mut().zip(inputs.iter_mut()).enumerate() {
 			input.update(player);
-			player.tick(&mut self.tilemap, input.as_ref());
+			player.tick(&mut self.tilemap, input.as_ref(), i);
 		}
 	}
 
@@ -48,7 +48,6 @@ impl World {
 				let n = accuracy(from - to);
 				for i in 0..n {
 					let current = from * (n-1-i) / (n-1) + to * i / (n-1);
-                    dbg!(from, to, current);
 					if !self.tilemap.check_solid(current) { return current; }
 				}
 				panic!("this implies that the player is glitched actually!");
