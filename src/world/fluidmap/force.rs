@@ -14,8 +14,7 @@ impl FluidMap {
 			let velocity = velocity - GameVec::new(0, GRAVITY);
 
 			// drag
-			let velocity = velocity - velocity / 10;
-
+			let velocity = velocity * 15 / 16;
 
 			// neighbour-affection
 			let velocity = velocity + neighbours
@@ -27,7 +26,7 @@ impl FluidMap {
 
 			if let FluidState::AtHand = f.state {
 				let cursor = players[f.owner].cursor_position();
-				velocity = velocity * 9 / 10 + (cursor - f.position).with_length(30);
+				velocity = velocity * 9 / 10 + (cursor - f.position).with_length(200);
 			}
 
 			let velocity = velocity.clamped(-200, 200);

@@ -76,12 +76,17 @@ impl World {
 	}
 
 	fn despawn_walls(&mut self) {
+		let mut changed = false;
 		for tile in self.tilemap.tiles.iter_mut() {
 			if let Tile::Wall { remaining_lifetime, owner } = tile {
 				*tile = remaining_lifetime.checked_sub(1)
 					.map(|lifetime| Tile::Wall { remaining_lifetime: lifetime, owner: *owner })
-					.unwrap_or(Tile::Void);
+					.unwrap_or_else(|| { changed = true; Tile::Void });
 			}
+		}
+
+		if changed {
+			self.tilemap.update_texture();
 		}
 	}
 

@@ -57,6 +57,10 @@ impl TileMap {
 	#[allow(unused)]
 	pub fn set(&mut self, v: TileVec, tile: Tile) {
 		self.tiles[(v.x + v.y * self.size.x) as usize] = tile;
+		self.update_texture();
+	}
+
+	pub fn update_texture(&mut self) {
 		self.texture = TileMap::create_texture(&self.tiles, self.size);
 	}
 
