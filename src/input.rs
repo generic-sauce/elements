@@ -160,6 +160,12 @@ impl Input for AdaptiveInput {
 				(gamepad.value(gilrs::Axis::RightStickY) * 2000.0) as i32,
 			);
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
+
+			self.attack1 = gamepad.is_pressed(gilrs::Button::RightTrigger2);
+			self.attack2 = gamepad.is_pressed(gilrs::Button::RightTrigger);
+			self.special1 = gamepad.is_pressed(gilrs::Button::LeftTrigger2);
+			self.special2 = gamepad.is_pressed(gilrs::Button::LeftTrigger);
 		}
+
 	}
 }
