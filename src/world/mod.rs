@@ -1,6 +1,7 @@
 pub mod player;
 pub mod tilemap;
 pub mod fluidmap;
+pub mod skill;
 mod draw;
 
 use crate::prelude::*;
@@ -38,6 +39,7 @@ impl World {
 		}
 
 		// damage
+		self.handle_skills(inputs);
 		self.check_damage();
 	}
 
