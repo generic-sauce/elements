@@ -114,15 +114,9 @@ impl Input for AdaptiveInput {
 
 	fn update(&mut self, _player: &Player, gilrs: &gilrs::Gilrs) {
 		let gamepad = self.gamepad_id.map(|x| gilrs.gamepad(x));
+		let has_keyboard = self.index == 1;
 
-		let up_key = if self.index == 0 { sfml::window::Key::W } else { sfml::window::Key::Up };
-		let down_key = if self.index == 0 { sfml::window::Key::S } else { sfml::window::Key::Down };
-		let right_key = if self.index == 0 { sfml::window::Key::D } else { sfml::window::Key::Right };
-		let left_key = if self.index == 0 { sfml::window::Key::A } else { sfml::window::Key::Left };
-		let attack1_key = sfml::window::Key::Q;
-		let attack2_key = sfml::window::Key::E;
-		let special1_key = sfml::window::Key::R;
-		let special2_key = sfml::window::Key::F;
+		use sfml::window::Key::*;
 
 		let last_frame_up = self.up();
 		let last_frame_down = self.down();
@@ -130,9 +124,9 @@ impl Input for AdaptiveInput {
 		self.direction.x = 0;
 		self.direction.y = 0;
 
-		self.direction.y += if up_key.is_pressed() {
+		self.direction.y += if W.is_pressed() && has_keyboard {
 			CONTROLLER_MAX
-		} else if down_key.is_pressed() {
+		} else if S.is_pressed() && has_keyboard {
 			-CONTROLLER_MAX
 		} else if let Some(gamepad) = gamepad {
 			apply_deadzone((gamepad.value(gilrs::Axis::LeftStickY) * 100.0) as i32)
@@ -141,11 +135,11 @@ impl Input for AdaptiveInput {
 		};
 
 		let mut key_pressed = false;
-		if right_key.is_pressed() {
+		if D.is_pressed() && has_keyboard {
 			self.direction.x += CONTROLLER_MAX;
 			key_pressed = true;
 		}
-		if left_key.is_pressed() {
+		if A.is_pressed() && has_keyboard {
 			self.direction.x -= CONTROLLER_MAX;
 			key_pressed = true;
 		}
@@ -158,10 +152,11 @@ impl Input for AdaptiveInput {
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 
-		self.attack1 = attack1_key.is_pressed();
-		self.attack2 = attack2_key.is_pressed();
-		self.special1 = special1_key.is_pressed();
-		self.special2 = special2_key.is_pressed();
+		self.attack1 = Q.is_pressed() && has_keyboard;
+		self.attack2 = E.is_pressed() && has_keyboard;
+		self.special1 = R.is_pressed() && has_keyboard;
+		self.special2 = F.is_pressed() && has_keyboard;
+
 		if let Some(gamepad) = gamepad {
 			self.cursor = GameVec::new(
 				(gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32,
