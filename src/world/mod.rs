@@ -25,11 +25,22 @@ impl World {
 	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
 		// sub-tick
 		self.fluidmap.tick(&self.tilemap, &self.players);
-		for (i, (p, input)) in self.players.iter_mut().zip(inputs.iter_mut()).enumerate() {
+		self.tick_players(inputs);
+		self.handle_skills(inputs);
+		self.spawn_fluids();
+		self.check_damage();
+	}
+
+	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+		for (p, input) in self.players.iter_mut().zip(inputs.iter_mut()) {
 			input.update();
 			p.tick(&self.tilemap, input.as_ref());
+		}
+	}
 
-			// spawn fluids
+	fn spawn_fluids(&mut self) {
+		for i in 0..2 {
+			let p = &self.players[i];
 			self.fluidmap.add_fluid(Fluid{
 				state: FluidState::AtHand,
 				owner: i,
@@ -37,10 +48,6 @@ impl World {
 				position: p.center_position() + p.cursor,
 			});
 		}
-
-		// damage
-		self.handle_skills(inputs);
-		self.check_damage();
 	}
 
 	fn check_damage(&mut self) {
