@@ -35,7 +35,7 @@ impl App {
 		for (elapsed_time, delta_time, fps, perf) in timed_loop {
 			while let Some(event) = self.window.poll_event() {
 				match event {
-					Event::Closed | Event::KeyPressed { code: Key::Q, .. } => {
+					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
 						self.window.close();
 						return;
 					}

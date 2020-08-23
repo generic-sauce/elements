@@ -119,6 +119,10 @@ impl Input for AdaptiveInput {
 		let down_key = if self.index == 0 { sfml::window::Key::S } else { sfml::window::Key::Down };
 		let right_key = if self.index == 0 { sfml::window::Key::D } else { sfml::window::Key::Right };
 		let left_key = if self.index == 0 { sfml::window::Key::A } else { sfml::window::Key::Left };
+		let attack1_key = sfml::window::Key::Q;
+		let attack2_key = sfml::window::Key::E;
+		let special1_key = sfml::window::Key::R;
+		let special2_key = sfml::window::Key::F;
 
 		let last_frame_up = self.up();
 		let last_frame_down = self.down();
@@ -154,6 +158,10 @@ impl Input for AdaptiveInput {
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 
+		self.attack1 = attack1_key.is_pressed();
+		self.attack2 = attack2_key.is_pressed();
+		self.special1 = special1_key.is_pressed();
+		self.special2 = special2_key.is_pressed();
 		if let Some(gamepad) = gamepad {
 			self.cursor = GameVec::new(
 				(gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32,
@@ -161,11 +169,10 @@ impl Input for AdaptiveInput {
 			);
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
 
-			self.attack1 = gamepad.is_pressed(gilrs::Button::RightTrigger2);
-			self.attack2 = gamepad.is_pressed(gilrs::Button::RightTrigger);
-			self.special1 = gamepad.is_pressed(gilrs::Button::LeftTrigger2);
-			self.special2 = gamepad.is_pressed(gilrs::Button::LeftTrigger);
+			self.attack1 |= gamepad.is_pressed(gilrs::Button::RightTrigger2);
+			self.attack2 |= gamepad.is_pressed(gilrs::Button::RightTrigger);
+			self.special1 |= gamepad.is_pressed(gilrs::Button::LeftTrigger2);
+			self.special2 |= gamepad.is_pressed(gilrs::Button::LeftTrigger);
 		}
-
 	}
 }
