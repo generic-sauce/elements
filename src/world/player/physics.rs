@@ -65,7 +65,7 @@ fn is_colliding(left_bot: GameVec, t: &TileMap) -> bool {
 	for x in min.x..=max.x {
 		for y in min.y..=max.y {
 			let p = TileVec::new(x, y);
-			if t.get(p).is_solid() { return true; }
+			if t.check_solid(p) { return true; }
 		}
 	}
 	false

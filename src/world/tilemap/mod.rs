@@ -70,6 +70,10 @@ impl TileMap {
 		let image = Image::create_from_pixels(size.x, size.y, &pixels).unwrap();
 		Texture::from_image(&image).unwrap()
 	}
+
+	pub fn check_solid(&self, v: impl Into<TileVec>) -> bool {
+		self.get(v.into()).is_solid()
+	}
 }
 
 impl Tile {

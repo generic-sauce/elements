@@ -21,8 +21,8 @@ impl FluidMap {
 				let change = GameVec::new(xroute, ychange);
 
 				let change_ex = change + (remaining_vel.x.signum(), 0);
-				if is_colliding(f.position + change_ex, t) {
-					assert!(!is_colliding(f.position + change, t));
+				if t.check_solid(f.position + change_ex) {
+					assert!(!t.check_solid(f.position + change));
 
 					remaining_vel -= change;
 					f.position += change;
@@ -40,8 +40,8 @@ impl FluidMap {
 				let change = GameVec::new(xchange, yroute);
 
 				let change_ex = change + (0, remaining_vel.y.signum());
-				if is_colliding(f.position + change_ex, t) {
-					assert!(!is_colliding(f.position + change, t));
+				if t.check_solid(f.position + change_ex) {
+					assert!(!t.check_solid(f.position + change));
 
 					remaining_vel -= change;
 					f.position += change;
@@ -57,10 +57,6 @@ impl FluidMap {
 
 		f
 	}
-}
-
-pub(in super) fn is_colliding(point: GameVec, t: &TileMap) -> bool {
-	t.get(point.to_tile()).is_solid()
 }
 
 // returns the change required to touch, but not collide the next tile
