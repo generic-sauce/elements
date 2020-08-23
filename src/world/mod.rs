@@ -55,12 +55,12 @@ impl World {
 
 			let position = calc_spawn_pos(p.cursor_position(), p.center_position());
 
-			self.fluidmap.add_fluid(Fluid{
-				state: FluidState::AtHand,
-				owner: i,
-				velocity: 0.into(),
-				position,
-			});
+			// self.fluidmap.add_fluid(Fluid{
+			// 	state: FluidState::AtHand,
+			// 	owner: i,
+			// 	velocity: 0.into(),
+			// 	position,
+			// });
 		}
 	}
 
