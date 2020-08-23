@@ -28,6 +28,7 @@ impl World {
 		self.tick_players(inputs);
 		self.handle_skills(inputs);
 		self.spawn_fluids();
+		self.despawn_fluids();
 		self.check_damage();
 	}
 
@@ -46,6 +47,15 @@ impl World {
 				owner: i,
 				velocity: 0.into(),
 				position: p.cursor_position(),
+			});
+		}
+	}
+
+	fn despawn_fluids(&mut self) {
+		for cell in self.fluidmap.grid.iter_mut() {
+			cell.drain_filter(|_| {
+				let r = rand::random::<u8>();
+				r < 2
 			});
 		}
 	}
