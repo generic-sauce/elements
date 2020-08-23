@@ -149,7 +149,9 @@ impl Input for AdaptiveInput {
 		);
 		self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
 
-		self.special1 = joystick::axis_position(self.index, joystick::Axis::Z) > 0.0;
-		self.special2 = joystick::axis_position(self.index, joystick::Axis::R) > 0.0;
+		if controller_connected {
+			self.special1 = joystick::axis_position(self.index, joystick::Axis::Z) > 0.0;
+			self.special2 = joystick::axis_position(self.index, joystick::Axis::R) > 0.0;
+		}
 	}
 }

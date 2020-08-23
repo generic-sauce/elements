@@ -65,7 +65,7 @@ impl TileMap {
 		for &tile in tiles.iter() {
 
 			let team: u8 = match tile {
-				Tile::Wall { owner, .. } => owner as u8, // TODO maybe owner should be u8 generally
+				Tile::Wall { owner, .. } => owner as u8 * 255, // TODO maybe owner should be u8 generally
 				 _ => 0,
 			};
 			let ground: u8 = match tile {
