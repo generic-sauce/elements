@@ -50,12 +50,18 @@ pub struct AdaptiveInput {
 	attack2: bool,
 	cursor: GameVec,
 	gamepad_id: Option<GamepadId>,
+	mouse_position: Vec2i,
 }
 
 fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
 	gilrs.gamepads()
 		.map(|(gamepad_id, _)| gamepad_id)
 		.find(|gamepad_id| Into::<usize>::into(*gamepad_id) == index as usize)
+}
+
+fn get_mouse_position() -> Vec2i {
+	let mp = sfml::window::mouse::desktop_position();
+	Vec2i::new(mp.x, mp.y)
 }
 
 impl AdaptiveInput {
@@ -71,6 +77,7 @@ impl AdaptiveInput {
 			attack2: false,
 			cursor: GameVec::new(0, 0),
 			gamepad_id: get_gamepad(index, gilrs),
+			mouse_position: get_mouse_position(),
 		}
 	}
 }
@@ -157,17 +164,32 @@ impl Input for AdaptiveInput {
 		self.special1 = R.is_pressed() && has_keyboard;
 		self.special2 = F.is_pressed() && has_keyboard;
 
+		let mut cursor_set_by_gamepad = false;
+
 		if let Some(gamepad) = gamepad {
-			self.cursor = GameVec::new(
-				(gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32,
-				(gamepad.value(gilrs::Axis::RightStickY) * 2000.0) as i32,
-			);
-			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
+			let cx = (gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32;
+			let cy = (gamepad.value(gilrs::Axis::RightStickY) * 2000.0) as i32;
+			if cx != 0 || cy != 0 {
+				self.cursor = GameVec::new(
+					cx,
+					cy,
+				);
+				self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
+				cursor_set_by_gamepad = true;
+			}
 
 			self.attack1 |= gamepad.is_pressed(gilrs::Button::RightTrigger2);
 			self.attack2 |= gamepad.is_pressed(gilrs::Button::RightTrigger);
 			self.special1 |= gamepad.is_pressed(gilrs::Button::LeftTrigger2);
 			self.special2 |= gamepad.is_pressed(gilrs::Button::LeftTrigger);
+		}
+
+		if has_keyboard {
+			let new_mouse_pos = get_mouse_position();
+			let mouse_diff = new_mouse_pos - self.mouse_position;
+			self.cursor += GameVec::new(mouse_diff.x, -mouse_diff.y) * 6;
+			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
+			self.mouse_position = new_mouse_pos;
 		}
 	}
 }
