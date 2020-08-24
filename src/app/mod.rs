@@ -30,12 +30,7 @@ impl App {
 	}
 
 	pub fn restart_game(&mut self) {
-		let mut should_restart = false;
-		let it = self.world.players.iter();
-		for player in it {
-			should_restart |= player.health == 0;
-		}
-		if should_restart {
+		if self.world.players.iter().any(|p| p.health == 0) {
 			self.world = World::new();
 		}
 	}
