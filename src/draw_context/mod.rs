@@ -12,6 +12,7 @@ pub struct DrawContext<'a> {
 	pub animation_state: &'a AnimationState,
 	pub tilemap_size: TileVec,
 	pub elapsed_time: Duration,
+	pub aspect_ratio: f32,
 }
 
 #[derive(PartialEq, Eq)]
@@ -35,6 +36,7 @@ impl<'a> DrawContext<'a> {
 		animation_state: &'a AnimationState,
 		tilemap_size: TileVec,
 		elapsed_time: Duration,
+		aspect_ratio: f32,
 		) -> DrawContext<'a>
 	{
 		DrawContext {
@@ -45,6 +47,7 @@ impl<'a> DrawContext<'a> {
 			animation_state,
 			tilemap_size,
 			elapsed_time,
+			aspect_ratio,
 		}
 	}
 
