@@ -6,8 +6,7 @@ const DESIRED_FLUID_DIST: i32 = 400;
 
 const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
-const fn hand_drag(x: i32) -> i32 { x * 15 / 16 }
-const CURSOR_PULL: i32 = 220;
+const fn hand_drag(x: i32) -> i32 { x * 10 / 16 }
 
 struct Force { // this represents a constraint saying that velocity projected onto goal should be larger than goal
 	priority: i32,
@@ -51,7 +50,11 @@ impl FluidMap {
 fn calc_vel(old_velocity: GameVec, forces: impl Iterator<Item=Force>) -> GameVec {
 	const ACCURACY: i32 = 5;
 
-	let forces: Vec<_> = forces.collect();
+	const WEIGHT_NEW: i32 = 1;
+	const WEIGHT_OLD: i32 = 3;
+
+	let forces: Vec<_> = forces
+		.collect();
 
 	let mut prios: Vec<_> = forces.iter()
 		.map(|x| x.priority)
@@ -62,17 +65,19 @@ fn calc_vel(old_velocity: GameVec, forces: impl Iterator<Item=Force>) -> GameVec
 	let mut result = old_velocity;
 
 	for p in prios {
-        let filtered: Vec<&Force> = forces.iter().filter(|x| x.priority == p).collect();
+		let filtered: Vec<&Force> = forces.iter().filter(|x| x.priority == p).collect();
 		for _ in 0..ACCURACY {
 			for &force in &filtered {
-				if force.goal.dot(force.goal) > force.goal.dot(result) {
+				if force.goal.dot(force.goal).abs() > force.goal.dot(result).abs() {
 					result += force.goal / ACCURACY;
 				}
 			}
 		}
 	}
 
-    result
+	let result = (result * WEIGHT_NEW + old_velocity * WEIGHT_OLD) / (WEIGHT_NEW + WEIGHT_OLD);
+
+	result
 }
 
 fn sqrt(x: i32) -> i32 {
@@ -84,7 +89,7 @@ fn neighbour_force(f: &Fluid, n: &Fluid) -> Force {
 	if to_neighbour.as_short_as(DESIRED_FLUID_DIST) {
 		// push
 
-		let value = sqrt(sqrt(DESIRED_FLUID_DIST - to_neighbour.length())) * 30;
+		let value = (DESIRED_FLUID_DIST - to_neighbour.length()) * 4;
 		Force {
 			priority: 10,
 			goal: to_neighbour.with_length(value) * (-1),
@@ -92,7 +97,7 @@ fn neighbour_force(f: &Fluid, n: &Fluid) -> Force {
 	} else {
 		// pull
 
-		let value = 4;
+		let value = 20;
 		Force {
 			priority: 3,
 			goal: to_neighbour.with_length(value),
@@ -101,8 +106,9 @@ fn neighbour_force(f: &Fluid, n: &Fluid) -> Force {
 }
 
 fn cursor_force(f: &Fluid, cursor: GameVec) -> Force {
-    Force {
+	let v = cursor - f.position;
+	Force {
 		priority: 5,
-		goal: (cursor - f.position).with_length(CURSOR_PULL), // TODO this should not be a constant force I assume
+		goal: v / 4,
 	}
 }
