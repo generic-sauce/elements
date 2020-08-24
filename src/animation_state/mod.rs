@@ -11,7 +11,7 @@ struct AnimationBuffer {
 
 macro_rules! setup {
 	($($id:ident : $dir:expr, $interval:expr),*$(,)?) => {
-		#[derive(Copy, Clone, Debug)]
+		#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 		#[repr(usize)]
 		pub enum AnimationId {
 			$($id),*
@@ -78,5 +78,6 @@ impl AnimationState {
 }
 
 setup!(
-	BluePlayerIdle: "res/images/player_blue/player_idle", 4
+	BluePlayerIdle: "res/images/player_blue/player_idle", 4,
+	BluePlayerRun: "res/images/player_blue/player_run", 4
 );
