@@ -6,7 +6,7 @@ const DESIRED_FLUID_DIST: i32 = 400;
 
 const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
-const fn hand_drag(x: i32) -> i32 { x * 10 / 16 }
+const fn hand_drag(x: i32) -> i32 { x * 15 / 16 }
 
 struct Force { // this represents a constraint saying that velocity projected onto goal should be larger than goal
 	priority: i32,
@@ -16,8 +16,15 @@ struct Force { // this represents a constraint saying that velocity projected on
 impl FluidMap {
 	pub(in super) fn apply_forces<'a>(&'a self, t: &'a TileMap, players: &'a [Player; 2]) -> impl Iterator<Item=Fluid> + 'a {
 		self.iter().map(move |f| {
+			let mut f = f.clone();
+
 			// gravity
-			let velocity = f.velocity - GameVec::new(0, FLUID_GRAVITY);
+			let mut velocity = f.velocity - GameVec::new(0, FLUID_GRAVITY);
+
+			if let FluidState::AtHand = f.state {
+				let cursor = players[f.owner].cursor_position();
+				velocity += cursor_force(&f, cursor);
+			}
 
 			// drag
 			let velocity = velocity.map(
@@ -27,88 +34,38 @@ impl FluidMap {
 				}
 			);
 
-			// forces
-			let iter = self.neighbours(f).map(|n| neighbour_force(f, n))
-				.chain(
-					if let FluidState::AtHand = f.state {
-						let cursor = players[f.owner].cursor_position();
-						Some(cursor_force(f, cursor))
-					} else { None }
-						.into_iter()
-			);
+			// position offset
+			let neighbours: Vec<_> = self.neighbours(&f)
+				.filter(|n| (f.position - n.position).as_short_as(DESIRED_FLUID_DIST))
+				.collect();
 
-			let velocity = calc_vel(velocity, iter);
+			let len = neighbours.len().max(1) as i32;
 
-			Fluid {
-				velocity,
-				..f.clone()
-			}
+			let position = neighbours.iter()
+				.map(|n| (f.position - n.position).with_length(DESIRED_FLUID_DIST) + n.position )
+				.sum::<GameVec>() / len;
+
+			let position_update = position - f.position;
+
+			let velocity_update = neighbours.iter()
+				.map(|n| {
+					let relative_velocity = n.velocity - velocity;
+					let from_n = f.position - n.position;
+					let projected = relative_velocity.projected_on(from_n);
+					if projected.dot(from_n) < 0 {
+						return GameVec::new(0, 0);
+					}
+					projected / 2
+				} ).sum::<GameVec>() / len * 0;
+
+			f.velocity = velocity + velocity_update;
+			f.move_and_slide(position_update, t);
+			f
 		})
 	}
 }
 
-fn calc_vel(old_velocity: GameVec, forces: impl Iterator<Item=Force>) -> GameVec {
-	const ACCURACY: i32 = 5;
-
-	const WEIGHT_NEW: i32 = 1;
-	const WEIGHT_OLD: i32 = 3;
-
-	let forces: Vec<_> = forces
-		.collect();
-
-	let mut prios: Vec<_> = forces.iter()
-		.map(|x| x.priority)
-		.collect();
-	prios.sort_unstable();
-	prios.dedup();
-
-	let mut result = old_velocity;
-
-	for p in prios {
-		let filtered: Vec<&Force> = forces.iter().filter(|x| x.priority == p).collect();
-		for _ in 0..ACCURACY {
-			for &force in &filtered {
-				if force.goal.dot(force.goal).abs() > force.goal.dot(result).abs() {
-					result += force.goal / ACCURACY;
-				}
-			}
-		}
-	}
-
-	let result = (result * WEIGHT_NEW + old_velocity * WEIGHT_OLD) / (WEIGHT_NEW + WEIGHT_OLD);
-
-	result
-}
-
-fn sqrt(x: i32) -> i32 {
-	(x as f32).sqrt() as i32
-}
-
-fn neighbour_force(f: &Fluid, n: &Fluid) -> Force {
-	let to_neighbour = n.position - f.position;
-	if to_neighbour.as_short_as(DESIRED_FLUID_DIST) {
-		// push
-
-		let value = (DESIRED_FLUID_DIST - to_neighbour.length()) * 4;
-		Force {
-			priority: 10,
-			goal: to_neighbour.with_length(value) * (-1),
-		}
-	} else {
-		// pull
-
-		let value = 20;
-		Force {
-			priority: 3,
-			goal: to_neighbour.with_length(value),
-		}
-	}
-}
-
-fn cursor_force(f: &Fluid, cursor: GameVec) -> Force {
-	let v = cursor - f.position;
-	Force {
-		priority: 5,
-		goal: v / 4,
-	}
+fn cursor_force(f: &Fluid, cursor: GameVec) -> GameVec {
+    let v = cursor - f.position;
+	(v / 4).length_clamped(30)
 }
