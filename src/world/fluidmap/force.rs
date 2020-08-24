@@ -62,5 +62,5 @@ impl FluidMap {
 
 fn cursor_force(f: &Fluid, cursor: GameVec) -> GameVec {
     let v = cursor - f.position;
-	(v / 4).length_clamped(30)
+	(v / 4).length_clamped(42)
 }
