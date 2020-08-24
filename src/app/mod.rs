@@ -31,8 +31,7 @@ impl App {
 
 	pub fn restart_game(&mut self) {
 		let mut should_restart = false;
-		let it = self.world.players.iter();
-		for player in it {
+		for player in self.world.players.iter() {
 			should_restart |= player.health == 0;
 		}
 		if should_restart {
