@@ -2,41 +2,43 @@ use crate::prelude::*;
 
 // if fluids have a distance <= FLUID_AFFECT_DIST they may affect each other
 pub const FLUID_AFFECT_DIST: i32 = 500; // in game coordinates
+const DESIRED_FLUID_DIST: i32 = 400;
 
-const MAX_VEL: i32 = 500;
 const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
 const fn hand_drag(x: i32) -> i32 { x * 15 / 16 }
-const CURSOR_PULL: i32 = 200;
+const CURSOR_PULL: i32 = 220;
+
+struct Force { // this represents a constraint saying that velocity projected onto goal should be larger than goal
+	priority: i32,
+	goal: GameVec,
+}
 
 impl FluidMap {
 	pub(in super) fn apply_forces<'a>(&'a self, t: &'a TileMap, players: &'a [Player; 2]) -> impl Iterator<Item=Fluid> + 'a {
 		self.iter().map(move |f| {
-			let neighbours = self.neighbours(f);
-
-			let velocity = f.velocity;
-
 			// gravity
-			let velocity = velocity - GameVec::new(0, FLUID_GRAVITY);
+			let velocity = f.velocity - GameVec::new(0, FLUID_GRAVITY);
 
 			// drag
 			let velocity = velocity.map(
-				if let FluidState::Free = f.state { free_drag } else { hand_drag }
+				match f.state {
+					FluidState::Free => free_drag,
+					FluidState::AtHand => hand_drag,
+				}
 			);
-			// neighbour-affection
-			let velocity = velocity + neighbours
-				.map(|n| affect(f, n))
-				.sum::<GameVec>();
 
-			// tilemap-affection
-			let mut velocity = velocity + tilemap_affect(f, t);
+			// forces
+			let iter = self.neighbours(f).map(|n| neighbour_force(f, n))
+				.chain(
+					if let FluidState::AtHand = f.state {
+						let cursor = players[f.owner].cursor_position();
+						Some(cursor_force(f, cursor))
+					} else { None }
+						.into_iter()
+			);
 
-			if let FluidState::AtHand = f.state {
-				let cursor = players[f.owner].cursor_position();
-				velocity = velocity + (cursor - f.position).with_length(CURSOR_PULL);
-			}
-
-			let velocity = velocity.clamped(-MAX_VEL, MAX_VEL);
+			let velocity = calc_vel(velocity, iter);
 
 			Fluid {
 				velocity,
@@ -46,40 +48,61 @@ impl FluidMap {
 	}
 }
 
-fn affect(f: &Fluid, n: &Fluid) -> GameVec {
-	let v = n.position - f.position;
+fn calc_vel(old_velocity: GameVec, forces: impl Iterator<Item=Force>) -> GameVec {
+	const ACCURACY: i32 = 5;
 
-	if v.magnitude_sqr() <= 30 * 30 {
-		v.with_length(-30)
-	} else if v.magnitude_sqr() <= 200 * 200 {
-		v.with_length(-10)
+	let forces: Vec<_> = forces.collect();
+
+	let mut prios: Vec<_> = forces.iter()
+		.map(|x| x.priority)
+		.collect();
+	prios.sort_unstable();
+	prios.dedup();
+
+	let mut result = old_velocity;
+
+	for p in prios {
+        let filtered: Vec<&Force> = forces.iter().filter(|x| x.priority == p).collect();
+		for _ in 0..ACCURACY {
+			for &force in &filtered {
+				if force.goal.dot(force.goal) > force.goal.dot(result) {
+					result += force.goal / ACCURACY;
+				}
+			}
+		}
+	}
+
+    result
+}
+
+fn sqrt(x: i32) -> i32 {
+	(x as f32).sqrt() as i32
+}
+
+fn neighbour_force(f: &Fluid, n: &Fluid) -> Force {
+	let to_neighbour = n.position - f.position;
+	if to_neighbour.as_short_as(DESIRED_FLUID_DIST) {
+		// push
+
+		let value = sqrt(sqrt(DESIRED_FLUID_DIST - to_neighbour.length())) * 30;
+		Force {
+			priority: 10,
+			goal: to_neighbour.with_length(value) * (-1),
+		}
 	} else {
-		(v * (-1)).with_length(10)
+		// pull
+
+		let value = 4;
+		Force {
+			priority: 3,
+			goal: to_neighbour.with_length(value),
+		}
 	}
 }
 
-fn tilemap_affect(f: &Fluid, t: &TileMap) -> GameVec {
-	let mut affect = GameVec::new(0, 0);
-
-	let p = f.position + TileVec::new(0, -1).to_game();
-	if t.check_solid(p) {
-		affect += GameVec::new(0, 40);
+fn cursor_force(f: &Fluid, cursor: GameVec) -> Force {
+    Force {
+		priority: 5,
+		goal: (cursor - f.position).with_length(CURSOR_PULL), // TODO this should not be a constant force I assume
 	}
-
-	let p = f.position + TileVec::new(0, 1).to_game();
-	if t.check_solid(p) {
-		affect += GameVec::new(0, -10);
-	}
-
-	let p = f.position + TileVec::new(-1, 0).to_game();
-	if t.check_solid(p) {
-		affect += GameVec::new(10, 0);
-	}
-
-	let p = f.position + TileVec::new(1, 0).to_game();
-	if t.check_solid(p) {
-		affect += GameVec::new(-10, 0);
-	}
-
-	affect
 }
