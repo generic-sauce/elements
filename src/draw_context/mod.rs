@@ -1,8 +1,10 @@
 use crate::prelude::*;
 
 mod canvas_vec;
+mod shader;
 
 pub use canvas_vec::*;
+pub use shader::*;
 
 pub struct DrawContext<'a> {
 	pub window: &'a mut RenderWindow,
@@ -116,22 +118,22 @@ impl<'a> DrawContext<'a> {
 		self.window.draw_circle_shape(&shape, RenderStates::default());
 	}
 
-	pub fn apply_noise(&mut self, in_texture: &mut RenderTexture, out_target: &mut impl RenderTarget) {
-		let shader = &mut self.shader_state.get_shader(ShaderId::Noise);
-		let &mut texture = &mut in_texture.texture();
-		let x: *mut Texture = &mut *texture;
-		let texture: &'static mut Texture;
-		unsafe { texture = &mut *x; }
+    // NOTE: "in_texture: &mut RenderTexture" was used before!
+	/*
+	pub fn apply_noise(&mut self, in_texture: RenderTexture, out_target: &mut impl RenderTarget) {
+		let container = TextureContainer::Render(in_texture);
+		let shader = self.shader_state.get_shader(ShaderId::Noise);
 
-		shader.set_uniform_texture("input_tex", texture);
+		shader.set_uniform_texture("input_tex", container);
 
 		let mut states = RenderStates::default();
-		states.shader = Some(&shader);
+		states.shader = Some(&shader.inner_shader);
 
 		let mut rect = RectangleShape::default();
-		rect.set_texture(&texture, true);
+		rect.set_texture(container.texture(), true);
 		rect.set_scale(Vector2f::new(1.0, -1.0));
 		rect.set_size(Vector2f::new(self.aspect_ratio, -1.0));
 		out_target.draw_rectangle_shape(&rect, states);
 	}
+	 */
 }

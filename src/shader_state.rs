@@ -22,11 +22,11 @@ macro_rules! setup {
 }
 
 pub struct ShaderState {
-	shaders: Vec<Shader<'static>>,
+	shaders: Vec<Shader>,
 }
 
 impl ShaderState {
-	pub fn get_shader(&mut self, id: ShaderId) -> &'_ mut Shader<'static> {
+	pub fn get_shader(&mut self, id: ShaderId) -> &'_ mut Shader {
 		&mut self.shaders[id as usize]
 	}
 }

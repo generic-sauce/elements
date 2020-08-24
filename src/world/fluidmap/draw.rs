@@ -20,21 +20,18 @@ impl FluidMap {
 		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let image = Image::create_from_pixels(context.tilemap_size.x as u32, context.tilemap_size.y as u32, &pixels).unwrap();
-		let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
-		let x: *mut Texture = &mut *texture_sfbox;
-		let texture: &'static mut Texture;
-		unsafe { texture = &mut *x; }
+		let container = TextureContainer::Boxed(Texture::from_image(&image).unwrap());
 
 		shader.set_uniform_float("elapsed_time", context.elapsed_time.as_secs_f32());
-		shader.set_uniform_texture("fluid_tex", texture);
+		shader.set_uniform_texture("fluid_tex", container);
 		let v = Vector2f::new(context.tilemap_size.x as f32, context.tilemap_size.y as f32); // TODO make nicer
 		shader.set_uniform_vec2("fluid_tex_size", v);
 
 		let mut states = RenderStates::default();
-		states.shader = Some(&shader);
+		states.shader = Some(&shader.inner_shader);
 
 		let mut rect = RectangleShape::default();
-		rect.set_texture(&texture, true);
+		rect.set_texture(container.texture(), true);
 		rect.set_scale(Vector2f::new(1.0, -1.0));
 		rect.set_size(Vector2f::new(context.aspect_ratio, -1.0));
 		context.window.draw_rectangle_shape(&rect, states);
