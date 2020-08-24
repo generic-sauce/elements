@@ -8,11 +8,6 @@ const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
 const fn hand_drag(x: i32) -> i32 { x * 15 / 16 }
 
-struct Force { // this represents a constraint saying that velocity projected onto goal should be larger than goal
-	priority: i32,
-	goal: GameVec,
-}
-
 impl FluidMap {
 	pub(in super) fn apply_forces<'a>(&'a self, t: &'a TileMap, players: &'a [Player; 2]) -> impl Iterator<Item=Fluid> + 'a {
 		self.iter().map(move |f| {
