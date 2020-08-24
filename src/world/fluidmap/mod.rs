@@ -18,11 +18,13 @@ pub struct Fluid {
 	pub owner: usize,
 	pub velocity: GameVec,
 	pub position: GameVec,
+	pub id: i32,
 }
 
 pub struct FluidMap {
 	pub grid: Vec<Vec<Fluid>>,
 	pub size: FluidVec,
+	pub next_id: i32,
 }
 
 impl FluidMap {
@@ -34,6 +36,7 @@ impl FluidMap {
 		FluidMap {
 			grid: FluidMap::mk_grid(None.into_iter(), size),
 			size,
+			next_id: 0,
 		}
 	}
 

@@ -57,12 +57,15 @@ impl World {
 
 			let position = calc_spawn_pos(p.cursor_position(), p.center_position());
 
-			self.fluidmap.add_fluid(Fluid{
+			self.fluidmap.add_fluid(Fluid {
 				state: FluidState::AtHand,
 				owner: i,
 				velocity: 0.into(),
 				position,
+				id: self.fluidmap.next_id,
 			});
+
+			self.fluidmap.next_id = self.fluidmap.next_id.checked_add(1).unwrap_or(0);
 		}
 	}
 
