@@ -54,7 +54,7 @@ impl App {
 			self.draw(elapsed_time, fps, perf);
 
 			self.window.display();
-			self.window.clear(Color::rgb(0, 0, 0));
+			self.window.clear(Color::rgb(115, 128, 56));
 
 			if !self.window.is_open() {
 				break;
