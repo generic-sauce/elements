@@ -32,6 +32,12 @@ static RIGHT_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
 };
 
+#[derive(PartialEq, Eq)]
+pub enum PlayerDirection {
+	Left,
+	Right,
+}
+
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
@@ -43,7 +49,7 @@ pub struct Player {
 }
 
 impl Player {
-	pub fn new(left_bot: GameVec) -> Player {
+	pub fn new(left_bot: GameVec, direction: PlayerDirection) -> Player {
 		Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
@@ -51,7 +57,7 @@ impl Player {
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
 			walljumped: true,
-			direction: -1,
+			direction: if direction == PlayerDirection::Left { -1 } else { 1 },
 		}
 	}
 
