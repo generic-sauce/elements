@@ -14,8 +14,7 @@ impl Animation {
 		}
 	}
 
-	pub fn draw(&mut self, player_index: usize, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, context: &DrawContext) {
-		let flip = if player_index == 1 { Flip::Horizontal } else { Flip::Normal };
+	pub fn draw(&mut self, flip: Flip, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, context: &DrawContext) {
 		context.draw_animation(position, radius, *self, flip);
 		self.index = (self.index + 1) % (context.animation_state.get_frame_count(*self) * context.animation_state.get_interval(*self));
 	}

@@ -19,9 +19,10 @@ impl Player {
 		PLAYER_SIZE * GameVec::new(IMG_SIZE, IMG_SIZE) / IMG_PLAYER_SIZE / 2
 	}
 
-	pub fn draw(&mut self, index: usize, context: &DrawContext) {
+	pub fn draw(&mut self, context: &DrawContext) {
 		// character
-		self.animation.draw(index, self.texture_center(), self.texture_radius(), context);
+		let flip = if self.direction == 1 { Flip::Normal } else { Flip::Horizontal };
+		self.animation.draw(flip, self.texture_center(), self.texture_radius(), context);
 
 		// cursor
 		context.draw_circle(self.center_position() + self.cursor, CURSOR_INDICATOR_RADIUS, Color::BLACK);

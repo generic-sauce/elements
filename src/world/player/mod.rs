@@ -39,6 +39,7 @@ pub struct Player {
 	pub cursor: GameVec,
 	pub health: i32,
 	walljumped: bool,
+	direction: i8,
 }
 
 impl Player {
@@ -50,12 +51,30 @@ impl Player {
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
 			walljumped: true,
+			direction: -1,
 		}
 	}
 
 	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input) {
+		self.select_animation();
 		self.apply_forces(input, t);
 		self.move_by_velocity(t);
+	}
+
+	fn select_animation(&mut self) {
+		let new_animation_id = if self.velocity.x.abs() > 10 {
+			AnimationId::BluePlayerRun
+		} else {
+			AnimationId::BluePlayerIdle
+		};
+
+		if new_animation_id != self.animation.animation_id {
+			self.animation = Animation::new(new_animation_id);
+		}
+
+		if self.velocity.x != 0 {
+			self.direction = self.velocity.x.signum() as i8;
+		}
 	}
 
 	fn apply_forces(&mut self, input: &dyn Input, t: &TileMap) {
