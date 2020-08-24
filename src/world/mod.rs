@@ -17,7 +17,7 @@ impl World {
 		let tilemap = TileMap::new("res/map/map02.png");
 
 		World {
-			players: [Player::new(TileVec::new(38, 45).into()), Player::new(TileVec::new(64, 40).into())],
+			players: [Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right), Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left)],
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
 		}
@@ -106,7 +106,7 @@ impl World {
 			let mut dmg = 0;
 			for v in self.fluidmap.grid.iter_mut() {
 				v.drain_filter(|x| x.owner != i && player.collides_point(x.position))
-				 .for_each(|_| dmg += 1 )
+				 .for_each(|_| dmg += 5 )
 			}
 			if dmg > 0 { player.damage(dmg); }
 		}

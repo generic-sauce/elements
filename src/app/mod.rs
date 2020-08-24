@@ -29,6 +29,12 @@ impl App {
 		}
 	}
 
+	pub fn restart_game(&mut self) {
+		if self.world.players.iter().any(|p| p.health == 0) {
+			self.world = World::new();
+		}
+	}
+
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
 		let interval = timed_loop.interval;
@@ -60,6 +66,7 @@ impl App {
 				break;
 			}
 
+			self.restart_game();
 		}
 	}
 
