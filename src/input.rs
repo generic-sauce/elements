@@ -4,7 +4,7 @@ use gilrs::GamepadId;
 const CONTROLLER_MAX: i32 = 100;
 const DEADZONE_MIN: i32 = 35;
 const DEADZONE_MAX: i32 = CONTROLLER_MAX - DEADZONE_MIN;
-const JOYSTICK_DISTANCE: i32 = 1500;
+const JOYSTICK_DISTANCE: i32 = 2300;
 
 fn apply_deadzone(value: i32) -> i32 {
 	let sign = value.signum();
@@ -165,8 +165,8 @@ impl Input for AdaptiveInput {
 		self.special2 = F.is_pressed() && has_keyboard;
 
 		if let Some(gamepad) = gamepad {
-			let cx = (gamepad.value(gilrs::Axis::RightStickX) * 2000.0) as i32;
-			let cy = (gamepad.value(gilrs::Axis::RightStickY) * 2000.0) as i32;
+			let cx = (gamepad.value(gilrs::Axis::RightStickX) * 1.2 * JOYSTICK_DISTANCE as f32) as i32;
+			let cy = (gamepad.value(gilrs::Axis::RightStickY) * 1.2 * JOYSTICK_DISTANCE as f32) as i32;
 			if cx != 0 || cy != 0 {
 				self.cursor = GameVec::new(
 					cx,
