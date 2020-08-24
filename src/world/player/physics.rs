@@ -24,19 +24,18 @@ impl Player {
 				let change = GameVec::new(xroute, ychange);
 
 				let change_ex = change + (remaining_vel.x.signum(), 0);
-                let stair_plus = |i: i32| {
+                let stair_plus_y = |i: i32| {
 					let tile = GameVec::new(0, self.left_bot.y + change_ex.y).to_tile() + (0,i);
 					tile.to_game().y
 				};
-				let mut stair_y_iter = // returns y-position where to be placed afterwards
+				let mut stair_iter = // returns position where to be placed afterwards
 					Some(self.left_bot.y + change_ex.y).into_iter()
 						.chain((1..(STAIR_NUM+1))
-							.map(stair_plus)
-						);
-				if let Some(y) = stair_y_iter.find(|&y| !is_colliding(GameVec::new(self.left_bot.x + change_ex.x, y), t)) {
+							.map(stair_plus_y)
+						).map(|y| GameVec::new(self.left_bot.x + change_ex.x, y));
+				if let Some(new_pos) = stair_iter.find(|&v| !is_colliding(v, t)) {
 					remaining_vel -= change_ex;
-					self.left_bot.x += change_ex.x;
-					self.left_bot.y = y;
+					self.left_bot = new_pos;
 				} else { // collision
 					remaining_vel -= change;
 					self.left_bot += change;
