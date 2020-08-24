@@ -105,13 +105,6 @@ impl Player {
 		// gravity
 		self.velocity.y -= GRAVITY;
 
-		// wall friction
-		if self.velocity.y < 0 &&
-			(self.is_left_walled(t) && input.left() ||
-			self.is_right_walled(t) && input.right()) {
-			self.velocity.y = (self.velocity.y as f32 * 0.8) as i32;
-		}
-
 		// aim
 		self.cursor = input.cursor();
 	}

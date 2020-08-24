@@ -6,6 +6,8 @@ mod physics;
 pub mod force;
 pub use self::force::*;
 
+pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
+
 #[derive(Clone)]
 pub enum FluidState {
 	AtHand,
@@ -25,6 +27,7 @@ pub struct FluidMap {
 	pub grid: Vec<Vec<Fluid>>,
 	pub size: FluidVec,
 	pub next_id: i32,
+	pub spawn_counter: u32,
 }
 
 impl FluidMap {
@@ -37,6 +40,7 @@ impl FluidMap {
 			grid: FluidMap::mk_grid(None.into_iter(), size),
 			size,
 			next_id: 0,
+			spawn_counter: 0,
 		}
 	}
 
