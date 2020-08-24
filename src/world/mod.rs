@@ -42,6 +42,13 @@ impl World {
 	}
 
 	fn spawn_fluids(&mut self) {
+		if self.fluidmap.spawn_counter > 0 {
+			self.fluidmap.spawn_counter -= 1;
+			return;
+		} else {
+			self.fluidmap.spawn_counter = FLUID_SPAWN_DIST;
+		}
+
 		for i in 0..2 {
 			let p = &self.players[i];
 
@@ -72,8 +79,8 @@ impl World {
 	fn despawn_fluids(&mut self) {
 		for cell in self.fluidmap.grid.iter_mut() {
 			cell.drain_filter(|_| {
-				let r = rand::random::<u8>();
-				r < 2
+				let r = rand::random::<u32>() % 2000;
+				r == 0
 			});
 		}
 	}
