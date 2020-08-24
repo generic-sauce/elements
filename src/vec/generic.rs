@@ -76,7 +76,7 @@ impl<T: Debug, P> Debug for Vec2t<T, P> {
 
 impl<T, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> + Copy {
 	pub fn magnitude_sqr(self) -> T {
-		self.x * self.x + self.y + self.y
+		self.x * self.x + self.y * self.y
 	}
 }
 
