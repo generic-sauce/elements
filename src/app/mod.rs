@@ -68,9 +68,8 @@ impl App {
 	}
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {
-		let window_size = self.window.size();
-		let aspect_ratio = window_size.x as f32 / window_size.y as f32;
-		let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
+		let aspect_ratio = 16.0 / 9.0;
+		let view = self.get_view(aspect_ratio);
 		self.window.set_view(&view);
 
 		let mut context = DrawContext::new(
@@ -80,7 +79,9 @@ impl App {
 			&self.font_state,
 			&self.animation_state,
 			self.world.tilemap.size,
-			elapsed_time);
+			elapsed_time,
+			aspect_ratio,
+		);
 
 		// draw game
 		self.world.draw(&mut context);
@@ -100,5 +101,21 @@ impl App {
 			.count();
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
 			&format!("fluid count: {}", fluid_count), Center::LeftTop);
+	}
+
+	fn get_view(&self, aspect_ratio: f32) -> SfBox<View> {
+		let window_size = self.window.size();
+		let window_size = Vector2f::new(window_size.x as f32, window_size.y as f32);
+		let window_aspect_ratio = window_size.x / window_size.y;
+		let aspect_factor = window_aspect_ratio / aspect_ratio;
+
+		let wider_factor = f32::max(0.0, aspect_factor - 1.0) / 2.0;
+		let higher_factor = f32::max(0.0, 1.0 / aspect_factor - 1.0) / 2.0;
+
+		let left = -wider_factor * aspect_ratio;
+		let width = aspect_ratio * (1.0 + 2.0 * wider_factor);
+		let top = -higher_factor;
+		let height = 1.0 + 2.0 * higher_factor;
+		View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height))
 	}
 }
