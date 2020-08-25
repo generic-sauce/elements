@@ -1,10 +1,8 @@
 use crate::prelude::*;
 use gilrs::GamepadId;
 
-const CONTROLLER_MAX: f32 = 1.0;
 const DEADZONE_MIN: f32 = 0.35;
-const CURSOR_DEADZONE: f32 = 0.05;
-const DEADZONE_MAX: f32 = CONTROLLER_MAX - DEADZONE_MIN;
+const CURSOR_DEADZONE: f32 = 0.07;
 const MAX_MOVEMENT_VALUE: i32 = 100;
 const JOYSTICK_DISTANCE: i32 = 2300;
 
