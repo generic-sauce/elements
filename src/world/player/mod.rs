@@ -188,21 +188,20 @@ impl Player {
 		self.health = i32::max(0, self.health);
 	}
 
-	pub fn collides_point(&self, p: GameVec) -> bool {
-		self.left_bot.x <= p.x && p.x <= self.left_bot.x + PLAYER_SIZE.x - 1
-			&& self.left_bot.y <= p.y && p.y <= self.left_bot.y + PLAYER_SIZE.y - 1
-	}
-
-	pub fn collides_tile(&self, t: TileVec) -> bool {
-		let t_lb = t.to_game();
-		let t_rt = (t + (1,1)).to_game() - (1,1);
-
+	pub fn collides_rect(&self, o_lb: GameVec, o_rt : GameVec) -> bool {
 		let p_lb = self.left_bot;
 		let p_rt = self.left_bot + PLAYER_SIZE - (1,1);
 
-		t_lb.x <= p_rt.x &&
-		t_lb.y <= p_rt.y &&
-		p_lb.x <= t_rt.x &&
-		p_lb.y <= t_rt.y
+		o_lb.x <= p_rt.x &&
+		o_lb.y <= p_rt.y &&
+		p_lb.x <= o_rt.x &&
+		p_lb.y <= o_rt.y
+	}
+
+	pub fn collides_tile(&self, t: TileVec) -> bool {
+		let o_lb = t.to_game();
+		let o_rt = (t + 1).to_game() - 1;
+
+		self.collides_rect(o_lb, o_rt)
 	}
 }
