@@ -188,6 +188,23 @@ impl Player {
 		self.health = i32::max(0, self.health);
 	}
 
+	pub fn collides_point_with_radius(&self, point: GameVec, radius: i32) -> bool {
+		let center = self.center_position();
+
+		let circle_dist = GameVec::new((center.x - point.x).abs(), (center.y - point.y).abs());
+
+		if circle_dist.x > PLAYER_SIZE.x / 2 + radius { return false; }
+		if circle_dist.y > PLAYER_SIZE.y / 2 + radius { return false; }
+
+		if circle_dist.x <= PLAYER_SIZE.x / 2 { return true; }
+		if circle_dist.y <= PLAYER_SIZE.y / 2 { return true; }
+
+		let sq = |a| a * a;
+		let cornerdist_sq = sq(circle_dist.x - PLAYER_SIZE.x / 2) + sq(circle_dist.y - PLAYER_SIZE.y / 2);
+
+		cornerdist_sq <= sq(radius)
+	}
+
 	pub fn collides_rect(&self, o_lb: GameVec, o_rt : GameVec) -> bool {
 		let p_lb = self.left_bot;
 		let p_rt = self.left_bot + PLAYER_SIZE - (1,1);

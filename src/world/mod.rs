@@ -6,7 +6,7 @@ mod draw;
 
 use crate::prelude::*;
 
-const FLUID_DAMAGE_RADIUS: i32 = TILESIZE;
+const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
 
 pub struct World {
 	pub players: [Player; 2],
@@ -113,11 +113,9 @@ impl World {
 			let player = &mut self.players[i];
 			let mut dmg = 0;
 			for v in self.fluidmap.grid.iter_mut() {
-				v.drain_filter(|x| {
-					// TODO this should be a circle - rect collision, and not rect - rect
-					let lb = x.position - FLUID_DAMAGE_RADIUS;
-					let rt = x.position + FLUID_DAMAGE_RADIUS;
-					x.owner != i && player.collides_rect(lb, rt) })
+				v.drain_filter(|x|
+					x.owner != i && player.collides_point_with_radius(x.position, FLUID_DAMAGE_RADIUS)
+				)
 				 .for_each(|_| dmg += 5 )
 			}
 			if dmg > 0 { player.damage(dmg); }
