@@ -26,6 +26,13 @@ impl FluidMap {
 			}
 		);
 
+		// noise
+		// TODO seed this!
+		let velocity = velocity + (
+			[-1, 1][rand::random::<usize>() % 2],
+			[-1, 1][rand::random::<usize>() % 2]
+		);
+
 		// position offset
 		let neighbours: Vec<_> = self.neighbours_with_owner(&f)
 			.filter(|n| (f.position - n.position).as_short_as(DESIRED_FLUID_DIST))
