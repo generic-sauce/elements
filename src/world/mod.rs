@@ -17,7 +17,10 @@ impl World {
 		let tilemap = TileMap::new("res/map/map02.png");
 
 		World {
-			players: [Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right), Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left)],
+			players: [
+				Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right, PlayerColor::Blue),
+				Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left, PlayerColor::Red)
+			],
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
 		}

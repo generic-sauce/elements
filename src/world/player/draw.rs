@@ -21,7 +21,7 @@ impl Player {
 
 	pub fn draw(&mut self, context: &DrawContext) {
 		// character
-		let flip = if self.direction == 1 { Flip::Normal } else { Flip::Horizontal };
+		let flip = if self.direction == PlayerDirection::Right { Flip::Normal } else { Flip::Horizontal };
 		self.animation.draw(flip, self.texture_center(), self.texture_radius(), context);
 
 		// cursor
