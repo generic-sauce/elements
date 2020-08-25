@@ -163,7 +163,11 @@ impl Player {
 	}
 
 	pub fn cursor_position(&self) -> GameVec {
-		self.center_position() + self.cursor
+		let mut c = self.center_position() + self.cursor;
+		if c.x < 0 { c.x = 0; }
+		if c.y < 0 { c.y = 0; }
+
+		c
 	}
 
 	pub fn damage(&mut self, dmg: i32) {
