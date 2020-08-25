@@ -56,6 +56,21 @@ impl<'a> DrawContext<'a> {
 		}
 	}
 
+	pub fn with_render_target(&mut self, render_target: &mut(impl RenderTarget + 'a)) -> DrawContext {
+		let render_target: &'a mut dyn RenderTarget = render_target;
+		DrawContext::new(
+			self.window_size,
+			self.texture_state,
+			self.shader_state,
+			self.font_state,
+			self.animation_state,
+			self.tilemap_size,
+			self.elapsed_time,
+			self.aspect_ratio,
+			render_target,
+		)
+	}
+
 	pub fn draw_texture(&self, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture: Option<&Texture>, flip: Flip) {
 		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size));
 		let radius: Vector2f = Into::<Vector2f>::into(radius.to_canvas(self.tilemap_size));
