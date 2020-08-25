@@ -30,7 +30,7 @@ impl World {
 
 	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
 		// sub-tick
-		self.fluidmap.tick(&self.tilemap, &self.players, self.frame_id);
+		self.tick_fluidmap();
 		self.tick_players(inputs, gilrs);
 		self.handle_skills(inputs);
 		self.spawn_fluids();

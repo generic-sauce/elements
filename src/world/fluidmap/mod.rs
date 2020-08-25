@@ -31,6 +31,17 @@ pub struct FluidMap {
 	pub spawn_counter: u32,
 }
 
+impl World {
+	pub fn tick_fluidmap(&mut self) {
+		let iter = self.fluidmap.iter()
+			.cloned()
+			.map(|f| self.fluidmap.apply_grab(f, &self.players))
+			.map(|f| self.fluidmap.apply_forces(f, &self.tilemap, &self.players, self.frame_id))
+			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap));
+		self.fluidmap.grid = FluidMap::mk_grid(iter, self.fluidmap.size);
+	}
+}
+
 impl FluidMap {
 	pub fn new(tilemap_size: TileVec) -> FluidMap {
 		let tilemap_size = TileVec::new(tilemap_size.x as i32, tilemap_size.y as i32); // number of tiles
@@ -43,15 +54,6 @@ impl FluidMap {
 			next_id: 0,
 			spawn_counter: 0,
 		}
-	}
-
-	pub fn tick(&mut self, t: &TileMap, players: &[Player; 2], frame_id: u32) { // maybe this function should live on World
-		let iter = self.iter()
-			.cloned()
-			.map(|f| self.apply_grab(f, players))
-			.map(|f| self.apply_forces(f, t, players, frame_id))
-			.map(|f| FluidMap::move_fluid_by_velocity(f, t));
-		self.grid = FluidMap::mk_grid(iter, self.size);
 	}
 
 	fn mk_grid(fluids: impl Iterator<Item=Fluid>, size: FluidVec) -> Vec<Vec<Fluid>> {
