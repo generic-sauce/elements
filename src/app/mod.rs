@@ -102,12 +102,18 @@ impl App {
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
 			&format!("perf: {:.2}%", perf), Center::LeftTop);
 
-		let fluid_count = self.world.fluidmap.grid.iter()
-			.map(|x| x.iter())
-			.flatten()
-			.count();
+		let (fluid_count_0, fluid_count_1) = (
+			self.world.fluidmap.iter()
+				.filter(|x| x.owner == 0)
+				.count(),
+			self.world.fluidmap.iter()
+				.filter(|x| x.owner == 1)
+				.count()
+		);
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
-			&format!("fluid count: {}", fluid_count), Center::LeftTop);
+			&format!("fluid count 0: {}", fluid_count_0), Center::LeftTop);
+		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
+			&format!("fluid count 1: {}", fluid_count_1), Center::LeftTop);
 	}
 
 	fn get_view(&self, aspect_ratio: f32) -> SfBox<View> {
