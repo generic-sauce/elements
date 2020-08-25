@@ -124,8 +124,8 @@ impl<'a> DrawContext<'a> {
 
 	// NOTE: "in_texture: &mut RenderTexture" was used before!
 	#[allow(unused)]
-	pub fn apply_noise(&mut self, in_texture: RenderTexture, out_target: &mut &impl RenderTarget) {
-		let container = TextureContainer::Render(in_texture);
+	pub fn apply_noise(&mut self, target: &impl RenderTarget, texture: RenderTexture) {
+		let container = TextureContainer::Render(texture);
 		let shader = self.shader_state.get_shader(ShaderId::Noise);
 
 		shader.set_uniform_texture("input_tex", container);
@@ -134,9 +134,11 @@ impl<'a> DrawContext<'a> {
 		states.shader = Some(&shader.inner_shader);
 
 		let mut rect = RectangleShape::default();
+		rect.set_texture(self.texture_state.get_texture(TextureId::Any), true);
 		rect.set_scale(Vector2f::new(1.0, -1.0));
 		rect.set_size(Vector2f::new(self.aspect_ratio, -1.0));
-		out_target.draw_rectangle_shape(&rect, states);
+
+		target.draw_rectangle_shape(&rect, states);
 	}
 
 	#[allow(unused)]
@@ -156,5 +158,14 @@ impl<'a> DrawContext<'a> {
 		rect.set_size(Vector2f::new(self.aspect_ratio, -1.0));
 
 		target.draw_rectangle_shape(&rect, states);
+	}
+
+	#[allow(unused)]
+	pub fn fill_canvas_with_color(&self, target: &impl RenderTarget, color: Color) {
+		let mut rect = RectangleShape::default();
+		rect.set_fill_color(color);
+		rect.set_size(Vector2f::new(self.aspect_ratio, 1.0));
+
+		target.draw_rectangle_shape(&rect, RenderStates::default());
 	}
 }

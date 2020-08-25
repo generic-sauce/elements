@@ -64,7 +64,7 @@ impl App {
 			self.draw(elapsed_time, fps, perf);
 
 			self.window.display();
-			self.window.clear(Color::rgb(115, 128, 56));
+			self.window.clear(Color::BLACK);
 
 			if !self.window.is_open() {
 				break;
@@ -84,8 +84,10 @@ impl App {
 
 		// declare render target
 		let mut game_texture_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
+		let mut game_noise_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
 
 		game_texture_target.set_view(&view);
+		game_noise_target.set_view(&view);
 		self.window.set_view(&window_view);
 
 		let window_size = self.window.size();
@@ -102,9 +104,10 @@ impl App {
 		);
 
 		// draw game
+		context.fill_canvas_with_color(&game_texture_target, Color::rgb(115, 128, 56));
 		self.world.draw(&game_texture_target, &mut context);
-		// game_texture_target.display();
-		context.fill_canvas_with_texture(&self.window, game_texture_target);
+		context.apply_noise(&game_noise_target, game_texture_target);
+		context.fill_canvas_with_texture(&self.window, game_noise_target);
 
 		// draw debug info
 		let text_size = 0.030;
