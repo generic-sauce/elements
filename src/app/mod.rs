@@ -150,8 +150,14 @@ impl App {
 		let height = 1.0 + 2.0 * higher_factor;
 		let window_view = View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height));
 
+		let wider_factor = wider_factor * 2.0 + 1.0;
+		let higher_factor = higher_factor * 2.0 + 1.0;
+
 		let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
-		let view_pixel_size = Vec2u::new(1280, 720);
+		let view_pixel_size = Vec2u::new(
+			(window_size.x as f32 / wider_factor) as u32,
+			(window_size.y as f32 / higher_factor) as u32
+		);
 
 		(window_view, view, view_pixel_size)
 	}
