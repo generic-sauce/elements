@@ -32,10 +32,11 @@ impl Player {
 	}
 
 	pub fn draw_health(&mut self, target: &impl RenderTarget, context: &DrawContext) {
-		let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 4);
-		let offset = GameVec::new(0, PLAYER_SIZE.y / 2 + TILESIZE);
-		context.draw_sprite(target, self.center_position() + offset, size, Color::BLACK, None, Flip::Normal);
+		let mut size = GameVec::new(PLAYER_SIZE.x / 2, TILESIZE / 3);
+		let offset = GameVec::new(0, PLAYER_SIZE.y + TILESIZE);
+		let left_bot = self.left_bot + offset;
+		context.draw_rect(target, left_bot, size, Color::BLACK, Origin::LeftBottom);
 		size.x = (size.x as f32 * (self.health as f32 / MAX_HEALTH as f32)) as i32;
-		context.draw_sprite(target, self.center_position() + offset, size, Color::GREEN, None, Flip::Normal);
+		context.draw_rect(target, left_bot, size, Color::GREEN, Origin::LeftBottom);
 	}
 }

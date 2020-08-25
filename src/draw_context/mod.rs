@@ -24,9 +24,18 @@ pub enum Flip {
 }
 
 #[derive(PartialEq, Eq)]
-pub enum Center {
+pub enum Origin {
+	Center,
 	LeftBottom,
 	LeftTop,
+}
+
+fn match_origin(origin: Origin, size: CanvasVec) -> CanvasVec {
+	match origin {
+		Origin::Center => size * 0.5,
+		Origin::LeftBottom => CanvasVec::new(0.0, size.y),
+		Origin::LeftTop => CanvasVec::new(0.0, 0.0),
+	}
 }
 
 impl<'a> DrawContext<'a> {
@@ -79,13 +88,28 @@ impl<'a> DrawContext<'a> {
 	}
 
 	#[allow(unused)]
+	pub fn draw_rect(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, origin: Origin) {
+		let position = position.to_canvas(self.tilemap_size);
+		let radius = radius.to_canvas(self.tilemap_size);
+
+		let mut shape = RectangleShape::new();
+		shape.set_scale(Vector2f::new(1.0, -1.0));
+		shape.set_size(radius * 2.0);
+		shape.set_origin(match_origin(origin, radius * 2.0));
+		shape.set_position(position);
+		shape.set_fill_color(color);
+
+		target.draw_rectangle_shape(&shape, RenderStates::default());
+	}
+
+	#[allow(unused)]
 	pub fn draw_animation(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, animation: Animation, flip: Flip) {
 		let texture = self.animation_state.get_animation_texture(animation);
 		self.draw_texture(target, position, radius, Color::WHITE, Some(texture), flip);
 	}
 
 	#[allow(unused)]
-	pub fn draw_text(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, size: f32 /* CanvasVec coordinate system */, text: &str, center: Center) {
+	pub fn draw_text(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, size: f32 /* CanvasVec coordinate system */, text: &str, origin: Origin) {
 		let mut position = position.to_canvas(self.tilemap_size);
 		let factor = self.window_size.y;
 		let size = (size as f32 * factor as f32) as u32;
@@ -97,7 +121,7 @@ impl<'a> DrawContext<'a> {
 		let mut text = Text::new(text, &font, size);
 
 		position.y += font.underline_position(size) / factor;
-		if center == Center::LeftBottom {
+		if origin == Origin::LeftBottom {
 			text.set_origin(Vector2f::new(0.0, text.character_size() as f32));
 		}
 

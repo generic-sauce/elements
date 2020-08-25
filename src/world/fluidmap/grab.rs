@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const GRAB_DIST: i32 = DESIRED_FLUID_DIST;
+const GRAB_DIST: i32 = DESIRED_FLUID_DIST * 3 / 2;
 
 impl FluidMap {
 	pub(in super) fn apply_grab(&self, mut f: Fluid, players: &[Player; 2]) -> Fluid {

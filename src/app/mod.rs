@@ -44,7 +44,7 @@ impl App {
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
 		let interval = timed_loop.interval;
-		for (elapsed_time, delta_time, fps, perf) in timed_loop {
+		for (elapsed_time, delta_time, fps, load) in timed_loop {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
@@ -63,7 +63,7 @@ impl App {
 			}
 
 			self.tick();
-			self.draw(elapsed_time, fps, perf);
+			self.draw(elapsed_time, fps, load);
 
 			self.window.display();
 			self.window.clear(Color::BLACK);
@@ -80,7 +80,7 @@ impl App {
 		self.world.tick(&mut self.inputs, &self.gilrs);
 	}
 
-	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {
+	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
 		let aspect_ratio = 16.0 / 9.0;
 		let (window_view, view, view_pixel_size) = self.get_views(aspect_ratio);
 
@@ -114,14 +114,14 @@ impl App {
 		// draw debug info
 		let text_size = 0.030;
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
-			&format!("{} / {}", self.kills[0], self.kills[1]), Center::LeftTop);
+			&format!("{} / {}", self.kills[0], self.kills[1]), Origin::LeftTop);
 
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
-			&format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
+			&format!("elapsed time: {}", elapsed_time.as_secs()), Origin::LeftTop);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
-			&format!("fps: {}", fps as u32), Center::LeftTop);
+			&format!("fps: {}", fps as u32), Origin::LeftTop);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
-			&format!("perf: {:.2}%", perf), Center::LeftTop);
+			&format!("load: {:.2}%", load * 100.0), Origin::LeftTop);
 
 		let (fluid_count_0, fluid_count_1) = (
 			self.world.fluidmap.iter()
@@ -132,7 +132,7 @@ impl App {
 				.count()
 		);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 5.0), text_size,
-			&format!("fluid count: {} / {}", fluid_count_0, fluid_count_1), Center::LeftTop);
+			&format!("fluid count: {} / {}", fluid_count_0, fluid_count_1), Origin::LeftTop);
 	}
 
 	fn get_views(&self, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, Vec2u) {
@@ -150,8 +150,14 @@ impl App {
 		let height = 1.0 + 2.0 * higher_factor;
 		let window_view = View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height));
 
+		let wider_factor = wider_factor * 2.0 + 1.0;
+		let higher_factor = higher_factor * 2.0 + 1.0;
+
 		let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
-		let view_pixel_size = Vec2u::new(1280, 720);
+		let view_pixel_size = Vec2u::new(
+			(window_size.x as f32 / wider_factor) as u32,
+			(window_size.y as f32 / higher_factor) as u32
+		);
 
 		(window_view, view, view_pixel_size)
 	}

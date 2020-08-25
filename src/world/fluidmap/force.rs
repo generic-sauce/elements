@@ -9,7 +9,7 @@ const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
 const fn hand_drag(x: i32) -> i32 { x * 30 / 32 }
 
 impl FluidMap {
-	pub(in super) fn apply_forces(&self, mut f: Fluid, t: &TileMap, players: &[Player; 2]) -> Fluid {
+	pub(in super) fn apply_forces(&self, mut f: Fluid, t: &TileMap, players: &[Player; 2], frame_id: u32) -> Fluid {
 		// gravity
 		let mut velocity = f.velocity - GameVec::new(0, FLUID_GRAVITY);
 
@@ -27,10 +27,9 @@ impl FluidMap {
 		);
 
 		// noise
-		// TODO seed this!
 		let velocity = velocity + (
-			[-1, 1][rand::random::<usize>() % 2],
-			[-1, 1][rand::random::<usize>() % 2]
+			noise(frame_id, f.id, 0),
+			noise(frame_id, f.id, 1),
 		);
 
 		// position offset
@@ -67,4 +66,18 @@ impl FluidMap {
 fn cursor_force(f: &Fluid, cursor: GameVec) -> GameVec {
 	let v = cursor - f.position;
 	(v / 4).length_clamped(42)
+}
+
+// returns -1 or 1
+fn noise(fluid_id: u32, frame_id: u32, num: u32) -> i32 {
+	use rand::{SeedableRng, RngCore};
+	use rand_xorshift::XorShiftRng;
+
+	let seed = (fluid_id + num * 7) as u64;
+	let seed = XorShiftRng::seed_from_u64(seed).next_u64() / 2 + frame_id as u64; // the / 2 prevents overflows
+	let result = XorShiftRng::seed_from_u64(seed).next_u32();
+	match result % 2 {
+		0 => -1,
+		_ => 1,
+	}
 }

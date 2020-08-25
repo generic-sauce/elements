@@ -6,6 +6,8 @@ mod draw;
 
 use crate::prelude::*;
 
+const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
+
 pub struct World {
 	pub players: [Player; 2],
 	pub tilemap: TileMap,
@@ -30,7 +32,7 @@ impl World {
 
 	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
 		// sub-tick
-		self.fluidmap.tick(&self.tilemap, &self.players);
+		self.tick_fluidmap();
 		self.tick_players(inputs, gilrs);
 		self.handle_skills(inputs);
 		self.spawn_fluids();
@@ -111,7 +113,9 @@ impl World {
 			let player = &mut self.players[i];
 			let mut dmg = 0;
 			for v in self.fluidmap.grid.iter_mut() {
-				v.drain_filter(|x| x.owner != i && player.collides_point(x.position))
+				v.drain_filter(|x|
+					x.owner != i && player.collides_point_with_radius(x.position, FLUID_DAMAGE_RADIUS)
+				)
 				 .for_each(|_| dmg += 5 )
 			}
 			if dmg > 0 { player.damage(dmg); }

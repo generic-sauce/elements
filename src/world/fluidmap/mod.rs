@@ -21,14 +21,25 @@ pub struct Fluid {
 	pub owner: usize,
 	pub velocity: GameVec,
 	pub position: GameVec,
-	pub id: i32,
+	pub id: u32,
 }
 
 pub struct FluidMap {
 	pub grid: Vec<Vec<Fluid>>,
 	pub size: FluidVec,
-	pub next_id: i32,
+	pub next_id: u32,
 	pub spawn_counter: u32,
+}
+
+impl World {
+	pub fn tick_fluidmap(&mut self) {
+		let iter = self.fluidmap.iter()
+			.cloned()
+			.map(|f| self.fluidmap.apply_grab(f, &self.players))
+			.map(|f| self.fluidmap.apply_forces(f, &self.tilemap, &self.players, self.frame_id))
+			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap));
+		self.fluidmap.grid = FluidMap::mk_grid(iter, self.fluidmap.size);
+	}
 }
 
 impl FluidMap {
@@ -43,15 +54,6 @@ impl FluidMap {
 			next_id: 0,
 			spawn_counter: 0,
 		}
-	}
-
-	pub fn tick(&mut self, t: &TileMap, players: &[Player; 2]) {
-		let iter = self.iter()
-			.cloned()
-			.map(|f| self.apply_grab(f, players))
-			.map(|f| self.apply_forces(f, t, players))
-			.map(|f| FluidMap::move_fluid_by_velocity(f, t));
-		self.grid = FluidMap::mk_grid(iter, self.size);
 	}
 
 	fn mk_grid(fluids: impl Iterator<Item=Fluid>, size: FluidVec) -> Vec<Vec<Fluid>> {
