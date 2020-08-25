@@ -143,7 +143,13 @@ impl Player {
 		self.velocity.y -= GRAVITY;
 
 		// aim
-		self.cursor = input.cursor();
+		let largest = (t.size + 1).to_game() - 1; // TODO correct?
+		let ctr = self.center_position();
+		let mut global_cursor = ctr + input.cursor();
+		global_cursor.x = global_cursor.x.max(0).min(largest.x);
+		global_cursor.y = global_cursor.y.max(0).min(largest.y);
+		self.cursor.x = global_cursor.x - ctr.x;
+		self.cursor.y = global_cursor.y - ctr.y;
 	}
 
 	fn is_grounded(&self, t: &TileMap) -> bool {
@@ -163,11 +169,7 @@ impl Player {
 	}
 
 	pub fn cursor_position(&self) -> GameVec {
-		let mut c = self.center_position() + self.cursor;
-		if c.x < 0 { c.x = 0; }
-		if c.y < 0 { c.y = 0; }
-
-		c
+		self.center_position() + self.cursor
 	}
 
 	pub fn damage(&mut self, dmg: i32) {
