@@ -18,6 +18,15 @@ impl<T: Copy, P> From<T> for Vec2t<T, P> {
 	}
 }
 
+impl<T: Default, P> Default for Vec2t<T, P> {
+	fn default() -> Self {
+		Vec2t::new(
+			Default::default(),
+			Default::default()
+		)
+	}
+}
+
 impl<T, P> From<(T, T)> for Vec2t<T, P> {
 	fn from(t: (T, T)) -> Vec2t<T, P> {
 		Vec2t::new(t.0, t.1)
@@ -71,12 +80,6 @@ impl<T: Debug, P> Debug for Vec2t<T, P> {
 	fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
 		let s = format!("Vec2t({:?}, {:?})", self.x, self.y);
 		fmt.write_str(&*s)
-	}
-}
-
-impl<T, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> + Copy {
-	pub fn magnitude_sqr(self) -> T {
-		self.x * self.x + self.y * self.y
 	}
 }
 
@@ -154,6 +157,16 @@ impl<T: Copy, U: Into<Vec2t<T, P>>, P> DivAssign<U> for Vec2t<T, P> where T: Div
 	}
 }
 
+// this could be written by only requiring Sum!
+impl<T: Add<Output=T> + Default, P> Sum<Self> for Vec2t<T, P> {
+	fn sum<I>(iter: I) -> Self where I: Iterator<Item = Self> {
+		let null: Vec2t<T, P> = Default::default();
+		iter.fold(null, |a, b| Vec2t::new(a.x + b.x, a.y + b.y))
+	}
+}
+
+// other functionality
+
 impl<T: Copy, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> {
 	pub fn dot(self, other: impl Into<Vec2t<T, P>>) -> T {
 		let other = other.into();
@@ -192,22 +205,13 @@ impl<T, P> Vec2t<T, P> where T: Copy + Ord + Mul<T, Output=T> + Add<T, Output=T>
 		if orig_len == Default::default() { return Vec2t::default(); }
 		(self * l) / orig_len
 	}
-}
 
+	pub fn as_short_as(self, l: T) -> bool { self.length_squared() <= l * l }
 
-impl<T: Default, P> Default for Vec2t<T, P> {
-	fn default() -> Self {
-		Vec2t::new(
-			Default::default(),
-			Default::default()
-		)
-	}
-}
-
-// this could be written by only requiring Sum!
-impl<T: Add<Output=T> + Default, P> Sum<Self> for Vec2t<T, P> {
-	fn sum<I>(iter: I) -> Self where I: Iterator<Item = Self> {
-		let null: Vec2t<T, P> = Default::default();
-		iter.fold(null, |a, b| Vec2t::new(a.x + b.x, a.y + b.y))
+	pub fn projected_on(self, other: Self) -> Self {
+		if other == Default::default() {
+			return other;
+		}
+		other * self.dot(other) / other.dot(other)
 	}
 }

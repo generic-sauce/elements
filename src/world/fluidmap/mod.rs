@@ -89,7 +89,7 @@ impl FluidMap {
 			.map(move |t| fluid_tile + t)
 			.map(move |t| self.index(t))
 			.flatten()
-			.filter(move |n| (f.position - n.position).magnitude_sqr() <= FLUID_AFFECT_DIST * FLUID_AFFECT_DIST)
+			.filter(move |n| (f.position - n.position).as_short_as(FLUID_AFFECT_DIST))
 	}
 
 	pub fn add_fluid(&mut self, fluid: Fluid) {
