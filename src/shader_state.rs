@@ -31,16 +31,17 @@ macro_rules! setup {
 }
 
 pub struct ShaderState {
-	shaders: Vec<Shader<'static>>,
+	shaders: Vec<Shader>,
 }
 
 impl ShaderState {
-	pub fn get_shader(&mut self, id: ShaderId) -> &'_ mut Shader<'static> {
+	pub fn get_shader(&mut self, id: ShaderId) -> &'_ mut Shader {
 		&mut self.shaders[id as usize]
 	}
 }
 
 setup!(
 	Fluid: (Some("vertex.glsl"), None, Some("fluids_fragment.glsl")),
-	Tilemap: (Some("vertex.glsl"), None, Some("tilemap_fragment.glsl"))
+	Tilemap: (Some("vertex.glsl"), None, Some("tilemap_fragment.glsl")),
+	Noise: (Some("vertex.glsl"), None, Some("noise_fragment.glsl"))
 );

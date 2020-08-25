@@ -1,5 +1,4 @@
 #version 130
-/* precision mediump float; */
 
 uniform float elapsed_time;
 uniform vec2 fluid_tex_size;
@@ -8,10 +7,6 @@ uniform sampler2D fluid_tex;
 in vec2 uv;
 
 out vec4 color;
-
-float n21(vec2 uv) {
-	return fract(9232.43 * sin(dot(uv, vec2(123.42, 642.332))));
-}
 
 float smin(float a, float b, float k) {
 	float h = clamp(0.5+0.5*(b-a)/k, 0.0, 1.0);
