@@ -21,13 +21,13 @@ pub struct Fluid {
 	pub owner: usize,
 	pub velocity: GameVec,
 	pub position: GameVec,
-	pub id: i32,
+	pub id: u32,
 }
 
 pub struct FluidMap {
 	pub grid: Vec<Vec<Fluid>>,
 	pub size: FluidVec,
-	pub next_id: i32,
+	pub next_id: u32,
 	pub spawn_counter: u32,
 }
 
@@ -45,11 +45,11 @@ impl FluidMap {
 		}
 	}
 
-	pub fn tick(&mut self, t: &TileMap, players: &[Player; 2]) {
+	pub fn tick(&mut self, t: &TileMap, players: &[Player; 2], frame_id: u32) { // maybe this function should live on World
 		let iter = self.iter()
 			.cloned()
 			.map(|f| self.apply_grab(f, players))
-			.map(|f| self.apply_forces(f, t, players))
+			.map(|f| self.apply_forces(f, t, players, frame_id))
 			.map(|f| FluidMap::move_fluid_by_velocity(f, t));
 		self.grid = FluidMap::mk_grid(iter, self.size);
 	}
