@@ -44,7 +44,7 @@ impl App {
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
 		let interval = timed_loop.interval;
-		for (elapsed_time, delta_time, fps, perf) in timed_loop {
+		for (elapsed_time, delta_time, fps, load) in timed_loop {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
@@ -63,7 +63,7 @@ impl App {
 			}
 
 			self.tick();
-			self.draw(elapsed_time, fps, perf);
+			self.draw(elapsed_time, fps, load);
 
 			self.window.display();
 			self.window.clear(Color::BLACK);
@@ -80,7 +80,7 @@ impl App {
 		self.world.tick(&mut self.inputs, &self.gilrs);
 	}
 
-	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {
+	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
 		let aspect_ratio = 16.0 / 9.0;
 		let (window_view, view, view_pixel_size) = self.get_views(aspect_ratio);
 
@@ -121,7 +121,7 @@ impl App {
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
 			&format!("fps: {}", fps as u32), Origin::LeftTop);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
-			&format!("perf: {:.2}%", perf), Origin::LeftTop);
+			&format!("load: {:.2}%", load * 100.0), Origin::LeftTop);
 
 		let (fluid_count_0, fluid_count_1) = (
 			self.world.fluidmap.iter()

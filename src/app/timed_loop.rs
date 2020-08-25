@@ -9,7 +9,7 @@ pub struct TimedLoop {
 	frames_since_prev_second: u32,
 	duration_since_prev_second: Duration,
 	fps: u32,
-	perf: f32,
+	load: f32,
 }
 
 impl TimedLoop {
@@ -23,7 +23,7 @@ impl TimedLoop {
 			frames_since_prev_second: 0,
 			duration_since_prev_second: Duration::from_secs(0),
 			fps: 0,
-			perf: 0.0,
+			load: 0.0,
 		}
 	}
 
@@ -61,7 +61,7 @@ impl Iterator for TimedLoop {
 				self.fps = self.frames_since_prev_second;
 				self.frames_since_prev_second = 0;
 
-				self.perf = self.duration_since_prev_second.as_secs_f32();
+				self.load = self.duration_since_prev_second.as_secs_f32();
 				self.duration_since_prev_second = Duration::from_secs(0);
 
 				self.prev_second = next_second;
@@ -71,6 +71,6 @@ impl Iterator for TimedLoop {
 
 		self.duration_since_prev_second += delta_time;
 		self.frames_since_prev_second += 1;
-		Some((self.elapsed_time(), delta_time, self.fps, self.perf))
+		Some((self.elapsed_time(), delta_time, self.fps, self.load))
 	}
 }
