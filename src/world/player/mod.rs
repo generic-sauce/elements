@@ -44,6 +44,7 @@ pub struct Player {
 	pub animation: Animation,
 	pub cursor: GameVec,
 	pub health: i32,
+	pub free_wall: u32,
 	walljumped: bool,
 	direction: i8,
 }
@@ -56,6 +57,7 @@ impl Player {
 			animation: Animation::new(AnimationId::BluePlayerIdle),
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
+			free_wall: 0,
 			walljumped: true,
 			direction: if direction == PlayerDirection::Left { -1 } else { 1 },
 		}
