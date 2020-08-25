@@ -35,6 +35,7 @@ impl World {
 		}
 
 		if self.alloc_wall(p).is_none() {
+			self.players[p].last_wall_pos = None;
 			return;
 		}
 
