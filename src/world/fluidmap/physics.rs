@@ -3,6 +3,7 @@ use crate::prelude::*;
 impl Fluid {
 	pub(in super) fn move_and_slide(&mut self, mut remaining_vel: GameVec, t: &TileMap) {
 		if t.check_solid(self.position) {
+			#[cfg(debug_assertions)]
 			println!("A fluid is glitched.");
 			return;
 		}
