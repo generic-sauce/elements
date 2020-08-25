@@ -48,7 +48,7 @@ impl FluidMap {
 					return GameVec::new(0, 0);
 				}
 				projected / 2
-			} ).sum::<GameVec>() / len;
+			} ).sum::<GameVec>() / len * 5 / 2;
 
 		f.velocity = velocity + velocity_update;
 		f.move_and_slide(position_update, t);
