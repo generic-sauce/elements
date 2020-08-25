@@ -1,32 +1,39 @@
 use crate::prelude::*;
 use gilrs::GamepadId;
 
-const CONTROLLER_MAX: i32 = 100;
-const DEADZONE_MIN: i32 = 35;
-const DEADZONE_MAX: i32 = CONTROLLER_MAX - DEADZONE_MIN;
+const CONTROLLER_MAX: f32 = 1.0;
+const DEADZONE_MIN: f32 = 0.35;
+const CURSOR_DEADZONE: f32 = 0.05;
+const DEADZONE_MAX: f32 = CONTROLLER_MAX - DEADZONE_MIN;
+const MAX_MOVEMENT_VALUE: i32 = 100;
 const JOYSTICK_DISTANCE: i32 = 2300;
 
-fn apply_deadzone(value: i32) -> i32 {
+fn apply_deadzone_min(value: f32, deadzone_min: f32) -> f32 {
 	let sign = value.signum();
-	if value.abs() < DEADZONE_MIN {
-		0
-	} else if value.abs() > DEADZONE_MAX {
-		sign * CONTROLLER_MAX
+	let deadzone_max = 1.0 - deadzone_min;
+	if value.abs() < deadzone_min {
+		0.0
+	} else if value.abs() > deadzone_max {
+		sign
 	} else {
-		(value.abs()*CONTROLLER_MAX / (DEADZONE_MAX-DEADZONE_MIN) - ((CONTROLLER_MAX * DEADZONE_MIN) / (DEADZONE_MAX-DEADZONE_MIN))) * sign
+		(value.abs() - deadzone_min) / (deadzone_max-deadzone_min) * sign
 	}
+}
+
+fn apply_deadzone(value: f32) -> f32 {
+	apply_deadzone_min(value, DEADZONE_MIN)
 }
 
 pub trait Input {
 	fn horizontal_dir(&self) -> i32;
 	fn vertical_dir(&self) -> i32;
 
-	fn up(&self) -> bool { self.vertical_dir() >= DEADZONE_MIN }
+	fn up(&self) -> bool { self.vertical_dir() >= (DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	fn just_up(&self) -> bool;
-	fn down(&self) -> bool { self.vertical_dir() <= -DEADZONE_MIN }
+	fn down(&self) -> bool { self.vertical_dir() <= (-DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	fn just_down(&self) -> bool;
-	fn right(&self) -> bool { self.horizontal_dir() >= DEADZONE_MIN }
-	fn left(&self) -> bool { self.horizontal_dir() <= -DEADZONE_MIN }
+	fn right(&self) -> bool { self.horizontal_dir() >= (DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
+	fn left(&self) -> bool { self.horizontal_dir() <= (-DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	fn attack1(&self) -> bool;
 	fn attack2(&self) -> bool;
 	fn special1(&self) -> bool;
@@ -132,27 +139,27 @@ impl Input for AdaptiveInput {
 		self.direction.y = 0;
 
 		self.direction.y += if W.is_pressed() && has_keyboard {
-			CONTROLLER_MAX
+			MAX_MOVEMENT_VALUE
 		} else if S.is_pressed() && has_keyboard {
-			-CONTROLLER_MAX
+			-MAX_MOVEMENT_VALUE
 		} else if let Some(gamepad) = gamepad {
-			apply_deadzone((gamepad.value(gilrs::Axis::LeftStickY) * 100.0) as i32)
+			(apply_deadzone(gamepad.value(gilrs::Axis::LeftStickY)) * MAX_MOVEMENT_VALUE as f32) as i32
 		} else {
 			0
 		};
 
 		let mut key_pressed = false;
 		if D.is_pressed() && has_keyboard {
-			self.direction.x += CONTROLLER_MAX;
+			self.direction.x += MAX_MOVEMENT_VALUE;
 			key_pressed = true;
 		}
 		if A.is_pressed() && has_keyboard {
-			self.direction.x -= CONTROLLER_MAX;
+			self.direction.x -= MAX_MOVEMENT_VALUE;
 			key_pressed = true;
 		}
 		if !key_pressed {
 			if let Some(gamepad) = gamepad {
-				self.direction.x = apply_deadzone((gamepad.value(gilrs::Axis::LeftStickX) * 100.0) as i32)
+				self.direction.x = (apply_deadzone(gamepad.value(gilrs::Axis::LeftStickX)) * MAX_MOVEMENT_VALUE as f32) as i32
 			}
 		}
 
@@ -165,9 +172,11 @@ impl Input for AdaptiveInput {
 		self.special2 = F.is_pressed() && has_keyboard;
 
 		if let Some(gamepad) = gamepad {
-			let cx = (gamepad.value(gilrs::Axis::RightStickX) * 1.2 * JOYSTICK_DISTANCE as f32) as i32;
-			let cy = (gamepad.value(gilrs::Axis::RightStickY) * 1.2 * JOYSTICK_DISTANCE as f32) as i32;
-			if cx != 0 || cy != 0 {
+			let cx = gamepad.value(gilrs::Axis::RightStickX);
+			let cy = gamepad.value(gilrs::Axis::RightStickY);
+			if cx != 0.0 || cy != 0.0 {
+				let cx = (apply_deadzone_min(cx, CURSOR_DEADZONE) * 1.2 * JOYSTICK_DISTANCE as f32) as i32;
+				let cy = (apply_deadzone_min(cy, CURSOR_DEADZONE) * 1.2 * JOYSTICK_DISTANCE as f32) as i32;
 				self.cursor = GameVec::new(
 					cx,
 					cy,
