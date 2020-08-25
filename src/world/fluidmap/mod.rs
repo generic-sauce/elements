@@ -9,7 +9,7 @@ pub use self::force::*;
 
 pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum FluidState {
 	AtHand,
 	Free,
@@ -46,7 +46,10 @@ impl FluidMap {
 	}
 
 	pub fn tick(&mut self, t: &TileMap, players: &[Player; 2]) {
-		let iter = self.apply_forces(t, players)
+		let iter = self.iter()
+			.cloned()
+			.map(|f| self.apply_grab(f, players))
+			.map(|f| self.apply_forces(f, t, players))
 			.map(|f| FluidMap::move_fluid_by_velocity(f, t));
 		self.grid = FluidMap::mk_grid(iter, self.size);
 	}
