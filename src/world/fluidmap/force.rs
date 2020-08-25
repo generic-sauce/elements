@@ -72,7 +72,6 @@ fn cursor_force(f: &Fluid, cursor: GameVec) -> GameVec {
 fn noise(fluid_id: u32, frame_id: u32, num: u32) -> i32 {
 	use rand::{SeedableRng, RngCore};
 
-	let mut seed = [0u8; 16];
 	let seed = (fluid_id + frame_id + num) as u64;
 	let mut xor = rand_xorshift::XorShiftRng::seed_from_u64(seed);
 	match xor.next_u32() % 2 {
