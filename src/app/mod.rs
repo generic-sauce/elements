@@ -114,14 +114,14 @@ impl App {
 		// draw debug info
 		let text_size = 0.030;
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
-			&format!("{} / {}", self.kills[0], self.kills[1]), Center::LeftTop);
+			&format!("{} / {}", self.kills[0], self.kills[1]), Origin::LeftTop);
 
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
-			&format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
+			&format!("elapsed time: {}", elapsed_time.as_secs()), Origin::LeftTop);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
-			&format!("fps: {}", fps as u32), Center::LeftTop);
+			&format!("fps: {}", fps as u32), Origin::LeftTop);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
-			&format!("perf: {:.2}%", perf), Center::LeftTop);
+			&format!("perf: {:.2}%", perf), Origin::LeftTop);
 
 		let (fluid_count_0, fluid_count_1) = (
 			self.world.fluidmap.iter()
@@ -132,7 +132,7 @@ impl App {
 				.count()
 		);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 5.0), text_size,
-			&format!("fluid count: {} / {}", fluid_count_0, fluid_count_1), Center::LeftTop);
+			&format!("fluid count: {} / {}", fluid_count_0, fluid_count_1), Origin::LeftTop);
 	}
 
 	fn get_views(&self, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, Vec2u) {
