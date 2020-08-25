@@ -13,6 +13,7 @@ pub struct App {
 	font_state: FontState,
 	animation_state: AnimationState,
 	inputs: [Box<dyn Input>; 2],
+	kills: [u32; 2],
 	gilrs: gilrs::Gilrs,
 }
 
@@ -28,12 +29,14 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0, &gilrs)), Box::new(AdaptiveInput::new(1, &gilrs))],
+            kills: [0, 0],
 			gilrs,
 		}
 	}
 
-	pub fn restart_game(&mut self) {
-		if self.world.players.iter().any(|p| p.health == 0) {
+	fn check_restart(&mut self) {
+		if let Some(p) = (0..2).find(|&p| self.world.players[p].health == 0) {
+            self.kills[1-p] += 1;
 			self.world = World::new();
 		}
 	}
@@ -69,7 +72,7 @@ impl App {
 				break;
 			}
 
-			self.restart_game();
+			self.check_restart();
 		}
 	}
 
@@ -99,10 +102,13 @@ impl App {
 		// draw debug info
 		let text_size = 0.030;
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
-			&format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 1.0), text_size,
-			&format!("fps: {}", fps as u32), Center::LeftTop);
+						  &format!("{} / {}", self.kills[0], self.kills[1]), Center::LeftTop);
+
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
+			&format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
+		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
+			&format!("fps: {}", fps as u32), Center::LeftTop);
+		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
 			&format!("perf: {:.2}%", perf), Center::LeftTop);
 
 		let (fluid_count_0, fluid_count_1) = (
@@ -113,10 +119,8 @@ impl App {
 				.filter(|x| x.owner == 1)
 				.count()
 		);
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
-			&format!("fluid count 0: {}", fluid_count_0), Center::LeftTop);
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
-			&format!("fluid count 1: {}", fluid_count_1), Center::LeftTop);
+		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 5.0), text_size,
+			&format!("fluid count: {} / {}", fluid_count_0, fluid_count_1), Center::LeftTop);
 	}
 
 	fn get_view(&self, aspect_ratio: f32) -> SfBox<View> {
