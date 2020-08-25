@@ -35,7 +35,7 @@ impl Shader {
 
 	pub unsafe fn set_uniform_texture_raw<'a>(&mut self, name: &str, t: &'a Texture) {
 		let x: *const Texture = t;
-		let t: &'static Texture = unsafe { &*x };
+		let t: &'static Texture = &*x;
 
 		self.current_textures.remove(name);
 		self.inner_shader.set_uniform_texture(name, t);

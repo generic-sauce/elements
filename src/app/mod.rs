@@ -81,8 +81,12 @@ impl App {
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {
 		let aspect_ratio = 16.0 / 9.0;
 		let (view, view_pixel_size) = self.get_view(aspect_ratio);
+
+		// declare render target
+		let mut game_render_texture = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
+
+		game_render_texture.set_view(&view);
 		self.window.set_view(&view);
-		let mut game_render_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
 
 		let window_size = self.window.size();
 		let window_size = Vec2u::new(window_size.x, window_size.y);
@@ -95,28 +99,25 @@ impl App {
 			self.world.tilemap.size,
 			elapsed_time,
 			aspect_ratio,
-			&mut game_render_target,
 		);
 
 		// draw game
-		self.world.draw(&mut context);
-
-		let context = context.with_render_target(&mut self.window);
+		self.world.draw(&self.window, &mut context);
 
 		// draw debug info
 		let text_size = 0.030;
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
+		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
 			&format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 1.0), text_size,
+		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 1.0), text_size,
 			&format!("fps: {}", fps as u32), Center::LeftTop);
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
+		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
 			&format!("perf: {:.2}%", perf), Center::LeftTop);
 
 		let fluid_count = self.world.fluidmap.grid.iter()
 			.map(|x| x.iter())
 			.flatten()
 			.count();
-		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
+		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
 			&format!("fluid count: {}", fluid_count), Center::LeftTop);
 	}
 

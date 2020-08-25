@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 impl FluidMap {
-	pub fn draw(&self, context: &mut DrawContext) {
+	pub fn draw(&self, target: &impl RenderTarget, context: &mut DrawContext) {
 		let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
 		let mut pixels = Vec::with_capacity(size);
 		pixels.resize(size * 4, 0 as u8);
@@ -34,11 +34,11 @@ impl FluidMap {
 		rect.set_texture(context.texture_state.get_texture(TextureId::Any), true);
 		rect.set_scale(Vector2f::new(1.0, -1.0));
 		rect.set_size(Vector2f::new(context.aspect_ratio, -1.0));
-		context.render_target.draw_rectangle_shape(&rect, states);
+		target.draw_rectangle_shape(&rect, states);
 
 		#[cfg(debug_assertions)]
 		for fluid in self.iter() {
-			context.draw_circle(fluid.position, TILESIZE / 3, Color::RED);
+			context.draw_circle(target, fluid.position, TILESIZE / 3, Color::RED);
 		}
 	}
 }
