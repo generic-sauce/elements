@@ -4,6 +4,11 @@ const STAIR_NUM: i32 = 2;
 
 impl Player {
 	pub(in super) fn move_by_velocity(&mut self, t: &TileMap) {
+		if is_colliding(self.left_bot, t) {
+			println!("A player is glitched.");
+			return;
+		}
+
 		let mut remaining_vel = self.velocity;
 
 		while remaining_vel != 0.into() {
@@ -17,7 +22,6 @@ impl Player {
 				self.left_bot += remaining_vel;
 				break;
 			} else if (remaining_vel.y == 0 && yroute_ex == 0) /* edge case */ || (xroute_ex * remaining_vel.y).abs() < (yroute_ex * remaining_vel.x).abs() { //    <->    xroute / self.velocity.x < yroute / self.velocity.y    <->    xtime < ytime
-				#[cfg(debug_assertions)]
 				assert!(remaining_vel.x != 0);
 
 				let ychange = xroute.abs() * remaining_vel.y / remaining_vel.x.abs();
@@ -44,7 +48,6 @@ impl Player {
 					self.velocity.x = 0;
 				}
 			} else {
-				#[cfg(debug_assertions)]
 				assert!(remaining_vel.y != 0);
 
 				let xchange = yroute.abs() * remaining_vel.x / remaining_vel.y.abs();
@@ -52,7 +55,6 @@ impl Player {
 
 				let change_ex = change + (0, remaining_vel.y.signum());
 				if is_colliding(self.left_bot + change_ex, t) {
-					#[cfg(debug_assertions)]
 					assert!(!is_colliding(self.left_bot + change, t));
 
 					remaining_vel -= change;
