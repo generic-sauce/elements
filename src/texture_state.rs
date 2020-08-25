@@ -37,5 +37,6 @@ impl TextureState {
 }
 
 setup!(
+	Any: "images/checkerboard.png",
 	BluePlayerIdle1: "images/player_blue/player_idle/player_idle1.png"
 );

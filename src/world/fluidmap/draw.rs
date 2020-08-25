@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 impl FluidMap {
-	pub fn draw(&self, context: &mut DrawContext) {
+	pub fn draw(&self, target: &impl RenderTarget, context: &mut DrawContext) {
 		let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
 		let mut pixels = Vec::with_capacity(size);
 		pixels.resize(size * 4, 0 as u8);
@@ -20,28 +20,25 @@ impl FluidMap {
 		let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
 
 		let image = Image::create_from_pixels(context.tilemap_size.x as u32, context.tilemap_size.y as u32, &pixels).unwrap();
-		let mut texture_sfbox: SfBox<Texture> = Texture::from_image(&image).unwrap();
-		let x: *mut Texture = &mut *texture_sfbox;
-		let texture: &'static mut Texture;
-		unsafe { texture = &mut *x; }
+		let container = TextureContainer::Boxed(Texture::from_image(&image).unwrap());
 
 		shader.set_uniform_float("elapsed_time", context.elapsed_time.as_secs_f32());
-		shader.set_uniform_texture("fluid_tex", texture);
+		shader.set_uniform_texture("fluid_tex", container);
 		let v = Vector2f::new(context.tilemap_size.x as f32, context.tilemap_size.y as f32); // TODO make nicer
 		shader.set_uniform_vec2("fluid_tex_size", v);
 
 		let mut states = RenderStates::default();
-		states.shader = Some(&shader);
+		states.shader = Some(&shader.inner_shader);
 
 		let mut rect = RectangleShape::default();
-		rect.set_texture(&texture, true);
+		rect.set_texture(context.texture_state.get_texture(TextureId::Any), true);
 		rect.set_scale(Vector2f::new(1.0, -1.0));
 		rect.set_size(Vector2f::new(context.aspect_ratio, -1.0));
-		context.window.draw_rectangle_shape(&rect, states);
+		target.draw_rectangle_shape(&rect, states);
 
 		#[cfg(debug_assertions)]
 		for fluid in self.iter() {
-			context.draw_circle(fluid.position, TILESIZE / 3, Color::RED);
+			context.draw_circle(target, fluid.position, TILESIZE / 3, Color::RED);
 		}
 	}
 }
