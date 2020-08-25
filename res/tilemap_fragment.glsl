@@ -8,6 +8,10 @@ in vec2 uv;
 
 out vec4 color;
 
+float n21(vec2 uv) {
+	return fract(9232.43 * sin(dot(uv, vec2(123.42, 642.332))));
+}
+
 float sdf_square(vec2 uv) {
 	uv = abs(uv);
 	return max(uv.x, uv.y);
@@ -65,8 +69,8 @@ void main() {
 	float ratio = tile.b;
 	float alpha = ground;
 
-	float d = sdf_tilemap(uv);
-	vec3 ground_color = vec3(.2, .1, d);
+	float d = 1. - sdf_tilemap(uv);
+	vec3 ground_color = vec3(.25, .1, .1) * (1. - d * .5);
 	vec3 wall_color = vec3(.85, .95, .99);
 	vec3 team_color = mix(wall_color, 1.-wall_color, team);
 	vec3 c = mix(ground_color, team_color, ratio);
