@@ -79,5 +79,13 @@ impl AnimationState {
 
 setup!(
 	BluePlayerIdle: "res/images/player_blue/player_idle", 4,
-	BluePlayerRun: "res/images/player_blue/player_run", 4
+	BluePlayerRun: "res/images/player_blue/player_run", 4,
+	BluePlayerJump: "res/images/player_blue/player_jump", 4,
+	BluePlayerFall: "res/images/player_blue/player_fall", 4,
+	BluePlayerFallSlow: "res/images/player_blue/player_fall_slow", 4,
+	RedPlayerIdle: "res/images/player_red/player_idle", 4,
+	RedPlayerRun: "res/images/player_red/player_run", 4,
+	RedPlayerJump: "res/images/player_red/player_jump", 4,
+	RedPlayerFall: "res/images/player_red/player_fall", 4,
+	RedPlayerFallSlow: "res/images/player_red/player_fall_slow", 4
 );

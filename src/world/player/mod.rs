@@ -32,10 +32,15 @@ static RIGHT_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
 };
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Copy, Clone)]
 pub enum PlayerDirection {
 	Left,
 	Right,
+}
+#[derive(PartialEq, Eq, Copy, Clone)]
+pub enum PlayerColor {
+	Blue,
+	Red,
 }
 
 pub struct Player {
@@ -46,11 +51,12 @@ pub struct Player {
 	pub health: i32,
 	pub free_wall: u32,
 	walljumped: bool,
-	direction: i8,
+	direction: PlayerDirection,
+	color: PlayerColor,
 }
 
 impl Player {
-	pub fn new(left_bot: GameVec, direction: PlayerDirection) -> Player {
+	pub fn new(left_bot: GameVec, direction: PlayerDirection, color: PlayerColor) -> Player {
 		Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
@@ -59,29 +65,50 @@ impl Player {
 			health: MAX_HEALTH,
 			free_wall: 0,
 			walljumped: true,
-			direction: if direction == PlayerDirection::Left { -1 } else { 1 },
+			direction,
+			color,
 		}
 	}
 
 	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input) {
-		self.select_animation();
+		self.select_animation(t);
 		self.apply_forces(input, t);
 		self.move_by_velocity(t);
 	}
 
-	fn select_animation(&mut self) {
-		let new_animation_id = if self.velocity.x.abs() > 10 {
-			AnimationId::BluePlayerRun
+	fn select_animation(&mut self, t: &TileMap) {
+		let (run, idle, jump, fall, fall_slow) = if self.color == PlayerColor::Blue {
+			(AnimationId::BluePlayerRun, AnimationId::BluePlayerIdle, AnimationId::BluePlayerJump, AnimationId::BluePlayerFall, AnimationId::BluePlayerFallSlow)
 		} else {
-			AnimationId::BluePlayerIdle
+			(AnimationId::RedPlayerRun, AnimationId::RedPlayerIdle, AnimationId::RedPlayerJump, AnimationId::RedPlayerFall, AnimationId::RedPlayerFallSlow)
+		};
+
+		let new_animation_id = if self.is_grounded(t) {
+			if self.velocity.x.abs() > 10 {
+				run
+			} else {
+				idle
+			}
+		} else {
+			if self.velocity.y > 70 {
+				jump
+			} else if self.velocity.y > -70 {
+				fall_slow
+			} else {
+				fall
+			}
 		};
 
 		if new_animation_id != self.animation.animation_id {
 			self.animation = Animation::new(new_animation_id);
 		}
 
-		if self.velocity.x != 0 {
-			self.direction = self.velocity.x.signum() as i8;
+		self.direction = if self.velocity.x < 0 {
+			PlayerDirection::Left
+		} else if self.velocity.x > 0 {
+			PlayerDirection::Right
+		} else {
+			self.direction
 		}
 	}
 
