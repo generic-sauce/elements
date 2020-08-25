@@ -1,4 +1,7 @@
 pub mod timed_loop;
+mod resource;
+
+pub use resource::res;
 
 use crate::prelude::*;
 

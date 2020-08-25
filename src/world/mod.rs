@@ -14,7 +14,7 @@ pub struct World {
 
 impl World {
 	pub fn new() -> World {
-		let tilemap = TileMap::new("res/map/map02.png");
+		let tilemap = TileMap::new(&res("map/map02.png"));
 
 		World {
 			players: [

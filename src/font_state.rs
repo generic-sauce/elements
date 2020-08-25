@@ -13,7 +13,8 @@ macro_rules! setup {
 			pub fn new() -> FontState {
 				let mut fonts = Vec::new();
 				$(
-					fonts.push(Font::from_file($y).expect("could not load file"));
+					let y = res($y);
+					fonts.push(Font::from_file(&y).expect("could not load file"));
 				)*
 				FontState { fonts }
 			}
@@ -32,5 +33,5 @@ impl FontState {
 }
 
 setup!(
-	DefaultFont: "res/dashing_unicorn.ttf"
+	DefaultFont: "dashing_unicorn.ttf"
 );

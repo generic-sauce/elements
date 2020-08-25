@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+// TODO this thing is not used currently!
+
 macro_rules! setup {
 	($($x:ident : $y:expr),*) => {
 
@@ -14,7 +16,8 @@ macro_rules! setup {
 			pub fn new() -> TextureState {
 				let mut textures = Vec::new();
 				$(
-					textures.push(Texture::from_file($y).expect("could not load file"));
+					let y = res($y);
+					textures.push(Texture::from_file(&y).expect("could not load file"));
 				)*
 				TextureState { textures }
 			}
@@ -34,5 +37,5 @@ impl TextureState {
 }
 
 setup!(
-	BluePlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png"
+	BluePlayerIdle1: "images/player_blue/player_idle/player_idle1.png"
 );

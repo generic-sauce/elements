@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+use std::ops::Deref;
+
 macro_rules! setup {
 	($($x:ident : ($y:expr, $z:expr, $w: expr)),*) => {
 
@@ -13,7 +15,14 @@ macro_rules! setup {
 			pub fn new() -> ShaderState {
 				let mut shaders = Vec::new();
 				$(
-					shaders.push(Shader::from_file($y, $z, $w).expect("could not load file"));
+					let y = $y.map(res);
+					let z = $z.map(res);
+					let w = $w.map(res);
+
+					let y_ref: Option<&str> = y.as_ref().map(|x| x.deref());
+					let z_ref: Option<&str> = z.as_ref().map(|x| x.deref());
+					let w_ref: Option<&str> = w.as_ref().map(|x| x.deref());
+					shaders.push(Shader::from_file(y_ref, z_ref, w_ref).expect("could not load file"));
 				)*
 				ShaderState { shaders }
 			}
@@ -32,6 +41,6 @@ impl ShaderState {
 }
 
 setup!(
-	Fluid: (Some("res/vertex.glsl"), None, Some("res/fluids_fragment.glsl")),
-	Tilemap: (Some("res/vertex.glsl"), None, Some("res/tilemap_fragment.glsl"))
+	Fluid: (Some("vertex.glsl"), None, Some("fluids_fragment.glsl")),
+	Tilemap: (Some("vertex.glsl"), None, Some("tilemap_fragment.glsl"))
 );

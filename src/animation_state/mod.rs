@@ -31,7 +31,8 @@ macro_rules! setup {
 
 impl AnimationBuffer {
 	fn from_directory(directory: &str, interval: usize) -> AnimationBuffer {
-		let files = read_dir(directory).expect(&format!("Could not read animation directory {}", directory));
+        let directory = res(directory);
+		let files = read_dir(&directory).expect(&format!("Could not read animation directory {}", directory));
 		let mut filenames = Vec::new();
 		for file in files {
 			let file = file.expect("Could not find file");
@@ -78,14 +79,14 @@ impl AnimationState {
 }
 
 setup!(
-	BluePlayerIdle: "res/images/player_blue/player_idle", 4,
-	BluePlayerRun: "res/images/player_blue/player_run", 4,
-	BluePlayerJump: "res/images/player_blue/player_jump", 4,
-	BluePlayerFall: "res/images/player_blue/player_fall", 4,
-	BluePlayerFallSlow: "res/images/player_blue/player_fall_slow", 4,
-	RedPlayerIdle: "res/images/player_red/player_idle", 4,
-	RedPlayerRun: "res/images/player_red/player_run", 4,
-	RedPlayerJump: "res/images/player_red/player_jump", 4,
-	RedPlayerFall: "res/images/player_red/player_fall", 4,
-	RedPlayerFallSlow: "res/images/player_red/player_fall_slow", 4
+	BluePlayerIdle: "images/player_blue/player_idle", 4,
+	BluePlayerRun: "images/player_blue/player_run", 4,
+	BluePlayerJump: "images/player_blue/player_jump", 4,
+	BluePlayerFall: "images/player_blue/player_fall", 4,
+	BluePlayerFallSlow: "images/player_blue/player_fall_slow", 4,
+	RedPlayerIdle: "images/player_red/player_idle", 4,
+	RedPlayerRun: "images/player_red/player_run", 4,
+	RedPlayerJump: "images/player_red/player_jump", 4,
+	RedPlayerFall: "images/player_red/player_fall", 4,
+	RedPlayerFallSlow: "images/player_red/player_fall_slow", 4
 );
