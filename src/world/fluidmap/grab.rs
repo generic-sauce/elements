@@ -10,10 +10,9 @@ impl FluidMap {
 		let cursor = player.cursor_position();
 
 		let condition = (cursor - f.position).as_short_as(GRAB_DIST) ||
-			self.neighbours(&f)
+			self.neighbours_with_owner(&f)
 				.find(|n|
 					(f.position - n.position).as_short_as(GRAB_DIST)
-					&& n.owner == f.owner
 					&& n.state == FluidState::AtHand
 				).is_some();
 		if condition {

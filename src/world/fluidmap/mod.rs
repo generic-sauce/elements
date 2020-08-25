@@ -96,6 +96,10 @@ impl FluidMap {
 			.filter(move |n| (f.position - n.position).as_short_as(FLUID_AFFECT_DIST))
 	}
 
+	pub fn neighbours_with_owner<'s>(&'s self, f: &'s Fluid) -> impl Iterator<Item=&Fluid> + 's {
+		self.neighbours(f).filter(move |n| n.owner == f.owner)
+	}
+
 	pub fn add_fluid(&mut self, fluid: Fluid) {
 		let tile_pos: FluidVec = fluid.position.into();
 		let index = (tile_pos.x + tile_pos.y * self.size.x) as usize;
