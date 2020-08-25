@@ -83,8 +83,10 @@ impl App {
 		let view = self.get_view(aspect_ratio);
 		self.window.set_view(&view);
 
+		let window_size = self.window.size();
+		let window_size = Vec2u::new(window_size.x, window_size.y);
 		let mut context = DrawContext::new(
-			&mut self.window,
+			window_size,
 			&self.texture_state,
 			&mut self.shader_state,
 			&self.font_state,
@@ -92,6 +94,7 @@ impl App {
 			self.world.tilemap.size,
 			elapsed_time,
 			aspect_ratio,
+			&mut self.window,
 		);
 
 		// draw game

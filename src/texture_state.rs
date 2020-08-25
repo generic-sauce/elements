@@ -34,5 +34,6 @@ impl TextureState {
 }
 
 setup!(
-	BluePlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png"
+	BluePlayerIdle1: "res/images/player_blue/player_idle/player_idle1.png",
+	Any: "res/images/checkerboard.png"
 );
