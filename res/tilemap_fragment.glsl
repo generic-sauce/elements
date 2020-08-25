@@ -15,8 +15,8 @@ void main() {
 	float alpha = ground;
 
 	vec3 ground_color = vec3(.2, .1, .1);
-	vec2 wall_color = vec2(.8, .2);
-	vec3 team_color = mix(wall_color.yyx, wall_color.xyy, team);
+	vec3 wall_color = vec3(.85, .95, .99);
+	vec3 team_color = mix(wall_color, 1.-wall_color, team);
 	vec3 c = mix(ground_color, team_color, ratio);
 	color = vec4(c, alpha);
 }
