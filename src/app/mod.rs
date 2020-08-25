@@ -29,14 +29,14 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			inputs: [Box::new(AdaptiveInput::new(0, &gilrs)), Box::new(AdaptiveInput::new(1, &gilrs))],
-            kills: [0, 0],
+			kills: [0, 0],
 			gilrs,
 		}
 	}
 
 	fn check_restart(&mut self) {
 		if let Some(p) = (0..2).find(|&p| self.world.players[p].health == 0) {
-            self.kills[1-p] += 1;
+			self.kills[1-p] += 1;
 			self.world = World::new();
 		}
 	}
@@ -102,7 +102,7 @@ impl App {
 		// draw debug info
 		let text_size = 0.030;
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
-						  &format!("{} / {}", self.kills[0], self.kills[1]), Center::LeftTop);
+			&format!("{} / {}", self.kills[0], self.kills[1]), Center::LeftTop);
 
 		context.draw_text(CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
 			&format!("elapsed time: {}", elapsed_time.as_secs()), Center::LeftTop);

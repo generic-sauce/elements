@@ -31,7 +31,7 @@ macro_rules! setup {
 
 impl AnimationBuffer {
 	fn from_directory(directory: &str, interval: usize) -> AnimationBuffer {
-        let directory = res(directory);
+		let directory = res(directory);
 		let files = read_dir(&directory).expect(&format!("Could not read animation directory {}", directory));
 		let mut filenames = Vec::new();
 		for file in files {

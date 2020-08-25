@@ -51,9 +51,25 @@ pub struct Player {
 	pub health: i32,
 	pub free_wall: u32,
 	pub last_wall_pos: Option<GameVec>,
+	pub grab_cooldown: Option<u32>,
 	walljumped: bool,
 	direction: PlayerDirection,
 	color: PlayerColor,
+}
+
+impl World {
+	pub fn tick_player(&mut self, p: usize, input: &mut dyn Input) {
+		let pl = &mut self.players[p];
+		pl.select_animation(&self.tilemap);
+		pl.apply_forces(input, &self.tilemap);
+		pl.move_by_velocity(&self.tilemap);
+
+		pl.grab_cooldown = match pl.grab_cooldown {
+			None => None,
+			Some(0) => None,
+			Some(x) => Some(x-1),
+		};
+	}
 }
 
 impl Player {
@@ -66,16 +82,11 @@ impl Player {
 			health: MAX_HEALTH,
 			free_wall: 0,
 			last_wall_pos: None,
+			grab_cooldown: None,
 			walljumped: true,
 			direction,
 			color,
 		}
-	}
-
-	pub fn tick(&mut self, t: &mut TileMap, input: &dyn Input) {
-		self.select_animation(t);
-		self.apply_forces(input, t);
-		self.move_by_velocity(t);
 	}
 
 	fn select_animation(&mut self, t: &TileMap) {

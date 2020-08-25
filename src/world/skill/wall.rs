@@ -5,8 +5,8 @@ const WALLS_PER_FLUID: u32 = 4;
 impl World {
 	pub(in super) fn handle_wall(&mut self, p: usize) {
 		let player = &mut self.players[p];
-        let cursor = player.cursor_position();
-        if let Some(pos) = player.last_wall_pos {
+		let cursor = player.cursor_position();
+		if let Some(pos) = player.last_wall_pos {
 			self.wall_from_to(p, pos, cursor);
 		} else {
 			self.wall(p, cursor);
@@ -47,7 +47,7 @@ impl World {
 	fn alloc_wall(&mut self, p: usize) -> Option<()> {
 		let mut pl = &mut self.players[p];
 
-        // allocate free_wall
+		// allocate free_wall
 		if pl.free_wall == 0 {
 			for inner_v in self.fluidmap.grid.iter_mut() {
 				if inner_v.drain_filter(|x| x.owner == p).next().is_some() {
