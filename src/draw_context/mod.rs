@@ -142,19 +142,10 @@ impl<'a> DrawContext<'a> {
 	#[allow(unused)]
 	pub fn fill_canvas_with_texture(&mut self, target: &impl RenderTarget, texture: RenderTexture) {
 		let mut rect = RectangleShape::default();
-		rect.set_texture(self.texture_state.get_texture(TextureId::Any), true);
-		rect.set_scale(Vector2f::new(1.0, -1.0));
-		rect.set_size(Vector2f::new(self.aspect_ratio, -1.0));
+		rect.set_texture(texture.texture(), true);
+		rect.set_size(Vector2f::new(self.aspect_ratio, 1.0));
 
-		let container = TextureContainer::Render(texture);
-		let shader = self.shader_state.get_shader(ShaderId::Noise);
-
-		shader.set_uniform_texture("input_tex", container);
-
-		let mut states = RenderStates::default();
-		states.shader = Some(&shader.inner_shader);
-
-		target.draw_rectangle_shape(&rect, states);
+		target.draw_rectangle_shape(&rect, RenderStates::default());
 	}
 
 	#[allow(unused)]

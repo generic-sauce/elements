@@ -80,13 +80,13 @@ impl App {
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, perf: f32) {
 		let aspect_ratio = 16.0 / 9.0;
-		let (view, view_pixel_size) = self.get_view(aspect_ratio);
+		let (window_view, view, view_pixel_size) = self.get_views(aspect_ratio);
 
 		// declare render target
-		let mut game_render_texture = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
+		let mut game_texture_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
 
-		game_render_texture.set_view(&view);
-		self.window.set_view(&view);
+		game_texture_target.set_view(&view);
+		self.window.set_view(&window_view);
 
 		let window_size = self.window.size();
 		let window_size = Vec2u::new(window_size.x, window_size.y);
@@ -102,7 +102,9 @@ impl App {
 		);
 
 		// draw game
-		self.world.draw(&self.window, &mut context);
+		self.world.draw(&game_texture_target, &mut context);
+		// game_texture_target.display();
+		context.fill_canvas_with_texture(&self.window, game_texture_target);
 
 		// draw debug info
 		let text_size = 0.030;
@@ -121,7 +123,7 @@ impl App {
 			&format!("fluid count: {}", fluid_count), Center::LeftTop);
 	}
 
-	fn get_view(&self, aspect_ratio: f32) -> (SfBox<View>, Vec2u) {
+	fn get_views(&self, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, Vec2u) {
 		let window_size = self.window.size();
 		let window_size = Vector2f::new(window_size.x as f32, window_size.y as f32);
 		let window_aspect_ratio = window_size.x / window_size.y;
@@ -134,10 +136,11 @@ impl App {
 		let width = aspect_ratio * (1.0 + 2.0 * wider_factor);
 		let top = -higher_factor;
 		let height = 1.0 + 2.0 * higher_factor;
-		let view = View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height));
+		let window_view = View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height));
 
-		let pixel_size = Vec2u::new(1280, 720);
+		let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
+		let view_pixel_size = Vec2u::new(1280, 720);
 
-		(view, pixel_size)
+		(window_view, view, view_pixel_size)
 	}
 }
