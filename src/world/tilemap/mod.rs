@@ -51,7 +51,9 @@ impl TileMap {
 
 	#[allow(unused)]
 	pub fn get(&self, v: TileVec) -> Tile {
-		self.tiles[(v.x + v.y * self.size.x) as usize]
+		self.tiles.get((v.x + v.y * self.size.x) as usize)
+			.cloned()
+			.unwrap_or(Tile::Ground)
 	}
 
 	#[allow(unused)]
