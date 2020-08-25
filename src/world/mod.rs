@@ -10,6 +10,7 @@ pub struct World {
 	pub players: [Player; 2],
 	pub tilemap: TileMap,
 	pub fluidmap: FluidMap,
+	pub frame_id: u32,
 }
 
 impl World {
@@ -23,6 +24,7 @@ impl World {
 			],
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
+			frame_id: 0,
 		}
 	}
 
@@ -35,6 +37,7 @@ impl World {
 		self.despawn_fluids();
 		self.despawn_walls();
 		self.check_damage();
+		self.frame_id += 1;
 	}
 
 	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
