@@ -2,18 +2,17 @@ use crate::prelude::*;
 
 pub struct Server {
 	world: World,
-	inputs: [Box<dyn Input>; 2],
-	gilrs: gilrs::Gilrs, // TODO: remove for server
 }
 
 impl Server {
 	pub fn new() -> Server {
-		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 		Server {
 			world: World::new(),
-			inputs: [Box::new(AdaptiveInput::new(0, &gilrs)), Box::new(AdaptiveInput::new(1, &gilrs))],
-			gilrs,
 		}
+	}
+
+	fn get_input_states(&self) -> [InputState; 2] {
+		unimplemented!()
 	}
 
 	pub fn run(&mut self) {
@@ -25,6 +24,8 @@ impl Server {
 			}
 
 			// TODO: receive from clients
+
+			// TODO: update inputs
 			self.tick();
 			// TODO: send game update
 
@@ -37,6 +38,6 @@ impl Server {
 	}
 
 	fn tick(&mut self) {
-		self.world.tick(&mut self.inputs, &self.gilrs);
+		self.world.tick(&self.get_input_states());
 	}
 }

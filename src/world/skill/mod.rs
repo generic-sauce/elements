@@ -5,11 +5,11 @@ mod wall;
 pub const GRAB_COOLDOWN: u32 = 10;
 
 impl World {
-	pub(in super) fn handle_skills(&mut self, inputs: &mut [Box<dyn Input>; 2]) {
+	pub(in super) fn handle_skills(&mut self, inputs: &[InputState; 2]) {
 		for p in 0..2 {
-			if inputs[p].attack1() { self.handle_throw(p); }
-			if inputs[p].attack2() { self.handle_throw3(p); }
-			if inputs[p].special1() { self.handle_wall(p); }
+			if inputs[p].attack1 { self.handle_throw(p); }
+			if inputs[p].attack2 { self.handle_throw3(p); }
+			if inputs[p].special1 { self.handle_wall(p); }
 			else { self.stop_wall(p); }
 		}
 	}

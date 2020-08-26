@@ -25,5 +25,6 @@ pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
 pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
 
+pub use gilrs::GamepadId;
 pub use bitflags::*;
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer};

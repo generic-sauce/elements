@@ -31,10 +31,10 @@ impl World {
 		}
 	}
 
-	pub fn tick(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
+	pub fn tick(&mut self, inputs: &[InputState; 2]) {
 		// sub-tick
 		self.tick_fluidmap();
-		self.tick_players(inputs, gilrs);
+		self.tick_players(inputs);
 		self.handle_skills(inputs);
 		self.spawn_fluids();
 		self.despawn_fluids();
@@ -43,10 +43,9 @@ impl World {
 		self.frame_id += 1;
 	}
 
-	fn tick_players(&mut self, inputs: &mut [Box<dyn Input>; 2], gilrs: &gilrs::Gilrs) {
+	fn tick_players(&mut self, inputs: &[InputState; 2]) {
 		for p in 0..2 {
-			inputs[p].update(&self.players[p], gilrs);
-			self.tick_player(p, &mut *inputs[p]);
+			self.tick_player(p, &inputs[p]);
 		}
 	}
 

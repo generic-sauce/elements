@@ -59,7 +59,7 @@ pub struct Player {
 }
 
 impl World {
-	pub fn tick_player(&mut self, p: usize, input: &mut dyn Input) {
+	pub fn tick_player(&mut self, p: usize, input: &InputState) {
 		let pl = &mut self.players[p];
 		pl.select_animation(&self.tilemap);
 		pl.apply_forces(input, &self.tilemap);
@@ -126,7 +126,7 @@ impl Player {
 		}
 	}
 
-	fn apply_forces(&mut self, input: &dyn Input, t: &TileMap) {
+	fn apply_forces(&mut self, input: &InputState, t: &TileMap) {
 		// drag
 		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
 		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
@@ -157,7 +157,7 @@ impl Player {
 		// aim
 		let largest = (t.size + 1).to_game() - 1; // TODO correct?
 		let ctr = self.center_position();
-		let mut global_cursor = ctr + input.cursor();
+		let mut global_cursor = ctr + input.cursor;
 		global_cursor.x = global_cursor.x.max(0).min(largest.x);
 		global_cursor.y = global_cursor.y.max(0).min(largest.y);
 		self.cursor.x = global_cursor.x - ctr.x;

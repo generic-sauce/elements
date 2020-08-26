@@ -7,7 +7,7 @@ pub struct Client {
 	shader_state: ShaderState,
 	font_state: FontState,
 	animation_state: AnimationState,
-	inputs: [Box<dyn Input>; 2],
+	inputs: [InputDevice; 2],
 	kills: [u32; 2],
 	gilrs: gilrs::Gilrs,
 }
@@ -25,7 +25,7 @@ impl Client {
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
-			inputs: [Box::new(AdaptiveInput::new(0, &gilrs)), Box::new(AdaptiveInput::new(1, &gilrs))],
+			inputs: [InputDevice::new_adaptive(0, &gilrs), InputDevice::new_adaptive(1, &gilrs)],
 			kills: [0, 0],
 			gilrs,
 		}
@@ -59,6 +59,7 @@ impl Client {
 				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
 			}
 
+			// TODO: update inputs
 			self.tick();
 			self.draw(elapsed_time, fps, load);
 
@@ -73,8 +74,15 @@ impl Client {
 		}
 	}
 
-	pub fn tick(&mut self) {
-		self.world.tick(&mut self.inputs, &self.gilrs);
+	fn get_input_state(&mut self, i: usize) -> InputState {
+		match &mut self.inputs[i] {
+			InputDevice::Adaptive(adaptive) => adaptive.update(&self.gilrs),
+		}
+	}
+
+	fn tick(&mut self) {
+		let input_states = [self.get_input_state(0), self.get_input_state(1)];
+		self.world.tick(&input_states);
 	}
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
