@@ -1,5 +1,8 @@
 #![feature(drain_filter)]
 
+#[macro_use]
+mod fps_timer;
+
 mod animation_state;
 mod input;
 mod app;
