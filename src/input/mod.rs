@@ -27,6 +27,18 @@ pub struct InputState {
 }
 
 impl InputState {
+	pub fn new() -> InputState {
+		InputState {
+			direction: Default::default(),
+			cursor: Default::default(),
+			just_up: false,
+			just_down: false,
+			special1: false,
+			special2: false,
+			attack1: false,
+			attack2: false,
+		}
+	}
 	pub fn horizontal_dir(&self) -> i32 { self.direction.x }
 	pub fn vertical_dir(&self) -> i32 { self.direction.y }
 
