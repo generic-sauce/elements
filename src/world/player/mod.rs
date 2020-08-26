@@ -6,7 +6,7 @@ use crate::prelude::*;
 
 // The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
 pub const PLAYER_SIZE: GameVec = TileVec::new(2, 6).to_game();
-pub const MAX_HEALTH: i32 = 100;
+pub const MAX_HEALTH: i32 = 1000;
 
 const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;

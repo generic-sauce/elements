@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const MIN_DAMAGE: u32 = 3;
+const MIN_DAMAGE: u32 = 20;
 
 const fn update_reference_mixin(s: FluidState) -> (i32, i32) {
 	match s {
@@ -15,7 +15,7 @@ impl Fluid {
 	}
 
 	pub fn damage(&self) -> i32 {
-		let dmg = (self.activity() / 500);
+		let dmg = self.activity() / 100;
 		dmg.max(MIN_DAMAGE) as i32
 	}
 

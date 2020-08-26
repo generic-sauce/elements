@@ -25,6 +25,7 @@ pub enum Flip {
 
 #[derive(PartialEq, Eq)]
 pub enum Origin {
+	#[allow(unused)]
 	Center,
 	LeftBottom,
 	LeftTop,
