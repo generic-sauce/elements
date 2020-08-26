@@ -5,11 +5,13 @@ mod physics;
 mod grab;
 
 pub mod force;
+mod activity;
+
 pub use self::force::*;
 
 pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum FluidState {
 	AtHand,
 	Free,
@@ -21,6 +23,7 @@ pub struct Fluid {
 	pub owner: usize,
 	pub velocity: GameVec,
 	pub position: GameVec,
+	pub reference_position: GameVec,
 	pub id: u32,
 }
 
@@ -37,7 +40,8 @@ impl World {
 			.cloned()
 			.map(|f| self.fluidmap.apply_grab(f, &self.players))
 			.map(|f| self.fluidmap.apply_forces(f, &self.tilemap, &self.players, self.frame_id))
-			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap));
+			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap))
+			.map(|mut f| { f.update_reference_position(); f});
 		self.fluidmap.grid = FluidMap::mk_grid(iter, self.fluidmap.size);
 	}
 }
