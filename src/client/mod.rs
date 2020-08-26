@@ -10,14 +10,20 @@ pub struct Client {
 	inputs: [InputDevice; 2],
 	kills: [u32; 2],
 	gilrs: gilrs::Gilrs,
+	socket: UdpSocket,
 }
 
 impl Client {
-	pub fn new(ip: impl ToSocketAddrs) -> Client { // TODO use the ip
+	pub fn new(server_ip: impl ToSocketAddrs) -> Client {
 		let context_settings = ContextSettings::default();
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
+
 		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
 		window.set_mouse_cursor_visible(false);
+
+		let socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
+		socket.connect(server_ip).expect("Could not connect to server");
+
 		Client {
 			window,
 			world: World::new(),
@@ -28,6 +34,7 @@ impl Client {
 			inputs: [InputDevice::new_adaptive(0, &gilrs), InputDevice::new_adaptive(1, &gilrs)],
 			kills: [0, 0],
 			gilrs,
+			socket,
 		}
 	}
 

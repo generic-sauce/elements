@@ -1,7 +1,7 @@
 pub use std::time::{Duration, SystemTime, Instant};
 pub use std::thread::sleep;
 pub use std::rc::Rc;
-pub use std::net::ToSocketAddrs;
+pub use std::net::{ToSocketAddrs, UdpSocket};
 pub use std::collections::HashMap;
 
 pub use crate::client::*;
