@@ -3,7 +3,7 @@ mod serde;
 
 use crate::prelude::*;
 
-pub const WALL_LIFETIME: u32 = 20;
+pub const WALL_LIFETIME: u32 = 40;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Tile {
