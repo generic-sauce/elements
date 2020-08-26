@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Serialize)]
 pub struct Animation {
 	pub animation_id: AnimationId,
 	pub index: usize,

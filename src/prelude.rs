@@ -22,3 +22,4 @@ pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarge
 pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
 
 pub use bitflags::*;
+pub use serde::{Serialize, Deserialize};

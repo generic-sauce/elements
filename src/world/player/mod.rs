@@ -32,17 +32,18 @@ static RIGHT_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
 };
 
-#[derive(PartialEq, Eq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone, Serialize)]
 pub enum PlayerDirection {
 	Left,
 	Right,
 }
-#[derive(PartialEq, Eq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone, Serialize)]
 pub enum PlayerColor {
 	Blue,
 	Red,
 }
 
+#[derive(Serialize)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,

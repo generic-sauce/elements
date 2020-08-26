@@ -48,3 +48,33 @@ impl From<GameVec> for FluidVec {
 		t.to_fluid()
 	}
 }
+
+impl Serialize for GameVec {
+	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+		S: Serializer {
+		unimplemented!()
+	}
+}
+
+/*
+impl Deserialize<'_> for GameVec {
+	fn deserialize<'de, D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
+		D: Deserializer<'de> {
+		unimplemented!()
+	}
+}
+ */
+
+impl Serialize for TileVec {
+	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+		S: Serializer {
+		unimplemented!()
+	}
+}
+
+impl Serialize for FluidVec {
+	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+		S: Serializer {
+		unimplemented!()
+	}
+}
