@@ -1,7 +1,5 @@
 use crate::prelude::*;
 
-use std::ops::Deref;
-
 macro_rules! setup {
 	($($x:ident : ($y:expr, $z:expr, $w: expr)),*) => {
 
@@ -13,6 +11,8 @@ macro_rules! setup {
 
 		impl ShaderState {
 			pub fn new() -> ShaderState {
+				use std::ops::Deref;
+
 				let mut shaders = Vec::new();
 				$(
 					let y = $y.map(res);
