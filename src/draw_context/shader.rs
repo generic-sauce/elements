@@ -1,7 +1,5 @@
 use crate::prelude::*;
 
-use std::collections::HashMap;
-
 pub struct Shader {
 	pub inner_shader: SfmlShader<'static>,
 	current_textures: HashMap<String, TextureContainer>,

@@ -1,8 +1,6 @@
 pub mod animation;
 
 use crate::prelude::*;
-use std::fs::read_dir;
-
 
 struct AnimationBuffer {
 	frames: Vec<SfBox<Texture>>,
@@ -31,6 +29,8 @@ macro_rules! setup {
 
 impl AnimationBuffer {
 	fn from_directory(directory: &str, interval: usize) -> AnimationBuffer {
+		use std::fs::read_dir;
+
 		let directory = res(directory);
 		let files = read_dir(&directory).expect(&format!("Could not read animation directory {}", directory));
 		let mut filenames = Vec::new();
