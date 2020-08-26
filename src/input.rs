@@ -5,6 +5,7 @@ const DEADZONE_MIN: f32 = 0.35;
 const CURSOR_DEADZONE: f32 = 0.07;
 const MAX_MOVEMENT_VALUE: i32 = 100;
 const JOYSTICK_DISTANCE: i32 = 2300;
+const DEFAULT_MOUSE_POSITION: Vec2i = Vec2i::new(300, 300);
 
 fn apply_deadzone_min(value: f32, deadzone_min: f32) -> f32 {
 	let sign = value.signum();
@@ -55,7 +56,6 @@ pub struct AdaptiveInput {
 	attack2: bool,
 	cursor: GameVec,
 	gamepad_id: Option<GamepadId>,
-	mouse_position: Vec2i,
 }
 
 fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
@@ -82,7 +82,6 @@ impl AdaptiveInput {
 			attack2: false,
 			cursor: GameVec::new(0, 0),
 			gamepad_id: get_gamepad(index, gilrs),
-			mouse_position: get_mouse_position(),
 		}
 	}
 }
@@ -190,10 +189,11 @@ impl Input for AdaptiveInput {
 
 		if has_keyboard {
 			let new_mouse_pos = get_mouse_position();
-			let mouse_diff = new_mouse_pos - self.mouse_position;
+			let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
+
+			sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.into());
 			self.cursor += GameVec::new(mouse_diff.x, -mouse_diff.y) * 6;
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
-			self.mouse_position = new_mouse_pos;
 		}
 	}
 }

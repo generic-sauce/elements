@@ -21,8 +21,10 @@ impl App {
 	pub fn new() -> App {
 		let context_settings = ContextSettings::default();
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
+		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
+		window.set_mouse_cursor_visible(false);
 		App {
-			window: RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings),
+			window,
 			world: World::new(),
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
