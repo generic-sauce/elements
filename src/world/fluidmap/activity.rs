@@ -4,8 +4,8 @@ const MIN_DAMAGE: u32 = 3;
 
 const fn update_reference_mixin(s: FluidState) -> (i32, i32) {
 	match s {
-		FluidState::AtHand => (2, 200),
-		FluidState::Free => (1, 200),
+		FluidState::AtHand => (32, 100),
+		FluidState::Free => (9, 100),
 	}
 }
 
@@ -15,13 +15,14 @@ impl Fluid {
 	}
 
 	pub fn damage(&self) -> i32 {
-		self.activity().max(MIN_DAMAGE) as i32
+		let dmg = (self.activity() / 500);
+		dmg.max(MIN_DAMAGE) as i32
 	}
 
 	fn despawn_rate(&self) -> (u32, u32) {
 		match self.state {
-			FluidState::AtHand => (2, 10000),
-			FluidState::Free => (10 * self.activity() / TILESIZE as u32, 10 * 200),
+			FluidState::AtHand => (2, 5000),
+			FluidState::Free => (1, 4 * (self.activity() + TILESIZE as u32/16)),
 		}
 	}
 

@@ -39,6 +39,7 @@ impl FluidMap {
 		#[cfg(debug_assertions)]
 		for fluid in self.iter() {
 			context.draw_circle(target, fluid.position, TILESIZE / 3, Color::GREEN);
+			context.draw_circle(target, fluid.reference_position, TILESIZE / 5, Color::RED);
 		}
 	}
 }
