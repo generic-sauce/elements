@@ -5,7 +5,7 @@ pub use resource::res;
 
 use crate::prelude::*;
 
-pub struct App {
+pub struct Client {
 	window: RenderWindow,
 	world: World,
 	texture_state: TextureState,
@@ -17,13 +17,13 @@ pub struct App {
 	gilrs: gilrs::Gilrs,
 }
 
-impl App {
-	pub fn new() -> App {
+impl Client {
+	pub fn new() -> Client {
 		let context_settings = ContextSettings::default();
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
 		window.set_mouse_cursor_visible(false);
-		App {
+		Client {
 			window,
 			world: World::new(),
 			texture_state: TextureState::new(),
