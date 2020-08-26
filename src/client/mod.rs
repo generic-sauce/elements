@@ -1,8 +1,3 @@
-pub mod timed_loop;
-mod resource;
-
-pub use resource::res;
-
 use crate::prelude::*;
 
 pub struct Client {
@@ -18,7 +13,7 @@ pub struct Client {
 }
 
 impl Client {
-	pub fn new() -> Client {
+	pub fn new(ip: impl ToSocketAddrs) -> Client { // TODO use the ip
 		let context_settings = ContextSettings::default();
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);

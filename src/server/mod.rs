@@ -32,6 +32,10 @@ impl Server {
 		}
 	}
 
+	pub fn check_restart(&mut self) {
+		unimplemented!(); // TODO
+	}
+
 	fn tick(&mut self) {
 		self.world.tick(&mut self.inputs, &self.gilrs);
 	}
