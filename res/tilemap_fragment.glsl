@@ -1,5 +1,4 @@
 #version 130
-/* precision mediump float; */
 
 uniform vec2 tilemap_tex_size;
 uniform sampler2D tilemap_tex;
@@ -7,10 +6,6 @@ uniform sampler2D tilemap_tex;
 in vec2 uv;
 
 out vec4 color;
-
-float n21(vec2 uv) {
-	return fract(9232.43 * sin(dot(uv, vec2(123.42, 642.332))));
-}
 
 float sdf_square(vec2 uv) {
 	uv = abs(uv);
