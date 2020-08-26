@@ -6,7 +6,7 @@ pub const DESIRED_FLUID_DIST: i32 = 400;
 
 const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
-const fn hand_drag(x: i32) -> i32 { x * 30 / 32 }
+const fn hand_drag(x: i32) -> i32 { x * 24 / 32 }
 
 impl FluidMap {
 	pub(in super) fn apply_forces(&self, mut f: Fluid, t: &TileMap, players: &[Player; 2], frame_id: u32) -> Fluid {
@@ -65,7 +65,7 @@ impl FluidMap {
 
 fn cursor_force(f: &Fluid, cursor: GameVec) -> GameVec {
 	let v = cursor - f.position;
-	(v / 4).length_clamped(48)
+	(v / 4).length_clamped(160)
 }
 
 // returns -1 or 1
