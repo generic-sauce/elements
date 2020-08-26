@@ -51,7 +51,7 @@ impl AdaptiveInput {
 		let gamepad = self.gamepad_id.map(|x| gilrs.gamepad(x));
 		let has_keyboard = self.index == 1;
 
-		use sfml::window::Key::*;
+		use sfml::window::{Key::*, mouse::Button};
 
 		let last_frame_up = self.up();
 		let last_frame_down = self.down();
@@ -86,9 +86,9 @@ impl AdaptiveInput {
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 
-		self.attack1 = Q.is_pressed() && has_keyboard;
+		self.attack1 = (Q.is_pressed() || Button::Left.is_pressed()) && has_keyboard;
 		self.attack2 = E.is_pressed() && has_keyboard;
-		self.special1 = R.is_pressed() && has_keyboard;
+		self.special1 = (R.is_pressed() || Button::Right.is_pressed()) && has_keyboard;
 		self.special2 = F.is_pressed() && has_keyboard;
 
 		if let Some(gamepad) = gamepad {
