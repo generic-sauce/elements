@@ -1,3 +1,5 @@
+mod update;
+
 use crate::prelude::*;
 
 pub trait Packet: Serialize + DeserializeOwned {}
@@ -5,8 +7,15 @@ pub trait Packet: Serialize + DeserializeOwned {}
 #[derive(Serialize, Deserialize)]
 pub struct Init;
 
+#[derive(Serialize, Deserialize)]
+pub struct Update {
+	client_player_id: u8,
+	server_input_state: InputState,
+	world_bytes: Vec<u8>,
+}
+
 impl Packet for Init {}
-impl Packet for World {}
+impl Packet for Update {}
 impl Packet for InputState {}
 
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
@@ -35,4 +44,3 @@ fn ser<P: Serialize>(p: &P) -> Vec<u8> {
 fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
 	deserialize(bytes).unwrap()
 }
-

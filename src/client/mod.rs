@@ -61,7 +61,7 @@ impl Client {
 				}
 			}
 
-			if let Some((w, _)) = recv_packet(&mut self.socket) {
+			if let Some((_, _, w)) = recv_packet(&mut self.socket).map(|(u, _)| Update::tuple(u)) {
 				self.world = w;
 			}
 

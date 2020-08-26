@@ -48,7 +48,8 @@ impl Server {
 
 			// send game update
 			for peer in &self.peers {
-				send_packet_to(&mut self.socket, &self.world, *peer);
+				let update = Update::from_tuple(unimplemented!(), unimplemented!(), &self.world);
+				send_packet_to(&mut self.socket, &update, *peer);
 			}
 
 			self.check_restart();
