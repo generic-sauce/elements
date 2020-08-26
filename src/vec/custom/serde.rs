@@ -11,6 +11,6 @@ impl<'de, T, P> Deserialize<'de> for Vec2t<T, P> where T: Deserialize<'de> {
 			D: Deserializer<'de>,
 	{
 		<(T, T)>::deserialize(deserializer)
-			.map(|x| x.into())
+			.map(Into::into)
 	}
 }
