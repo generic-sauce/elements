@@ -8,7 +8,7 @@ use crate::prelude::*;
 
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct World {
 	pub players: [Player; 2],
 	pub tilemap: TileMap,

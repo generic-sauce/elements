@@ -1,10 +1,11 @@
 mod draw;
+mod serde;
 
 use crate::prelude::*;
 
 pub const WALL_LIFETIME: u32 = 20;
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Tile {
 	Void,
 	Ground,
@@ -104,12 +105,5 @@ impl Tile {
 			Tile::Void => false,
 			_ => true,
 		}
-	}
-}
-
-impl Serialize for TileMap {
-	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
-		S: Serializer {
-		unimplemented!()
 	}
 }

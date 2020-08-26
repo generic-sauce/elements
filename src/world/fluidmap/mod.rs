@@ -11,13 +11,13 @@ pub use self::force::*;
 
 pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FluidState {
 	AtHand,
 	Free,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Fluid {
 	pub state: FluidState,
 	pub owner: usize,
@@ -27,7 +27,7 @@ pub struct Fluid {
 	pub id: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct FluidMap {
 	pub grid: Vec<Vec<Fluid>>,
 	pub size: FluidVec,

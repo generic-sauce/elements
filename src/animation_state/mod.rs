@@ -11,7 +11,7 @@ struct AnimationBuffer {
 
 macro_rules! setup {
 	($($id:ident : $dir:expr, $interval:expr),*$(,)?) => {
-		#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize)]
+		#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 		#[repr(usize)]
 		pub enum AnimationId {
 			$($id),*
