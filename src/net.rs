@@ -20,7 +20,7 @@ pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAdd
 }
 
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
-	let mut bytes = vec![0; 2000];
+	let mut bytes = vec![0; 2000]; // TODO this may be a problem!
 	let n = socket.recv(&mut bytes[..]).unwrap();
 	bytes.truncate(n);
 
