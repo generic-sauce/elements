@@ -11,6 +11,8 @@ pub struct Client {
 	kills: [u32; 2],
 	gilrs: gilrs::Gilrs,
 	socket: UdpSocket,
+	input_states: [InputState; 2],
+	player_id: usize,
 }
 
 impl Client {
@@ -26,9 +28,19 @@ impl Client {
 
 		send_packet(&mut socket, &Init);
 
+		let (player_id, server_input_state, world) = loop {
+			// TODO maybe add a sleep here?
+			if let Some((u, _)) = recv_packet::<Update>(&mut socket) {
+				break u.tuple();
+			}
+		};
+
+		let mut input_states = [InputState::new(), InputState::new()];
+		input_states[1-player_id] = server_input_state;
+
 		Client {
 			window,
-			world: World::new(),
+			world,
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
@@ -37,6 +49,8 @@ impl Client {
 			kills: [0, 0],
 			gilrs,
 			socket,
+			input_states,
+			player_id,
 		}
 	}
 

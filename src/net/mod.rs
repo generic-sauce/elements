@@ -9,7 +9,7 @@ pub struct Init;
 
 #[derive(Serialize, Deserialize)]
 pub struct Update {
-	client_player_id: u8,
+	client_player_id: usize,
 	server_input_state: InputState,
 	world_bytes: Vec<u8>,
 }
