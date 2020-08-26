@@ -19,6 +19,7 @@ mod vec;
 mod prelude;
 mod draw_context;
 mod server;
+mod net;
 
 use crate::prelude::*;
 

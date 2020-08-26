@@ -21,8 +21,10 @@ impl Client {
 		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
 		window.set_mouse_cursor_visible(false);
 
-		let socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
+		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.connect(server_ip).expect("Could not connect to server");
+
+		send_packet(&mut socket, Packet::Init);
 
 		Client {
 			window,
