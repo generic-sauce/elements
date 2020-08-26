@@ -24,7 +24,7 @@ impl Client {
 		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.connect(server_ip).expect("Could not connect to server");
 
-		send_packet(&mut socket, Packet::Init);
+		send_packet(&mut socket, &Init);
 
 		Client {
 			window,
@@ -61,7 +61,7 @@ impl Client {
 				}
 			}
 
-			if let Some((Packet::Update(w), _)) = recv_packet(&mut self.socket) {
+			if let Some((w, _)) = recv_packet(&mut self.socket) {
 				self.world = w;
 			}
 

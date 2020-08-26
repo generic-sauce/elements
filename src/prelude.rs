@@ -28,4 +28,4 @@ pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
 
 pub use gilrs::GamepadId;
 pub use bitflags::*;
-pub use serde::{Serialize, Serializer, Deserialize, Deserializer};
+pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};

@@ -1,20 +1,22 @@
 use crate::prelude::*;
 
+pub trait Packet: Serialize + DeserializeOwned {}
+
 #[derive(Serialize, Deserialize)]
-pub enum Packet {
-	Init,
-	Update(World),
-	Input(InputState),
-}
+pub struct Init;
 
-pub fn send_packet(socket: &mut UdpSocket, p: Packet) {
+impl Packet for Init {}
+impl Packet for World {}
+impl Packet for InputState {}
+
+pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
 	unimplemented!() // TODO
 }
 
-pub fn send_packet_to(socket: &mut UdpSocket, p: Packet, target: SocketAddr) {
+pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAddr) {
 	unimplemented!() // TODO
 }
 
-pub fn recv_packet(socket: &mut UdpSocket) -> Option<(Packet, SocketAddr)> {
+pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
 	unimplemented!() // TODO
 }
