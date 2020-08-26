@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+mod serde;
+
 pub struct GameParam;
 pub type GameVec = Vec2t<i32, GameParam>;
 
@@ -46,35 +48,5 @@ impl From<FluidVec> for GameVec {
 impl From<GameVec> for FluidVec {
 	fn from(t: GameVec) -> FluidVec {
 		t.to_fluid()
-	}
-}
-
-impl Serialize for GameVec {
-	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
-		S: Serializer {
-		unimplemented!()
-	}
-}
-
-/*
-impl Deserialize<'_> for GameVec {
-	fn deserialize<'de, D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
-		D: Deserializer<'de> {
-		unimplemented!()
-	}
-}
- */
-
-impl Serialize for TileVec {
-	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
-		S: Serializer {
-		unimplemented!()
-	}
-}
-
-impl Serialize for FluidVec {
-	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
-		S: Serializer {
-		unimplemented!()
 	}
 }
