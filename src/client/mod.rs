@@ -22,7 +22,7 @@ impl Client {
 		window.set_mouse_cursor_visible(false);
 
 		let socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
-		// socket.connect(server_ip).expect("Could not connect to server"); TODO: use
+		socket.connect(server_ip).expect("Could not connect to server");
 
 		Client {
 			window,
