@@ -61,6 +61,10 @@ impl Client {
 				}
 			}
 
+			if let Some((Packet::Update(w), _)) = recv_packet(&mut self.socket) {
+				self.world = w;
+			}
+
 			// process gilrs events
 			while let Some(_) = self.gilrs.next_event() {}
 
