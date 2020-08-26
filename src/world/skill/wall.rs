@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const WALLS_PER_FLUID: u32 = 7;
+const WALLS_PER_FLUID: u32 = 6;
 
 impl World {
 	pub(in super) fn handle_wall(&mut self, p: usize) {
