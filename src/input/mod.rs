@@ -3,7 +3,6 @@ pub use adaptive::*;
 
 use crate::prelude::*;
 
-
 const DEADZONE_MIN: f32 = 0.35;
 const CURSOR_DEADZONE: f32 = 0.07;
 const MAX_MOVEMENT_VALUE: i32 = 100;
@@ -15,6 +14,7 @@ pub enum InputDevice {
 	Adaptive(AdaptiveInput),
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct InputState {
 	pub direction: GameVec,
 	pub cursor: GameVec,
