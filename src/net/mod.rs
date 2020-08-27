@@ -6,7 +6,7 @@ pub use go::*;
 
 use crate::prelude::*;
 
-const PACKET_SIZE: usize = 65536;
+const PACKET_SIZE: usize = 5000;
 
 pub trait Packet: Serialize + DeserializeOwned {}
 
