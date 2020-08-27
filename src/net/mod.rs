@@ -30,10 +30,11 @@ pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAdd
 
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
 	let mut bytes = vec![0; 2000]; // TODO this may be a problem!
-	let n = socket.recv(&mut bytes[..]).unwrap();
-	bytes.truncate(n);
-
-	deser(&bytes[..])
+	let n = match socket.recv(&mut bytes[..]) {
+		Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return None,
+		err => err.unwrap(),
+	};
+	deser(&bytes[..n])
 }
 
 fn ser<P: Serialize>(p: &P) -> Vec<u8> {

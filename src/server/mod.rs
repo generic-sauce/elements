@@ -10,6 +10,7 @@ pub struct Server {
 impl Server {
 	pub fn new() -> Server {
 		let mut socket = UdpSocket::bind("127.0.0.1:7575").expect("Could not create server socket");
+		socket.set_nonblocking(true).unwrap();
 
 		let peers = wait_for_players(&mut socket);
 

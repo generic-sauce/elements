@@ -26,6 +26,7 @@ impl Client {
 		window.set_mouse_cursor_visible(false);
 
 		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
+		socket.set_nonblocking(true).unwrap();
 		socket.connect(server_ip).expect("Could not connect to server");
 
 		send_packet(&mut socket, &Init);
