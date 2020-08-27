@@ -32,29 +32,14 @@ impl Player {
 					let tile = GameVec::new(0, self.left_bot.y + change_ex.y).to_tile() + (0,i);
 					tile.to_game().y
 				};
-
-				let mut stair_up_iter = // returns position where to be placed afterwards
+				let mut stair_iter = // returns position where to be placed afterwards
 					Some(self.left_bot.y + change_ex.y).into_iter()
 						.chain((1..(STAIR_NUM+1))
 							.map(stair_plus_y)
 						).map(|y| GameVec::new(self.left_bot.x + change_ex.x, y));
-
-				let mut stair_down_iter = // returns position where to be placed afterwards
-					Some(self.left_bot.y + change_ex.y).into_iter()
-						.chain((1..(STAIR_NUM+1))
-							.map(|x| -x)
-							.map(stair_plus_y)
-						).map(|y| GameVec::new(self.left_bot.x + change_ex.x, y));
-				let new_down_pos = stair_down_iter.find(|&v| is_colliding(v, t));
-
-				if let Some(new_pos) = stair_up_iter.find(|&v| !is_colliding(v, t)) {
+				if let Some(new_pos) = stair_iter.find(|&v| !is_colliding(v, t)) {
 					remaining_vel -= change_ex;
 					self.left_bot = new_pos;
-
-					if let Some(new_pos) = new_down_pos {
-						self.left_bot = new_pos + TileVec::new(0, 1);
-						dbg!(0);
-					}
 				} else { // collision
 					remaining_vel -= change;
 					self.left_bot += change;
