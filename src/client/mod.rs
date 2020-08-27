@@ -7,7 +7,7 @@ pub struct Client {
 	shader_state: ShaderState,
 	font_state: FontState,
 	animation_state: AnimationState,
-	inputs: [InputDevice; 2],
+	input: InputDevice,
 	kills: [u32; 2],
 	gilrs: gilrs::Gilrs,
 	socket: UdpSocket,
@@ -45,7 +45,7 @@ impl Client {
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
-			inputs: [InputDevice::new_adaptive(0, &gilrs), InputDevice::new_adaptive(1, &gilrs)],
+			input: InputDevice::new_adaptive(0, &gilrs),
 			kills: [0, 0],
 			gilrs,
 			socket,
@@ -75,7 +75,8 @@ impl Client {
 				}
 			}
 
-			if let Some((_, _, w)) = recv_packet(&mut self.socket).map(|(u, _)| Update::tuple(u)) {
+			if let Some((_, server_input_state, w)) = recv_packet(&mut self.socket).map(|(u, _)| Update::tuple(u)) {
+				self.input_states[1-self.player_id] = server_input_state;
 				self.world = w;
 			}
 
@@ -101,15 +102,9 @@ impl Client {
 		}
 	}
 
-	fn get_input_state(&mut self, i: usize) -> InputState {
-		match &mut self.inputs[i] {
-			InputDevice::Adaptive(adaptive) => adaptive.update(&self.gilrs),
-		}
-	}
-
 	fn tick(&mut self) {
-		let input_states = [self.get_input_state(0), self.get_input_state(1)];
-		self.world.tick(&input_states);
+		self.input_states[self.player_id] = self.input.update(&self.gilrs);
+		self.world.tick(&self.input_states);
 	}
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
