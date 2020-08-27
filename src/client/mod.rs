@@ -30,19 +30,16 @@ impl Client {
 
 		send_packet(&mut socket, &Init::Init);
 
-		let (player_id, server_input_state, world) = loop {
+		let player_id = loop {
 			// TODO maybe add a sleep here?
-			if let Some((u, _)) = recv_packet::<Update>(&mut socket) {
-				break u.tuple();
+			if let Some((Go { your_player_id }, _)) = recv_packet::<Go>(&mut socket) {
+				break your_player_id;
 			}
 		};
 
-		let mut input_states = [InputState::new(), InputState::new()];
-		input_states[1-player_id] = server_input_state;
-
 		Client {
 			window,
-			world,
+			world: World::new(),
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
@@ -50,7 +47,7 @@ impl Client {
 			input: InputDevice::new_adaptive(0, true, &gilrs),
 			gilrs,
 			socket,
-			input_states,
+			input_states: [InputState::new(), InputState::new()],
 			player_id,
 		}
 	}
@@ -69,7 +66,7 @@ impl Client {
 				}
 			}
 
-			if let Some((_, server_input_state, w)) = recv_packet(&mut self.socket).map(|(u, _)| Update::tuple(u)) {
+			if let Some((server_input_state, w)) = recv_packet(&mut self.socket).map(|(u, _)| Update::tuple(u)) {
 				self.input_states[1-self.player_id] = server_input_state;
 				self.world = w;
 			}
