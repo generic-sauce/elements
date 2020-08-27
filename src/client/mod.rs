@@ -10,7 +10,6 @@ pub struct Client {
 	font_state: FontState,
 	animation_state: AnimationState,
 	input: InputDevice,
-	kills: [u32; 2],
 	gilrs: gilrs::Gilrs,
 	socket: UdpSocket,
 	input_states: [InputState; 2],
@@ -49,18 +48,10 @@ impl Client {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			input: InputDevice::new_adaptive(0, &gilrs),
-			kills: [0, 0],
 			gilrs,
 			socket,
 			input_states,
 			player_id,
-		}
-	}
-
-	fn check_restart(&mut self) {
-		if let Some(p) = (0..2).find(|&p| self.world.players[p].health == 0) {
-			self.kills[1-p] += 1;
-			self.world = World::new();
 		}
 	}
 
@@ -105,8 +96,6 @@ impl Client {
 			if !self.window.is_open() {
 				break;
 			}
-
-			self.check_restart();
 		}
 	}
 
@@ -141,7 +130,7 @@ impl Client {
 		// draw debug info
 		let text_size = 0.030;
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
-			&format!("{} / {}", self.kills[0], self.kills[1]), Origin::LeftTop);
+			&format!("{} / {}", self.world.kills[0], self.world.kills[1]), Origin::LeftTop);
 
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
 			&format!("elapsed time: {}", elapsed_time.as_secs()), Origin::LeftTop);
