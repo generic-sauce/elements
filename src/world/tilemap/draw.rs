@@ -3,8 +3,6 @@ use crate::prelude::*;
 impl TileMap {
 	pub fn draw(&mut self, target: &impl RenderTarget, context: &mut DrawContext) {
 		let shader = context.shader_state.get_shader(ShaderId::Tilemap);
-		let v = Vector2f::new(context.tilemap_size.x as f32, context.tilemap_size.y as f32); // TODO make nicer
-		shader.set_uniform_vec2("tilemap_tex_size", v);
 		unsafe { shader.set_uniform_texture_raw("tilemap_tex", &self.texture); }
 
 		let mut states = RenderStates::default();
