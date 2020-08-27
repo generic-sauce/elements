@@ -96,6 +96,10 @@ impl Client {
 		let aspect_ratio = 16.0 / 9.0;
 		let (window_view, view, view_pixel_size) = self.get_views(aspect_ratio);
 
+		// declare render target
+		let mut game_texture_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
+
+		game_texture_target.set_view(&view);
 		self.window.set_view(&window_view);
 
 		let window_size = self.window.size();
@@ -112,8 +116,9 @@ impl Client {
 		);
 
 		// draw game
-		context.fill_canvas_with_color(&self.window, Color::rgb(115, 128, 56));
-		self.world.draw(&self.window, &mut context);
+		context.fill_canvas_with_color(&game_texture_target, Color::rgb(115, 128, 56));
+		self.world.draw(&game_texture_target, &mut context);
+		context.fill_canvas_with_texture(&self.window, game_texture_target);
 
 		// draw debug info
 		let text_size = 0.030;
