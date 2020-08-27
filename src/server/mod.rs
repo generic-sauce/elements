@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const UPDATE_INTERVAL: u32 = 5;
+const UPDATE_INTERVAL: u32 = 3;
 
 pub struct Server {
 	world: World,
