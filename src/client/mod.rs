@@ -48,7 +48,7 @@ impl Client {
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
-			input: InputDevice::new_adaptive(0, &gilrs),
+			input: InputDevice::new_adaptive(0, true, &gilrs),
 			kills: [0, 0],
 			gilrs,
 			socket,
