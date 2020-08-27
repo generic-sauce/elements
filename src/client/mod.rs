@@ -1,7 +1,5 @@
 use crate::prelude::*;
 
-const FRAMES_PER_INPUT_UPDATE: u32 = 5;
-
 pub struct Client {
 	window: RenderWindow,
 	world: World,
@@ -80,9 +78,7 @@ impl Client {
 
 			// inputs
 			self.input_states[self.player_id] = self.input.update(&self.gilrs);
-			if self.world.frame_id % FRAMES_PER_INPUT_UPDATE == 0 {
-				send_packet(&mut self.socket, &self.input_states[self.player_id]);
-			}
+			send_packet(&mut self.socket, &self.input_states[self.player_id]);
 
 			self.world.tick(&self.input_states);
 			self.draw(elapsed_time, fps, load);
