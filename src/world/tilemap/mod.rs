@@ -53,6 +53,7 @@ impl TileMap {
 				*x = Tile::Void;
 			}
 		}
+		self.update_texture();
 	}
 
 	#[allow(unused)]
