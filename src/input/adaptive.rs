@@ -115,7 +115,7 @@ impl AdaptiveInput {
 			let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
 
 			sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.into());
-			self.cursor += GameVec::new(mouse_diff.x, -mouse_diff.y) * 6;
+			self.cursor += GameVec::new(mouse_diff.x, -mouse_diff.y) * 9;
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
 		}
 
