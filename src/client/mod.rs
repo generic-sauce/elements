@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+const FRAMES_PER_INPUT_UPDATE: u32 = 5;
+
 pub struct Client {
 	window: RenderWindow,
 	world: World,
@@ -87,8 +89,13 @@ impl Client {
 				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
 			}
 
-			// TODO: update inputs
-			self.tick();
+			// inputs
+			self.input_states[self.player_id] = self.input.update(&self.gilrs);
+			if self.world.frame_id % FRAMES_PER_INPUT_UPDATE == 0 {
+				send_packet(&mut self.socket, &self.input_states[self.player_id]);
+			}
+
+			self.world.tick(&self.input_states);
 			self.draw(elapsed_time, fps, load);
 
 			self.window.display();
@@ -100,11 +107,6 @@ impl Client {
 
 			self.check_restart();
 		}
-	}
-
-	fn tick(&mut self) {
-		self.input_states[self.player_id] = self.input.update(&self.gilrs);
-		self.world.tick(&self.input_states);
 	}
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
