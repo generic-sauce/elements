@@ -9,8 +9,8 @@ pub struct Init;
 
 #[derive(Serialize, Deserialize)]
 pub struct Update {
-	client_player_id: usize,
-	server_input_state: InputState,
+	your_player_id: usize,
+	enemy_input_state: InputState,
 	world_bytes: Vec<u8>,
 }
 
@@ -35,7 +35,6 @@ pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)>
 
 	deser(&bytes[..])
 }
-
 
 fn ser<P: Serialize>(p: &P) -> Vec<u8> {
 	serialize(p).unwrap()

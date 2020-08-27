@@ -47,8 +47,8 @@ impl Server {
 			self.tick();
 
 			// send game update
-			for peer in &self.peers {
-				let update = Update::from_tuple(unimplemented!(), unimplemented!(), &self.world);
+			for (i, peer) in self.peers.iter().enumerate() {
+				let update = Update::from_tuple(i, self.input_states[1-i].clone(), &self.world);
 				send_packet_to(&mut self.socket, &update, *peer);
 			}
 

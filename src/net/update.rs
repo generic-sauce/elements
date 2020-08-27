@@ -2,16 +2,16 @@ use crate::prelude::*;
 
 impl Update {
 	pub fn tuple(self) -> (usize, InputState, World) {
-		(self.client_player_id,
-		 self.server_input_state,
+		(self.your_player_id,
+		 self.enemy_input_state,
 		 super::deser(&self.world_bytes[..]),
 		)
 	}
 
-	pub fn from_tuple(client_player_id: usize, server_input_state: InputState, world: &World) -> Update {
+	pub fn from_tuple(your_player_id: usize, enemy_input_state: InputState, world: &World) -> Update {
 		Update {
-			client_player_id,
-			server_input_state,
+			your_player_id,
+			enemy_input_state,
 			world_bytes: super::ser(world),
 		}
 	}

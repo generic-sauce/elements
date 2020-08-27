@@ -14,7 +14,7 @@ pub enum InputDevice {
 	Adaptive(AdaptiveInput),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct InputState {
 	pub direction: GameVec,
 	pub cursor: GameVec,
