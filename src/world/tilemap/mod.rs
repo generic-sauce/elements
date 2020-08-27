@@ -45,6 +45,14 @@ impl TileMap {
 		}
 	}
 
+	pub fn reset(&mut self) {
+		for x in &mut self.tiles {
+			if let Tile::Wall { .. } = x {
+				*x = Tile::Void;
+			}
+		}
+	}
+
 	#[allow(unused)]
 	pub fn get_mut(&mut self, v: TileVec) -> &'_ mut Tile {
 		&mut self.tiles[(v.x + v.y * self.size.x) as usize]

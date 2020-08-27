@@ -57,8 +57,11 @@ impl Server {
 		}
 	}
 
-	pub fn check_restart(&mut self) {
-		// TODO
+	fn check_restart(&mut self) {
+		if let Some(p) = (0..2).find(|&p| self.world.players[p].health == 0) {
+			self.world.kills[1-p] += 1;
+			self.world.reset();
+		}
 	}
 
 	fn tick(&mut self) {
