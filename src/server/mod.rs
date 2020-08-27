@@ -9,7 +9,7 @@ pub struct Server {
 
 impl Server {
 	pub fn new() -> Server {
-		let mut socket = UdpSocket::bind("127.0.0.1:7575").expect("Could not create server socket");
+		let mut socket = UdpSocket::bind("0.0.0.0:7575").expect("Could not create server socket");
 		socket.set_nonblocking(true).unwrap();
 
 		let peers = wait_for_players(&mut socket);
@@ -72,6 +72,7 @@ fn wait_for_players(socket: &mut UdpSocket) -> [SocketAddr; 2] {
 	for _ in TimedLoop::with_fps(10) {
 		if let Some((Init::Init, recv_addr)) = recv_packet(socket) {
 			peers.push(recv_addr);
+			println!("new player joined {}", recv_addr);
 			if peers.len() == 2 {
 				break;
 			}
