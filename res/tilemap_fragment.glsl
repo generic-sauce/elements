@@ -1,6 +1,6 @@
 #version 130
+/* precision mediump float; */
 
-uniform vec2 tilemap_tex_size;
 uniform sampler2D tilemap_tex;
 
 in vec2 uv;
