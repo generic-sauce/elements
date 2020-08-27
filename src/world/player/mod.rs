@@ -43,7 +43,7 @@ pub enum PlayerColor {
 	Red,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,

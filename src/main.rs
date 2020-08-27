@@ -19,12 +19,16 @@ mod vec;
 mod prelude;
 mod draw_context;
 mod server;
+mod net;
+mod app;
+mod local;
 
 use crate::prelude::*;
 
 fn main() {
 	let server_arg = std::env::args().nth(1);
 	match server_arg.as_ref().map(|s| s.as_str()) {
+		Some("local") => Local::new().run(),
 		Some(ip) => Client::new(ip).run(),
 		None => Server::new().run(),
 	}

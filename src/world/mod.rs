@@ -3,6 +3,9 @@ pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
 mod draw;
+mod update;
+
+pub use update::*;
 
 use crate::prelude::*;
 
@@ -14,20 +17,33 @@ pub struct World {
 	pub tilemap: TileMap,
 	pub fluidmap: FluidMap,
 	pub frame_id: u32,
+	pub kills: [u32; 2],
+}
+
+fn new_players() -> [Player; 2] {
+	[
+		Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right, PlayerColor::Blue),
+		Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left, PlayerColor::Red)
+	]
 }
 
 impl World {
+	pub fn reset(&mut self) {
+		self.players = new_players();
+		self.tilemap.reset();
+		self.fluidmap = FluidMap::new(self.tilemap.size);
+		self.frame_id = 0;
+	}
+
 	pub fn new() -> World {
 		let tilemap = TileMap::new(&res("map/map02.png"));
 
 		World {
-			players: [
-				Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right, PlayerColor::Blue),
-				Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left, PlayerColor::Red)
-			],
+			players: new_players(),
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
 			frame_id: 0,
+			kills: [0, 0],
 		}
 	}
 
@@ -118,5 +134,12 @@ impl World {
 			}
 			if dmg > 0 { player.damage(dmg); }
 		}
+	}
+
+	pub fn player_dead(&self) -> Option<usize> {
+		if let Some(p) = (0..2).find(|&p| self.players[p].health == 0) {
+			return Some(p);
+		}
+		None
 	}
 }

@@ -1,5 +1,8 @@
 mod draw;
 mod serde;
+mod update;
+
+pub use update::*;
 
 use crate::prelude::*;
 
@@ -9,7 +12,7 @@ pub const WALL_LIFETIME: u32 = 40;
 pub enum Tile {
 	Void,
 	Ground,
-	Wall { owner: usize, remaining_lifetime: u32 }, // TODO this feels terrible.
+	Wall { owner: usize, remaining_lifetime: u32 },
 }
 
 pub struct TileMap {
@@ -20,8 +23,7 @@ pub struct TileMap {
 
 impl TileMap {
 	pub fn new(filename: &str) -> TileMap {
-		let texture = Texture::from_file(filename).unwrap();
-		let image = texture.copy_to_image().unwrap();
+		let image = Image::from_file(filename).unwrap();
 		let s = image.size();
 		let mut tiles = Vec::with_capacity((s.x * s.y) as usize);
 
@@ -42,6 +44,14 @@ impl TileMap {
 			tiles,
 			size: s,
 			texture: texture,
+		}
+	}
+
+	pub fn reset(&mut self) {
+		for x in &mut self.tiles {
+			if let Tile::Wall { .. } = x {
+				*x = Tile::Void;
+			}
 		}
 	}
 
@@ -96,6 +106,12 @@ impl TileMap {
 
 	pub fn check_solid(&self, v: impl Into<TileVec>) -> bool {
 		self.get(v.into()).is_solid()
+	}
+
+	pub fn iter(&self) -> impl Iterator<Item=TileVec> + '_ {
+		(0..self.size.x).map(move |x| {
+			(0..self.size.y).map(move |y| TileVec::new(x, y))
+		}).flatten()
 	}
 }
 
