@@ -58,7 +58,7 @@ impl Server {
 	}
 
 	pub fn check_restart(&mut self) {
-		unimplemented!(); // TODO
+		// TODO
 	}
 
 	fn tick(&mut self) {

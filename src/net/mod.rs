@@ -2,6 +2,8 @@ mod update;
 
 use crate::prelude::*;
 
+const PACKET_SIZE: usize = 558580;
+
 pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
@@ -20,16 +22,18 @@ impl Packet for InputState {}
 
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
 	let bytes = ser(p);
+	assert!(bytes.len() <= PACKET_SIZE);
 	socket.send(&bytes[..]).unwrap();
 }
 
 pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAddr) {
 	let bytes = ser(p);
+	assert!(bytes.len() <= PACKET_SIZE);
 	socket.send_to(&bytes[..], target).unwrap();
 }
 
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
-	let mut bytes = vec![0; 2000]; // TODO this may be a problem!
+	let mut bytes = vec![0; PACKET_SIZE]; // TODO this may be a problem!
 	let (n, addr) = match socket.recv_from(&mut bytes[..]) {
 		Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return None,
 		err => err.unwrap(),
