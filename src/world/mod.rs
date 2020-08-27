@@ -3,6 +3,9 @@ pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
 mod draw;
+mod update;
+
+pub use update::*;
 
 use crate::prelude::*;
 

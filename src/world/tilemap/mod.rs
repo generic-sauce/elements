@@ -1,5 +1,8 @@
 mod draw;
 mod serde;
+mod update;
+
+pub use update::*;
 
 use crate::prelude::*;
 
@@ -9,7 +12,7 @@ pub const WALL_LIFETIME: u32 = 20;
 pub enum Tile {
 	Void,
 	Ground,
-	Wall { owner: usize, remaining_lifetime: u32 }, // TODO this feels terrible.
+	Wall { owner: usize, remaining_lifetime: u32 },
 }
 
 pub struct TileMap {
@@ -103,6 +106,12 @@ impl TileMap {
 
 	pub fn check_solid(&self, v: impl Into<TileVec>) -> bool {
 		self.get(v.into()).is_solid()
+	}
+
+	pub fn iter(&self) -> impl Iterator<Item=TileVec> + '_ {
+		(0..self.size.x).map(move |x| {
+			(0..self.size.y).map(move |y| TileVec::new(x, y))
+		}).flatten()
 	}
 }
 

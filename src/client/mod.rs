@@ -66,9 +66,9 @@ impl Client {
 				}
 			}
 
-			if let Some((server_input_state, w)) = recv_packet(&mut self.socket).map(|(u, _)| Update::tuple(u)) {
-				self.input_states[1-self.player_id] = server_input_state;
-				self.world = w;
+			if let Some((update, _)) = recv_packet::<Update>(&mut self.socket) {
+				self.input_states[1-self.player_id] = update.enemy_input_state;
+				self.world.apply_update(update.world_update);
 			}
 
 			// process gilrs events

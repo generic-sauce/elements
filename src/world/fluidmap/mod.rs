@@ -6,7 +6,9 @@ mod grab;
 
 pub mod force;
 mod activity;
+mod update;
 
+pub use update::*;
 pub use self::force::*;
 
 pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
