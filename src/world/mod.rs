@@ -135,4 +135,11 @@ impl World {
 			if dmg > 0 { player.damage(dmg); }
 		}
 	}
+
+	pub fn player_dead(&self) -> Option<usize> {
+		if let Some(p) = (0..2).find(|&p| self.players[p].health == 0) {
+			return Some(p);
+		}
+		None
+	}
 }

@@ -15,6 +15,7 @@ pub use bincode::{serialize, deserialize};
 
 pub use crate::client::*;
 pub use crate::server::*;
+pub use crate::local::*;
 pub use crate::app::*;
 pub use crate::input::*;
 pub use crate::texture_state::*;

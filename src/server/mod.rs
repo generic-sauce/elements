@@ -68,7 +68,7 @@ impl Server {
 	}
 
 	fn check_restart(&mut self) {
-		if let Some(p) = (0..2).find(|&p| self.world.players[p].health == 0) {
+		if let Some(p) = self.world.player_dead() {
 			self.world.kills[1-p] += 1;
 			self.world.reset();
 		}
