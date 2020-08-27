@@ -2,7 +2,7 @@ mod update;
 
 use crate::prelude::*;
 
-const PACKET_SIZE: usize = 558580;
+const PACKET_SIZE: usize = 65536;
 
 pub trait Packet: Serialize + DeserializeOwned {}
 

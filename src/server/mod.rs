@@ -1,10 +1,13 @@
 use crate::prelude::*;
 
+const UPDATE_INTERVAL: u32 = 5;
+
 pub struct Server {
 	world: World,
 	socket: UdpSocket,
 	peers: [SocketAddr; 2],
 	input_states: [InputState; 2],
+	update_counter: u32,
 }
 
 impl Server {
@@ -18,7 +21,8 @@ impl Server {
 			world: World::new(),
 			socket,
 			peers,
-			input_states: [InputState::new(), InputState::new()]
+			input_states: [InputState::new(), InputState::new()],
+			update_counter: 0,
 		}
 	}
 
@@ -48,10 +52,13 @@ impl Server {
 			self.tick();
 
 			// send game update
-			for (i, peer) in self.peers.iter().enumerate() {
-				let update = Update::from_tuple(i, self.input_states[1-i].clone(), &self.world);
-				send_packet_to(&mut self.socket, &update, *peer);
+			if self.update_counter == 0 {
+				for (i, peer) in self.peers.iter().enumerate() {
+					let update = Update::from_tuple(i, self.input_states[1-i].clone(), &self.world);
+					send_packet_to(&mut self.socket, &update, *peer);
+				}
 			}
+			self.update_counter = (self.update_counter + 1) % UPDATE_INTERVAL;
 
 			self.check_restart();
 		}
