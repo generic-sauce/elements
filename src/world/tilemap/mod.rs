@@ -20,8 +20,7 @@ pub struct TileMap {
 
 impl TileMap {
 	pub fn new(filename: &str) -> TileMap {
-		let texture = Texture::from_file(filename).unwrap();
-		let image = texture.copy_to_image().unwrap();
+		let image = Image::from_file(filename).unwrap();
 		let s = image.size();
 		let mut tiles = Vec::with_capacity((s.x * s.y) as usize);
 
