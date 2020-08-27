@@ -5,7 +5,7 @@ use crate::prelude::*;
 pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
-pub struct Init;
+pub enum Init { Init } // this is an enum as every network object needs a size > 0
 
 #[derive(Serialize, Deserialize)]
 pub struct Update {
@@ -30,11 +30,12 @@ pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAdd
 
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
 	let mut bytes = vec![0; 2000]; // TODO this may be a problem!
-	let n = match socket.recv(&mut bytes[..]) {
+	let (n, addr) = match socket.recv_from(&mut bytes[..]) {
 		Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return None,
 		err => err.unwrap(),
 	};
-	deser(&bytes[..n])
+	let p = deser::<P>(&bytes[..n]);
+	Some((p, addr))
 }
 
 fn ser<P: Serialize>(p: &P) -> Vec<u8> {

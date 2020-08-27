@@ -29,7 +29,7 @@ impl Client {
 		socket.set_nonblocking(true).unwrap();
 		socket.connect(server_ip).expect("Could not connect to server");
 
-		send_packet(&mut socket, &Init);
+		send_packet(&mut socket, &Init::Init);
 
 		let (player_id, server_input_state, world) = loop {
 			// TODO maybe add a sleep here?

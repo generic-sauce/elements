@@ -70,7 +70,7 @@ fn wait_for_players(socket: &mut UdpSocket) -> [SocketAddr; 2] {
 	let mut peers = vec!();
 
 	for _ in TimedLoop::with_fps(10) {
-		if let Some((Init, recv_addr)) = recv_packet(socket) {
+		if let Some((Init::Init, recv_addr)) = recv_packet(socket) {
 			peers.push(recv_addr);
 			if peers.len() == 2 {
 				break;
