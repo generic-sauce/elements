@@ -54,7 +54,7 @@ impl Server {
 			// send game update
 			if self.update_counter == 0 {
 				for (i, peer) in self.peers.iter().enumerate() {
-					let update = Update::from_tuple(i, self.input_states[1-i].clone(), &self.world);
+					let update = Update::from_tuple(self.input_states[1 - i].clone(), &self.world);
 					send_packet_to(&mut self.socket, &update, *peer);
 				}
 			}
@@ -87,6 +87,11 @@ fn wait_for_players(socket: &mut UdpSocket) -> [SocketAddr; 2] {
 				break;
 			}
 		}
+	}
+
+	for (i, peer) in peers.iter().enumerate() {
+		let go = Go { your_player_id: i };
+		send_packet_to(socket, &go, *peer);
 	}
 
 	return [peers[0], peers[1]];

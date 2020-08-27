@@ -1,4 +1,8 @@
 mod update;
+mod go;
+
+pub use update::*;
+pub use go::*;
 
 use crate::prelude::*;
 
@@ -7,17 +11,10 @@ const PACKET_SIZE: usize = 65536;
 pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
-pub enum Init { Init } // this is an enum as every network object needs a size > 0
-
-#[derive(Serialize, Deserialize)]
-pub struct Update {
-	your_player_id: usize,
-	enemy_input_state: InputState,
-	world_bytes: Vec<u8>,
-}
+// this is an enum as every network object needs a size > 0
+pub enum Init { Init }
 
 impl Packet for Init {}
-impl Packet for Update {}
 impl Packet for InputState {}
 
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
