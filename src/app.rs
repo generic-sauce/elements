@@ -71,7 +71,7 @@ impl App {
 		self.apply_commands(cmds);
 
 		for x in &mut self.player_animations {
-			x.tick(&self.animation_state);
+			x.tick();
 		}
 	}
 

@@ -4,23 +4,42 @@ use crate::prelude::*;
 
 struct AnimationBuffer {
 	frames: Vec<SfBox<Texture>>,
-	interval: usize,
 }
 
 macro_rules! setup {
-	($($id:ident : $dir:expr, $interval:expr),*$(,)?) => {
+	($($id:ident : $dir:expr, $frame_count:expr, $interval:expr),*$(,)?) => {
 		#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 		#[repr(usize)]
 		pub enum AnimationId {
 			$($id),*
 		}
 
+		impl AnimationId {
+			pub fn frame_count(self) -> usize {
+				match self {
+					$(
+						AnimationId::$id => $frame_count,
+					)*
+				}
+			}
+
+			pub fn interval(self) -> usize {
+				match self {
+					$(
+						AnimationId::$id => $interval,
+					)*
+				}
+			}
+		}
+
 		impl AnimationState {
 			pub fn new() -> AnimationState {
 				let mut animation_buffers = Vec::new();
-				$(
-					animation_buffers.push(AnimationBuffer::from_directory($dir, $interval));
-				)*
+				$( {
+					let buffer = AnimationBuffer::from_directory($dir);
+					assert_eq!(buffer.frames.len(), $frame_count, std::stringify!($id));
+					animation_buffers.push(buffer);
+				} )*
 				AnimationState { animation_buffers }
 			}
 		}
@@ -28,7 +47,7 @@ macro_rules! setup {
 }
 
 impl AnimationBuffer {
-	fn from_directory(directory: &str, interval: usize) -> AnimationBuffer {
+	fn from_directory(directory: &str) -> AnimationBuffer {
 		use std::fs::read_dir;
 
 		let directory = res(directory);
@@ -53,7 +72,6 @@ impl AnimationBuffer {
 
 		AnimationBuffer {
 			frames,
-			interval,
 		}
 	}
 }
@@ -65,28 +83,20 @@ pub struct AnimationState {
 impl AnimationState {
 	pub fn get_animation_texture(&self, animation: Animation) -> &'_ Texture {
 		let animation_buffer = &self.animation_buffers[animation.animation_id as usize];
-		let index = animation.index / animation_buffer.interval;
+		let index = animation.index / animation.animation_id.interval();
 		&animation_buffer.frames[index]
-	}
-
-	pub fn get_frame_count(&self, animation: Animation) -> usize {
-		self.animation_buffers[animation.animation_id as usize].frames.len()
-	}
-
-	pub fn get_interval(&self, animation: Animation) -> usize {
-		self.animation_buffers[animation.animation_id as usize].interval
 	}
 }
 
 setup!(
-	BluePlayerIdle: "images/player_blue/player_idle", 4,
-	BluePlayerRun: "images/player_blue/player_run", 4,
-	BluePlayerJump: "images/player_blue/player_jump", 4,
-	BluePlayerFall: "images/player_blue/player_fall", 4,
-	BluePlayerFallSlow: "images/player_blue/player_fall_slow", 4,
-	RedPlayerIdle: "images/player_red/player_idle", 4,
-	RedPlayerRun: "images/player_red/player_run", 4,
-	RedPlayerJump: "images/player_red/player_jump", 4,
-	RedPlayerFall: "images/player_red/player_fall", 4,
-	RedPlayerFallSlow: "images/player_red/player_fall_slow", 4
+	BluePlayerIdle: "images/player_blue/player_idle", 5, 4,
+	BluePlayerRun: "images/player_blue/player_run", 6, 4,
+	BluePlayerJump: "images/player_blue/player_jump", 2, 4,
+	BluePlayerFall: "images/player_blue/player_fall", 2, 4,
+	BluePlayerFallSlow: "images/player_blue/player_fall_slow", 2, 4,
+	RedPlayerIdle: "images/player_red/player_idle", 5, 4,
+	RedPlayerRun: "images/player_red/player_run", 4, 4,
+	RedPlayerJump: "images/player_red/player_jump", 2, 4,
+	RedPlayerFall: "images/player_red/player_fall", 2, 4,
+	RedPlayerFallSlow: "images/player_red/player_fall_slow", 2, 4
 );
