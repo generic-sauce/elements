@@ -9,7 +9,6 @@ pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarge
 pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
 
 pub use gilrs::{GamepadId, Gilrs};
-pub use bitflags::*;
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
 
