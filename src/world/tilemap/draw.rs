@@ -1,9 +1,9 @@
 use crate::prelude::*;
 
 impl TileMap {
-	pub fn draw(&mut self, target: &impl RenderTarget, context: &mut DrawContext) {
+	pub fn draw(&self, target: &impl RenderTarget, context: &mut DrawContext) {
 		let shader = context.shader_state.get_shader(ShaderId::Tilemap);
-		unsafe { shader.set_uniform_texture_raw("tilemap_tex", &self.texture); }
+		unsafe { shader.set_uniform_texture_raw("tilemap_tex", &context.tilemap_texture); }
 
 		let mut states = RenderStates::default();
 		states.shader = Some(&shader.inner_shader);

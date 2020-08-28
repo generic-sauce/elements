@@ -70,12 +70,12 @@ impl Server {
 	fn check_restart(&mut self) {
 		if let Some(p) = self.world.player_dead() {
 			self.world.kills[1-p] += 1;
-			self.world.reset();
+			let _ = self.world.reset();
 		}
 	}
 
 	fn tick(&mut self) {
-		self.world.tick(&self.input_states);
+		let _ = self.world.tick(&self.input_states);
 	}
 }
 

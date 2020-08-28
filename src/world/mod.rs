@@ -22,17 +22,20 @@ pub struct World {
 
 fn new_players() -> [Player; 2] {
 	[
-		Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right, PlayerColor::Blue),
-		Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left, PlayerColor::Red)
+		Player::new(TileVec::new(37, 39).into()),
+		Player::new(TileVec::new(88, 40).into()),
 	]
 }
 
 impl World {
-	pub fn reset(&mut self) {
+	#[must_use]
+	pub fn reset(&mut self) -> Vec<Command> {
 		self.players = new_players();
-		self.tilemap.reset();
+		let cmds = self.tilemap.reset();
 		self.fluidmap = FluidMap::new(self.tilemap.size);
 		self.frame_id = 0;
+
+		cmds
 	}
 
 	pub fn new() -> World {
@@ -47,22 +50,28 @@ impl World {
 		}
 	}
 
-	pub fn tick(&mut self, inputs: &[InputState; 2]) {
+	#[must_use]
+	pub fn tick(&mut self, inputs: &[InputState; 2]) -> Vec<Command> {
+		let mut cmds = Vec::new();
+
 		// sub-tick
 		self.tick_fluidmap();
-		self.tick_players(inputs);
-		self.handle_skills(inputs);
+		cmds.extend(self.tick_players(inputs));
+		cmds.extend(self.handle_skills(inputs));
 		self.spawn_fluids();
 		self.despawn_fluids();
-		self.despawn_walls();
+		cmds.extend(self.despawn_walls());
 		self.check_damage();
 		self.frame_id += 1;
+
+		cmds
 	}
 
-	fn tick_players(&mut self, inputs: &[InputState; 2]) {
-		for p in 0..2 {
-			self.tick_player(p, &inputs[p]);
-		}
+	#[must_use]
+	fn tick_players(&mut self, inputs: &[InputState; 2]) -> Vec<Command> {
+		(0..2).map(|p| self.tick_player(p, &inputs[p]).into_iter())
+			.flatten()
+			.collect()
 	}
 
 	fn spawn_fluids(&mut self) {
@@ -107,7 +116,8 @@ impl World {
 		}
 	}
 
-	fn despawn_walls(&mut self) {
+	#[must_use]
+	fn despawn_walls(&mut self) -> Vec<Command> {
 		let mut changed = false;
 		for tile in self.tilemap.tiles.iter_mut() {
 			if let Tile::Wall { remaining_lifetime, owner } = tile {
@@ -118,7 +128,9 @@ impl World {
 		}
 
 		if changed {
-			self.tilemap.update_texture();
+			vec![Command::UpdateTileMapTexture]
+		} else {
+			Vec::new()
 		}
 	}
 

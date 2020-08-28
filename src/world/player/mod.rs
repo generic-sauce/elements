@@ -32,36 +32,29 @@ static RIGHT_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
 };
 
-#[derive(PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum PlayerDirection {
 	Left,
 	Right,
-}
-#[derive(PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
-pub enum PlayerColor {
-	Blue,
-	Red,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
-	pub animation: Animation,
 	pub cursor: GameVec,
 	pub health: i32,
 	pub free_wall: u32,
 	pub last_wall_pos: Option<GameVec>,
 	pub grab_cooldown: Option<u32>,
 	walljumped: bool,
-	direction: PlayerDirection,
-	color: PlayerColor,
 }
 
 impl World {
-	pub fn tick_player(&mut self, p: usize, input: &InputState) {
+	#[must_use]
+	pub fn tick_player(&mut self, p: usize, input: &InputState) -> Vec<Command> {
 		let pl = &mut self.players[p];
-		pl.select_animation(&self.tilemap);
+		let cmds = pl.select_animation(p, &self.tilemap);
 		pl.apply_forces(input, &self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
 
@@ -70,34 +63,34 @@ impl World {
 			Some(0) => None,
 			Some(x) => Some(x-1),
 		};
+
+		cmds
 	}
 }
 
 impl Player {
-	pub fn new(left_bot: GameVec, direction: PlayerDirection, color: PlayerColor) -> Player {
+	pub fn new(left_bot: GameVec) -> Player {
 		Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
-			animation: Animation::new(AnimationId::BluePlayerIdle),
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
 			free_wall: 0,
 			last_wall_pos: None,
 			grab_cooldown: None,
 			walljumped: true,
-			direction,
-			color,
 		}
 	}
 
-	fn select_animation(&mut self, t: &TileMap) {
-		let (run, idle, jump, fall, fall_slow) = if self.color == PlayerColor::Blue {
+	#[must_use]
+	fn select_animation(&self, player_id: usize, t: &TileMap) -> Vec<Command> {
+		let (run, idle, jump, fall, fall_slow) = if player_id == 0 {
 			(AnimationId::BluePlayerRun, AnimationId::BluePlayerIdle, AnimationId::BluePlayerJump, AnimationId::BluePlayerFall, AnimationId::BluePlayerFallSlow)
 		} else {
 			(AnimationId::RedPlayerRun, AnimationId::RedPlayerIdle, AnimationId::RedPlayerJump, AnimationId::RedPlayerFall, AnimationId::RedPlayerFallSlow)
 		};
 
-		let new_animation_id = if self.is_grounded(t) {
+		let animation_id = if self.is_grounded(t) {
 			if self.velocity.x.abs() > 10 {
 				run
 			} else {
@@ -113,17 +106,16 @@ impl Player {
 			}
 		};
 
-		if new_animation_id != self.animation.animation_id {
-			self.animation = Animation::new(new_animation_id);
-		}
-
-		self.direction = if self.velocity.x < 0 {
-			PlayerDirection::Left
+		let direction = if self.velocity.x < 0 {
+			Some(PlayerDirection::Left)
 		} else if self.velocity.x > 0 {
-			PlayerDirection::Right
+			Some(PlayerDirection::Right)
 		} else {
-			self.direction
-		}
+			None
+		};
+
+		let c = Command::ChangeAnimation { player_id, animation_id, direction };
+		vec![c]
 	}
 
 	fn apply_forces(&mut self, input: &InputState, t: &TileMap) {

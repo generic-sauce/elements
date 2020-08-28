@@ -42,7 +42,7 @@ impl Local {
 				self.app.input_states[i] = input.update(&self.app.gilrs);
 			}
 
-			self.app.world.tick(&self.app.input_states);
+			self.app.tick();
 			self.app.draw(elapsed_time, fps, load);
 
 			self.check_restart();
@@ -56,7 +56,8 @@ impl Local {
 	fn check_restart(&mut self) {
 		if let Some(p) = self.app.world.player_dead() {
 			self.app.world.kills[1-p] += 1;
-			self.app.world.reset();
+			let cmds = self.app.world.reset();
+			self.app.apply_commands(cmds);
 		}
 	}
 }

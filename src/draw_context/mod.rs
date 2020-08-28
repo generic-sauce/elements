@@ -14,6 +14,9 @@ pub struct DrawContext<'a> {
 	pub animation_state: &'a AnimationState,
 	pub tilemap_size: TileVec,
 	pub elapsed_time: Duration,
+	pub player_animations: &'a [Animation; 2], // TODO these things are also stored in App and seem kinda redundant
+	pub player_directions: &'a [PlayerDirection; 2],
+	pub tilemap_texture: &'a Texture,
 	pub aspect_ratio: f32,
 }
 
@@ -40,29 +43,6 @@ fn match_origin(origin: Origin, size: CanvasVec) -> CanvasVec {
 }
 
 impl<'a> DrawContext<'a> {
-	pub fn new(
-		window_size: Vec2u,
-		texture_state: &'a TextureState,
-		shader_state: &'a mut ShaderState,
-		font_state: &'a FontState,
-		animation_state: &'a AnimationState,
-		tilemap_size: TileVec,
-		elapsed_time: Duration,
-		aspect_ratio: f32,
-		) -> DrawContext<'a>
-	{
-		DrawContext {
-			window_size,
-			texture_state,
-			shader_state,
-			font_state,
-			animation_state,
-			tilemap_size,
-			elapsed_time,
-			aspect_ratio,
-		}
-	}
-
 	#[allow(unused)]
 	pub fn draw_texture(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture: Option<&Texture>, flip: Flip) {
 		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size));

@@ -19,10 +19,10 @@ impl Player {
 		PLAYER_SIZE * GameVec::new(IMG_SIZE, IMG_SIZE) / IMG_PLAYER_SIZE / 2
 	}
 
-	pub fn draw(&mut self, target: &impl RenderTarget, context: &DrawContext) {
+	pub fn draw(&self, p: usize, target: &impl RenderTarget, context: &DrawContext) {
 		// character
-		let flip = if self.direction == PlayerDirection::Right { Flip::Normal } else { Flip::Horizontal };
-		self.animation.draw(target, flip, self.texture_center(), self.texture_radius(), context);
+		let flip = if let PlayerDirection::Right = context.player_directions[p] { Flip::Normal } else { Flip::Horizontal };
+		context.player_animations[p].draw(target, flip, self.texture_center(), self.texture_radius(), context);
 
 		// cursor
 		context.draw_circle(target, self.center_position() + self.cursor, CURSOR_INDICATOR_RADIUS, Color::BLACK);
@@ -31,7 +31,7 @@ impl Player {
 		self.draw_health(target, context);
 	}
 
-	pub fn draw_health(&mut self, target: &impl RenderTarget, context: &DrawContext) {
+	pub fn draw_health(&self, target: &impl RenderTarget, context: &DrawContext) {
 		let mut size = GameVec::new(PLAYER_SIZE.x / 2, TILESIZE / 3);
 		let offset = GameVec::new(0, PLAYER_SIZE.y + TILESIZE);
 		let left_bot = self.left_bot + offset;

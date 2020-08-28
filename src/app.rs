@@ -3,12 +3,21 @@ use crate::prelude::*;
 pub struct App {
 	pub window: RenderWindow,
 	pub world: World,
+	pub player_animations: [Animation; 2],
+	pub player_directions: [PlayerDirection; 2],
+	pub tilemap_texture: SfBox<Texture>,
 	pub texture_state: TextureState,
 	pub shader_state: ShaderState,
 	pub font_state: FontState,
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
 	pub input_states: [InputState; 2],
+}
+
+#[must_use]
+pub enum Command {
+	UpdateTileMapTexture,
+	ChangeAnimation { player_id: usize, animation_id: AnimationId, direction: Option<PlayerDirection> }
 }
 
 impl App {
@@ -19,15 +28,50 @@ impl App {
 
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 
+		let world = World::new();
+		let tilemap_texture = App::create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
+
 		App {
 			window,
-			world: World::new(),
+			world,
+			player_animations: [Animation::new(AnimationId::BluePlayerIdle), Animation::new(AnimationId::RedPlayerIdle)],
+			player_directions: [PlayerDirection::Right, PlayerDirection::Left],
+			tilemap_texture,
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			gilrs,
 			input_states: [InputState::new(), InputState::new()],
+		}
+	}
+
+	fn apply_command(&mut self, c: Command) {
+		match c {
+			Command::UpdateTileMapTexture => {
+				self.tilemap_texture = App::create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
+			},
+			Command::ChangeAnimation { player_id, animation_id, direction, } => {
+				if self.player_animations[player_id].animation_id != animation_id {
+					self.player_animations[player_id] = Animation::new(animation_id);
+				}
+				self.player_directions[player_id] = direction.unwrap_or(self.player_directions[player_id]);
+			},
+		}
+	}
+
+	pub fn apply_commands(&mut self, v: Vec<Command>) {
+		for x in v {
+			self.apply_command(x);
+		}
+	}
+
+	pub fn tick(&mut self) {
+		let cmds = self.world.tick(&self.input_states);
+		self.apply_commands(cmds);
+
+		for x in &mut self.player_animations {
+			x.tick(&self.animation_state);
 		}
 	}
 
@@ -45,16 +89,19 @@ impl App {
 
 		let window_size = self.window.size();
 		let window_size = Vec2u::new(window_size.x, window_size.y);
-		let mut context = DrawContext::new(
-			window_size,
-			&self.texture_state,
-			&mut self.shader_state,
-			&self.font_state,
-			&self.animation_state,
-			self.world.tilemap.size,
+		let mut context = DrawContext {
+			window_size: window_size,
+			texture_state: &self.texture_state,
+			shader_state: &mut self.shader_state,
+			font_state: &self.font_state,
+			animation_state: &self.animation_state,
+			tilemap_size: self.world.tilemap.size,
 			elapsed_time,
-			aspect_ratio,
-		);
+			player_animations: &self.player_animations,
+			player_directions: &self.player_directions,
+			tilemap_texture: &self.tilemap_texture,
+			aspect_ratio: aspect_ratio,
+		};
 
 		// draw game
 		context.fill_canvas_with_color(&game_texture_target, Color::rgb(115, 128, 56));

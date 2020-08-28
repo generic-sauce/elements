@@ -1,5 +1,4 @@
 mod draw;
-mod serde;
 mod update;
 
 pub use update::*;
@@ -15,10 +14,10 @@ pub enum Tile {
 	Wall { owner: usize, remaining_lifetime: u32 },
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct TileMap {
 	pub tiles: Vec<Tile>,
 	pub size: TileVec,
-	pub texture: SfBox<Texture>,
 }
 
 impl TileMap {
@@ -38,22 +37,22 @@ impl TileMap {
 			}
 		}
 		let s = TileVec::new(s.x as i32, s.y as i32); // TODO make nicer
-		let texture = TileMap::create_texture(&tiles, s);
 
 		TileMap {
 			tiles,
 			size: s,
-			texture: texture,
 		}
 	}
 
-	pub fn reset(&mut self) {
+	#[must_use]
+	pub fn reset(&mut self) -> Vec<Command> {
 		for x in &mut self.tiles {
 			if let Tile::Wall { .. } = x {
 				*x = Tile::Void;
 			}
 		}
-		self.update_texture();
+
+		vec![Command::UpdateTileMapTexture]
 	}
 
 	#[allow(unused)]
@@ -71,38 +70,6 @@ impl TileMap {
 	#[allow(unused)]
 	pub fn set(&mut self, v: TileVec, tile: Tile) {
 		self.tiles[(v.x + v.y * self.size.x) as usize] = tile;
-		self.update_texture();
-	}
-
-	pub fn update_texture(&mut self) {
-		self.texture = TileMap::create_texture(&self.tiles, self.size);
-	}
-
-	fn create_texture(tiles: &Vec<Tile>, size: TileVec) -> SfBox<Texture> {
-		let mut pixels = Vec::new();
-		for &tile in tiles.iter() {
-
-			let team: u8 = match tile {
-				Tile::Wall { owner, .. } => owner as u8 * 255, // TODO maybe owner should be u8 generally
-				 _ => 0,
-			};
-			let ground: u8 = match tile {
-				Tile::Void => 0,
-				_ => 255,
-			};
-			let ratio: u8 = match tile {
-				Tile::Wall { .. } => 255, // TODO correct?
-				_ => 0,
-			};
-
-			pixels.push(ground);
-			pixels.push(team);
-			pixels.push(ratio);
-			pixels.push(255 as u8);
-		}
-
-		let image = Image::create_from_pixels(size.x as u32, size.y as u32, &pixels).unwrap();
-		Texture::from_image(&image).unwrap()
 	}
 
 	pub fn check_solid(&self, v: impl Into<TileVec>) -> bool {
@@ -122,5 +89,33 @@ impl Tile {
 			Tile::Void => false,
 			_ => true,
 		}
+	}
+}
+
+impl App {
+	pub fn create_tilemap_texture(tiles: &Vec<Tile>, size: TileVec) -> SfBox<Texture> {
+		let mut pixels = Vec::new();
+		for &tile in tiles.iter() {
+			let team: u8 = match tile {
+				Tile::Wall { owner, .. } => owner as u8 * 255, // TODO maybe owner should be u8 generally
+				_ => 0,
+			};
+			let ground: u8 = match tile {
+				Tile::Void => 0,
+				_ => 255,
+			};
+			let ratio: u8 = match tile {
+				Tile::Wall { .. } => 255, // TODO correct?
+				_ => 0,
+			};
+
+			pixels.push(ground);
+			pixels.push(team);
+			pixels.push(ratio);
+			pixels.push(255 as u8);
+		}
+
+		let image = Image::create_from_pixels(size.x as u32, size.y as u32, &pixels).unwrap();
+		Texture::from_image(&image).unwrap()
 	}
 }
