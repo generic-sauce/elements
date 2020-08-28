@@ -21,25 +21,27 @@ pub struct TileMap {
 
 impl TileMap {
 	pub fn new(filename: &str) -> TileMap {
-		let image = Image::from_file(filename).unwrap();
-		let s = image.size();
-		let mut tiles = Vec::with_capacity((s.x * s.y) as usize);
+		use image::{GenericImageView, Rgba};
 
-		for y in (0..s.y).rev() {
-			for x in 0..s.x {
-				let tile = match image.pixel_at(x as u32, y as u32) {
-					Color { r: 255, g: 255, b: 255, a: 255 } => Tile::Void,
-					Color { r: 0, g: 0, b: 0, a: 255 } => Tile::Ground,
+		let image = image::open(filename).unwrap();
+		let (width, height) = image.dimensions();
+		let mut tiles = Vec::with_capacity((width * height) as usize);
+
+		for y in (0..height).rev() {
+			for x in 0..width {
+				let tile = match image.get_pixel(x as u32, y as u32) {
+					Rgba([255, 255, 255, 255]) => Tile::Void,
+					Rgba([0, 0, 0, 255]) => Tile::Ground,
 					c => panic!("tile color out of range! {:?}", c),
 				};
 				tiles.push(tile);
 			}
 		}
-		let s = TileVec::new(s.x as i32, s.y as i32); // TODO make nicer
 
+		let size = TileVec::new(width as i32, height as i32);
 		TileMap {
 			tiles,
-			size: s,
+			size,
 		}
 	}
 
