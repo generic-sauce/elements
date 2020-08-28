@@ -6,7 +6,6 @@ pub struct Server {
 	world: World,
 	socket: UdpSocket,
 	peers: [SocketAddr; 2],
-	input_states: [InputState; 2],
 	update_counter: u32,
 }
 
@@ -22,7 +21,6 @@ impl Server {
 			world: World::new(),
 			socket,
 			peers,
-			input_states: [InputState::new(), InputState::new()],
 			update_counter: 0,
 		}
 	}
@@ -47,7 +45,7 @@ impl Server {
 				if index == -1 {
 					eprintln!("got packet from {}, which is not a known peer", recv_addr);
 				} else {
-					self.input_states[index as usize] = input_state;
+					self.world.players[index as usize].input = input_state;
 				}
 			}
 
@@ -57,7 +55,7 @@ impl Server {
 			if self.update_counter == 0 {
 				for (i, peer) in self.peers.iter().enumerate() {
 					let update = Update {
-						enemy_input_state: self.input_states[1 - i].clone(),
+						enemy_input_state: self.world.players[1-i].input.clone(),
 						world_update: self.world.update(),
 					};
 					send_packet_to(&mut self.socket, &update, *peer);
