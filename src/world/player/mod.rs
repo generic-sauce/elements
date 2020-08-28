@@ -18,8 +18,8 @@ pub const CURSOR_INDICATOR_RADIUS: i32 = TILESIZE / 2;
 pub const GRAVITY: i32 = 15;
 
 static GROUND_SENSOR: Sensor = Sensor {
-	left_bot_offset: GameVec::new(0, -1),
-	size: GameVec::new(PLAYER_SIZE.x, 2),
+	left_bot_offset: GameVec::new(0, -TILESIZE-1),
+	size: GameVec::new(PLAYER_SIZE.x, TILESIZE+1),
 };
 
 static LEFT_SENSOR: Sensor = Sensor {
