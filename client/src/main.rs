@@ -1,7 +1,5 @@
 #![feature(drain_filter)]
 
-extern crate serde_derive;
-
 mod animation_state;
 mod client;
 mod texture_state;
