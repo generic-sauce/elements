@@ -14,8 +14,6 @@ pub struct DrawContext<'a> {
 	pub animation_state: &'a AnimationState,
 	pub tilemap_size: TileVec,
 	pub elapsed_time: Duration,
-	pub player_animations: &'a [Animation; 2], // TODO these things are also stored in App and seem kinda redundant
-	pub player_directions: &'a [PlayerDirection; 2],
 	pub tilemap_texture: &'a Texture,
 	pub aspect_ratio: f32,
 }

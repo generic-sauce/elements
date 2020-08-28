@@ -3,8 +3,6 @@ use crate::prelude::*;
 pub struct App {
 	pub window: RenderWindow,
 	pub world: World,
-	pub player_animations: [Animation; 2],
-	pub player_directions: [PlayerDirection; 2],
 	pub tilemap_texture: SfBox<Texture>,
 	pub texture_state: TextureState,
 	pub shader_state: ShaderState,
@@ -17,7 +15,6 @@ pub struct App {
 #[must_use]
 pub enum Command {
 	UpdateTileMapTexture,
-	ChangeAnimation { player_id: usize, animation_id: AnimationId, direction: Option<PlayerDirection> }
 }
 
 impl App {
@@ -34,8 +31,6 @@ impl App {
 		App {
 			window,
 			world,
-			player_animations: [Animation::new(AnimationId::BluePlayerIdle), Animation::new(AnimationId::RedPlayerIdle)],
-			player_directions: [PlayerDirection::Right, PlayerDirection::Left],
 			tilemap_texture,
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
@@ -51,12 +46,6 @@ impl App {
 			Command::UpdateTileMapTexture => {
 				self.tilemap_texture = App::create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
 			},
-			Command::ChangeAnimation { player_id, animation_id, direction, } => {
-				if self.player_animations[player_id].animation_id != animation_id {
-					self.player_animations[player_id] = Animation::new(animation_id);
-				}
-				self.player_directions[player_id] = direction.unwrap_or(self.player_directions[player_id]);
-			},
 		}
 	}
 
@@ -69,10 +58,6 @@ impl App {
 	pub fn tick(&mut self) {
 		let cmds = self.world.tick(&self.input_states);
 		self.apply_commands(cmds);
-
-		for x in &mut self.player_animations {
-			x.tick();
-		}
 	}
 
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
@@ -97,8 +82,6 @@ impl App {
 			animation_state: &self.animation_state,
 			tilemap_size: self.world.tilemap.size,
 			elapsed_time,
-			player_animations: &self.player_animations,
-			player_directions: &self.player_directions,
 			tilemap_texture: &self.tilemap_texture,
 			aspect_ratio: aspect_ratio,
 		};

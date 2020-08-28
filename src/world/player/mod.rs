@@ -32,7 +32,7 @@ static RIGHT_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
 };
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
 pub enum PlayerDirection {
 	Left,
 	Right,
@@ -47,14 +47,16 @@ pub struct Player {
 	pub free_wall: u32,
 	pub last_wall_pos: Option<GameVec>,
 	pub grab_cooldown: Option<u32>,
-	walljumped: bool,
+	pub animation: Animation,
+	pub direction: PlayerDirection,
+	pub walljumped: bool,
 }
 
 impl World {
-	#[must_use]
-	pub fn tick_player(&mut self, p: usize, input: &InputState) -> Vec<Command> {
+	pub fn tick_player(&mut self, p: usize, input: &InputState) {
 		let pl = &mut self.players[p];
-		let cmds = pl.select_animation(p, &self.tilemap);
+		pl.animation.tick();
+		pl.select_animation(p, &self.tilemap);
 		pl.apply_forces(input, &self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
 
@@ -63,13 +65,11 @@ impl World {
 			Some(0) => None,
 			Some(x) => Some(x-1),
 		};
-
-		cmds
 	}
 }
 
 impl Player {
-	pub fn new(left_bot: GameVec) -> Player {
+	pub fn new(left_bot: GameVec, animation_id: AnimationId, direction: PlayerDirection) -> Player {
 		Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
@@ -78,12 +78,13 @@ impl Player {
 			free_wall: 0,
 			last_wall_pos: None,
 			grab_cooldown: None,
+			animation: Animation::new(animation_id),
+			direction,
 			walljumped: true,
 		}
 	}
 
-	#[must_use]
-	fn select_animation(&self, player_id: usize, t: &TileMap) -> Vec<Command> {
+	fn select_animation(&mut self, player_id: usize, t: &TileMap) {
 		let (run, idle, jump, fall, fall_slow) = if player_id == 0 {
 			(AnimationId::BluePlayerRun, AnimationId::BluePlayerIdle, AnimationId::BluePlayerJump, AnimationId::BluePlayerFall, AnimationId::BluePlayerFallSlow)
 		} else {
@@ -106,16 +107,14 @@ impl Player {
 			}
 		};
 
-		let direction = if self.velocity.x < 0 {
-			Some(PlayerDirection::Left)
-		} else if self.velocity.x > 0 {
-			Some(PlayerDirection::Right)
-		} else {
-			None
-		};
+		self.direction =
+			if self.velocity.x < 0 { PlayerDirection::Left }
+			else if self.velocity.x > 0 { PlayerDirection::Right }
+			else { self.direction };
 
-		let c = Command::ChangeAnimation { player_id, animation_id, direction };
-		vec![c]
+		if self.animation.animation_id != animation_id {
+			self.animation = Animation::new(animation_id);
+		}
 	}
 
 	fn apply_forces(&mut self, input: &InputState, t: &TileMap) {

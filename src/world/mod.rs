@@ -22,8 +22,8 @@ pub struct World {
 
 fn new_players() -> [Player; 2] {
 	[
-		Player::new(TileVec::new(37, 39).into()),
-		Player::new(TileVec::new(88, 40).into()),
+		Player::new(TileVec::new(37, 39).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
+		Player::new(TileVec::new(88, 40).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
 	]
 }
 
@@ -56,7 +56,7 @@ impl World {
 
 		// sub-tick
 		self.tick_fluidmap();
-		cmds.extend(self.tick_players(inputs));
+		self.tick_players(inputs);
 		cmds.extend(self.handle_skills(inputs));
 		self.spawn_fluids();
 		self.despawn_fluids();
@@ -67,11 +67,10 @@ impl World {
 		cmds
 	}
 
-	#[must_use]
-	fn tick_players(&mut self, inputs: &[InputState; 2]) -> Vec<Command> {
-		(0..2).map(|p| self.tick_player(p, &inputs[p]).into_iter())
-			.flatten()
-			.collect()
+	fn tick_players(&mut self, inputs: &[InputState; 2]) {
+		for p in 0..2 {
+			self.tick_player(p, &inputs[p]);
+		}
 	}
 
 	fn spawn_fluids(&mut self) {
