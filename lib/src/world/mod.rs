@@ -55,13 +55,13 @@ impl World {
 	}
 
 	#[must_use]
-	pub fn tick(&mut self, inputs: &[InputState; 2]) -> Vec<Command> {
+	pub fn tick(&mut self) -> Vec<Command> {
 		let mut cmds = Vec::new();
 
 		// sub-tick
 		self.tick_fluidmap();
-		self.tick_players(inputs);
-		cmds.extend(self.handle_skills(inputs));
+		self.tick_players();
+		cmds.extend(self.handle_skills());
 		self.spawn_fluids();
 		self.despawn_fluids();
 		cmds.extend(self.despawn_walls());
@@ -71,9 +71,9 @@ impl World {
 		cmds
 	}
 
-	fn tick_players(&mut self, inputs: &[InputState; 2]) {
+	fn tick_players(&mut self) {
 		for p in 0..2 {
-			self.tick_player(p, &inputs[p]);
+			self.tick_player(p);
 		}
 	}
 

@@ -7,7 +7,6 @@ extern crate serde_derive;
 mod fps_timer;
 
 mod timed_loop;
-mod input;
 mod world;
 mod vec;
 mod prelude;

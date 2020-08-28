@@ -12,6 +12,7 @@ mod draw_context;
 mod app;
 mod local;
 mod draw;
+mod input;
 
 use crate::prelude::*;
 

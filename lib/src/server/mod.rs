@@ -77,7 +77,7 @@ impl Server {
 	}
 
 	fn tick(&mut self) {
-		let _ = self.world.tick(&self.input_states);
+		let _ = self.world.tick();
 	}
 }
 

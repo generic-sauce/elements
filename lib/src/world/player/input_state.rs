@@ -1,18 +1,7 @@
-mod adaptive;
-pub use adaptive::*;
-
 use crate::prelude::*;
 
 const DEADZONE_MIN: f32 = 0.35;
-const CURSOR_DEADZONE: f32 = 0.07;
 const MAX_MOVEMENT_VALUE: i32 = 100;
-const JOYSTICK_DISTANCE: i32 = 2600;
-const DEFAULT_MOUSE_POSITION: Vec2i = Vec2i::new(300, 300);
-
-// TODO: use bitmask instead of booleans
-pub enum InputDevice {
-	Adaptive(AdaptiveInput),
-}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InputState {
@@ -24,14 +13,6 @@ pub struct InputState {
 	pub special2: bool,
 	pub attack1: bool,
 	pub attack2: bool,
-}
-
-impl InputDevice {
-	pub fn update(&mut self, gilrs: &Gilrs) -> InputState {
-		match self {
-			InputDevice::Adaptive(x) => x.update(gilrs),
-		}
-	}
 }
 
 impl InputState {

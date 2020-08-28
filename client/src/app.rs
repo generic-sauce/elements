@@ -9,7 +9,6 @@ pub struct App {
 	pub font_state: FontState,
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
-	pub input_states: [InputState; 2],
 }
 
 impl App {
@@ -32,7 +31,6 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			gilrs,
-			input_states: [InputState::new(), InputState::new()],
 		}
 	}
 
@@ -51,7 +49,7 @@ impl App {
 	}
 
 	pub fn tick(&mut self) {
-		let cmds = self.world.tick(&self.input_states);
+		let cmds = self.world.tick();
 		self.apply_commands(cmds);
 	}
 }

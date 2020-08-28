@@ -8,12 +8,10 @@ pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
 pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
 
-pub use gilrs::{GamepadId, Gilrs};
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
 
 pub use crate::server::*;
-pub use crate::input::*;
 pub use crate::world::*;
 pub use crate::world::player::{*, sensor::*};
 pub use crate::world::tilemap::*;

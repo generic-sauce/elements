@@ -39,7 +39,7 @@ impl Local {
 
 			// inputs
 			for (i, input) in self.inputs.iter_mut().enumerate() {
-				self.app.input_states[i] = input.update(&self.app.gilrs);
+				self.app.world.players[i].input = input.update(&self.app.gilrs);
 			}
 
 			self.app.tick();

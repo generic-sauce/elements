@@ -48,7 +48,7 @@ impl Client {
 			}
 
 			if let Some((update, _)) = recv_packet::<Update>(&mut self.socket) {
-				self.app.input_states[1-self.player_id] = update.enemy_input_state;
+				self.app.world.players[1-self.player_id].input = update.enemy_input_state;
 				let cmds = self.app.world.apply_update(update.world_update);
 				self.app.apply_commands(cmds);
 			}
@@ -61,8 +61,8 @@ impl Client {
 			}
 
 			// inputs
-			self.app.input_states[self.player_id] = self.input.update(&self.app.gilrs);
-			send_packet(&mut self.socket, &self.app.input_states[self.player_id]);
+			self.app.world.players[self.player_id].input = self.input.update(&self.app.gilrs);
+			send_packet(&mut self.socket, &self.app.world.players[self.player_id].input);
 
 			self.app.tick();
 			self.app.draw(elapsed_time, fps, load);

@@ -1,5 +1,8 @@
+mod input_state;
 mod physics;
 pub mod sensor;
+
+pub use input_state::*;
 
 use crate::prelude::*;
 
@@ -48,14 +51,15 @@ pub struct Player {
 	pub animation: Animation,
 	pub direction: PlayerDirection,
 	pub walljumped: bool,
+	pub input: InputState,
 }
 
 impl World {
-	pub fn tick_player(&mut self, p: usize, input: &InputState) {
+	pub fn tick_player(&mut self, p: usize) {
 		let pl = &mut self.players[p];
 		pl.animation.tick();
 		pl.select_animation(p, &self.tilemap);
-		pl.apply_forces(input, &self.tilemap);
+		pl.apply_forces(&self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
 
 		pl.grab_cooldown = match pl.grab_cooldown {
@@ -79,6 +83,7 @@ impl Player {
 			animation: Animation::new(animation_id),
 			direction,
 			walljumped: true,
+			input: InputState::new(),
 		}
 	}
 
@@ -115,26 +120,26 @@ impl Player {
 		}
 	}
 
-	fn apply_forces(&mut self, input: &InputState, t: &TileMap) {
+	fn apply_forces(&mut self, t: &TileMap) {
 		// drag
 		if self.velocity.x.abs() < X_DRAG { self.velocity.x = 0; }
 		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
 
 		// walk
-		self.velocity.x += input.horizontal_dir() * X_ACCELERATION;
+		self.velocity.x += self.input.horizontal_dir() * X_ACCELERATION;
 		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
-		if self.is_grounded(t) && input.up() && self.velocity.y <= 0 {
+		if self.is_grounded(t) && self.input.up() && self.velocity.y <= 0 {
 			self.velocity.y = JUMP_POWER;
 			self.walljumped = false;
 		}
 
 		// walljump
-		if !self.walljumped && !self.is_grounded(t) && input.up() && (
-				self.is_left_walled(t) && input.right() ||
-				self.is_right_walled(t) && input.left()) {
-			let horizontal_dir = i32::signum(input.horizontal_dir()) * 100;
+		if !self.walljumped && !self.is_grounded(t) && self.input.up() && (
+				self.is_left_walled(t) && self.input.right() ||
+				self.is_right_walled(t) && self.input.left()) {
+			let horizontal_dir = i32::signum(self.input.horizontal_dir()) * 100;
 			let force = GameVec::new(horizontal_dir, JUMP_POWER);
 			self.velocity = force;
 			self.walljumped = true;
@@ -146,7 +151,7 @@ impl Player {
 		// aim
 		let largest = (t.size + 1).to_game() - 1; // TODO correct?
 		let ctr = self.center_position();
-		let mut global_cursor = ctr + input.cursor;
+		let mut global_cursor = ctr + self.input.cursor;
 		global_cursor.x = global_cursor.x.max(0).min(largest.x);
 		global_cursor.y = global_cursor.y.max(0).min(largest.y);
 		self.cursor.x = global_cursor.x - ctr.x;
