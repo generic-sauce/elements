@@ -56,7 +56,7 @@ impl AdaptiveInput {
 
 		let mut direction = GameVec::new(0, 0);
 
-		direction.y += if W.is_pressed() && self.has_keyboard {
+		direction.y += if self.has_keyboard && W.is_pressed() {
 			MAX_MOVEMENT_VALUE
 		} else if S.is_pressed() && self.has_keyboard {
 			-MAX_MOVEMENT_VALUE
@@ -67,11 +67,11 @@ impl AdaptiveInput {
 		};
 
 		let mut key_pressed = false;
-		if D.is_pressed() && self.has_keyboard {
+		if self.has_keyboard && D.is_pressed() {
 			direction.x += MAX_MOVEMENT_VALUE;
 			key_pressed = true;
 		}
-		if A.is_pressed() && self.has_keyboard {
+		if self.has_keyboard && A.is_pressed(){
 			direction.x -= MAX_MOVEMENT_VALUE;
 			key_pressed = true;
 		}
@@ -84,9 +84,9 @@ impl AdaptiveInput {
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 
-		self.attack1 = (Q.is_pressed() || Button::Left.is_pressed()) && self.has_keyboard;
-		self.attack2 = E.is_pressed() && self.has_keyboard;
-		self.special1 = (R.is_pressed() || Button::Right.is_pressed()) && self.has_keyboard;
+		self.attack1 = self.has_keyboard && (Q.is_pressed() || Button::Left.is_pressed());
+		self.attack2 = self.has_keyboard && E.is_pressed();
+		self.special1 = self.has_keyboard && (R.is_pressed() || Button::Right.is_pressed());
 		self.special2 = F.is_pressed() && self.has_keyboard;
 
 		if let Some(gamepad) = gamepad {
