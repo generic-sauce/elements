@@ -70,12 +70,12 @@ macro_rules! setup {
 }
 
 setup!(
-	BluePlayerIdle: "images/player_blue/player_idle", 5, 4,
+	BluePlayerIdle: "images/player_blue/player_idle", 5, 8,
 	BluePlayerRun: "images/player_blue/player_run", 6, 4,
 	BluePlayerJump: "images/player_blue/player_jump", 2, 4,
 	BluePlayerFall: "images/player_blue/player_fall", 2, 4,
 	BluePlayerFallSlow: "images/player_blue/player_fall_slow", 2, 4,
-	RedPlayerIdle: "images/player_red/player_idle", 5, 4,
+	RedPlayerIdle: "images/player_red/player_idle", 5, 8,
 	RedPlayerRun: "images/player_red/player_run", 4, 4,
 	RedPlayerJump: "images/player_red/player_jump", 2, 4,
 	RedPlayerFall: "images/player_red/player_fall", 2, 4,
