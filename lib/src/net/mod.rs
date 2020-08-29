@@ -1,7 +1,4 @@
-mod update;
 mod go;
-
-pub use update::*;
 pub use go::*;
 
 use crate::prelude::*;
@@ -16,6 +13,7 @@ pub enum Init { Init }
 
 impl Packet for Init {}
 impl Packet for InputState {}
+impl Packet for WorldUpdate {}
 
 #[allow(unused)]
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {

@@ -47,9 +47,8 @@ impl Client {
 				}
 			}
 
-			if let Some((update, _)) = recv_packet::<Update>(&mut self.socket) {
-				self.app.world.players[1-self.player_id].input = update.enemy_input_state;
-				let cmds = self.app.world.apply_update(update.world_update);
+			if let Some((update, _)) = recv_packet::<WorldUpdate>(&mut self.socket) {
+				let cmds = self.app.world.apply_update(update);
 				self.app.apply_commands(cmds);
 			}
 

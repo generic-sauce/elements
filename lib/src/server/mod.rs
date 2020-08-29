@@ -54,10 +54,7 @@ impl Server {
 			// send game update
 			if self.update_counter == 0 {
 				for (i, peer) in self.peers.iter().enumerate() {
-					let update = Update {
-						enemy_input_state: self.world.players[1-i].input.clone(),
-						world_update: self.world.update(),
-					};
+					let update = self.world.update();
 					send_packet_to(&mut self.socket, &update, *peer);
 				}
 			}
