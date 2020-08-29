@@ -6,9 +6,7 @@ pub use custom::*;
 
 use std::marker::PhantomData;
 
-pub struct DefaultParam;
-
-pub struct Vec2t<T, P = DefaultParam> {
+pub struct Vec2t<T, P> {
 	pub x: T,
 	pub y: T,
 	_p: PhantomData<P>,
