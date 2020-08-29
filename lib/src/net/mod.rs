@@ -6,6 +6,7 @@ pub use go::*;
 
 use crate::prelude::*;
 
+pub const PORT: u16 = 7575;
 const PACKET_SIZE: usize = 20000;
 
 pub trait Packet: Serialize + DeserializeOwned {}

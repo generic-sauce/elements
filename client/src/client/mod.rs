@@ -8,10 +8,10 @@ pub struct Client {
 }
 
 impl Client {
-	pub fn new(server_ip: impl ToSocketAddrs) -> Client {
+	pub fn new(server_ip: &str) -> Client {
 		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.set_nonblocking(true).unwrap();
-		socket.connect(server_ip).expect("Could not connect to server");
+		socket.connect((server_ip, PORT)).expect("Could not connect to server");
 
 		send_packet(&mut socket, &Init::Init);
 
