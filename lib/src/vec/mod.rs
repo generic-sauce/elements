@@ -1,9 +1,7 @@
 mod generic;
-mod iuf8;
 mod custom;
 
 pub use generic::*;
-pub use iuf8::*;
 pub use custom::*;
 
 use std::marker::PhantomData;

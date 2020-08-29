@@ -14,3 +14,4 @@ pub use crate::shader_state::*;
 pub use crate::font_state::*;
 pub use crate::animation_state::*;
 pub use crate::input::*;
+pub use crate::window_vec::*;

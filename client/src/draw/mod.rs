@@ -10,17 +10,17 @@ impl App {
 		let (window_view, view, view_pixel_size) = self.get_views(aspect_ratio);
 
 		// declare render target
-		let mut game_texture_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
-		let mut game_noise_target = RenderTexture::new(view_pixel_size.x, view_pixel_size.y, false).unwrap();
+		let mut game_texture_target = RenderTexture::new(view_pixel_size.x as u32, view_pixel_size.y as u32, false).unwrap();
+		let mut game_noise_target = RenderTexture::new(view_pixel_size.x as u32, view_pixel_size.y as u32, false).unwrap();
 
 		game_texture_target.set_view(&view);
 		game_noise_target.set_view(&view);
 		self.window.set_view(&window_view);
 
 		let window_size = self.window.size();
-		let window_size = Vec2u::new(window_size.x, window_size.y);
+		let window_size = WindowVec::new(window_size.x as f32, window_size.y as f32);
 		let mut context = DrawContext {
-			window_size: window_size,
+			window_size,
 			texture_state: &self.texture_state,
 			shader_state: &mut self.shader_state,
 			font_state: &self.font_state,
@@ -64,7 +64,7 @@ impl App {
         self.window.clear(Color::BLACK);
 	}
 
-	fn get_views(&self, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, Vec2u) {
+	fn get_views(&self, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, WindowVec) {
 		let window_size = self.window.size();
 		let window_size = Vector2f::new(window_size.x as f32, window_size.y as f32);
 		let window_aspect_ratio = window_size.x / window_size.y;
@@ -83,9 +83,9 @@ impl App {
 		let higher_factor = higher_factor * 2.0 + 1.0;
 
 		let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
-		let view_pixel_size = Vec2u::new(
-			(window_size.x as f32 / wider_factor) as u32,
-			(window_size.y as f32 / higher_factor) as u32
+		let view_pixel_size = WindowVec::new(
+			window_size.x as f32 / wider_factor,
+			window_size.y as f32 / higher_factor
 		);
 
 		(window_view, view, view_pixel_size)

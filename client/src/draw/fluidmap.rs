@@ -7,13 +7,13 @@ pub(in super) fn draw(fluidmap: &FluidMap, target: &impl RenderTarget, context: 
 
 	for fluid in fluidmap.iter() {
 		let cell_id = fluid.position / TILESIZE;
-		let local_position = Vec2u8::new((fluid.position.x % TILESIZE) as u8, (fluid.position.y % TILESIZE) as u8);
+		let local_position = ((fluid.position.x % TILESIZE) as u8, (fluid.position.y % TILESIZE) as u8);
 
 		let cell_index = 4 * (cell_id.x + cell_id.y * context.tilemap_size.x as i32) as usize;
 		pixels[cell_index+3] = 255;
 		pixels[cell_index+2] = (fluid.owner * 255) as u8;
-		pixels[cell_index+1] = local_position.y as u8;
-		pixels[cell_index+0] = local_position.x as u8;
+		pixels[cell_index+1] = local_position.1 as u8;
+		pixels[cell_index+0] = local_position.0 as u8;
 	}
 
 	let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);

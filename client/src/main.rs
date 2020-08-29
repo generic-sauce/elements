@@ -11,6 +11,7 @@ mod app;
 mod local;
 mod draw;
 mod input;
+mod window_vec;
 
 use crate::prelude::*;
 

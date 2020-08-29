@@ -7,7 +7,7 @@ pub use canvas_vec::*;
 pub use shader::*;
 
 pub struct DrawContext<'a> {
-	pub window_size: Vec2u,
+	pub window_size: WindowVec,
 	pub texture_state: &'a TextureState,
 	pub shader_state: &'a mut ShaderState,
 	pub font_state: &'a FontState,
@@ -43,8 +43,8 @@ fn match_origin(origin: Origin, size: CanvasVec) -> CanvasVec {
 impl<'a> DrawContext<'a> {
 	#[allow(unused)]
 	pub fn draw_texture(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture: Option<&Texture>, flip: Flip) {
-		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size));
-		let radius: Vector2f = Into::<Vector2f>::into(radius.to_canvas(self.tilemap_size));
+		let position: Vector2f = conv(position.to_canvas(self.tilemap_size));
+		let radius: Vector2f = conv(radius.to_canvas(self.tilemap_size));
 
 		let mut shape = RectangleShape::new();
 		if let Some(texture) = texture {
@@ -73,9 +73,9 @@ impl<'a> DrawContext<'a> {
 
 		let mut shape = RectangleShape::new();
 		shape.set_scale(Vector2f::new(1.0, -1.0));
-		shape.set_size(radius * 2.0);
-		shape.set_origin(match_origin(origin, radius * 2.0));
-		shape.set_position(position);
+		shape.set_size(conv(radius * 2.0));
+		shape.set_origin(conv(match_origin(origin, radius * 2.0)));
+		shape.set_position(conv(position));
 		shape.set_fill_color(color);
 
 		target.draw_rectangle_shape(&shape, RenderStates::default());
@@ -90,7 +90,7 @@ impl<'a> DrawContext<'a> {
 	#[allow(unused)]
 	pub fn draw_text(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, size: f32 /* CanvasVec coordinate system */, text: &str, origin: Origin) {
 		let mut position = position.to_canvas(self.tilemap_size);
-		let factor = self.window_size.y;
+		let factor = self.window_size.y as u32;
 		let size = (size as f32 * factor as f32) as u32;
 
 		// make sure factor is a multiple of size. TODO: think about this again
@@ -104,7 +104,7 @@ impl<'a> DrawContext<'a> {
 			text.set_origin(Vector2f::new(0.0, text.character_size() as f32));
 		}
 
-		text.set_position(position);
+		text.set_position(conv(position));
 		text.set_scale(Vector2f::new(1.0 / factor, -1.0 / factor));
 		target.draw_text(&text, RenderStates::default());
 	}
@@ -112,7 +112,7 @@ impl<'a> DrawContext<'a> {
 	#[allow(unused)]
 	pub fn draw_circle(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: i32 /* GameVec coordinate system */, color: Color) {
 		let factor = (TILESIZE * self.tilemap_size.y) as f32;
-		let position: Vector2f = Into::<Vector2f>::into(position.to_canvas(self.tilemap_size));
+		let position: Vector2f = conv(position.to_canvas(self.tilemap_size));
 		let radius = radius as f32 / factor;
 
 		let mut shape = CircleShape::new(radius, 8);
@@ -170,4 +170,8 @@ impl<'a> DrawContext<'a> {
 
 		target.draw_rectangle_shape(&rect, RenderStates::default());
 	}
+}
+
+fn conv(v: CanvasVec) -> Vector2f {
+	Vector2f::new(v.x, v.y)
 }

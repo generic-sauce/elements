@@ -112,8 +112,9 @@ impl AdaptiveInput {
 			let new_mouse_pos = get_mouse_position();
 			let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
 
-			sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.into());
-			self.cursor += GameVec::new(mouse_diff.x, -mouse_diff.y) * 9;
+			sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.to_vector2i());
+			let mouse_diff_scaled = mouse_diff * 9.0;
+			self.cursor += GameVec::new(mouse_diff_scaled.x as i32, -mouse_diff_scaled.y as i32);
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
 		}
 
@@ -152,7 +153,7 @@ fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
 		.find(|gamepad_id| Into::<usize>::into(*gamepad_id) == index as usize)
 }
 
-fn get_mouse_position() -> Vec2i {
+fn get_mouse_position() -> WindowVec {
 	let mp = sfml::window::mouse::desktop_position();
-	Vec2i::new(mp.x, mp.y)
+	WindowVec::new(mp.x as f32, mp.y as f32)
 }
