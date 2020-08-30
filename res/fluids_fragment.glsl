@@ -15,12 +15,50 @@ float smin(float a, float b, float k) {
 
 void main() {
 	vec3 c = vec3(0);
+	vec4 z = vec4(0, 0, 0, 0);
 
 	vec2 id = floor(uv * fluid_tex_size);
 	vec2 lv = fract(uv * fluid_tex_size) - .5;
 	float r = 2.;
 	float d = r * .5;
 	float team = 0.;
+
+	bool nothing =
+		// (texture(fluid_tex, uv + vec2(-2, -2) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(-2, -1) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(-2, 0) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(-2, 1) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(-2, 2) / fluid_tex_size) == z) &&
+
+		(texture(fluid_tex, uv + vec2(-1, -2) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(-1, -1) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(-1, 0) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(-1, 1) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(-1, 2) / fluid_tex_size) == z) &&
+
+		(texture(fluid_tex, uv + vec2(0, -2) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(0, -1) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(0, 0) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(0, 1) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(0, 2) / fluid_tex_size) == z) &&
+
+		(texture(fluid_tex, uv + vec2(1, -2) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(1, -1) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(1, 0) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(1, 1) / fluid_tex_size) == z) &&
+		(texture(fluid_tex, uv + vec2(1, 2) / fluid_tex_size) == z);
+
+		// (texture(fluid_tex, uv + vec2(2, -2) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(2, -1) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(2, 0) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(2, 1) / fluid_tex_size) == z) &&
+		// (texture(fluid_tex, uv + vec2(2, 2) / fluid_tex_size) == z);
+
+	if (nothing) {
+		color = z;
+		return;
+	}
+
 	for (float x = -r; x < r+.5; ++x) {
 		for (float y = -r; y < r+.5; ++y) {
 			vec2 o = vec2(x, y);
