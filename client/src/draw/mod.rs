@@ -6,6 +6,11 @@ use crate::prelude::*;
 
 impl App {
 	pub fn draw(&mut self, elapsed_time: Duration, fps: u32, load: f32) {
+		// by putting display at the start, the GPU has the whole frame to do graphics until .display() comes again
+		// this offsets the rendering by one frame though!
+		self.window.display();
+		self.window.clear(Color::BLACK);
+
 		let aspect_ratio = 16.0 / 9.0;
 		let (window_view, view, view_pixel_size) = self.get_views(aspect_ratio);
 
@@ -59,9 +64,6 @@ impl App {
 		);
 		context.draw_text(&self.window, CanvasVec::new(0.0, 1.0 - text_size * 5.0), text_size,
 						  &format!("fluid count: {} / {}", fluid_count_0, fluid_count_1), Origin::LeftTop);
-
-		self.window.display();
-        self.window.clear(Color::BLACK);
 	}
 
 	fn get_views(&self, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, WindowVec) {
