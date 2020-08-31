@@ -37,4 +37,20 @@ impl InputState {
 	pub fn down(&self) -> bool { self.vertical_dir() <= (-DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	pub fn right(&self) -> bool { self.horizontal_dir() >= (DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	pub fn left(&self) -> bool { self.horizontal_dir() <= (-DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
+
+	// returns a value from 0..=1000
+	pub fn diff(&self, other: &InputState) -> u32 {
+		if self.up() != other.up()
+			|| self.right() != other.right()
+			|| self.left() != other.left()
+			|| self.attack1 != other.attack1
+			|| self.attack2 != other.attack2
+			|| self.special1 != other.special1 {
+			return 1000;
+		}
+
+		let game_length = (self.cursor - other.cursor).length();
+		let tile_length = game_length / TILESIZE;
+		(1000 * tile_length / 4).min(1000) as u32
+	}
 }

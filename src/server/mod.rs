@@ -1,16 +1,16 @@
 use crate::prelude::*;
 
-const UPDATE_INTERVAL: u32 = 3;
+// update_desire is within 0..=1000
+const UPDATE_DESIRE_PER_FRAME: u32 = 100;
 
 pub struct Server {
 	world: World,
 	socket: UdpSocket,
 	peers: [SocketAddr; 2],
-	update_counter: u32,
+	update_desire: [u32; 2],
 }
 
 impl Server {
-	#[allow(unused)]
 	pub fn new() -> Server {
 		let mut socket = UdpSocket::bind(("0.0.0.0", PORT)).expect("Could not create server socket");
 		socket.set_nonblocking(true).unwrap();
@@ -21,11 +21,10 @@ impl Server {
 			world: World::new(),
 			socket,
 			peers,
-			update_counter: 0,
+			update_desire: [0, 0],
 		}
 	}
 
-	#[allow(unused)]
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
 		let interval = timed_loop.interval;
@@ -45,20 +44,23 @@ impl Server {
 				if index == -1 {
 					eprintln!("got packet from {}, which is not a known peer", recv_addr);
 				} else {
-					self.world.players[index as usize].input = input_state;
+					let i = index as usize;
+					self.update_desire[1-i] += self.world.players[i].input.diff(&input_state);
+					self.world.players[i].input = input_state;
 				}
 			}
 
 			self.tick();
 
 			// send game update
-			if self.update_counter == 0 {
-				for (i, peer) in self.peers.iter().enumerate() {
+			for i in 0..2 {
+				self.update_desire[i] += UPDATE_DESIRE_PER_FRAME;
+				if self.update_desire[i] >= 1000 {
+					self.update_desire[i] = 0;
 					let update = self.world.update();
-					send_packet_to(&mut self.socket, &update, *peer);
+					send_packet_to(&mut self.socket, &update, self.peers[i]);
 				}
 			}
-			self.update_counter = (self.update_counter + 1) % UPDATE_INTERVAL;
 
 			self.check_restart();
 		}
