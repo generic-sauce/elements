@@ -45,7 +45,9 @@ impl Server {
 					eprintln!("got packet from {}, which is not a known peer", recv_addr);
 				} else {
 					let i = index as usize;
-					self.update_desire[1-i] += self.world.players[i].input.diff(&input_state);
+					let diff = self.world.players[i].input.diff(&input_state);
+					self.update_desire[0] += diff;
+					self.update_desire[1] += diff;
 					self.world.players[i].input = input_state;
 				}
 			}
