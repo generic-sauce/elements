@@ -3,20 +3,20 @@
 #[macro_use]
 extern crate serde_derive;
 
+#[cfg(feature = "client")] mod animation_state;
+#[cfg(feature = "client")] mod client;
+#[cfg(feature = "client")] mod texture_state;
+#[cfg(feature = "client")] mod shader_state;
+#[cfg(feature = "client")] mod font_state;
+#[cfg(feature = "client")] mod draw_context;
+#[cfg(feature = "client")] mod app;
+#[cfg(feature = "client")] mod local;
+#[cfg(feature = "client")] mod draw;
+#[cfg(feature = "client")] mod input;
+#[cfg(feature = "client")] mod window_vec;
+
 #[macro_use]
 mod fps_timer;
-
-mod animation_state;
-mod client;
-mod texture_state;
-mod shader_state;
-mod font_state;
-mod draw_context;
-mod app;
-mod local;
-mod draw;
-mod input;
-mod window_vec;
 
 mod timed_loop;
 mod world;
@@ -30,6 +30,7 @@ mod prelude;
 
 use crate::prelude::*;
 
+#[cfg(feature = "client")]
 fn main() {
 	let server_arg = std::env::args().nth(1);
 	match server_arg.as_ref().map(|s| s.as_str()) {
@@ -37,4 +38,9 @@ fn main() {
 		Some(ip) => Client::new(ip).run(),
 		None => Local::new().run(),
 	}
+}
+
+#[cfg(not(feature = "client"))]
+fn main() {
+	Server::new().run();
 }
