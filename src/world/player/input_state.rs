@@ -51,6 +51,6 @@ impl InputState {
 
 		let game_length = (self.cursor - other.cursor).length();
 		let tile_length = game_length / TILESIZE;
-		(1000 * tile_length / 4).min(1000) as u32
+		(1000 * tile_length).min(1000) as u32
 	}
 }
