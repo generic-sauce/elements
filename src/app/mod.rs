@@ -1,3 +1,6 @@
+mod music;
+
+use music::*;
 use crate::prelude::*;
 
 pub struct App {
@@ -9,6 +12,7 @@ pub struct App {
 	pub font_state: FontState,
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
+	pub music_sender: Sender<MusicCommand>,
 }
 
 impl App {
@@ -22,6 +26,10 @@ impl App {
 		let world = World::new();
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 
+		let (music_sender, music_receiver) = channel();
+
+		thread::spawn(move || Musician::new(music_receiver).run() );
+
 		App {
 			window,
 			world,
@@ -31,6 +39,7 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			gilrs,
+			music_sender,
 		}
 	}
 
@@ -51,6 +60,11 @@ impl App {
 	pub fn tick(&mut self) {
 		let cmds = self.world.tick();
 		self.apply_commands(cmds);
+	}
+
+	#[allow(unused)]
+	pub fn send_music_command(&mut self, c: MusicCommand) {
+		self.music_sender.send(c).unwrap();
 	}
 }
 
