@@ -37,6 +37,7 @@ macro_rules! setup {
 		}
 
 		impl AnimationId {
+			#[allow(unused)]
 			pub fn iter() -> impl Iterator<Item=AnimationId> {
 				[$(AnimationId::$id),*].iter().cloned()
 			}

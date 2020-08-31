@@ -175,6 +175,7 @@ impl<T: Copy, P> Vec2t<T, P> where T: Add<Output=T> + Mul<Output=T> {
 }
 
 impl<T, P> Vec2t<T, P> where T: Copy + Ord + Mul<T, Output=T> + Add<T, Output=T> + Div<T, Output=T> + num_traits::cast::NumCast + Default {
+	#[allow(unused)]
 	pub fn clamped(self, min: T, max: T) -> Vec2t<T, P> {
 		Vec2t::new(
 			if self.x < min { min } else if self.x > max { max } else { self.x },
