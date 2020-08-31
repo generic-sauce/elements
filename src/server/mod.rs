@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 // update_desire is within 0..=1000
-const UPDATE_DESIRE_PER_FRAME: u32 = 100;
+const UPDATE_DESIRE_PER_FRAME: u32 = 350;
 
 pub struct Server {
 	world: World,
