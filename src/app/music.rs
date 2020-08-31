@@ -23,7 +23,7 @@ impl Musician {
 		}
 	}
 
-	pub fn apply_command(&mut self, c: MusicCommand) {
+	fn apply_command(&mut self, c: MusicCommand) {
 		match c { }
 	}
 }
