@@ -1,5 +1,5 @@
 [package]
-name = "elements2client"
+name = "elements2"
 version = "0.1.0"
 authors = ["Bluemi <bruno.schilling@protonmail.ch>", "memoryleak47 <memoryleak47@protonmail.ch>"]
 edition = "2018"
@@ -7,9 +7,16 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-elements2lib = { path = "../lib" }
 sfml = "0.15"
 gilrs = "0.7.2"
+image = "0.23"
+itertools = "0.9"
+num-traits = "0.2"
+rand = "0.7"
+rand_xorshift = "0.2"
+serde = "1.0"
+serde_derive = "1.0"
+bincode = "1.3"
 
 [profile.release]
 debug = true

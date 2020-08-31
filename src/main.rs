@@ -1,17 +1,32 @@
 #![feature(drain_filter)]
 
+#[macro_use]
+extern crate serde_derive;
+
+#[macro_use]
+mod fps_timer;
+
 mod animation_state;
 mod client;
 mod texture_state;
 mod shader_state;
 mod font_state;
-mod prelude;
 mod draw_context;
 mod app;
 mod local;
 mod draw;
 mod input;
 mod window_vec;
+
+mod timed_loop;
+mod world;
+mod vec;
+mod server;
+mod net;
+mod animation;
+mod resource;
+
+mod prelude;
 
 use crate::prelude::*;
 

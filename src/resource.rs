@@ -17,7 +17,6 @@ fn res_dir() -> PathBuf {
 	p.pop();
 	p.pop();
 	p.pop();
-	p.push("..");
 	p.push("res");
 	p
 
