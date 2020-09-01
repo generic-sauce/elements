@@ -5,25 +5,25 @@ pub enum MusicCommand {
 	PlayMusic(MusicId),
 }
 
-struct Sample {
+struct Sound {
 	channels: u16,
 	sample_rate: u32,
 	data: Vec<f32>,
 }
 
 lazy_static! {
-	static ref PARTS: Vec<Sample> = load_samples();
+	static ref SOUNDS: Vec<Sound> = load_samples();
 }
 
-fn load_samples() -> Vec<Sample> {
-	let mut parts: Vec<Sample> = Vec::new();
+fn load_samples() -> Vec<Sound> {
+	let mut parts: Vec<Sound> = Vec::new();
 	for music_id in MusicId::iter() {
 		let file = File::open(res(music_id.filename())).unwrap();
 		let source = Decoder::new(BufReader::new(file)).unwrap();
 		let channels = source.channels();
 		let sample_rate = source.sample_rate();
 		let data = source.convert_samples().collect();
-		let sample = Sample {
+		let sample = Sound {
 			channels,
 			sample_rate,
 			data,
@@ -32,6 +32,16 @@ fn load_samples() -> Vec<Sample> {
 	}
 	parts
 }
+
+fn get_sample_buffer(sound_id: MusicId) -> static_buffer::StaticSamplesBuffer<f32> {
+	let sample = &SOUNDS[sound_id as usize];
+	static_buffer::StaticSamplesBuffer::new(
+		sample.channels,
+		sample.sample_rate,
+		&sample.data[..],
+	)
+}
+
 
 pub struct Musician {
 	receiver: Receiver<MusicCommand>,
@@ -60,13 +70,7 @@ impl Musician {
 	fn apply_command(&mut self, command: MusicCommand) {
 		match command {
 			MusicCommand::PlayMusic(sound_id) => {
-				let sample = &PARTS[sound_id as usize];
-				let sample_buffer = static_buffer::StaticSamplesBuffer::new(
-					sample.channels,
-					sample.sample_rate,
-					&sample.data[..],
-				);
-				play_raw(&self.device, sample_buffer);
+				play_raw(&self.device, get_sample_buffer(sound_id));
 			},
 		}
 	}
