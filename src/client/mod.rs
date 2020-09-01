@@ -41,7 +41,7 @@ impl Client {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
 						self.app.window.close();
-						return;
+						std::process::exit(0);
 					}
 					_ => {},
 				}
@@ -67,7 +67,7 @@ impl Client {
 			self.app.draw(elapsed_time, fps, load);
 
 			if !self.app.window.is_open() {
-				break;
+				std::process::exit(0);
 			}
 		}
 	}

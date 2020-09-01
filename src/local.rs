@@ -24,7 +24,7 @@ impl Local {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
 						self.app.window.close();
-						return;
+						std::process::exit(0);
 					}
 					_ => {},
 				}
@@ -48,7 +48,7 @@ impl Local {
 			self.check_restart();
 
 			if !self.app.window.is_open() {
-				break;
+				std::process::exit(0);
 			}
 		}
 	}
