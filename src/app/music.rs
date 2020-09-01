@@ -1,29 +1,41 @@
 use crate::prelude::*;
-use rodio::Source;
-use std::io::Read;
+use rodio::*;
 
 pub enum MusicCommand {
 	PlayMusic(MusicId),
 }
 
-lazy_static! {
-	static ref PARTS: Vec<Vec<u8>> = load_samples();
+struct Sample {
+	channels: u16,
+	sample_rate: u32,
+	data: Vec<f32>,
 }
 
-fn load_samples() -> Vec<Vec<u8>> {
-	let mut parts: Vec<Vec<u8>> = Vec::new();
+lazy_static! {
+	static ref PARTS: Vec<Sample> = load_samples();
+}
+
+fn load_samples() -> Vec<Sample> {
+	let mut parts: Vec<Sample> = Vec::new();
 	for music_id in MusicId::iter() {
-		let mut file = File::open(res(music_id.filename())).unwrap();
-		let mut vec = Vec::new();
-		file.read_to_end(&mut vec).unwrap();
-		parts.push(vec);
+		let file = File::open(res(music_id.filename())).unwrap();
+		let source = Decoder::new(BufReader::new(file)).unwrap();
+		let channels = source.channels();
+		let sample_rate = source.sample_rate();
+		let data = source.convert_samples().collect();
+		let sample = Sample {
+			channels,
+			sample_rate,
+			data,
+		};
+		parts.push(sample);
 	}
 	parts
 }
 
 pub struct Musician {
 	receiver: Receiver<MusicCommand>,
-	device: rodio::Device,
+	device: Device,
 }
 
 
@@ -31,10 +43,9 @@ impl Musician {
 	pub fn new(receiver: Receiver<MusicCommand>) -> Musician {
 		Musician {
 			receiver,
-			device: rodio::default_output_device().unwrap(),
+			device: default_output_device().unwrap(),
 		}
 	}
-
 
 	pub fn run(&mut self) {
 		for _ in TimedLoop::with_fps(10) {
@@ -49,9 +60,13 @@ impl Musician {
 	fn apply_command(&mut self, command: MusicCommand) {
 		match command {
 			MusicCommand::PlayMusic(sound_id) => {
-				let file = std::io::Cursor::new(&PARTS[sound_id as usize][..]);
-				let source = rodio::Decoder::new(file).unwrap();
-				rodio::play_raw(&self.device, source.convert_samples());
+				let sample = &PARTS[sound_id as usize];
+				let sample_buffer = static_buffer::StaticSamplesBuffer::new(
+					sample.channels,
+					sample.sample_rate,
+					&sample.data[..],
+				);
+				play_raw(&self.device, sample_buffer);
 			},
 		}
 	}
