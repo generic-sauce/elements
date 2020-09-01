@@ -34,6 +34,7 @@ impl Client {
 	}
 
 	pub fn run(&mut self) {
+		self.app.send_music_command(MusicCommand::PlayMusic(MusicId::APart));
 		let timed_loop = TimedLoop::with_fps(60);
 		let interval = timed_loop.interval;
 		for (elapsed_time, delta_time, fps, load) in timed_loop {

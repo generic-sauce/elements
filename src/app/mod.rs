@@ -1,6 +1,6 @@
 mod music;
 
-use music::*;
+pub use music::*;
 use crate::prelude::*;
 
 pub struct App {
