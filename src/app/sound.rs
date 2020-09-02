@@ -72,7 +72,7 @@ pub struct SoundManager {
 
 impl SoundManager {
 	pub fn new(receiver: Receiver<SoundCommand>) -> SoundManager {
-		let device = default_output_device().unwrap();
+		let device = get_device();
 		let music_sink = Sink::new(&device);
 		SoundManager {
 			receiver,
@@ -173,6 +173,14 @@ macro_rules! setup {
 			}
 		}
 	};
+}
+
+// this is a fallback for the case that default_output_device().default_output_format() is Err
+fn get_device() -> Device {
+	default_output_device().into_iter()
+		.chain(devices().into_iter().flatten())
+		.find(|d| d.default_output_format().is_ok())
+		.expect("no output device found!")
 }
 
 setup!(
