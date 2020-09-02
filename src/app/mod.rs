@@ -12,8 +12,8 @@ pub struct App {
 	pub font_state: FontState,
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
-	pub sound_sender: Sender<SoundCommand>,
 	pub current_sound_id: SoundId,
+	pub sound_manager: SoundManager,
 }
 
 impl App {
@@ -27,10 +27,6 @@ impl App {
 		let world = World::new();
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 
-		let (sound_sender, sound_receiver) = channel();
-
-		thread::spawn(move || SoundManager::new(sound_receiver).run() );
-
 		App {
 			window,
 			world,
@@ -40,8 +36,8 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			gilrs,
-			sound_sender,
 			current_sound_id: SoundId::APart,
+			sound_manager: SoundManager::new(),
 		}
 	}
 
@@ -59,6 +55,7 @@ impl App {
 		self.world.tick(&mut handler);
 		self.handle(&handler);
 		self.update_music();
+		self.sound_manager.tick();
 	}
 
 	pub fn update_music(&mut self) {
@@ -77,7 +74,7 @@ impl App {
 
 	#[allow(unused)]
 	pub fn send_sound_command(&mut self, c: SoundCommand) {
-		self.sound_sender.send(c).unwrap();
+		self.sound_manager.apply_command(c);
 	}
 }
 

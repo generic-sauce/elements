@@ -1,7 +1,6 @@
 use crate::prelude::*;
 use rodio::*;
 
-const SOUND_FPS: u32 = 10;
 const START_MUSIC_OFFSET: Duration = Duration::from_micros(200);
 const NUM_PARTS: usize = 4;
 
@@ -60,7 +59,6 @@ fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f3
 }
 
 pub struct SoundManager {
-	receiver: Receiver<SoundCommand>,
 	device: Device,
 	music_sink: Sink,
 	current_music_id: Option<SoundId>,
@@ -71,11 +69,10 @@ pub struct SoundManager {
 
 
 impl SoundManager {
-	pub fn new(receiver: Receiver<SoundCommand>) -> SoundManager {
+	pub fn new() -> SoundManager {
 		let device = default_output_device().unwrap();
 		let music_sink = Sink::new(&device);
 		SoundManager {
-			receiver,
 			device,
 			music_sink,
 			current_music_id: None,
@@ -85,17 +82,9 @@ impl SoundManager {
 		}
 	}
 
-	pub fn run(&mut self) {
-		for _ in TimedLoop::with_fps(SOUND_FPS) {
-			match self.receiver.try_recv() {
-				Ok(c) => self.apply_command(c),
-				Err(TryRecvError::Disconnected) => panic!("sound manager is disconnected!"),
-				Err(TryRecvError::Empty) => {},
-			}
-
-			self.check_start_music();
-			self.check_restart_music();
-		}
+	pub fn tick(&mut self) {
+		self.check_start_music();
+		self.check_restart_music();
 	}
 
 	fn play_music(&mut self, music_id: SoundId) {
@@ -126,7 +115,7 @@ impl SoundManager {
 		}
 	}
 
-	fn apply_command(&mut self, command: SoundCommand) {
+	pub fn apply_command(&mut self, command: SoundCommand) {
 		match command {
 			SoundCommand::PlayMusic(music_id) => {
 				self.next_music_id = Some(music_id);
