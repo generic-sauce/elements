@@ -49,8 +49,9 @@ impl Client {
 			}
 
 			if let Some((update, _)) = recv_packet::<WorldUpdate>(&mut self.socket) {
-				let cmds = self.app.world.apply_update(update);
-				self.app.apply_commands(cmds);
+				let mut handler = AppEventHandler::new();
+				self.app.world.apply_update(update, &mut handler);
+				self.app.handle(&handler);
 			}
 
 			// process gilrs events

@@ -45,15 +45,13 @@ impl TileMap {
 		}
 	}
 
-	#[must_use]
-	pub fn reset(&mut self) -> Vec<Command> {
+	pub fn reset(&mut self, handler: &mut impl EventHandler) {
 		for x in &mut self.tiles {
 			if let Tile::Wall { .. } = x {
 				*x = Tile::Void;
+				handler.tilemap_changed();
 			}
 		}
-
-		vec![Command::UpdateTileMapTexture]
 	}
 
 	#[allow(unused)]

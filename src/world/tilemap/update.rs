@@ -31,8 +31,7 @@ impl TileMap {
 		}
 	}
 
-	#[must_use]
-	pub fn apply_update(&mut self, u: TileMapUpdate) -> Vec<Command> {
+	pub fn apply_update(&mut self, u: TileMapUpdate, handler: &mut impl EventHandler) {
 		for x in &mut self.tiles {
 			if let Tile::Wall { .. } = x {
 				*x = Tile::Void;
@@ -41,6 +40,6 @@ impl TileMap {
 		for x in u.walls {
 			*self.get_mut(x.position) = Tile::Wall { remaining_lifetime: x.remaining_lifetime, owner: x.owner};
 		}
-		vec![Command::UpdateTileMapTexture]
+		handler.tilemap_changed();
 	}
 }

@@ -5,16 +5,13 @@ mod wall;
 pub const GRAB_COOLDOWN: u32 = 10;
 
 impl World {
-	#[must_use]
-	pub(in super) fn handle_skills(&mut self) -> Vec<Command> {
-		let mut cmds = Vec::new();
+	pub(in super) fn handle_skills(&mut self, handler: &mut impl EventHandler) {
 		for p in 0..2 {
 			if self.players[p].input.attack1 { self.handle_throw(p); }
 			if self.players[p].input.attack2 { self.handle_throw3(p); }
-			if self.players[p].input.special1 { cmds.extend(self.handle_wall(p)); }
+			if self.players[p].input.special1 { self.handle_wall(p, handler); }
 			else { self.stop_wall(p); }
 		}
-		cmds
 	}
 
 	fn handle_throw(&mut self, p: usize) {

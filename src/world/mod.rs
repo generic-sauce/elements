@@ -3,16 +3,12 @@ pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
 mod update;
+mod event;
 
 pub use update::*;
+pub use event::*;
 
 use crate::prelude::*;
-
-#[must_use]
-pub enum Command {
-	UpdateTileMapTexture,
-	PlayerDamage { damage: i32, player_id: usize },
-}
 
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
 
@@ -33,14 +29,11 @@ fn new_players() -> [Player; 2] {
 }
 
 impl World {
-	#[must_use]
-	pub fn reset(&mut self) -> Vec<Command> {
+	pub fn reset(&mut self, handler: &mut impl EventHandler) {
 		self.players = new_players();
-		let cmds = self.tilemap.reset();
+		self.tilemap.reset(handler);
 		self.fluidmap = FluidMap::new(self.tilemap.size);
 		self.frame_id = 0;
-
-		cmds
 	}
 
 	pub fn new() -> World {
@@ -55,21 +48,16 @@ impl World {
 		}
 	}
 
-	#[must_use]
-	pub fn tick(&mut self) -> Vec<Command> {
-		let mut cmds = Vec::new();
-
+	pub fn tick(&mut self, handler: &mut impl EventHandler) {
 		// sub-tick
 		self.tick_fluidmap();
 		self.tick_players();
-		cmds.extend(self.handle_skills());
+		self.handle_skills(handler);
 		self.spawn_fluids();
 		self.despawn_fluids();
-		cmds.extend(self.despawn_walls());
-		cmds.extend(self.check_damage());
+		self.despawn_walls(handler);
+		self.check_damage(handler);
 		self.frame_id += 1;
-
-		cmds
 	}
 
 	fn tick_players(&mut self) {
@@ -120,26 +108,17 @@ impl World {
 		}
 	}
 
-	#[must_use]
-	fn despawn_walls(&mut self) -> Vec<Command> {
-		let mut changed = false;
+	fn despawn_walls(&mut self, handler: &mut impl EventHandler) {
 		for tile in self.tilemap.tiles.iter_mut() {
 			if let Tile::Wall { remaining_lifetime, owner } = tile {
 				*tile = remaining_lifetime.checked_sub(1)
 					.map(|lifetime| Tile::Wall { remaining_lifetime: lifetime, owner: *owner })
-					.unwrap_or_else(|| { changed = true; Tile::Void });
+					.unwrap_or_else(|| { handler.tilemap_changed(); Tile::Void });
 			}
-		}
-
-		if changed {
-			vec![Command::UpdateTileMapTexture]
-		} else {
-			Vec::new()
 		}
 	}
 
-	fn check_damage(&mut self) -> Vec<Command> {
-		let mut cmds = Vec::new();
+	fn check_damage(&mut self, handler: &mut impl EventHandler) {
 		for i in 0..2 {
 			let player = &mut self.players[i];
 			let mut dmg = 0;
@@ -151,13 +130,13 @@ impl World {
 			}
 			if dmg > 0 {
 				player.damage(dmg);
-				cmds.push( Command::PlayerDamage { damage: dmg, player_id: i });
+				handler.damage_inflicted(dmg, i);
 			}
 		}
-		cmds
 	}
 
 	pub fn player_dead(&self) -> Option<usize> {
+		// TODO @Bluemi, this can be simplified! :p
 		if let Some(p) = (0..2).find(|&p| self.players[p].health == 0) {
 			return Some(p);
 		}

@@ -45,30 +45,19 @@ impl App {
 		}
 	}
 
-	fn apply_command(&mut self, c: Command) {
-		let mut player_damaged = false;
-		match c {
-			Command::UpdateTileMapTexture => {
-				self.tilemap_texture = create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
-			},
-			Command::PlayerDamage { .. } => {
-				player_damaged = true;
-			}
+	pub fn handle(&mut self, handler: &AppEventHandler) {
+		if handler.tilemap_changed {
+			self.tilemap_texture = create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
 		}
-		if player_damaged {
+		if (0..2).any(|p| handler.damages[p] > 0) {
 			self.send_sound_command(SoundCommand::PlaySound(SoundId::Whiz));
 		}
 	}
 
-	pub fn apply_commands(&mut self, v: Vec<Command>) {
-		for x in v {
-			self.apply_command(x);
-		}
-	}
-
 	pub fn tick(&mut self) {
-		let cmds = self.world.tick();
-		self.apply_commands(cmds);
+		let mut handler = AppEventHandler::new();
+		self.world.tick(&mut handler);
+		self.handle(&handler);
 		self.update_music();
 	}
 

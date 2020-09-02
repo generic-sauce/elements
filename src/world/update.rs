@@ -20,15 +20,12 @@ impl World {
 		}
 	}
 
-	#[must_use]
 	#[allow(unused)]
-	pub fn apply_update(&mut self, u: WorldUpdate) -> Vec<Command> {
+	pub fn apply_update(&mut self, u: WorldUpdate, handler: &mut impl EventHandler) {
 		self.players = u.players;
-		let cmds = self.tilemap.apply_update(u.tilemap_update);
+		self.tilemap.apply_update(u.tilemap_update, handler);
 		self.fluidmap.apply_update(u.fluidmap_update);
 		self.frame_id = u.frame_id;
 		self.kills = u.kills;
-
-		cmds
 	}
 }

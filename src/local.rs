@@ -57,8 +57,9 @@ impl Local {
 	fn check_restart(&mut self) {
 		if let Some(p) = self.app.world.player_dead() {
 			self.app.world.kills[1-p] += 1;
-			let cmds = self.app.world.reset();
-			self.app.apply_commands(cmds);
+			let mut handler = AppEventHandler::new();
+			self.app.world.reset(&mut handler);
+			self.app.handle(&handler);
 		}
 	}
 }
