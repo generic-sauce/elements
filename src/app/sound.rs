@@ -2,7 +2,8 @@ use crate::prelude::*;
 use rodio::*;
 
 const SOUND_FPS: u32 = 10;
-const START_MUSIC_OFFSET: Duration = Duration::from_micros(100);
+const START_MUSIC_OFFSET: Duration = Duration::from_micros(200);
+const NUM_PARTS: usize = 4;
 
 pub enum SoundCommand {
 	PlayMusic(SoundId),
@@ -36,17 +37,17 @@ fn load_samples() -> Vec<Sound> {
 	parts
 }
 
-/*
 fn get_part_sample_buffer(sound_id: SoundId, part: u8) -> static_buffer::StaticSamplesBuffer<f32> {
+	let part = part as usize;
 	let sample = &SOUNDS[sound_id as usize];
-	let num_samples = sample.data.len();
+	let part_size = sample.data.len() / NUM_PARTS;
+
 	static_buffer::StaticSamplesBuffer::new(
 		sample.channels,
 		sample.sample_rate,
-		&sample.data[part*num_samples/2..(part+1)*num_samples/2]
+		&sample.data[part*part_size..(part+1)*part_size]
 	)
 }
- */
 
 fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f32> {
 	let sample = &SOUNDS[sound_id as usize];
@@ -57,14 +58,13 @@ fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f3
 	)
 }
 
-
 pub struct SoundManager {
 	receiver: Receiver<SoundCommand>,
 	device: Device,
 	music_sink: Sink,
 	current_music_id: Option<SoundId>,
 	next_music_id: Option<SoundId>,
-	// next_part: u8,
+	next_part: u8,
 	next_music_refresh_time: Instant,
 }
 
@@ -79,7 +79,7 @@ impl SoundManager {
 			music_sink,
 			current_music_id: None,
 			next_music_id: None,
-			// next_part: 0,
+			next_part: 0,
 			next_music_refresh_time: Instant::now(),
 		}
 	}
@@ -98,11 +98,12 @@ impl SoundManager {
 	}
 
 	fn play_music(&mut self, music_id: SoundId) {
-		let sample = get_sample_buffer(music_id);
+		let sample = get_part_sample_buffer(music_id, self.next_part);
 		let sample_duration = sample.total_duration().unwrap();
 		self.music_sink.append(sample);
 		self.current_music_id = Some(music_id);
 		self.next_music_refresh_time = self.next_music_refresh_time + sample_duration;
+		self.next_part = (self.next_part + 1) % NUM_PARTS as u8;
 	}
 
 	fn check_start_music(&mut self) {
