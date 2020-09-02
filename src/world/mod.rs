@@ -136,10 +136,6 @@ impl World {
 	}
 
 	pub fn player_dead(&self) -> Option<usize> {
-		// TODO @Bluemi, this can be simplified! :p
-		if let Some(p) = (0..2).find(|&p| self.players[p].health == 0) {
-			return Some(p);
-		}
-		None
+		(0..2).find(|&p| self.players[p].health == 0)
 	}
 }
