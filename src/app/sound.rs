@@ -103,7 +103,7 @@ impl SoundManager {
 		let sample_duration = sample.total_duration().unwrap();
 		self.music_sink.append(sample);
 		self.current_music_id = Some(music_id);
-		self.next_music_refresh_time = self.next_music_refresh_time + sample_duration;
+		self.next_music_refresh_time += sample_duration;
 		self.next_part = (self.next_part + 1) % NUM_PARTS as u8;
 	}
 

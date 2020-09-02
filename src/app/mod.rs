@@ -51,7 +51,7 @@ impl App {
 			Command::UpdateTileMapTexture => {
 				self.tilemap_texture = create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
 			},
-			Command::PlayerDamage { damage, player_id } => {
+			Command::PlayerDamage { .. } => {
 				player_damaged = true;
 			}
 		}
