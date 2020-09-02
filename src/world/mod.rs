@@ -11,6 +11,7 @@ use crate::prelude::*;
 #[must_use]
 pub enum Command {
 	UpdateTileMapTexture,
+	PlayerDamage { damage: i32, player_id: usize },
 }
 
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
@@ -65,7 +66,7 @@ impl World {
 		self.spawn_fluids();
 		self.despawn_fluids();
 		cmds.extend(self.despawn_walls());
-		self.check_damage();
+		cmds.extend(self.check_damage());
 		self.frame_id += 1;
 
 		cmds
@@ -137,7 +138,8 @@ impl World {
 		}
 	}
 
-	fn check_damage(&mut self) {
+	fn check_damage(&mut self) -> Vec<Command> {
+		let mut cmds = Vec::new();
 		for i in 0..2 {
 			let player = &mut self.players[i];
 			let mut dmg = 0;
@@ -147,8 +149,12 @@ impl World {
 				).map(|f| f.damage())
 				.sum::<i32>();
 			}
-			if dmg > 0 { player.damage(dmg); }
+			if dmg > 0 {
+				player.damage(dmg);
+				cmds.push( Command::PlayerDamage { damage: dmg, player_id: i });
+			}
 		}
+		cmds
 	}
 
 	pub fn player_dead(&self) -> Option<usize> {

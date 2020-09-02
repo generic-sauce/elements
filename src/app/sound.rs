@@ -7,6 +7,7 @@ const NUM_PARTS: usize = 4;
 
 pub enum SoundCommand {
 	PlayMusic(SoundId),
+	PlaySound(SoundId),
 }
 
 struct Sound {
@@ -130,6 +131,9 @@ impl SoundManager {
 			SoundCommand::PlayMusic(music_id) => {
 				self.next_music_id = Some(music_id);
 			},
+			SoundCommand::PlaySound(sound_id) => {
+				play_raw(&self.device, get_sample_buffer(sound_id));
+			}
 		}
 	}
 }
@@ -176,4 +180,5 @@ setup!(
 	BPart: "audio/b_part.wav",
 	CPart: "audio/c_part.wav",
 	DPart: "audio/d_part.wav",
+	Whiz: "audio/whiz.wav",
 );

@@ -46,10 +46,17 @@ impl App {
 	}
 
 	fn apply_command(&mut self, c: Command) {
+		let mut player_damaged = false;
 		match c {
 			Command::UpdateTileMapTexture => {
 				self.tilemap_texture = create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
 			},
+			Command::PlayerDamage { damage, player_id } => {
+				player_damaged = true;
+			}
+		}
+		if player_damaged {
+			self.send_sound_command(SoundCommand::PlaySound(SoundId::Whiz));
 		}
 	}
 
