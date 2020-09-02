@@ -1,6 +1,6 @@
-mod music;
+mod sound;
 
-pub use music::*;
+pub use sound::*;
 use crate::prelude::*;
 
 pub struct App {
@@ -12,7 +12,8 @@ pub struct App {
 	pub font_state: FontState,
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
-	pub music_sender: Sender<MusicCommand>,
+	pub sound_sender: Sender<SoundCommand>,
+	pub current_sound_id: SoundId,
 }
 
 impl App {
@@ -26,9 +27,9 @@ impl App {
 		let world = World::new();
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 
-		let (music_sender, music_receiver) = channel();
+		let (sound_sender, sound_receiver) = channel();
 
-		thread::spawn(move || Musician::new(music_receiver).run() );
+		thread::spawn(move || SoundManager::new(sound_receiver).run() );
 
 		App {
 			window,
@@ -39,7 +40,8 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			gilrs,
-			music_sender,
+			sound_sender,
+			current_sound_id: SoundId::APart,
 		}
 	}
 
@@ -60,11 +62,26 @@ impl App {
 	pub fn tick(&mut self) {
 		let cmds = self.world.tick();
 		self.apply_commands(cmds);
+		self.update_music();
+	}
+
+	pub fn update_music(&mut self) {
+		let mut critical_level = 0;
+		for player in &self.world.players {
+			if player.health < MAX_HEALTH / 2 {
+				critical_level += 1;
+			}
+		}
+		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
+		if sound_id != self.current_sound_id {
+			self.send_sound_command(SoundCommand::PlayMusic(sound_id));
+			self.current_sound_id = sound_id;
+		}
 	}
 
 	#[allow(unused)]
-	pub fn send_music_command(&mut self, c: MusicCommand) {
-		self.music_sender.send(c).unwrap();
+	pub fn send_sound_command(&mut self, c: SoundCommand) {
+		self.sound_sender.send(c).unwrap();
 	}
 }
 
