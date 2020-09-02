@@ -3,6 +3,7 @@ use rodio::*;
 
 const START_MUSIC_OFFSET: Duration = Duration::from_micros(200);
 const NUM_PARTS: usize = 4;
+const WHIZ_VOLUME: f32 = 0.1;
 
 pub enum SoundCommand {
 	PlayMusic(SoundId),
@@ -121,7 +122,7 @@ impl SoundManager {
 				self.next_music_id = Some(music_id);
 			},
 			SoundCommand::PlaySound(sound_id) => {
-				play_raw(&self.device, get_sample_buffer(sound_id));
+				play_raw(&self.device, get_sample_buffer(sound_id).amplify(WHIZ_VOLUME));
 			}
 		}
 	}
