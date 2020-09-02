@@ -2,7 +2,7 @@ use crate::prelude::*;
 use rodio::*;
 
 const SOUND_FPS: u32 = 10;
-const MUSIC_DURATION: u32 = 16 * SOUND_FPS;
+const START_MUSIC_OFFSET: Duration = Duration::from_micros(100);
 
 pub enum SoundCommand {
 	PlayMusic(SoundId),
@@ -36,6 +36,18 @@ fn load_samples() -> Vec<Sound> {
 	parts
 }
 
+/*
+fn get_part_sample_buffer(sound_id: SoundId, part: u8) -> static_buffer::StaticSamplesBuffer<f32> {
+	let sample = &SOUNDS[sound_id as usize];
+	let num_samples = sample.data.len();
+	static_buffer::StaticSamplesBuffer::new(
+		sample.channels,
+		sample.sample_rate,
+		&sample.data[part*num_samples/2..(part+1)*num_samples/2]
+	)
+}
+ */
+
 fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f32> {
 	let sample = &SOUNDS[sound_id as usize];
 	static_buffer::StaticSamplesBuffer::new(
@@ -52,7 +64,8 @@ pub struct SoundManager {
 	music_sink: Sink,
 	current_music_id: Option<SoundId>,
 	next_music_id: Option<SoundId>,
-	music_counter: u32,
+	// next_part: u8,
+	next_music_refresh_time: Instant,
 }
 
 
@@ -66,7 +79,8 @@ impl SoundManager {
 			music_sink,
 			current_music_id: None,
 			next_music_id: None,
-			music_counter: 0,
+			// next_part: 0,
+			next_music_refresh_time: Instant::now(),
 		}
 	}
 
@@ -83,33 +97,36 @@ impl SoundManager {
 		}
 	}
 
+	fn play_music(&mut self, music_id: SoundId) {
+		let sample = get_sample_buffer(music_id);
+		let sample_duration = sample.total_duration().unwrap();
+		self.music_sink.append(sample);
+		self.current_music_id = Some(music_id);
+		self.next_music_refresh_time = self.next_music_refresh_time + sample_duration;
+	}
+
 	fn check_start_music(&mut self) {
 		if self.current_music_id.is_none() {
 			if let Some(next_music_id) = self.next_music_id {
-				self.music_sink.append(get_sample_buffer(next_music_id));
-				self.current_music_id = Some(next_music_id);
-				self.music_counter = 0;
+				self.next_music_refresh_time = Instant::now();
+				self.play_music(next_music_id);
 			}
 		}
 	}
 
 	fn check_restart_music(&mut self) {
-		if let Some(next_music_id) = self.next_music_id {
-			if self.music_counter == MUSIC_DURATION {
-				if self.music_sink.len() <= 1 {
-					self.music_sink.append(get_sample_buffer(next_music_id));
-					self.current_music_id = Some(next_music_id);
-				}
-				self.music_counter = 0;
+		let should_refresh = self.next_music_refresh_time.saturating_duration_since(Instant::now()) < START_MUSIC_OFFSET;
+		if should_refresh {
+			if let Some(next_music_id) = self.next_music_id {
+				assert_eq!(self.music_sink.len(), 1);
+				self.play_music(next_music_id);
 			}
-			self.music_counter += 1;
 		}
 	}
 
 	fn apply_command(&mut self, command: SoundCommand) {
 		match command {
 			SoundCommand::PlayMusic(music_id) => {
-				println!("next music: {}", music_id);
 				self.next_music_id = Some(music_id);
 			},
 		}
