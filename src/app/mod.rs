@@ -43,8 +43,11 @@ impl App {
 		if handler.tilemap_changed {
 			self.tilemap_texture = create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
 		}
-		if (0..2).any(|p| handler.damages[p] > 0) {
-			self.sound_manager.play_sound(SoundId::Whiz, 1.0);
+		if let Some(dmg) = (0..2).map(|p| handler.damages[p]).max() {
+			if dmg > 0 {
+				let volume = (dmg as f32 / 100.0).max(0.5).min(2.0);
+				self.sound_manager.play_sound(SoundId::Whiz, volume);
+			}
 		}
 	}
 
