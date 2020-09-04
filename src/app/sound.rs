@@ -5,11 +5,6 @@ const START_MUSIC_OFFSET: Duration = Duration::from_micros(200);
 const NUM_PARTS: usize = 4;
 const WHIZ_VOLUME: f32 = 0.1;
 
-pub enum SoundCommand {
-	PlayMusic(SoundId),
-	PlaySound(SoundId),
-}
-
 struct Sound {
 	channels: u16,
 	sample_rate: u32,
@@ -62,9 +57,9 @@ fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f3
 pub struct SoundManager {
 	device: Device,
 	music_sink: Sink,
-	current_music_id: Option<SoundId>,
-	next_music_id: Option<SoundId>,
-	next_part: u8,
+	pub current_music_id: Option<SoundId>,
+	pub next_music_id: Option<SoundId>,
+	pub next_part: u8,
 	next_music_refresh_time: Instant,
 }
 
@@ -89,7 +84,7 @@ impl SoundManager {
 		self.check_restart_music();
 	}
 
-	fn play_music(&mut self, music_id: SoundId) {
+	fn start_music_sample(&mut self, music_id: SoundId) {
 		let sample = get_part_sample_buffer(music_id, self.next_part);
 		let sample_duration = sample.total_duration().unwrap();
 		self.music_sink.append(sample);
@@ -102,7 +97,7 @@ impl SoundManager {
 		if self.current_music_id.is_none() {
 			if let Some(next_music_id) = self.next_music_id {
 				self.next_music_refresh_time = Instant::now();
-				self.play_music(next_music_id);
+				self.start_music_sample(next_music_id);
 			}
 		}
 	}
@@ -112,20 +107,17 @@ impl SoundManager {
 		if should_refresh {
 			if let Some(next_music_id) = self.next_music_id {
 				assert_eq!(self.music_sink.len(), 1);
-				self.play_music(next_music_id);
+				self.start_music_sample(next_music_id);
 			}
 		}
 	}
 
-	pub fn apply_command(&mut self, command: SoundCommand) {
-		match command {
-			SoundCommand::PlayMusic(music_id) => {
-				self.next_music_id = Some(music_id);
-			},
-			SoundCommand::PlaySound(sound_id) => {
-				play_raw(&self.device, get_sample_buffer(sound_id).amplify(WHIZ_VOLUME));
-			}
-		}
+	pub fn play_music(&mut self, music_id: SoundId) {
+		self.next_music_id = Some(music_id);
+	}
+
+	pub fn play_sound(&mut self, sound_id: SoundId, volume: f32) {
+		play_raw(&self.device, get_sample_buffer(sound_id).amplify(WHIZ_VOLUME * volume));
 	}
 }
 

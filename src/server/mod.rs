@@ -35,21 +35,14 @@ impl Server {
 
 			// receive packets
 			while let Some((input_state, recv_addr)) = recv_packet(&mut self.socket) {
-				let mut index: i32 = -1;
-				for i in 0i32..2i32 {
-					if recv_addr == self.peers[i as usize] {
-						index = i;
-					}
-				}
-				if index == -1 {
-					eprintln!("got packet from {}, which is not a known peer", recv_addr);
-				} else {
-					let i = index as usize;
-					let diff = self.world.players[i].input.diff(&input_state);
+				if let Some(index) = (0..2).find(|&i| recv_addr == self.peers[i]) {
+					let diff = self.world.players[index].input.diff(&input_state);
 					self.update_desire[0] += diff;
 					self.update_desire[1] += diff;
-					self.world.players[i].input = input_state;
-				}
+					self.world.players[index].input = input_state;
+				} else {
+					eprintln!("got packet from {}, which is not a known peer", recv_addr);
+				};
 			}
 
 			self.tick();

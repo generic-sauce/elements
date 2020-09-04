@@ -12,7 +12,6 @@ pub struct App {
 	pub font_state: FontState,
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
-	pub current_sound_id: SoundId,
 	pub sound_manager: SoundManager,
 }
 
@@ -36,7 +35,6 @@ impl App {
 			font_state: FontState::new(),
 			animation_state: AnimationState::new(),
 			gilrs,
-			current_sound_id: SoundId::APart,
 			sound_manager: SoundManager::new(),
 		}
 	}
@@ -45,8 +43,11 @@ impl App {
 		if handler.tilemap_changed {
 			self.tilemap_texture = create_tilemap_texture(&self.world.tilemap.tiles, self.world.tilemap.size);
 		}
-		if (0..2).any(|p| handler.damages[p] > 0) {
-			self.send_sound_command(SoundCommand::PlaySound(SoundId::Whiz));
+		if let Some(dmg) = (0..2).map(|p| handler.damages[p]).max() {
+			if dmg > 0 {
+				let volume = (dmg as f32 / 100.0).max(0.5).min(2.0);
+				self.sound_manager.play_sound(SoundId::Whiz, volume);
+			}
 		}
 	}
 
@@ -66,15 +67,9 @@ impl App {
 			}
 		}
 		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
-		if sound_id != self.current_sound_id {
-			self.send_sound_command(SoundCommand::PlayMusic(sound_id));
-			self.current_sound_id = sound_id;
+		if self.sound_manager.current_music_id.map_or(true, |music_id| music_id != sound_id) {
+			self.sound_manager.play_music(sound_id);
 		}
-	}
-
-	#[allow(unused)]
-	pub fn send_sound_command(&mut self, c: SoundCommand) {
-		self.sound_manager.apply_command(c);
 	}
 }
 
