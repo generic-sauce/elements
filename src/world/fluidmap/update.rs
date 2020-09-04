@@ -17,8 +17,11 @@ impl FluidMap {
 	}
 
 	pub fn apply_update(&mut self, u: FluidMapUpdate) {
-		self.grid = FluidMap::mk_grid(u.fluids.into_iter(), self.size);
-		self.next_id = u.next_id;
-		self.spawn_counter = u.spawn_counter;
+		*self = FluidMap {
+			grid: FluidMap::mk_grid(u.fluids.into_iter(), self.size),
+			size: self.size,
+			next_id: u.next_id,
+			spawn_counter: u.spawn_counter,
+		};
 	}
 }
