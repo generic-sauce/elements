@@ -17,6 +17,7 @@ impl FluidMap {
 	}
 
 	pub fn apply_update(&mut self, u: FluidMapUpdate) {
+		// This exists to generate a compiler error whenever a field will be added to FluidMap.
 		*self = FluidMap {
 			grid: FluidMap::mk_grid(u.fluids.into_iter(), self.size),
 			size: self.size,

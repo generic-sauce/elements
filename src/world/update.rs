@@ -27,5 +27,8 @@ impl World {
 		self.fluidmap.apply_update(u.fluidmap_update);
 		self.frame_id = u.frame_id;
 		self.kills = u.kills;
+
+		// This exists to generate a compiler error whenever a field will be added to World.
+		let Self { players: _, tilemap: _, fluidmap: _, frame_id: _, kills: _ } = self;
 	}
 }
