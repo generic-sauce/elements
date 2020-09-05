@@ -45,7 +45,7 @@ impl Server {
 				};
 			}
 
-			self.tick();
+			self.world.tick(&mut ());
 
 			// send game update
 			for i in 0..2 {
@@ -57,10 +57,6 @@ impl Server {
 				}
 			}
 		}
-	}
-
-	fn tick(&mut self) {
-		self.world.tick(&mut ());
 	}
 }
 
