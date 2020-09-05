@@ -10,7 +10,15 @@ pub use event::*;
 
 use crate::prelude::*;
 
+const RESTART_DELAY_COUNT: u32 = 90;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
+
+#[derive(Serialize, Deserialize, Clone, Copy)]
+pub enum RestartState {
+	Game,
+	Restart { counter: u32 },
+}
+
 
 #[derive(Serialize, Deserialize)]
 pub struct World {
@@ -19,6 +27,7 @@ pub struct World {
 	pub fluidmap: FluidMap,
 	pub frame_id: u32,
 	pub kills: [u32; 2],
+	pub restart_state: RestartState,
 }
 
 fn new_players() -> [Player; 2] {
@@ -34,6 +43,7 @@ impl World {
 		self.tilemap.reset(handler);
 		self.fluidmap = FluidMap::new(self.tilemap.size);
 		self.frame_id = 0;
+		self.restart_state = RestartState::Game;
 	}
 
 	pub fn new() -> World {
@@ -45,19 +55,37 @@ impl World {
 			tilemap,
 			frame_id: 0,
 			kills: [0, 0],
+			restart_state: RestartState::Game,
 		}
 	}
 
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
 		// sub-tick
-		self.tick_fluidmap();
-		self.tick_players();
-		self.handle_skills(handler);
-		self.spawn_fluids();
-		self.despawn_fluids();
-		self.despawn_walls(handler);
-		self.check_damage(handler);
-		self.frame_id += 1;
+		match self.restart_state {
+			RestartState::Game => {
+				self.tick_fluidmap();
+				self.tick_players();
+				self.handle_skills(handler);
+				self.spawn_fluids();
+				self.despawn_fluids();
+				self.despawn_walls(handler);
+				self.check_damage(handler);
+				if let Some(p) = self.player_dead() {
+					self.kills[1-p] += 1;
+					self.restart_state = RestartState::Restart { counter: 0 };
+				}
+				self.frame_id += 1;
+			},
+			RestartState::Restart { counter } => {
+				self.restart_state = RestartState::Restart { counter: counter + 1 };
+				if counter >= RESTART_DELAY_COUNT {
+					if self.players.iter().any(|p| p.input.restart()) {
+						self.reset(handler);
+						self.restart_state = RestartState::Game;
+					}
+				}
+			}
+		}
 	}
 
 	fn tick_players(&mut self) {

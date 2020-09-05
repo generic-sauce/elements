@@ -56,15 +56,6 @@ impl Server {
 					send_packet_to(&mut self.socket, &update, self.peers[i]);
 				}
 			}
-
-			self.check_restart();
-		}
-	}
-
-	fn check_restart(&mut self) {
-		if let Some(p) = self.world.player_dead() {
-			self.world.kills[1-p] += 1;
-			self.world.reset(&mut ());
 		}
 	}
 

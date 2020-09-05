@@ -89,10 +89,6 @@ impl AdaptiveInput {
 		self.special1 = self.has_keyboard && (R.is_pressed() || Button::Right.is_pressed());
 		self.special2 = self.has_keyboard && F.is_pressed();
 
-		self.just_up = !last_frame_up && self.up();
-		self.just_down = !last_frame_down && self.down();
-		self.just_attack2 = !last_frame_attack2 && self.attack2;
-
 		if let Some(gamepad) = gamepad {
 			let cx = gamepad.value(gilrs::Axis::RightStickX);
 			let cy = gamepad.value(gilrs::Axis::RightStickY);
@@ -121,6 +117,10 @@ impl AdaptiveInput {
 			self.cursor += GameVec::new(mouse_diff_scaled.x as i32, -mouse_diff_scaled.y as i32);
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
 		}
+
+		self.just_up = !last_frame_up && self.up();
+		self.just_down = !last_frame_down && self.down();
+		self.just_attack2 = !last_frame_attack2 && self.attack2;
 
 		InputState {
 			direction,
