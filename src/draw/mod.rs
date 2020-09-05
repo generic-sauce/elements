@@ -1,6 +1,7 @@
 mod player;
 mod fluidmap;
 mod tilemap;
+mod hud;
 
 use crate::prelude::*;
 
@@ -100,4 +101,7 @@ fn draw_world(w: &World, target: &impl RenderTarget, context: &mut DrawContext) 
 		player::draw(pl, target, context);
 	}
 	tilemap::draw(target, context);
+	for pl in &w.players {
+		hud::draw(pl, target, context);
+	}
 }
