@@ -41,5 +41,8 @@ impl TileMap {
 			*self.get_mut(x.position) = Tile::Wall { remaining_lifetime: x.remaining_lifetime, owner: x.owner};
 		}
 		handler.tilemap_changed();
+
+		// This exists to generate a compiler error whenever a field will be added to TileMap.
+		let Self { tiles: _, size: _ } = self;
 	}
 }

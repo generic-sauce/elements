@@ -15,7 +15,7 @@ impl Fluid {
 	}
 
 	pub fn damage(&self) -> i32 {
-		let dmg = self.activity() / 100;
+		let dmg = self.activity() / 50;
 		dmg.max(MIN_DAMAGE) as i32
 	}
 
