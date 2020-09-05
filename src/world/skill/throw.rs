@@ -5,7 +5,7 @@ pub const GRAB_COOLDOWN: u32 = 10;
 impl World {
 	pub(in super) fn handle_throw(&mut self, p: usize) {
 		self.fluidmap.iter_mut_notranslate()
-			.filter(|x| x.owner == p)
+			.filter(|x| x.owner == p && x.state == FluidState::AtHand)
 			.for_each(|f| f.state = FluidState::Free);
 
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
@@ -14,7 +14,7 @@ impl World {
 	pub(in super) fn handle_throw3(&mut self, p: usize) {
 		let player = &self.players[p];
 		let mut v: Vec<&mut Fluid> = self.fluidmap.iter_mut_notranslate()
-			.filter(|x| x.owner == p)
+			.filter(|x| x.owner == p && x.state == FluidState::AtHand)
 			.collect();
 		v.sort_by_cached_key(|f| -throw_priority(f, player));
 		v.truncate(3);

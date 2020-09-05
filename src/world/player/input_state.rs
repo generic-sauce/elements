@@ -13,6 +13,7 @@ pub struct InputState {
 	pub special2: bool,
 	pub attack1: bool,
 	pub attack2: bool,
+	pub just_attack2: bool,
 }
 
 impl InputState {
@@ -26,6 +27,7 @@ impl InputState {
 			special2: false,
 			attack1: false,
 			attack2: false,
+			just_attack2: false,
 		}
 	}
 

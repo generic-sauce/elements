@@ -10,6 +10,7 @@ pub struct AdaptiveInput {
 	special2: bool,
 	attack1: bool,
 	attack2: bool,
+	just_attack2: bool,
 	cursor: GameVec,
 	gamepad_id: Option<GamepadId>,
 	has_keyboard: bool,
@@ -25,6 +26,7 @@ impl InputDevice {
 			special2: false,
 			attack1: false,
 			attack2: false,
+			just_attack2: false,
 			cursor: GameVec::new(0, 0),
 			gamepad_id: get_gamepad(index, gilrs),
 			has_keyboard
@@ -53,6 +55,7 @@ impl AdaptiveInput {
 
 		let last_frame_up = self.up();
 		let last_frame_down = self.down();
+		let last_frame_attack2 = self.attack2;
 
 		let mut direction = GameVec::new(0, 0);
 
@@ -81,13 +84,14 @@ impl AdaptiveInput {
 			}
 		}
 
-		self.just_up = !last_frame_up && self.up();
-		self.just_down = !last_frame_down && self.down();
-
 		self.attack1 = self.has_keyboard && (Q.is_pressed() || Button::Left.is_pressed());
 		self.attack2 = self.has_keyboard && E.is_pressed();
 		self.special1 = self.has_keyboard && (R.is_pressed() || Button::Right.is_pressed());
 		self.special2 = self.has_keyboard && F.is_pressed();
+
+		self.just_up = !last_frame_up && self.up();
+		self.just_down = !last_frame_down && self.down();
+		self.just_attack2 = !last_frame_attack2 && self.attack2;
 
 		if let Some(gamepad) = gamepad {
 			let cx = gamepad.value(gilrs::Axis::RightStickX);
@@ -127,6 +131,7 @@ impl AdaptiveInput {
 			special2: self.special2,
 			attack1: self.attack1,
 			attack2: self.attack2,
+			just_attack2: self.just_attack2,
 		}
 	}
 }
