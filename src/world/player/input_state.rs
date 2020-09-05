@@ -37,6 +37,9 @@ impl InputState {
 	pub fn down(&self) -> bool { self.vertical_dir() <= (-DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	pub fn right(&self) -> bool { self.horizontal_dir() >= (DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
 	pub fn left(&self) -> bool { self.horizontal_dir() <= (-DEADZONE_MIN * MAX_MOVEMENT_VALUE as f32) as i32 }
+	pub fn restart(&self) -> bool {
+		self.attack1 || self.special1
+	}
 
 	// returns a value from 0..=1000
 	pub fn diff(&self, other: &InputState) -> u32 {

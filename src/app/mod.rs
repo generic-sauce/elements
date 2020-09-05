@@ -13,6 +13,7 @@ pub struct App {
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
+	pub restart_state: RestartState,
 }
 
 impl App {
@@ -36,6 +37,7 @@ impl App {
 			animation_state: AnimationState::new(),
 			gilrs,
 			sound_manager: SoundManager::new(),
+			restart_state: RestartState::Game,
 		}
 	}
 

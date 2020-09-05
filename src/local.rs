@@ -46,20 +46,9 @@ impl Local {
 			self.app.tick();
 			self.app.draw(elapsed_time, fps, load);
 
-			self.check_restart();
-
 			if !self.app.window.is_open() {
 				std::process::exit(0);
 			}
-		}
-	}
-
-	fn check_restart(&mut self) {
-		if let Some(p) = self.app.world.player_dead() {
-			self.app.world.kills[1-p] += 1;
-			let mut handler = AppEventHandler::new();
-			self.app.world.reset(&mut handler);
-			self.app.handle(&handler);
 		}
 	}
 }
