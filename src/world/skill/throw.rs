@@ -33,5 +33,5 @@ impl World {
 
 fn throw_priority(f: &Fluid, player: &Player) -> i32 {
 	let relative_pos = f.position - player.center_position();
-	relative_pos.dot(f.velocity.length())
+	relative_pos.dot(f.velocity)
 }
