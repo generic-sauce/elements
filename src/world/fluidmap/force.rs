@@ -65,7 +65,7 @@ impl FluidMap {
 
 fn apply_cursor_steering(velocity: &mut GameVec, f: &Fluid, cursor: GameVec) {
 	const MAX_SPEED: i32 = 600;
-	const MAX_FORCE: i32 = 160;
+	const MAX_FORCE: i32 = 260;
 
 	let desired_velocity = (cursor - f.position).length_clamped(MAX_SPEED);
 	let steering = (desired_velocity - f.velocity)

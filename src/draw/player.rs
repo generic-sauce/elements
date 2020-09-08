@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 const IMG_SIZE: i32 = 64;
 const IMG_PLAYER_WIDTH: i32 = 22;
-const IMG_PLAYER_HEIGHT: i32 = 55;
+const IMG_PLAYER_HEIGHT: i32 = 54;
 const IMG_PLAYER_SIZE: GameVec = GameVec::new(IMG_PLAYER_WIDTH, IMG_PLAYER_HEIGHT);
 
 const CURSOR_INDICATOR_RADIUS: i32 = TILESIZE / 2;
