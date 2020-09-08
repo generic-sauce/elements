@@ -7,7 +7,8 @@ pub use input_state::*;
 use crate::prelude::*;
 
 // The left-bottom of the tile (x,y) is located at position (x,y) * TILESIZE.
-pub const PLAYER_SIZE: GameVec = TileVec::new(2, 6).to_game();
+const PLAYER_SCALE: f32 = 0.93;
+pub const PLAYER_SIZE: GameVec = GameVec::new((2.0*TILESIZE as f32 * PLAYER_SCALE) as i32, (6.0*TILESIZE as f32 * PLAYER_SCALE) as i32);
 pub const MAX_HEALTH: i32 = 1000;
 
 const X_DRAG: i32 = 30;

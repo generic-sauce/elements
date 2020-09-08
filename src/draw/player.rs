@@ -1,10 +1,7 @@
 use crate::prelude::*;
 
 const IMG_SIZE: i32 = 64;
-const IMG_PLAYER_WIDTH: i32 = 22;
 const IMG_PLAYER_HEIGHT: i32 = 54;
-const IMG_PLAYER_SIZE: GameVec = GameVec::new(IMG_PLAYER_WIDTH, IMG_PLAYER_HEIGHT);
-
 const CURSOR_INDICATOR_RADIUS: i32 = TILESIZE / 2;
 
 // the texture rect has been obtained by reading the .png file
@@ -17,7 +14,8 @@ fn texture_center(pl: &Player) -> GameVec {
 }
 
 fn texture_radius() -> GameVec {
-	PLAYER_SIZE * GameVec::new(IMG_SIZE, IMG_SIZE) / IMG_PLAYER_SIZE / 2
+	let r = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
+	GameVec::new(r, r)
 }
 
 pub(in super) fn draw(pl: &Player, target: &impl RenderTarget, context: &DrawContext) {
