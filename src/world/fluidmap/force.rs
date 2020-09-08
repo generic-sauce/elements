@@ -15,7 +15,7 @@ impl FluidMap {
 
 		if let FluidState::AtHand = f.state {
 			let cursor = players[f.owner].cursor_position();
-			velocity += cursor_force(&f, cursor);
+			apply_cursor_steering(&mut velocity, &f, cursor);
 		}
 
 		// drag
@@ -63,9 +63,14 @@ impl FluidMap {
 	}
 }
 
-fn cursor_force(f: &Fluid, cursor: GameVec) -> GameVec {
-	let v = cursor - f.position;
-	(v / 8).length_clamped(230)
+fn apply_cursor_steering(velocity: &mut GameVec, f: &Fluid, cursor: GameVec) {
+	const MAX_SPEED: i32 = 600;
+	const MAX_FORCE: i32 = 160;
+
+	let desired_velocity = (cursor - f.position).length_clamped(MAX_SPEED);
+	let steering = (desired_velocity - f.velocity)
+		.length_clamped(MAX_FORCE);
+	*velocity = (*velocity + steering).length_clamped(MAX_SPEED);
 }
 
 // returns -1 or 1
