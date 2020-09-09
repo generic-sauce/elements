@@ -34,7 +34,7 @@ impl FluidMap {
 
 		// position offset
 		let neighbours: Vec<_> = self.neighbours_with_owner(&f)
-			.filter(|n| (f.position - n.position).as_short_as(DESIRED_FLUID_DIST))
+			.filter(|n| ((n.ignore_counter == 0 && f.ignore_counter == 0) || f.id == n.id) && (f.position - n.position).as_short_as(DESIRED_FLUID_DIST))
 			.collect();
 
 		let len = neighbours.len().max(1) as i32;

@@ -16,14 +16,18 @@ impl World {
 		let mut v: Vec<&mut Fluid> = self.fluidmap.iter_mut_notranslate()
 			.filter(|x| x.owner == p && x.state == FluidState::AtHand)
 			.collect();
-		v.sort_by_cached_key(|f| -throw_priority(f, player));
-		v.truncate(3);
+		v.sort_by_cached_key(|f| throw_priority(f, player));
 		if v.len() == 0 { return; }
-		let target_vel = v.iter()
-			.map(|x| x.velocity)
-			.sum::<GameVec>() / (v.len() as i32);
-		for x in v {
+		let best = v.pop().unwrap();
+		v.sort_by_cached_key(|f| (f.position - best.position).length());
+		v.truncate(2);
+
+		let target_vel = best.velocity;
+
+		let iter = Some(best).into_iter().chain(v.into_iter());
+		for x in iter {
 			x.state = FluidState::Free;
+			x.ignore_counter = MAX_IGNORE_COUNTER;
 			x.velocity = target_vel;
 		}
 

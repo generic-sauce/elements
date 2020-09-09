@@ -123,6 +123,7 @@ impl World {
 				velocity: 0.into(),
 				position,
 				reference_position: position,
+				ignore_counter: 0,
 				id: self.fluidmap.next_id,
 			});
 

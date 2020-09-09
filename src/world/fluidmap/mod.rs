@@ -11,6 +11,7 @@ pub use update::*;
 pub use force::*;
 
 pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
+pub const MAX_IGNORE_COUNTER: u32 = 20;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FluidState {
@@ -25,6 +26,7 @@ pub struct Fluid {
 	pub velocity: GameVec,
 	pub position: GameVec,
 	pub reference_position: GameVec,
+	pub ignore_counter: u32,
 	pub id: u32,
 }
 
