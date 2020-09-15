@@ -8,6 +8,8 @@ impl Fluid {
 			return;
 		}
 
+		let reflect = |x: i32| -x / 3; // TODO add some randomness.
+
 		while remaining_vel != 0.into() {
 			let xroute = route(remaining_vel.x, self.position.x);
 			let yroute = route(remaining_vel.y, self.position.y);
@@ -32,7 +34,7 @@ impl Fluid {
 					self.position += change;
 
 					remaining_vel.x = 0;
-					self.velocity.x = 0;
+					self.velocity.x = reflect(self.velocity.x);
 				} else {
 					remaining_vel -= change_ex;
 					self.position += change_ex;
@@ -51,7 +53,7 @@ impl Fluid {
 					self.position += change;
 
 					remaining_vel.y = 0;
-					self.velocity.y = 0;
+					self.velocity.y = reflect(self.velocity.y);
 				} else {
 					remaining_vel -= change_ex;
 					self.position += change_ex;

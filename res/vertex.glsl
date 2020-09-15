@@ -6,7 +6,7 @@ void main()
 {
 		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
-		uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+		uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy + .0001;
 
 		gl_FrontColor = gl_Color;
 }
