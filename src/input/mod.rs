@@ -4,7 +4,7 @@ pub use adaptive::*;
 use crate::prelude::*;
 
 const DEADZONE_MIN: f32 = 0.35;
-const CURSOR_DEADZONE: f32 = 0.07;
+const CURSOR_DEADZONE: f32 = 0.1;
 const MAX_MOVEMENT_VALUE: i32 = 100;
 const JOYSTICK_DISTANCE: i32 = 2600;
 const DEFAULT_MOUSE_POSITION: WindowVec = WindowVec::new(300.0, 300.0);
