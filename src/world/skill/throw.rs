@@ -32,6 +32,7 @@ impl World {
 			x.velocity = target_vel;
 		}
 
+		// TODO: check whether target position collides tilemap
 		if v.len() >= 2 {
 			v[1].position = v[0].position + (v[1].position - v[0].position).with_length(THROW_THREE_DISTANCE);
 		}
