@@ -41,7 +41,7 @@ impl ShaderState {
 }
 
 setup!(
-	Fluid: (Some("vertex.glsl"), None, Some("fluids_fragment.glsl")),
-	Tilemap: (Some("vertex.glsl"), None, Some("tilemap_fragment.glsl")),
-	Noise: (Some("vertex.glsl"), None, Some("noise_fragment.glsl"))
+	Fluid: (Some("shader/vertex.glsl"), None, Some("shader/fluids_fragment.glsl")),
+	Tilemap: (Some("shader/vertex.glsl"), None, Some("shader/tilemap_fragment.glsl")),
+	Noise: (Some("shader/vertex.glsl"), None, Some("shader/noise_fragment.glsl"))
 );
