@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub const GRAB_COOLDOWN: u32 = 10;
+pub const GRAB_COOLDOWN: u32 = 30;
 
 impl World {
 	pub(in super) fn handle_throw(&mut self, p: usize) {
@@ -16,14 +16,18 @@ impl World {
 		let mut v: Vec<&mut Fluid> = self.fluidmap.iter_mut_notranslate()
 			.filter(|x| x.owner == p && x.state == FluidState::AtHand)
 			.collect();
-		v.sort_by_cached_key(|f| -throw_priority(f, player));
-		v.truncate(3);
+		v.sort_by_cached_key(|f| throw_priority(f, player));
 		if v.len() == 0 { return; }
-		let target_vel = v.iter()
-			.map(|x| x.velocity)
-			.sum::<GameVec>() / (v.len() as i32);
+		let best = v.pop().unwrap();
+		v.sort_by_cached_key(|f| (f.position - best.position).length());
+		v.truncate(2);
+		v.push(best);
+
+		let target_vel = v.iter().map(|x| x.velocity).sum::<GameVec>() / (v.len() as i32);
+
 		for x in v {
 			x.state = FluidState::Free;
+			x.ignore_counter = MAX_IGNORE_COUNTER;
 			x.velocity = target_vel;
 		}
 
