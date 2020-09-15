@@ -32,14 +32,19 @@ impl World {
 			x.velocity = target_vel;
 		}
 
-		// TODO: check whether target position collides tilemap
 		if v.len() >= 2 {
-			v[1].position = v[0].position + (v[1].position - v[0].position).with_length(THROW_THREE_DISTANCE);
+			let p = v[0].position + (v[1].position - v[0].position).with_length(THROW_THREE_DISTANCE);
+			if !self.tilemap.check_solid(p) {
+				v[1].position = p;
+			}
 		}
 		if v.len() >= 3 {
 			let v0_to_v1 = v[1].position - v[0].position;
 			let v0_to_v1_rotated = GameVec::new(v0_to_v1.y, -v0_to_v1.x);
-			v[2].position = v[0].position + (v0_to_v1 / 2) + (v0_to_v1_rotated * 7 / 10);
+			let p = v[0].position + (v0_to_v1 / 2) + (v0_to_v1_rotated * 7 / 10);
+			if !self.tilemap.check_solid(p) {
+				v[2].position = p;
+			}
 		}
 
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
