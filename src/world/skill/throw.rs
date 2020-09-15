@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 pub const GRAB_COOLDOWN: u32 = 30;
+const THROW_THREE_DISTANCE: i32 = TILESIZE*2;
 
 impl World {
 	pub(in super) fn handle_throw(&mut self, p: usize) {
@@ -25,10 +26,19 @@ impl World {
 
 		let target_vel = v.iter().map(|x| x.velocity).sum::<GameVec>() / (v.len() as i32);
 
-		for x in v {
+		for x in &mut v {
 			x.state = FluidState::Free;
 			x.ignore_counter = MAX_IGNORE_COUNTER;
 			x.velocity = target_vel;
+		}
+
+		if v.len() >= 2 {
+			v[1].position = v[0].position + (v[1].position - v[0].position).with_length(THROW_THREE_DISTANCE);
+		}
+		if v.len() >= 3 {
+			let v0_to_v1 = v[1].position - v[0].position;
+			let v0_to_v1_rotated = GameVec::new(v0_to_v1.y, -v0_to_v1.x);
+			v[2].position = v[0].position + (v0_to_v1 / 2) + (v0_to_v1_rotated * 7 / 10);
 		}
 
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
