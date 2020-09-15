@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub const GRAB_COOLDOWN: u32 = 10;
+pub const GRAB_COOLDOWN: u32 = 30;
 
 impl World {
 	pub(in super) fn handle_throw(&mut self, p: usize) {
@@ -21,11 +21,11 @@ impl World {
 		let best = v.pop().unwrap();
 		v.sort_by_cached_key(|f| (f.position - best.position).length());
 		v.truncate(2);
+		v.push(best);
 
-		let target_vel = best.velocity;
+		let target_vel = v.iter().map(|x| x.velocity).sum::<GameVec>() / (v.len() as i32);
 
-		let iter = Some(best).into_iter().chain(v.into_iter());
-		for x in iter {
+		for x in v {
 			x.state = FluidState::Free;
 			x.ignore_counter = MAX_IGNORE_COUNTER;
 			x.velocity = target_vel;
