@@ -33,5 +33,5 @@ impl FontState {
 }
 
 setup!(
-	DefaultFont: "dashing_unicorn.ttf"
+	DefaultFont: "fonts/dashing_unicorn.ttf"
 );
