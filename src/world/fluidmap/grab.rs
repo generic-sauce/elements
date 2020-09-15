@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
-const GRAB_DIST: i32 = DESIRED_FLUID_DIST * 3 / 2;
+const FLUID_GRAB_DIST: i32 = DESIRED_FLUID_DIST * 3 / 2;
+const CURSOR_GRAB_DIST: i32 = TILESIZE * 4;
 
 impl FluidMap {
 	pub(in super) fn apply_grab(&self, mut f: Fluid, players: &[Player; 2]) -> Fluid {
@@ -9,10 +10,10 @@ impl FluidMap {
 
 		let cursor = player.cursor_position();
 
-		let condition = (cursor - f.position).as_short_as(GRAB_DIST) ||
+		let condition = (cursor - f.position).as_short_as(CURSOR_GRAB_DIST) ||
 			self.neighbours_with_owner(&f)
 				.find(|n|
-					(f.position - n.position).as_short_as(GRAB_DIST)
+					(f.position - n.position).as_short_as(FLUID_GRAB_DIST)
 					&& n.state == FluidState::AtHand
 				).is_some();
 		if condition {
