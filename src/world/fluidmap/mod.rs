@@ -143,7 +143,7 @@ impl FluidMap {
 		let tile_pos: FluidVec = fluid.position.into();
 		let index = FluidMap::index(self.size, tile_pos);
 
-		/*
+		/* // TODO re-enable asserts
 		#[cfg(debug_assertions)]
 		assert!(!self.collides_fluid(fluid.position));
 
