@@ -122,14 +122,27 @@ impl FluidMap {
 			},
 			Collision::Fluid { idx, change } => {
 				f.position += change;
-				*remaining_vel -= change;
 
 				let other = self.grid[idx].as_mut().unwrap();
 
-				// TODO handle fluid collision nicely by `reflect`ing along the correct axis
-				*remaining_vel = 0.into();
-				f.velocity = 0.into();
-				other.velocity = 0.into();
+				let other_to_us = f.position - other.position;
+				let vel_other_to_us = other.velocity - f.velocity;
+
+				let sqrt = |x: i32| (x as f64).sqrt() as i32;
+				let overlap = sqrt(vel_other_to_us.dot(other_to_us).max(0));
+				let reflect_overlap = overlap / 2 + overlap / 5; // a little more than the normal overlap/2 in order to bounce back
+
+				f.velocity += other_to_us.with_length(reflect_overlap);
+				other.velocity -= other_to_us.with_length(reflect_overlap);
+
+				let rem_len = (remaining_vel.length() - change.length()).max(0);
+				*remaining_vel = f.velocity.with_length(rem_len);
+
+				// TODO this should never happen!
+				if change == 0.into() {
+					*remaining_vel = 0.into();
+				}
+
 			}
 		}
 	}
