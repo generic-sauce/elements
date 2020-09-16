@@ -42,19 +42,15 @@ impl FluidMap {
 		let fluid_iter = self.iter() // TODO use this later: self.neighbours_of_pos(pos, BUFFER_DIST + remaining_vel.length())
 			.filter_map(|f| {
 				// from f to self
-				let vel_diff = f.velocity - remaining_vel;
-
 				// from f to self
 				let pos_diff = pos - f.position;
 
-				let proj = vel_diff.projected_on(pos_diff);
-
 				let pos_num = (pos_diff.length() - BUFFER_DIST).max(0);
-				let vel_num = proj.length();
+				let vel_num = remaining_vel.length();
 
-				if remaining_vel.length_squared() > 0 && pos_diff.dot(remaining_vel) <= 0 {
+				if vel_num > 0 && pos_diff.dot(remaining_vel) <= 0 {
 					let idx = FluidMap::index(self.size, f.position.into());
-					let change = GameVec::new(0, 0); // remaining_vel * pos_num / vel_num; // TODO this is probably wrong!
+					let change = remaining_vel * pos_num / vel_num;
 					Some(Collision::Fluid { idx, change })
 				} else {
 					None
