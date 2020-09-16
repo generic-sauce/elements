@@ -126,7 +126,7 @@ impl FluidMap {
 		iproduct!(-num_cells..=num_cells, -num_cells..=num_cells)
 			.map(move |t| fluid_tile + t)
 			.map(move |t| FluidMap::index(self.size, t))
-			.map(move |idx| self.grid[idx].iter())
+			.filter_map(move |idx| self.grid.get(idx).map(|x| x.iter()))
 			.flatten()
 			.filter(move |n| (p - n.position).as_short_as(dist))
 	}
