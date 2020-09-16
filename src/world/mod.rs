@@ -12,6 +12,7 @@ use crate::prelude::*;
 
 const RESTART_DELAY_COUNT: u32 = 90;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
+pub const MIN_FLUID_DISTANCE: i32 = TILESIZE;
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
 pub enum RestartState {
@@ -105,17 +106,23 @@ impl World {
 		for i in 0..2 {
 			let p = &self.players[i];
 
-			let calc_spawn_pos = |from: GameVec, to: GameVec| {
-				let accuracy = |v: GameVec| (v.x.abs() + v.y.abs()) / 40 + 2; // TODO is this a good choice?
-				let n = accuracy(from - to);
-				for i in 0..n {
-					let current = from * (n-1-i) / (n-1) + to * i / (n-1);
-					if !self.tilemap.check_solid(current) { return current; }
+			let calc_spawn_pos = |center: GameVec| {
+				for x in 0..1000 {
+					for y in 0..1000 {
+						for &x in &[x, -x] {
+							for &y in &[y, -y] {
+								let point = center + (x * TILESIZE / 3, y * TILESIZE / 3); // TODO is this a good accuracy?
+								if self.tilemap.check_solid(point) { continue; }
+								if self.fluidmap.collides_fluid(point) { continue; }
+								return point;
+							}
+						}
+					}
 				}
-				panic!("this implies that the player is glitched actually!");
+				panic!("no fluid spawn position found!")
 			};
 
-			let position = calc_spawn_pos(p.cursor_position(), p.center_position());
+			let position = calc_spawn_pos(p.cursor_position());
 
 			self.fluidmap.add_fluid(Fluid {
 				state: FluidState::AtHand,

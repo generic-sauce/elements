@@ -115,4 +115,9 @@ impl FluidMap {
 		let index = (tile_pos.x + tile_pos.y * self.size.x) as usize;
 		self.grid[index].push(fluid);
 	}
+
+	pub fn collides_fluid(&self, p: GameVec) -> bool {
+		// TODO this is very inefficient
+		self.iter().any(|f| (f.position - p).as_short_as(MIN_FLUID_DISTANCE))
+	}
 }
