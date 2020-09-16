@@ -46,7 +46,7 @@ impl FluidMap {
 				let pos_num = (pos_diff.length() - FLUID_MIN_DIST).max(0);
 				let vel_num = proj.length();
 
-				if  pos_num < vel_num {
+				if  pos_num < vel_num && pos_diff.dot(vel_diff) > 0 {
 					let idx = FluidMap::index(self.size, f.position.into());
 					let change = velocity * pos_num / vel_num;
 					Some(Collision::Fluid { idx, change })
