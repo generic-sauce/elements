@@ -52,16 +52,16 @@ impl FluidMap {
 				let pos_num = (pos_diff.length() - BUFFER_DIST).max(0);
 				let vel_num = proj.length();
 
-				if vel_num > 0 && pos_diff.dot(vel_diff) > 0 {
+				if remaining_vel.length_squared() > 0 && pos_diff.dot(remaining_vel) <= 0 {
 					let idx = FluidMap::index(self.size, f.position.into());
-					let change = remaining_vel * pos_num / vel_num;
+					let change = GameVec::new(0, 0); // remaining_vel * pos_num / vel_num; // TODO this is probably wrong!
 					Some(Collision::Fluid { idx, change })
 				} else {
 					None
 				}
 			});
 
-		let tile_x_iter =
+		let tile_x_iter = (|| {
 			if remaining_vel.x != 0 {
 				let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
 
@@ -72,9 +72,9 @@ impl FluidMap {
 
 				Some(Collision::TileX { change })
 			} else { None }
-				.into_iter();
+		})().into_iter();
 
-		let tile_y_iter =
+		let tile_y_iter = (|| {
 			if remaining_vel.y != 0 {
 				let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
 
@@ -85,7 +85,7 @@ impl FluidMap {
 
 				Some(Collision::TileY { change })
 			} else { None }
-				.into_iter();
+		})().into_iter();
 
 		fluid_iter.chain(tile_x_iter).chain(tile_y_iter)
 			.min_by_key(|c| c.change_len_sqr())
