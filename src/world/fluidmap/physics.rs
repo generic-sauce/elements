@@ -36,10 +36,10 @@ impl FluidMap {
 		}
 	}
 
-	fn find_next_collision(&self, pos: GameVec, velocity: GameVec, remaining_vel: GameVec) -> Option<Collision> {
+	fn find_next_collision(&self, pos: GameVec, remaining_vel: GameVec) -> Option<Collision> {
 		let fluid_iter = self.neighbours_of_pos(pos, FLUID_MIN_DIST + remaining_vel.length())
 			.filter_map(|f| {
-				let vel_diff = velocity - f.velocity;
+				let vel_diff = remaining_vel - f.velocity;
 				let pos_diff = pos - f.position;
 				let proj = vel_diff.projected_on(pos_diff);
 
@@ -48,7 +48,7 @@ impl FluidMap {
 
 				if  pos_num < vel_num && pos_diff.dot(vel_diff) > 0 {
 					let idx = FluidMap::index(self.size, f.position.into());
-					let change = velocity * pos_num / vel_num;
+					let change = remaining_vel * pos_num / vel_num;
 					Some(Collision::Fluid { idx, change })
 				} else {
 					None
@@ -137,7 +137,7 @@ impl FluidMap {
 
 		let mut remaining_vel = f.velocity;
 
-		while let Some(coll) = self.find_next_collision(f.position, f.velocity, remaining_vel) {
+		while let Some(coll) = self.find_next_collision(f.position, remaining_vel) {
 			self.handle_collision(f, coll, &mut remaining_vel, t);
 		}
 		f.position += remaining_vel;
