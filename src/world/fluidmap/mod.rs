@@ -135,11 +135,17 @@ impl FluidMap {
 		self.neighbours(f, dist).filter(move |n| n.owner == f.owner)
 	}
 
-	pub fn add_fluid(&mut self, fluid: Fluid) {
+	pub fn add_fluid(&mut self, fluid: Fluid) -> usize {
 		let tile_pos: FluidVec = fluid.position.into();
 		let index = FluidMap::index(self.size, tile_pos);
+
+		#[cfg(debug_assertions)]
+		assert!(!self.collides_fluid(fluid.position));
+
 		assert!(self.grid[index].is_none());
 		self.grid[index] = Some(fluid);
+
+		index
 	}
 
 	pub fn collides_fluid(&self, p: GameVec) -> bool {
