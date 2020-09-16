@@ -60,6 +60,8 @@ impl FluidMap {
 				let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
 
 				let ychange = route.x.abs() * remaining_vel.y / remaining_vel.x.abs();
+				if ychange.abs() > 1000 { return None; } // in this case the other coord is preferred, and it causes an overflow // TODO un-hardcode
+
 				let change = GameVec::new(route.x, ychange);
 
 				Some(Collision::TileX { change })
@@ -71,6 +73,8 @@ impl FluidMap {
 				let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
 
 				let xchange = route.y.abs() * remaining_vel.x / remaining_vel.y.abs();
+				if xchange.abs() > 1000 { return None; } // in this case the other coord is preferred, and it causes an overflow // TODO un-hardcode
+
 				let change = GameVec::new(xchange, route.y);
 
 				Some(Collision::TileY { change })
