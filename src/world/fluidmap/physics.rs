@@ -56,30 +56,26 @@ impl FluidMap {
 			});
 
 		let tile_x_iter =
-			Some(())
-				.filter(|()| remaining_vel.x != 0)
-				.map(|()| {
-					let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
+			if remaining_vel.x != 0 {
+				let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
 
-					let ychange = route.x.abs() * remaining_vel.y / remaining_vel.x.abs();
-					let change = GameVec::new(route.x, ychange);
+				let ychange = route.x.abs() * remaining_vel.y / remaining_vel.x.abs();
+				let change = GameVec::new(route.x, ychange);
 
-					Collision::TileX { change }
-				})
+				Some(Collision::TileX { change })
+			} else { None }
 				.into_iter();
 
 		let tile_y_iter =
-			Some(())
-				.filter(|()| remaining_vel.y != 0)
-				.map(|()|{
-					let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
+			if remaining_vel.y != 0 {
+				let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
 
-					let xchange = route.y.abs() * remaining_vel.x / remaining_vel.y.abs();
-					let change = GameVec::new(xchange, route.y);
+				let xchange = route.y.abs() * remaining_vel.x / remaining_vel.y.abs();
+				let change = GameVec::new(xchange, route.y);
 
-					Collision::TileY { change }
-				})
-		.into_iter();
+				Some(Collision::TileY { change })
+			} else { None }
+				.into_iter();
 
 		fluid_iter.chain(tile_x_iter).chain(tile_y_iter)
 			.min_by_key(|c| c.change_len_sqr())
@@ -118,8 +114,12 @@ impl FluidMap {
 					f.position += change_ex;
 				}
 			},
-			Collision::Fluid { .. } => {
-				unimplemented!()
+			Collision::Fluid { idx, change } => {
+				f.position += change;
+
+				// TODO handle fluid collision nicely by `reflect`ing along the correct axis
+				*remaining_vel = 0.into();
+				f.velocity = 0.into();
 			}
 		}
 	}
