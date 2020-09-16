@@ -1,4 +1,6 @@
 #![feature(drain_filter)]
+#![feature(const_fn)]
+#![feature(const_panic)]
 
 #[macro_use]
 extern crate serde_derive;

@@ -140,7 +140,10 @@ impl World {
 
 	fn despawn_fluids(&mut self) {
 		for cell in self.fluidmap.grid.iter_mut() {
-			cell.drain_filter(|f| f.check_despawn());
+			match cell {
+				Some(f) if f.check_despawn() => *cell = None,
+				_ =>  {},
+			}
 		}
 	}
 
@@ -158,11 +161,13 @@ impl World {
 		for i in 0..2 {
 			let player = &mut self.players[i];
 			let mut dmg = 0;
-			for v in self.fluidmap.grid.iter_mut() {
-				dmg += v.drain_filter(|x|
-					x.owner != i && player.collides_point_with_radius(x.position, FLUID_DAMAGE_RADIUS)
-				).map(|f| f.damage())
-				.sum::<i32>();
+			for opt in self.fluidmap.grid.iter_mut() {
+				if let Some(f) = opt {
+					if f.owner != i && player.collides_point_with_radius(f.position, FLUID_DAMAGE_RADIUS) {
+						dmg += f.damage();
+						*opt = None;
+					}
+				}
 			}
 			if dmg > 0 {
 				player.damage(dmg);

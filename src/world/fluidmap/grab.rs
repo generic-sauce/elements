@@ -1,25 +1,29 @@
 use crate::prelude::*;
 
-const FLUID_GRAB_DIST: i32 = DESIRED_FLUID_DIST * 3 / 2;
+const FLUID_GRAB_DIST: i32 = 400 * 3 / 2;
 const CURSOR_GRAB_DIST: i32 = TILESIZE * 4;
 
 impl FluidMap {
-	pub(in super) fn apply_grab(&self, mut f: Fluid, players: &[Player; 2]) -> Fluid {
-		let player = &players[f.owner];
-		if player.grab_cooldown.is_some() { return f; }
+	pub(in super) fn tick_grab(&mut self, players: &[Player; 2]) {
+		for i in 0..self.grid.len() {
+			let f = match &self.grid[i] {
+				Some(x) => x,
+				None => continue,
+			};
+			let player = &players[f.owner];
+			if player.grab_cooldown.is_some() { continue; }
 
-		let cursor = player.cursor_position();
+			let cursor = player.cursor_position();
 
-		let condition = (cursor - f.position).as_short_as(CURSOR_GRAB_DIST) ||
-			self.neighbours_with_owner(&f)
-				.find(|n|
-					(f.position - n.position).as_short_as(FLUID_GRAB_DIST)
-					&& n.state == FluidState::AtHand
-				).is_some();
-		if condition {
-			f.state = FluidState::AtHand;
+			let condition = (cursor - f.position).as_short_as(CURSOR_GRAB_DIST) ||
+				self.neighbours_with_owner(&f, FLUID_GRAB_DIST)
+					.any(|n| n.state == FluidState::AtHand);
+
+			if let Some(f) = &mut self.grid[i] {
+				if condition {
+					f.state = FluidState::AtHand;
+				}
+			}
 		}
-
-		f
 	}
 }

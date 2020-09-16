@@ -14,6 +14,7 @@ pub use std::fs::File;
 
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
+pub use itertools::iproduct;
 
 pub use crate::server::*;
 pub use crate::world::*;

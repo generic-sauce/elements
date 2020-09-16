@@ -50,10 +50,13 @@ impl World {
 
 		// allocate free_wall
 		if pl.free_wall == 0 {
-			for inner_v in self.fluidmap.grid.iter_mut() {
-				if inner_v.drain_filter(|x| x.owner == p).next().is_some() {
-					pl.free_wall += WALLS_PER_FLUID;
-					break;
+			for opt in self.fluidmap.grid.iter_mut() {
+				if let Some(f) = opt {
+					if f.owner == p {
+						pl.free_wall += WALLS_PER_FLUID;
+						*opt = None;
+						break;
+					}
 				}
 			}
 		}
