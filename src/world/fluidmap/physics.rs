@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+const BUFFER_DIST: i32 = FLUID_MIN_DIST + 10;
+
 enum Collision {
 	Fluid { idx: usize, change: GameVec },
 	TileX { change: GameVec },
@@ -16,7 +18,7 @@ impl Collision {
 	}
 }
 
-fn reflect(x: i32) -> i32 { -x / 3 } // TODO add some randomness.
+fn tile_reflect(x: i32) -> i32 { -x / 3 } // TODO add some randomness.
 
 impl FluidMap {
 	pub(in super) fn tick_physics(&mut self, t: &TileMap) {
@@ -37,13 +39,13 @@ impl FluidMap {
 	}
 
 	fn find_next_collision(&self, pos: GameVec, remaining_vel: GameVec) -> Option<Collision> {
-		let fluid_iter = self.neighbours_of_pos(pos, FLUID_MIN_DIST + remaining_vel.length())
+		let fluid_iter = self.neighbours_of_pos(pos, BUFFER_DIST + remaining_vel.length())
 			.filter_map(|f| {
 				let vel_diff = remaining_vel - f.velocity;
 				let pos_diff = pos - f.position;
 				let proj = vel_diff.projected_on(pos_diff);
 
-				let pos_num = (pos_diff.length() - FLUID_MIN_DIST).max(0);
+				let pos_num = (pos_diff.length() - BUFFER_DIST).max(0);
 				let vel_num = proj.length();
 
 				if  pos_num < vel_num && pos_diff.dot(vel_diff) > 0 {
@@ -97,7 +99,7 @@ impl FluidMap {
 					f.position += change;
 
 					remaining_vel.x = 0;
-					f.velocity.x = reflect(f.velocity.x);
+					f.velocity.x = tile_reflect(f.velocity.x);
 				} else {
 					*remaining_vel -= change_ex;
 					f.position += change_ex;
@@ -112,7 +114,7 @@ impl FluidMap {
 					f.position += change;
 
 					remaining_vel.y = 0;
-					f.velocity.y = reflect(f.velocity.y);
+					f.velocity.y = tile_reflect(f.velocity.y);
 				} else {
 					*remaining_vel -= change_ex;
 					f.position += change_ex;
@@ -121,9 +123,12 @@ impl FluidMap {
 			Collision::Fluid { idx, change } => {
 				f.position += change;
 
+				let other = self.grid[idx].as_mut().unwrap();
+
 				// TODO handle fluid collision nicely by `reflect`ing along the correct axis
 				*remaining_vel = 0.into();
 				f.velocity = 0.into();
+				other.velocity = 0.into();
 			}
 		}
 	}
