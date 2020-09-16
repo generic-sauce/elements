@@ -1,13 +1,19 @@
 use crate::prelude::*;
 
-enum XY {
-	X,
-	Y,
+enum Collision {
+	Fluid { idx: usize, change: GameVec },
+	TileX { change: GameVec },
+	TileY { change: GameVec },
 }
 
-enum Collision {
-	Fluid { idx: usize },
-	Tile(XY),
+impl Collision {
+	fn change_len_sqr(&self) -> i32 {
+		match self {
+			Collision::Fluid { change, .. }
+			| Collision::TileX { change  }
+			| Collision::TileY { change  } => change.length_squared(),
+		}
+	}
 }
 
 fn reflect(x: i32) -> i32 { -x / 3 } // TODO add some randomness.
@@ -31,40 +37,58 @@ impl FluidMap {
 	}
 
 	fn find_next_collision(&self, pos: GameVec, velocity: GameVec, remaining_vel: GameVec) -> Option<Collision> {
-		/*
-		let fluid_iter = None.into_iter();
+		let fluid_iter = self.neighbours_of_pos(pos, FLUID_MIN_DIST + remaining_vel.length())
+			.filter_map(|f| {
+				let vel_diff = velocity - f.velocity;
+				let pos_diff = pos - f.position;
+				let proj = vel_diff.projected_on(pos_diff);
+
+				let pos_num = (pos_diff.length() - FLUID_MIN_DIST).max(0);
+				let vel_num = proj.length();
+
+				if  pos_num < vel_num {
+					let idx = FluidMap::index(self.size, f.position.into());
+					let change = velocity * pos_num / vel_num;
+					Some(Collision::Fluid { idx, change })
+				} else {
+					None
+				}
+			});
 
 		let tile_x_iter =
-			Some(Collision::Tile(XY::X))
-				.filter(|_| remaining_vel.x != 0)
+			Some(())
+				.filter(|()| remaining_vel.x != 0)
+				.map(|()| {
+					let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
+
+					let ychange = route.x.abs() * remaining_vel.y / remaining_vel.x.abs();
+					let change = GameVec::new(route.x, ychange);
+
+					Collision::TileX { change }
+				})
 				.into_iter();
 
 		let tile_y_iter =
-			Some(Collision::Tile(XY::Y))
-				.filter(|_| remaining_vel.y != 0)
-				.into_iter();
+			Some(())
+				.filter(|()| remaining_vel.y != 0)
+				.map(|()|{
+					let route = GameVec::new(route(remaining_vel.x, pos.x), route(remaining_vel.y, pos.y));
+
+					let xchange = route.y.abs() * remaining_vel.x / remaining_vel.y.abs();
+					let change = GameVec::new(xchange, route.y);
+
+					Collision::TileY { change }
+				})
+		.into_iter();
 
 		fluid_iter.chain(tile_x_iter).chain(tile_y_iter)
-			.min_by_key(|c| c.change_until_touch.length_squared())
-			.filter(|c| c.change_until_touch.length_squared() <= remaining_vel.length_squared())
-		 */
-		unimplemented!()
+			.min_by_key(|c| c.change_len_sqr())
+			.filter(|c| c.change_len_sqr() <= remaining_vel.length_squared())
 	}
 
 	fn handle_collision(&mut self, f: &mut Fluid, c: Collision, remaining_vel: &mut GameVec, t: &TileMap) {
 		match c {
-			Collision::Tile(XY::X) => {
-				assert!(remaining_vel.x != 0);
-
-				let xroute = route(remaining_vel.x, f.position.x);
-				let yroute = route(remaining_vel.y, f.position.y);
-
-				let xroute_ex = xroute + remaining_vel.x.signum();
-				let yroute_ex = yroute + remaining_vel.y.signum();
-
-				let ychange = xroute.abs() * remaining_vel.y / remaining_vel.x.abs();
-				let change = GameVec::new(xroute, ychange);
-
+			Collision::TileX { change } => {
 				let change_ex = change + (remaining_vel.x.signum(), 0);
 				if t.check_solid(f.position + change_ex) {
 					assert!(!t.check_solid(f.position + change));
@@ -79,18 +103,7 @@ impl FluidMap {
 					f.position += change_ex;
 				}
 			},
-			Collision::Tile(XY::Y) => {
-				assert!(remaining_vel.y != 0);
-
-				let xroute = route(remaining_vel.x, f.position.x);
-				let yroute = route(remaining_vel.y, f.position.y);
-
-				let xroute_ex = xroute + remaining_vel.x.signum();
-				let yroute_ex = yroute + remaining_vel.y.signum();
-
-				let xchange = yroute.abs() * remaining_vel.x / remaining_vel.y.abs();
-				let change = GameVec::new(xchange, yroute);
-
+			Collision::TileY { change } => {
 				let change_ex = change + (0, remaining_vel.y.signum());
 				if t.check_solid(f.position + change_ex) {
 					assert!(!t.check_solid(f.position + change));

@@ -118,8 +118,8 @@ impl FluidMap {
 	}
 
 	// returns fluids with distance <= dist
-	pub fn neighbours<'s>(&'s self, f: &'s Fluid, dist: i32) -> impl Iterator<Item=&Fluid> + 's {
-		let fluid_tile = f.position.to_fluid();
+	pub fn neighbours_of_pos(&self, p: GameVec, dist: i32) -> impl Iterator<Item=&Fluid> + '_ {
+		let fluid_tile = p.to_fluid();
 
 		let num_cells = dist / FLUID_CELL_SIZE + 1; // TODO round_up(dist / FLUID_CELL_SIZE) may be a smaller iteration
 		// it would possibly be faster to iterate from 0, 0 to the farther parts for a few applications!
@@ -128,7 +128,11 @@ impl FluidMap {
 			.map(move |t| FluidMap::index(self.size, t))
 			.map(move |idx| self.grid[idx].iter())
 			.flatten()
-			.filter(move |n| (f.position - n.position).as_short_as(dist))
+			.filter(move |n| (p - n.position).as_short_as(dist))
+	}
+
+	pub fn neighbours<'s>(&'s self, f: &'s Fluid, dist: i32) -> impl Iterator<Item=&Fluid> + 's {
+		self.neighbours_of_pos(f.position, dist)
 	}
 
 	pub fn neighbours_with_owner<'s>(&'s self, f: &'s Fluid, dist: i32) -> impl Iterator<Item=&Fluid> + 's {
