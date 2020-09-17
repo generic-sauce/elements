@@ -133,7 +133,9 @@ impl FluidMap {
 				let vel_other_to_us = other.velocity - f.velocity;
 
 				let sqrt = |x: i32| (x as f64).sqrt() as i32;
-				let overlap = sqrt(vel_other_to_us.dot(other_to_us).max(0));
+				let overlap = if other_to_us.dot(vel_other_to_us) > 0 {
+					vel_other_to_us.projected_on(other_to_us).length()
+				} else { 0 };
 				let reflect_overlap = overlap / 2 + overlap / 5; // a little more than the normal overlap/2 in order to bounce back
 
 				let overlap_fix = other_to_us.with_length(reflect_overlap);
