@@ -42,7 +42,13 @@ impl FluidMap {
 		}
 	}
 
-	fn find_next_collision(&self, pos: GameVec, remaining_vel: GameVec) -> Option<Collision> {
+	fn find_next_collision(&self, pos: GameVec, remaining_vel: GameVec, t: &TileMap) -> Option<Collision> {
+		// don't find a collision if there is no need for it.
+		let works = |p| !t.check_solid(p) && !self.collides_fluid(p);
+		if works(pos + remaining_vel) {
+			return None;
+		}
+
 		let fluid_iter = self.neighbours_of_pos(pos, BUFFER_DIST + remaining_vel.length()) // TODO find a smarter neighbour-set
 			.filter_map(|f| {
 				// from f to self
@@ -167,7 +173,7 @@ impl FluidMap {
 
 		let mut remaining_vel = f.velocity;
 
-		while let Some(coll) = self.find_next_collision(f.position, remaining_vel) {
+		while let Some(coll) = self.find_next_collision(f.position, remaining_vel, t) {
 			self.handle_collision(f, coll, &mut remaining_vel, t);
 		}
 		f.position += remaining_vel;
