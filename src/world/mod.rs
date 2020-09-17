@@ -12,7 +12,6 @@ use crate::prelude::*;
 
 const RESTART_DELAY_COUNT: u32 = 90;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
-pub const MIN_FLUID_DISTANCE: i32 = TILESIZE;
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
 pub enum RestartState {

@@ -154,6 +154,6 @@ impl FluidMap {
 
 	pub fn collides_fluid(&self, p: GameVec) -> bool {
 		// TODO this is very inefficient, re-implement using neighbours().next().is_some()
-		self.iter().any(|f| (f.position - p).as_short_as(MIN_FLUID_DISTANCE))
+		self.iter().any(|f| (f.position - p).as_short_as(FLUID_MIN_DIST))
 	}
 }
