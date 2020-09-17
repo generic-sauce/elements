@@ -9,16 +9,20 @@ enum Collision {
 }
 
 impl Collision {
-	fn change_len_sqr(&self) -> i32 {
+	fn change(&self) -> GameVec {
 		match self {
 			Collision::Fluid { change, .. }
 			| Collision::TileX { change  }
-			| Collision::TileY { change  } => change.length_squared(),
+			| Collision::TileY { change  } => *change,
 		}
 	}
 }
 
 fn tile_reflect(x: i32) -> i32 { -x / 3 } // TODO add some randomness.
+fn rem(r: &mut GameVec, reduct: i32) {
+	let rem_len = (r.length() * 4 / 5 - reduct - 40).max(0);
+	*r = r.with_length(rem_len);
+}
 
 impl FluidMap {
 	pub(in super) fn tick_physics(&mut self, t: &TileMap) {
@@ -84,8 +88,8 @@ impl FluidMap {
 		})().into_iter();
 
 		fluid_iter.chain(tile_x_iter).chain(tile_y_iter)
-			.min_by_key(|c| c.change_len_sqr())
-			.filter(|c| c.change_len_sqr() <= remaining_vel.length_squared())
+			.min_by_key(|c| c.change().length_squared())
+			.filter(|c| c.change().length_squared() <= remaining_vel.length_squared())
 	}
 
 	fn handle_collision(&mut self, f: &mut Fluid, c: Collision, remaining_vel: &mut GameVec, t: &TileMap) {
@@ -93,32 +97,32 @@ impl FluidMap {
 			Collision::TileX { change } => {
 				let change_ex = change + (remaining_vel.x.signum(), 0);
 				if t.check_solid(f.position + change_ex) {
-					assert!(!t.check_solid(f.position + change));
 
-					*remaining_vel -= change;
+					rem(remaining_vel, change.length());
 					f.position += change;
 
 					remaining_vel.x = 0;
 					f.velocity.x = tile_reflect(f.velocity.x);
 				} else {
-					*remaining_vel -= change_ex;
+					rem(remaining_vel, change_ex.length());
 					f.position += change_ex;
 				}
+				f.velocity = f.velocity.length_clamped(MAX_FLUID_SPEED);
 			},
 			Collision::TileY { change } => {
 				let change_ex = change + (0, remaining_vel.y.signum());
 				if t.check_solid(f.position + change_ex) {
-					assert!(!t.check_solid(f.position + change));
 
-					*remaining_vel -= change;
+					rem(remaining_vel, change.length());
 					f.position += change;
 
 					remaining_vel.y = 0;
 					f.velocity.y = tile_reflect(f.velocity.y);
 				} else {
-					*remaining_vel -= change_ex;
+					rem(remaining_vel, change_ex.length());
 					f.position += change_ex;
 				}
+				f.velocity = f.velocity.length_clamped(MAX_FLUID_SPEED);
 			},
 			Collision::Fluid { idx, change } => {
 				f.position += change;
@@ -132,17 +136,20 @@ impl FluidMap {
 				let overlap = sqrt(vel_other_to_us.dot(other_to_us).max(0));
 				let reflect_overlap = overlap / 2 + overlap / 5; // a little more than the normal overlap/2 in order to bounce back
 
-				f.velocity += other_to_us.with_length(reflect_overlap);
-				other.velocity -= other_to_us.with_length(reflect_overlap);
+				let overlap_fix = other_to_us.with_length(reflect_overlap);
+				f.velocity += overlap_fix;
+				other.velocity -= overlap_fix;
 
-				let rem_len = (remaining_vel.length() - change.length()).max(0);
-				*remaining_vel = f.velocity.with_length(rem_len);
+				f.velocity = f.velocity.length_clamped(MAX_FLUID_SPEED);
+				other.velocity = other.velocity.length_clamped(MAX_FLUID_SPEED);
 
-				// TODO this should never happen!
-				if change == 0.into() {
-					*remaining_vel = 0.into();
+				rem(remaining_vel, change.length());
+
+				#[cfg(debug_assertions)] {
+					let new_vel_other_to_us = other.velocity - f.velocity;
+					let new_overlap = new_vel_other_to_us.dot(other_to_us);
+					assert!(new_overlap <= 10); // should be <= 0 most of the time
 				}
-
 			}
 		}
 	}

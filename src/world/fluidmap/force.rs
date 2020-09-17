@@ -3,6 +3,7 @@ use crate::prelude::*;
 const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
 const fn hand_drag(x: i32) -> i32 { x * 24 / 32 }
+pub const MAX_FLUID_SPEED: i32 = 500;
 
 impl FluidMap {
 	pub(in super) fn apply_forces(&mut self, t: &TileMap, players: &[Player; 2], frame_id: u32) {
@@ -28,6 +29,8 @@ impl FluidMap {
 				noise(frame_id, f.id, 0),
 				noise(frame_id, f.id, 1),
 			);
+
+			f.velocity = f.velocity.length_clamped(MAX_FLUID_SPEED);
 		}
 	}
 }
