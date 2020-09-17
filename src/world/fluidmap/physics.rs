@@ -20,7 +20,7 @@ impl Collision {
 
 fn tile_reflect(x: i32) -> i32 { -x / 3 } // TODO add some randomness.
 fn rem(r: &mut GameVec, reduct: i32) {
-	let rem_len = (r.length() * 4 / 5 - reduct - 40).max(0);
+	let rem_len = (r.length() * 4/5 - reduct - 40).max(0);
 	*r = r.with_length(rem_len);
 }
 
@@ -45,7 +45,6 @@ impl FluidMap {
 	fn find_next_collision(&self, pos: GameVec, remaining_vel: GameVec) -> Option<Collision> {
 		let fluid_iter = self.neighbours_of_pos(pos, BUFFER_DIST + remaining_vel.length()) // TODO find a smarter neighbour-set
 			.filter_map(|f| {
-				// from f to self
 				// from f to self
 				let pos_diff = pos - f.position;
 
@@ -132,9 +131,8 @@ impl FluidMap {
 				let other_to_us = f.position - other.position;
 				let vel_other_to_us = other.velocity - f.velocity;
 
-				let sqrt = |x: i32| (x as f64).sqrt() as i32;
 				let overlap = if other_to_us.dot(vel_other_to_us) > 0 {
-					vel_other_to_us.projected_on(other_to_us).length()
+					vel_other_to_us.projected_on(other_to_us).length().max(40)
 				} else { 0 };
 				let reflect_overlap = overlap / 2 + overlap / 5; // a little more than the normal overlap/2 in order to bounce back
 

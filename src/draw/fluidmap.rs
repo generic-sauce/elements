@@ -38,5 +38,6 @@ pub(in super) fn draw(fluidmap: &FluidMap, target: &impl RenderTarget, context: 
 	for fluid in fluidmap.iter() {
 		context.draw_circle(target, fluid.position, TILESIZE / 3, Color::GREEN);
 		context.draw_circle(target, fluid.reference_position, TILESIZE / 5, Color::RED);
+		context.draw_line(target, fluid.position, fluid.position + fluid.velocity * 3, Color::WHITE, Color::TRANSPARENT);
 	}
 }

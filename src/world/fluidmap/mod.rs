@@ -51,7 +51,7 @@ pub struct FluidMap {
 impl World {
 	pub fn tick_fluidmap(&mut self) {
 		self.fluidmap.tick_grab(&self.players);
-		self.fluidmap.apply_forces(&self.tilemap, &self.players, self.frame_id);
+		self.fluidmap.apply_forces(&self.players, self.frame_id);
 		self.fluidmap.tick_physics(&self.tilemap);
 		self.fluidmap.update_reference_positions();
 	}
@@ -87,17 +87,6 @@ impl FluidMap {
 		}
 
 		grid
-	}
-
-	pub fn get(&self, v: FluidVec) -> Option<&'_ Fluid> {
-		self.grid.get(FluidMap::index(self.size, v))
-			.and_then(|x| x.as_ref())
-
-	}
-
-	pub fn get_mut(&mut self, v: FluidVec) -> Option<&'_ mut Fluid> {
-		self.grid.get_mut(FluidMap::index(self.size, v))
-			.and_then(|x| x.as_mut())
 	}
 
 	pub fn iter(&self) -> impl Iterator<Item=&Fluid> + '_ {

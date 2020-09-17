@@ -3,17 +3,18 @@ use crate::prelude::*;
 const FLUID_GRAVITY: i32 = GRAVITY / 3;
 const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
 const fn hand_drag(x: i32) -> i32 { x * 24 / 32 }
+fn cursor_force(difference: GameVec) -> GameVec { difference / 20 }
 pub const MAX_FLUID_SPEED: i32 = 500;
 
 impl FluidMap {
-	pub(in super) fn apply_forces(&mut self, t: &TileMap, players: &[Player; 2], frame_id: u32) {
+	pub(in super) fn apply_forces(&mut self, players: &[Player; 2], frame_id: u32) {
 		for f in self.iter_mut_notranslate() {
 			// gravity
 			f.velocity -= GameVec::new(0, FLUID_GRAVITY);
 
 			if let FluidState::AtHand = f.state {
 				let cursor = players[f.owner].cursor_position();
-				apply_cursor_steering(f, cursor);
+				f.velocity += cursor_force(cursor - f.position);
 			}
 
 			// drag
@@ -33,16 +34,6 @@ impl FluidMap {
 			f.velocity = f.velocity.length_clamped(MAX_FLUID_SPEED);
 		}
 	}
-}
-
-fn apply_cursor_steering(f: &mut Fluid, cursor: GameVec) {
-	const MAX_SPEED: i32 = 600;
-	const MAX_FORCE: i32 = 260;
-
-	let desired_velocity = (cursor - f.position).length_clamped(MAX_SPEED);
-	let steering = (desired_velocity - f.velocity)
-		.length_clamped(MAX_FORCE);
-	f.velocity = (f.velocity + steering).length_clamped(MAX_SPEED);
 }
 
 // returns -1 or 1

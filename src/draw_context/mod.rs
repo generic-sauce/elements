@@ -125,6 +125,18 @@ impl<'a> DrawContext<'a> {
 		target.draw_circle_shape(&shape, RenderStates::default());
 	}
 
+	#[allow(unused)]
+	pub fn draw_line(&self, target: &impl RenderTarget, start_position: impl IntoCanvasVec, end_position: impl IntoCanvasVec, color: Color, color2: Color) {
+		let start_position = conv(start_position.to_canvas(self.tilemap_size));
+		let end_position = conv(end_position.to_canvas(self.tilemap_size));
+
+		let vertices = [
+			Vertex::new(start_position, color, Vector2f::new(0.0, 0.0)),
+			Vertex::new(end_position, color2, Vector2f::new(0.0, 0.0)),
+		];
+		target.draw_primitives(&vertices, PrimitiveType::LineStrip, RenderStates::default());
+	}
+
 	// NOTE: "in_texture: &mut RenderTexture" was used before!
 	#[allow(unused)]
 	pub fn apply_noise(&mut self, target: &impl RenderTarget, texture: RenderTexture) {

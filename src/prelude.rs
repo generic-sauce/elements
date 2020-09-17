@@ -8,7 +8,7 @@ pub use std::io::BufReader;
 pub use std::fs::File;
 
 #[cfg(feature = "client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
-#[cfg(feature = "client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
+#[cfg(feature = "client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture, Vertex, PrimitiveType};
 #[cfg(feature = "client")] pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
 #[cfg(feature = "client")] pub use gilrs::{GamepadId, Gilrs};
 
