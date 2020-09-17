@@ -145,6 +145,10 @@ impl FluidMap {
 
 				rem(remaining_vel, change.length());
 
+				if remaining_vel.dot(other_to_us * -1) >= 0 {
+					*remaining_vel -= remaining_vel.projected_on(other_to_us);
+				}
+
 				#[cfg(debug_assertions)] {
 					let new_vel_other_to_us = other.velocity - f.velocity;
 					let new_overlap = new_vel_other_to_us.dot(other_to_us);
