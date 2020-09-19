@@ -78,15 +78,13 @@ impl FluidMap {
 
 	pub fn iter(&self) -> impl Iterator<Item=&Fluid> + '_ {
 		self.grid.iter()
-			.map(|x| x.iter())
-			.flatten()
+			.flat_map(|x| x.iter())
 	}
 
 	// this function is not allowed to mutate the position, as this requires grid reordering!
 	pub fn iter_mut_notranslate(&mut self) -> impl Iterator<Item=&mut Fluid> + '_ {
 		self.grid.iter_mut()
-			.map(|x| x.iter_mut())
-			.flatten()
+			.flat_map(|x| x.iter_mut())
 	}
 
 	fn index(&self, t: FluidVec) -> &'_ [Fluid] {
@@ -100,9 +98,7 @@ impl FluidMap {
 		let fluid_tile = f.position.to_fluid();
 
 		iproduct!(-1..2, -1..2)
-			.map(move |t| fluid_tile + t)
-			.map(move |t| self.index(t))
-			.flatten()
+			.flat_map(move |t| self.index(fluid_tile + t))
 			.filter(move |n| (f.position - n.position).as_short_as(FLUID_AFFECT_DIST))
 	}
 

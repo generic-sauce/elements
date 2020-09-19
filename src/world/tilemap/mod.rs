@@ -76,9 +76,9 @@ impl TileMap {
 	}
 
 	pub fn iter(&self) -> impl Iterator<Item=TileVec> + '_ {
-		(0..self.size.x).map(move |x| {
+		(0..self.size.x).flat_map(move |x| {
 			(0..self.size.y).map(move |y| TileVec::new(x, y))
-		}).flatten()
+		})
 	}
 }
 
