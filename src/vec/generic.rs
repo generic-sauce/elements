@@ -161,7 +161,7 @@ impl<T: Primitive, U: Into<Vec2t<T, P>>, P> DivAssign<U> for Vec2t<T, P> {
 impl<T: Primitive, P> Sum<Self> for Vec2t<T, P> {
 	fn sum<I>(iter: I) -> Self where I: Iterator<Item = Self> {
 		let null: Vec2t<T, P> = Default::default();
-		iter.fold(null, |a, b| Vec2t::new(a.x + b.x, a.y + b.y))
+		iter.fold(null, |a, b| a + b)
 	}
 }
 
