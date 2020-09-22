@@ -19,10 +19,10 @@ pub enum RestartState {
 	Restart { counter: u32 },
 }
 
-
 #[derive(Serialize, Deserialize)]
 pub struct World {
 	pub players: [Player; 2],
+	pub characters: [Character; 2],
 	pub tilemap: TileMap,
 	pub fluidmap: FluidMap,
 	pub frame_id: u32,
@@ -37,9 +37,17 @@ fn new_players() -> [Player; 2] {
 	]
 }
 
+fn new_characters() -> [Character; 2] {
+	[
+		Character::FluidCharacter(FluidCharacter::new()),
+		Character::FluidCharacter(FluidCharacter::new())
+	]
+}
+
 impl World {
 	pub fn reset(&mut self, handler: &mut impl EventHandler) {
 		self.players = new_players();
+		self.characters = new_characters();
 		self.tilemap.reset(handler);
 		self.fluidmap = FluidMap::new(self.tilemap.size);
 		self.frame_id = 0;
@@ -51,6 +59,7 @@ impl World {
 
 		World {
 			players: new_players(),
+			characters: new_characters(),
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
 			frame_id: 0,
@@ -65,8 +74,8 @@ impl World {
 			RestartState::Game => {
 				self.tick_fluidmap();
 				self.tick_players();
+				self.tick_characters();
 				self.handle_skills(handler);
-				self.spawn_fluids();
 				self.despawn_fluids();
 				self.despawn_walls(handler);
 				self.check_damage(handler);
@@ -94,40 +103,11 @@ impl World {
 		}
 	}
 
-	fn spawn_fluids(&mut self) {
-		if self.fluidmap.spawn_counter > 0 {
-			self.fluidmap.spawn_counter -= 1;
-			return;
-		} else {
-			self.fluidmap.spawn_counter = FLUID_SPAWN_INTERVAL;
-		}
-
-		for i in 0..2 {
-			let p = &self.players[i];
-
-			let calc_spawn_pos = |from: GameVec, to: GameVec| {
-				let accuracy = |v: GameVec| (v.x.abs() + v.y.abs()) / 40 + 2; // TODO is this a good choice?
-				let n = accuracy(from - to);
-				for i in 0..n {
-					let current = from * (n-1-i) / (n-1) + to * i / (n-1);
-					if !self.tilemap.check_solid(current) { return current; }
-				}
-				panic!("this implies that the player is glitched actually!");
+	fn tick_characters(&mut self) {
+		for p in 0..2 {
+			match &mut (self.characters[p]) {
+				Character::FluidCharacter(c) => c.tick(p, &mut self.players, &mut self.tilemap, &mut self.fluidmap),
 			};
-
-			let position = calc_spawn_pos(p.cursor_position(), p.center_position());
-
-			self.fluidmap.add_fluid(Fluid {
-				state: FluidState::AtHand,
-				owner: i,
-				velocity: 0.into(),
-				position,
-				reference_position: position,
-				ignore_counter: 0,
-				id: self.fluidmap.next_id,
-			});
-
-			self.fluidmap.next_id = self.fluidmap.next_id.checked_add(1).unwrap_or(0);
 		}
 	}
 

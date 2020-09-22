@@ -42,11 +42,6 @@ pub enum PlayerDirection {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub enum Character {
-	FluidCharacter(FluidCharacter),
-}
-
-#[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
@@ -59,7 +54,6 @@ pub struct Player {
 	pub direction: PlayerDirection,
 	pub walljumped: bool,
 	pub input: InputState,
-	pub character: Character,
 }
 
 impl World {
@@ -92,7 +86,6 @@ impl Player {
 			direction,
 			walljumped: true,
 			input: InputState::new(),
-			character: Character::FluidCharacter(FluidCharacter::new()),
 		}
 	}
 
