@@ -40,7 +40,7 @@ fn new_players() -> [Player; 2] {
 fn new_characters() -> [Character; 2] {
 	[
 		Character::FluidCharacter(FluidCharacter::new()),
-		Character::FluidCharacter(FluidCharacter::new())
+		Character::BrickCharacter(BrickCharacter::new())
 	]
 }
 
@@ -105,9 +105,7 @@ impl World {
 
 	fn tick_characters(&mut self) {
 		for p in 0..2 {
-			match &mut (self.characters[p]) {
-				Character::FluidCharacter(c) => c.tick(p, &mut self.players, &mut self.tilemap, &mut self.fluidmap),
-			};
+			self.tick_character(p);
 		}
 	}
 
