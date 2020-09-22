@@ -30,6 +30,7 @@ mod server;
 mod net;
 mod animation;
 mod resource;
+mod menu;
 
 mod prelude;
 
@@ -40,6 +41,7 @@ fn main() {
 	let server_arg = std::env::args().nth(1);
 	match server_arg.as_ref().map(|s| s.as_str()) {
 		Some("server") => Server::new().run(),
+		Some("menu") => App::new().run(),
 		Some(ip) => Client::new(ip).run(),
 		None => Local::new().run(),
 	}

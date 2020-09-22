@@ -36,3 +36,4 @@ pub use crate::resource::res;
 #[cfg(feature = "client")] pub use crate::animation_state::*;
 #[cfg(feature = "client")] pub use crate::input::*;
 #[cfg(feature = "client")] pub use crate::window_vec::*;
+#[cfg(feature = "client")] pub use crate::menu::*;

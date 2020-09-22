@@ -17,38 +17,6 @@ impl Local {
 	}
 
 	pub fn run(&mut self) {
-		self.app.sound_manager.play_music(SoundId::APart);
-		let timed_loop = TimedLoop::with_fps(60);
-		let interval = timed_loop.interval;
-		for (elapsed_time, delta_time, fps, load) in timed_loop {
-			while let Some(event) = self.app.window.poll_event() {
-				match event {
-					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
-						self.app.window.close();
-						std::process::exit(0);
-					}
-					_ => {},
-				}
-			}
-
-			// process gilrs events
-			while let Some(_) = self.app.gilrs.next_event() {}
-
-			if delta_time > interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
-			}
-
-			// inputs
-			for (i, input) in self.inputs.iter_mut().enumerate() {
-				self.app.world.players[i].input = input.update(&self.app.gilrs);
-			}
-
-			self.app.tick();
-			self.app.draw(elapsed_time, fps, load);
-
-			if !self.app.window.is_open() {
-				std::process::exit(0);
-			}
-		}
+		unimplemented!();
 	}
 }
