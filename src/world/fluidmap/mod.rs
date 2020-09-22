@@ -10,7 +10,7 @@ mod update;
 pub use update::*;
 pub use force::*;
 
-pub const FLUID_SPAWN_DIST: u32 = 20; // every 20 frames a new fluid will spawn
+pub const FLUID_SPAWN_INTERVAL: u32 = 20; // every 20 frames a new fluid will spawn
 pub const MAX_IGNORE_COUNTER: u32 = 20;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

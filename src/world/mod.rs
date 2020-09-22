@@ -99,7 +99,7 @@ impl World {
 			self.fluidmap.spawn_counter -= 1;
 			return;
 		} else {
-			self.fluidmap.spawn_counter = FLUID_SPAWN_DIST;
+			self.fluidmap.spawn_counter = FLUID_SPAWN_INTERVAL;
 		}
 
 		for i in 0..2 {
