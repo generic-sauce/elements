@@ -11,6 +11,12 @@ pub struct App {
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
+	pub app_state: AppState,
+}
+
+pub enum AppState {
+	Menu(Menu),
+	Game(World),
 }
 
 impl App {
@@ -29,13 +35,14 @@ impl App {
 			animation_state: AnimationState::new(),
 			gilrs,
 			sound_manager: SoundManager::new(),
+			app_state: AppState::main_menu(),
 		}
 	}
 
 	pub fn run(&mut self) {
 		let timed_loop = TimedLoop::with_fps(60);
-		let _interval = timed_loop.interval;
-		for (_elapsed_time, _delta_time, _fps, _load) in timed_loop {
+		let interval = timed_loop.interval;
+		for (_elapsed_time, delta_time, _fps, _load) in timed_loop {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
@@ -45,6 +52,29 @@ impl App {
 					_ => {},
 				}
 			}
+			// process gilrs events
+			while let Some(_) = self.gilrs.next_event() {}
+
+			if delta_time > interval {
+				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
+			}
 		}
+	}
+}
+
+impl AppState {
+	fn main_menu() -> AppState {
+		AppState::Menu(Menu::main_menu())
+	}
+
+	fn draw(&mut self) {
+		match &self {
+			AppState::Menu(menu) => {},
+			AppState::Game(world) => {},
+		}
+	}
+
+	fn tick(&mut self) {
+		unimplemented!();
 	}
 }
