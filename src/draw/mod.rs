@@ -25,23 +25,25 @@ impl ClientWorld {
 
 		let window_size = app.window.size();
 		let window_size = WindowVec::new(window_size.x as f32, window_size.y as f32);
-		let mut context = DrawContext {
-			window_size,
-			texture_state: &app.texture_state,
-			shader_state: &mut app.shader_state,
-			font_state: &app.font_state,
-			animation_state: &app.animation_state,
+		let mut context = GameDrawContext {
+			ctxt: DrawContext {
+				window_size,
+				texture_state: &app.texture_state,
+				shader_state: &mut app.shader_state,
+				font_state: &app.font_state,
+				animation_state: &app.animation_state,
+				elapsed_time: timed_loop_info.elapsed_time,
+				aspect_ratio,
+			},
 			tilemap_size: self.world.tilemap.size,
-			elapsed_time: timed_loop_info.elapsed_time,
 			tilemap_texture: &self.tilemap_texture,
-			aspect_ratio,
 		};
 
 		// draw game
-		context.fill_canvas_with_color(&game_texture_target, Color::rgb(115, 128, 56));
+		context.ctxt.fill_canvas_with_color(&game_texture_target, Color::rgb(115, 128, 56));
 		draw_world(&self.world, &game_texture_target, &mut context);
-		context.apply_noise(&game_noise_target, game_texture_target);
-		context.fill_canvas_with_texture(&app.window, game_noise_target);
+		context.ctxt.apply_noise(&game_noise_target, game_texture_target);
+		context.ctxt.fill_canvas_with_texture(&app.window, game_noise_target);
 
 		// draw debug info
 		let text_size = 0.030;
@@ -83,7 +85,7 @@ impl ClientWorld {
 	}
 }
 
-fn draw_world(w: &World, target: &impl RenderTarget, context: &mut DrawContext) {
+fn draw_world(w: &World, target: &impl RenderTarget, context: &mut GameDrawContext) {
 	fluidmap::draw(&w.fluidmap, target, context);
 	for pl in &w.players {
 		player::draw(pl, target, context);

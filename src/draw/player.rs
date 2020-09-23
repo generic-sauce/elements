@@ -18,7 +18,7 @@ fn texture_radius() -> GameVec {
 	GameVec::new(r, r)
 }
 
-pub(in super) fn draw(pl: &Player, target: &impl RenderTarget, context: &DrawContext) {
+pub(in super) fn draw(pl: &Player, target: &impl RenderTarget, context: &GameDrawContext) {
 	// character
 	let flip = if let PlayerDirection::Right = pl.direction { Flip::Normal } else { Flip::Horizontal };
 	context.draw_animation(target, texture_center(pl), texture_radius(), pl.animation, flip);

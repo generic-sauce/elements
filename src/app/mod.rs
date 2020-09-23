@@ -46,6 +46,10 @@ impl App {
 		self.run_runnable(Client::new(ip, &self.gilrs));
 	}
 
+	pub fn run_menu(&mut self) {
+		self.run_runnable(MenuRunnable::new());
+	}
+
 	fn run_runnable(&mut self, mut runnable: impl Runnable) {
 		for timed_loop_info in TimedLoop::with_fps(60) {
 			while let Some(event) = self.window.poll_event() {

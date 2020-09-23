@@ -2,9 +2,11 @@ use crate::prelude::*;
 
 mod canvas_vec;
 mod shader;
+mod game_draw_context;
 
 pub use canvas_vec::*;
 pub use shader::*;
+pub use game_draw_context::*;
 
 pub struct DrawContext<'a> {
 	pub window_size: WindowVec,
@@ -12,9 +14,7 @@ pub struct DrawContext<'a> {
 	pub shader_state: &'a mut ShaderState,
 	pub font_state: &'a FontState,
 	pub animation_state: &'a AnimationState,
-	pub tilemap_size: TileVec,
 	pub elapsed_time: Duration,
-	pub tilemap_texture: &'a Texture,
 	pub aspect_ratio: f32,
 }
 
@@ -42,9 +42,9 @@ fn match_origin(origin: Origin, size: CanvasVec) -> CanvasVec {
 
 impl<'a> DrawContext<'a> {
 	#[allow(unused)]
-	pub fn draw_texture(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture: Option<&Texture>, flip: Flip) {
-		let position: Vector2f = conv(position.to_canvas(self.tilemap_size));
-		let radius: Vector2f = conv(radius.to_canvas(self.tilemap_size));
+	pub fn draw_texture(&self, target: &impl RenderTarget, position: CanvasVec, radius: CanvasVec, color: Color, texture: Option<&Texture>, flip: Flip) {
+		let position = conv(position);
+		let radius = conv(radius);
 
 		let mut shape = RectangleShape::new();
 		if let Some(texture) = texture {
@@ -61,16 +61,13 @@ impl<'a> DrawContext<'a> {
 	}
 
 	#[allow(unused)]
-	pub fn draw_sprite(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture_id: Option<TextureId>, flip: Flip) {
+	pub fn draw_sprite(&self, target: &impl RenderTarget, position: CanvasVec, radius: CanvasVec, color: Color, texture_id: Option<TextureId>, flip: Flip) {
 		let texture = texture_id.map(|texture_id| self.texture_state.get_texture(texture_id));
 		self.draw_texture(target, position, radius, color, texture, flip);
 	}
 
 	#[allow(unused)]
-	pub fn draw_rect(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, origin: Origin) {
-		let position = position.to_canvas(self.tilemap_size);
-		let radius = radius.to_canvas(self.tilemap_size);
-
+	pub fn draw_rect(&self, target: &impl RenderTarget, position: CanvasVec, radius: CanvasVec, color: Color, origin: Origin) {
 		let mut shape = RectangleShape::new();
 		shape.set_scale(Vector2f::new(1.0, -1.0));
 		shape.set_size(conv(radius * 2.0));
@@ -82,14 +79,13 @@ impl<'a> DrawContext<'a> {
 	}
 
 	#[allow(unused)]
-	pub fn draw_animation(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, animation: Animation, flip: Flip) {
+	pub fn draw_animation(&self, target: &impl RenderTarget, position: CanvasVec, radius: CanvasVec, animation: Animation, flip: Flip) {
 		let texture = self.animation_state.get_animation_texture(animation);
 		self.draw_texture(target, position, radius, Color::WHITE, Some(texture), flip);
 	}
 
 	#[allow(unused)]
-	pub fn draw_text(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, size: f32 /* CanvasVec coordinate system */, text: &str, origin: Origin) {
-		let mut position = position.to_canvas(self.tilemap_size);
+	pub fn draw_text(&self, target: &impl RenderTarget, mut position: CanvasVec, size: f32 /* CanvasVec coordinate system */, text: &str, origin: Origin) {
 		let factor = self.window_size.y as u32;
 		let size = (size as f32 * factor as f32) as u32;
 
@@ -110,10 +106,8 @@ impl<'a> DrawContext<'a> {
 	}
 
 	#[allow(unused)]
-	pub fn draw_circle(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: i32 /* GameVec coordinate system */, color: Color) {
-		let factor = (TILESIZE * self.tilemap_size.y) as f32;
-		let position: Vector2f = conv(position.to_canvas(self.tilemap_size));
-		let radius = radius as f32 / factor;
+	pub fn draw_circle(&self, target: &impl RenderTarget, position: CanvasVec, radius: f32 /* GameVec coordinate system */, color: Color) {
+		let position: Vector2f = conv(position);
 
 		let mut shape = CircleShape::new(radius, 8);
 		shape.set_position(position);
