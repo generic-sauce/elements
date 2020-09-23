@@ -13,7 +13,7 @@ impl ClientWorld {
 		app.window.clear(Color::BLACK);
 
 		let aspect_ratio = 16.0 / 9.0;
-		let (window_view, view, view_pixel_size) = self.get_views(app, aspect_ratio);
+		let (window_view, view, view_pixel_size) = get_views(app, aspect_ratio);
 
 		// declare render target
 		let mut game_texture_target = RenderTexture::new(view_pixel_size.x as u32, view_pixel_size.y as u32, false).unwrap();
@@ -57,32 +57,33 @@ impl ClientWorld {
 						  &format!("load: {:.2}%", timed_loop_info.load * 100.0), Origin::LeftTop);
 	}
 
-	fn get_views(&self, app: &App, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, WindowVec) {
-		let window_size = app.window.size();
-		let window_size = Vector2f::new(window_size.x as f32, window_size.y as f32);
-		let window_aspect_ratio = window_size.x / window_size.y;
-		let aspect_factor = window_aspect_ratio / aspect_ratio;
+}
 
-		let wider_factor = f32::max(0.0, aspect_factor - 1.0) / 2.0;
-		let higher_factor = f32::max(0.0, 1.0 / aspect_factor - 1.0) / 2.0;
+pub fn get_views(app: &App, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, WindowVec) {
+	let window_size = app.window.size();
+	let window_size = Vector2f::new(window_size.x as f32, window_size.y as f32);
+	let window_aspect_ratio = window_size.x / window_size.y;
+	let aspect_factor = window_aspect_ratio / aspect_ratio;
 
-		let left = -wider_factor * aspect_ratio;
-		let width = aspect_ratio * (1.0 + 2.0 * wider_factor);
-		let top = -higher_factor;
-		let height = 1.0 + 2.0 * higher_factor;
-		let window_view = View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height));
+	let wider_factor = f32::max(0.0, aspect_factor - 1.0) / 2.0;
+	let higher_factor = f32::max(0.0, 1.0 / aspect_factor - 1.0) / 2.0;
 
-		let wider_factor = wider_factor * 2.0 + 1.0;
-		let higher_factor = higher_factor * 2.0 + 1.0;
+	let left = -wider_factor * aspect_ratio;
+	let width = aspect_ratio * (1.0 + 2.0 * wider_factor);
+	let top = -higher_factor;
+	let height = 1.0 + 2.0 * higher_factor;
+	let window_view = View::from_rect(&FloatRect::new(left, 1.0 - top, width, -height));
 
-		let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
-		let view_pixel_size = WindowVec::new(
-			window_size.x as f32 / wider_factor,
-			window_size.y as f32 / higher_factor
-		);
+	let wider_factor = wider_factor * 2.0 + 1.0;
+	let higher_factor = higher_factor * 2.0 + 1.0;
 
-		(window_view, view, view_pixel_size)
-	}
+	let view = View::from_rect(&FloatRect::new(0.0, 1.0, aspect_ratio, -1.0));
+	let view_pixel_size = WindowVec::new(
+		window_size.x as f32 / wider_factor,
+		window_size.y as f32 / higher_factor
+	);
+
+	(window_view, view, view_pixel_size)
 }
 
 fn draw_world(w: &World, target: &impl RenderTarget, context: &mut GameDrawContext) {
