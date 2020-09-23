@@ -15,10 +15,11 @@ impl Client {
 
 		send_packet(&mut socket, &Init::Init);
 
-		let player_id = loop {
-			// TODO maybe add a sleep here?
+		let mut player_id = 0;
+		for _ in TimedLoop::with_fps(10) {
 			if let Some((Go { your_player_id }, _)) = recv_packet::<Go>(&mut socket) {
-				break your_player_id;
+				player_id = your_player_id;
+				break;
 			}
 		};
 
