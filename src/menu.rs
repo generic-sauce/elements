@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+const BUTTON_TEXT_SIZE: f32 = 0.05;
+
 pub struct Menu {
 	buttons: Vec<Button>,
 }
@@ -7,6 +9,7 @@ pub struct Menu {
 pub struct Button {
 	position: CanvasVec,
 	size: CanvasVec,
+	text: &'static str,
 }
 
 pub struct MenuRunnable {
@@ -16,7 +19,10 @@ pub struct MenuRunnable {
 impl Menu {
 	pub fn main_menu() -> Menu {
 		Menu {
-			buttons: Vec::new(),
+			buttons: vec!(
+				Button { position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), size: CanvasVec::new(0.15, 0.05), text: "Best of five" },
+				Button { position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), size: CanvasVec::new(0.15, 0.05), text: "Quit" },
+			),
 		}
 	}
 }
@@ -58,6 +64,11 @@ impl Runnable for MenuRunnable {
 		};
 
 		context.fill_canvas_with_color(&game_texture_target, Color::rgb(255, 0, 0));
-		context.draw_rect(&app.window, CanvasVec::new(0.1, 0.2), CanvasVec::new(0.1, 0.1), Color::rgb(0, 255, 0), Origin::LeftBottom);
+
+		// draw buttons
+		for button in &self.menu.buttons {
+			context.draw_rect(&app.window, button.position, button.size, Color::rgb(0, 255, 0), Origin::Center);
+			context.draw_text(&app.window, button.position - CanvasVec::new(button.text.len() as f32 * BUTTON_TEXT_SIZE / 5.5, 0.45 * BUTTON_TEXT_SIZE), BUTTON_TEXT_SIZE, &button.text, Origin::LeftBottom);
+		}
 	}
 }
