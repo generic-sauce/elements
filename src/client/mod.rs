@@ -15,13 +15,9 @@ impl Client {
 
 		send_packet(&mut socket, &Init::Init);
 
-		let mut player_id = 0;
-		for _ in TimedLoop::with_fps(10) {
-			if let Some((Go { your_player_id }, _)) = recv_packet::<Go>(&mut socket) {
-				player_id = your_player_id;
-				break;
-			}
-		};
+		let player_id = TimedLoop::with_fps(10).filter_map(|_| {
+			recv_packet::<Go>(&mut socket).map(|(go_packet, _)| go_packet.your_player_id)
+		}).next().unwrap();
 
 		let input = InputDevice::new_adaptive(0, true, gilrs);
 
