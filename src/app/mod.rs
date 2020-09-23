@@ -79,7 +79,8 @@ fn create_tilemap_texture(tiles: &Vec<Tile>, size: TileVec) -> SfBox<Texture> {
 	let mut pixels = Vec::new();
 	for &tile in tiles.iter() {
 		let team: u8 = match tile {
-			Tile::Wall { owner, .. } => owner as u8 * 255, // TODO maybe owner should be u8 generally
+			Tile::Wall { owner, .. } => owner as u8 * 255,
+			Tile::Brick (Brick {owner, ..}) => owner as u8 * 255,
 			_ => 0,
 		};
 		let ground: u8 = match tile {
@@ -87,7 +88,8 @@ fn create_tilemap_texture(tiles: &Vec<Tile>, size: TileVec) -> SfBox<Texture> {
 			_ => 255,
 		};
 		let ratio: u8 = match tile {
-			Tile::Wall { .. } => 255, // TODO correct?
+			Tile::Wall { .. } => 255,
+			Tile::Brick { .. } => 255,
 			_ => 0,
 		};
 

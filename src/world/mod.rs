@@ -72,12 +72,14 @@ impl World {
 		// sub-tick
 		match self.restart_state {
 			RestartState::Game => {
+				self.tick_tilemap(handler);
 				self.tick_fluidmap();
 				self.tick_players();
 				self.tick_characters();
 				self.handle_skills(handler);
 				self.despawn_fluids();
 				self.despawn_walls(handler);
+				self.despawn_bricks(handler);
 				self.check_damage(handler);
 				if let Some(p) = self.player_dead() {
 					self.kills[1-p] += 1;
@@ -121,6 +123,14 @@ impl World {
 				*tile = remaining_lifetime.checked_sub(1)
 					.map(|lifetime| Tile::Wall { remaining_lifetime: lifetime, owner: *owner })
 					.unwrap_or_else(|| { handler.tilemap_changed(); Tile::Void });
+			}
+		}
+	}
+
+	fn despawn_bricks(&mut self, handler: &mut impl EventHandler) {
+		for tile in self.tilemap.tiles.iter_mut() {
+			if let Tile::Brick(brick) = tile {
+				handler.tilemap_changed();
 			}
 		}
 	}

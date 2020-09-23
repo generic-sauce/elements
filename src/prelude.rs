@@ -6,6 +6,7 @@ pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr};
 pub use std::collections::HashMap;
 pub use std::io::BufReader;
 pub use std::fs::File;
+pub use std::cmp::*;
 
 #[cfg(feature = "client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};

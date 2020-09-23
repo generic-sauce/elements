@@ -14,7 +14,7 @@ pub struct TileMapUpdate {
 
 impl TileMap {
 	pub fn update(&self) -> TileMapUpdate {
-		let iter = self.iter()
+		let iter = TileMap::iter(self.size)
 			.filter_map(|position| {
 				if let Tile::Wall{ owner, remaining_lifetime } = self.get(position) {
 					Some(
