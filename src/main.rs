@@ -19,6 +19,7 @@ extern crate lazy_static;
 #[cfg(feature = "client")] mod draw;
 #[cfg(feature = "client")] mod input;
 #[cfg(feature = "client")] mod window_vec;
+#[cfg(feature = "client")] mod menu;
 
 #[macro_use]
 mod fps_timer;
@@ -30,8 +31,6 @@ mod server;
 mod net;
 mod animation;
 mod resource;
-mod menu;
-
 mod prelude;
 
 use crate::prelude::*;
@@ -41,12 +40,8 @@ fn main() {
 	let server_arg = std::env::args().nth(1);
 	match server_arg.as_ref().map(|s| s.as_str()) {
 		Some("server") => Server::new().run(),
-		_ => App::new().run(),
-		/*
-		Some("menu") => App::new().run(),
-		Some(ip) => Client::new(ip).run(),
-		None => Local::new().run(),
-		 */
+		Some(ip) => App::new().run_client(ip),
+		None => App::new().run_local(),
 	}
 }
 

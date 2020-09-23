@@ -34,6 +34,12 @@ impl ClientWorld {
 		}
 	}
 
+	pub fn apply_update(&mut self, update: WorldUpdate, sound_manager: &mut SoundManager) {
+		let mut handler = AppEventHandler::new();
+		self.world.apply_update(update, &mut handler);
+		self.handle(&handler, sound_manager);
+	}
+
 	pub fn update_music(&mut self, sound_manager: &mut SoundManager) {
 		let mut critical_level = 0;
 		for player in &self.world.players {

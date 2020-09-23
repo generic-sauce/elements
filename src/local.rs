@@ -6,9 +6,8 @@ pub struct Local {
 }
 
 impl Local {
-	pub fn new() -> Local {
-		let app = App::new();
-		let inputs = [InputDevice::new_adaptive(0, false, &app.gilrs), InputDevice::new_adaptive(1, true, &app.gilrs)];
+	pub fn new(gilrs: &Gilrs) -> Local {
+		let inputs = [InputDevice::new_adaptive(0, false, gilrs), InputDevice::new_adaptive(1, true, gilrs)];
 
 		Local {
 			inputs,

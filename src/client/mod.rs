@@ -1,14 +1,14 @@
 use crate::prelude::*;
 
 pub struct Client {
-	app: App,
+	client_world: ClientWorld,
 	input: InputDevice,
 	socket: UdpSocket,
 	player_id: usize,
 }
 
 impl Client {
-	pub fn new(server_ip: &str) -> Client {
+	pub fn new(server_ip: &str, gilrs: &Gilrs) -> Client {
 		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.set_nonblocking(true).unwrap();
 		socket.connect((server_ip, PORT)).expect("Could not connect to server");
@@ -22,18 +22,35 @@ impl Client {
 			}
 		};
 
-		let app = App::new();
-		let input = InputDevice::new_adaptive(0, true, &app.gilrs);
+		let input = InputDevice::new_adaptive(0, true, gilrs);
 
 		Client {
-			app,
+			client_world: ClientWorld::new(),
 			input,
 			socket,
 			player_id,
 		}
 	}
+}
 
-	pub fn run(&mut self) {
-		unimplemented!();
+impl Runnable for Client {
+	fn tick(&mut self, app: &mut App) {
+		// receive packets
+		if let Some((update, _)) = recv_packet::<WorldUpdate>(&mut self.socket) {
+			self.client_world.apply_update(update, &mut app.sound_manager);
+		}
+
+		// handle inputs
+		self.client_world.world.players[self.player_id].input = self.input.update(&app.gilrs);
+
+		// send packets
+		send_packet(&mut self.socket, &self.client_world.world.players[self.player_id].input);
+
+		// tick world
+		self.client_world.tick(app);
+	}
+
+	fn draw(&mut self, app: &mut App, elapsed_time: Duration, fps: u32, load: f32) {
+		self.client_world.draw(app, elapsed_time, fps, load);
 	}
 }

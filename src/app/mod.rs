@@ -38,8 +38,12 @@ impl App {
 		}
 	}
 
-	pub fn run(&mut self) {
-		self.run_runnable(Local::new());
+	pub fn run_local(&mut self) {
+		self.run_runnable(Local::new(&self.gilrs));
+	}
+
+	pub fn run_client(&mut self, ip: &str) {
+		self.run_runnable(Client::new(ip, &self.gilrs));
 	}
 
 	fn run_runnable(&mut self, mut runnable: impl Runnable) {
