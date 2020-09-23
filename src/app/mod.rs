@@ -64,6 +64,7 @@ impl App {
 
 			runnable.tick(self);
 			runnable.draw(self, elapsed_time, fps, load);
+			self.sound_manager.tick();
 
 			if !self.window.is_open() {
 				std::process::exit(0);

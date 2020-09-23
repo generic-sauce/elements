@@ -18,6 +18,7 @@ impl ClientWorld {
 	pub fn tick(&mut self, app: &mut App) {
 		let mut handler = AppEventHandler::new();
 		self.world.tick(&mut handler);
+		self.handle(&handler, &mut app.sound_manager);
 		self.update_music(&mut app.sound_manager);
 	}
 
