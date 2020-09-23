@@ -15,6 +15,15 @@ pub use std::fs::File;
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
 
+#[cfg(feature = "client")] pub mod pxp { // the pixels prelude, release into global scope later
+	pub use pixels::{Error, Pixels, SurfaceTexture};
+	pub use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
+	pub use winit::event::{Event, VirtualKeyCode};
+	pub use winit::event_loop::{ControlFlow, EventLoop};
+	pub use winit::window::Window;
+	pub use winit_input_helper::WinitInputHelper;
+}
+
 pub use crate::server::*;
 pub use crate::world::*;
 pub use crate::world::player::{*, sensor::*};
@@ -38,3 +47,4 @@ pub use crate::resource::res;
 #[cfg(feature = "client")] pub use crate::input::*;
 #[cfg(feature = "client")] pub use crate::window_vec::*;
 #[cfg(feature = "client")] pub use crate::menu::*;
+#[cfg(feature = "client")] pub use crate::px::*;

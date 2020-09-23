@@ -19,6 +19,7 @@ extern crate lazy_static;
 #[cfg(feature = "client")] mod draw;
 #[cfg(feature = "client")] mod input;
 #[cfg(feature = "client")] mod window_vec;
+#[cfg(feature = "client")] mod px;
 #[cfg(feature = "client")] mod menu;
 
 #[macro_use]
