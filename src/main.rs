@@ -38,15 +38,19 @@ use crate::prelude::*;
 
 #[cfg(feature = "client")]
 fn main() {
+	let arg = std::env::args().nth(1);
+
+	if let Some("server") = arg.as_deref() {
+		Server::new().run();
+		return;
+	}
 
 	let events_loop = pxp::EventLoop::new();
 	let window = pxp::Window::new(&events_loop).unwrap();
 
 	// main program
 	thread::spawn(move || {
-		let server_arg = std::env::args().nth(1);
-		match server_arg.as_ref().map(|s| s.as_str()) {
-			Some("server") => Server::new().run(),
+		match arg.as_deref() {
 			Some(ip) => App::new(window).run_client(ip),
 			None => App::new(window).run_local(),
 		}
