@@ -80,6 +80,7 @@ impl ClientWorld {
 		(window_view, view, view_pixel_size)
 	}
 }
+
 fn draw_world(w: &World, target: &impl RenderTarget, context: &mut DrawContext) {
 	fluidmap::draw(&w.fluidmap, target, context);
 	for pl in &w.players {
