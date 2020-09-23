@@ -11,12 +11,12 @@ pub struct App {
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
-	pub app_state: AppState,
 }
 
-pub enum AppState {
-	Menu(Menu),
-	Game(World),
+// TODO: rename
+pub trait Runnable {
+	fn tick(&mut self, app: &mut App);
+	fn draw(&mut self, app: &mut App, elapsed_time: Duration, fps: u32, load: f32);
 }
 
 impl App {
@@ -35,14 +35,17 @@ impl App {
 			animation_state: AnimationState::new(),
 			gilrs,
 			sound_manager: SoundManager::new(),
-			app_state: AppState::main_menu(),
 		}
 	}
 
 	pub fn run(&mut self) {
+		self.run_runnable(Local::new());
+	}
+
+	fn run_runnable(&mut self, mut runnable: impl Runnable) {
 		let timed_loop = TimedLoop::with_fps(60);
 		let interval = timed_loop.interval;
-		for (_elapsed_time, delta_time, _fps, _load) in timed_loop {
+		for (elapsed_time, delta_time, fps, load) in timed_loop {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
@@ -58,23 +61,13 @@ impl App {
 			if delta_time > interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
 			}
+
+			runnable.tick(self);
+			runnable.draw(self, elapsed_time, fps, load);
+
+			if !self.window.is_open() {
+				std::process::exit(0);
+			}
 		}
-	}
-}
-
-impl AppState {
-	fn main_menu() -> AppState {
-		AppState::Menu(Menu::main_menu())
-	}
-
-	fn draw(&mut self) {
-		match &self {
-			AppState::Menu(menu) => {},
-			AppState::Game(world) => {},
-		}
-	}
-
-	fn tick(&mut self) {
-		unimplemented!();
 	}
 }

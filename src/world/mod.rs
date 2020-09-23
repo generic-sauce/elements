@@ -2,8 +2,10 @@ pub mod player;
 pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
+pub mod client_world;
 mod update;
 mod event;
+#[cfg(feature = "client")]
 
 pub use update::*;
 pub use event::*;

@@ -37,6 +37,7 @@ impl TimedLoop {
 }
 
 impl Iterator for TimedLoop {
+	// TODO: use struct instead of tuple
 	type Item = (Duration, Duration, u32, f32);
 
 	fn next(&mut self) -> Option<Self::Item> {

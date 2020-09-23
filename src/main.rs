@@ -41,9 +41,12 @@ fn main() {
 	let server_arg = std::env::args().nth(1);
 	match server_arg.as_ref().map(|s| s.as_str()) {
 		Some("server") => Server::new().run(),
+		_ => App::new().run(),
+		/*
 		Some("menu") => App::new().run(),
 		Some(ip) => Client::new(ip).run(),
 		None => Local::new().run(),
+		 */
 	}
 }
 

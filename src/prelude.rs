@@ -27,6 +27,7 @@ pub use crate::animation::*;
 pub use crate::resource::res;
 
 #[cfg(feature = "client")] pub use crate::client::*;
+#[cfg(feature = "client")] pub use crate::world::client_world::*;
 #[cfg(feature = "client")] pub use crate::draw_context::*;
 #[cfg(feature = "client")] pub use crate::local::*;
 #[cfg(feature = "client")] pub use crate::app::*;
