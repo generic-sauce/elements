@@ -6,7 +6,7 @@ mod hud;
 use crate::prelude::*;
 
 impl ClientWorld {
-	pub fn draw(&mut self, app: &mut App, elapsed_time: Duration, fps: u32, load: f32) {
+	pub fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
 		// by putting display at the start, the GPU has the whole frame to do graphics until .display() comes again
 		// this offsets the rendering by one frame though!
 		app.window.display();
@@ -32,7 +32,7 @@ impl ClientWorld {
 			font_state: &app.font_state,
 			animation_state: &app.animation_state,
 			tilemap_size: self.world.tilemap.size,
-			elapsed_time,
+			elapsed_time: timed_loop_info.elapsed_time,
 			tilemap_texture: &self.tilemap_texture,
 			aspect_ratio,
 		};
@@ -46,11 +46,11 @@ impl ClientWorld {
 		// draw debug info
 		let text_size = 0.030;
 		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
-						  &format!("elapsed time: {}", elapsed_time.as_secs()), Origin::LeftTop);
+						  &format!("elapsed time: {}", timed_loop_info.elapsed_time.as_secs()), Origin::LeftTop);
 		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
-						  &format!("fps: {}", fps as u32), Origin::LeftTop);
+						  &format!("fps: {}", timed_loop_info.fps as u32), Origin::LeftTop);
 		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
-						  &format!("load: {:.2}%", load * 100.0), Origin::LeftTop);
+						  &format!("load: {:.2}%", timed_loop_info.load * 100.0), Origin::LeftTop);
 	}
 
 	fn get_views(&self, app: &App, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, WindowVec) {

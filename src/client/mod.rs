@@ -50,7 +50,7 @@ impl Runnable for Client {
 		self.client_world.tick(app);
 	}
 
-	fn draw(&mut self, app: &mut App, elapsed_time: Duration, fps: u32, load: f32) {
-		self.client_world.draw(app, elapsed_time, fps, load);
+	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
+		self.client_world.draw(app, timed_loop_info);
 	}
 }

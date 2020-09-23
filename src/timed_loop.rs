@@ -36,9 +36,16 @@ impl TimedLoop {
 	}
 }
 
+pub struct TimedLoopInfo {
+	pub elapsed_time: Duration,
+	pub delta_time: Duration,
+	pub fps: u32,
+	pub load: f32,
+	pub interval: Duration,
+}
+
 impl Iterator for TimedLoop {
-	// TODO: use struct instead of tuple
-	type Item = (Duration, Duration, u32, f32);
+	type Item = TimedLoopInfo;
 
 	fn next(&mut self) -> Option<Self::Item> {
 		let now = SystemTime::now();
@@ -72,6 +79,14 @@ impl Iterator for TimedLoop {
 
 		self.duration_since_prev_second += delta_time;
 		self.frames_since_prev_second += 1;
-		Some((self.elapsed_time(), delta_time, self.fps, self.load))
+		Some(
+			TimedLoopInfo {
+				elapsed_time: self.elapsed_time(),
+				delta_time,
+				fps: self.fps,
+				load: self.load,
+				interval: self.interval,
+			}
+		)
 	}
 }

@@ -26,11 +26,9 @@ impl Server {
 	}
 
 	pub fn run(&mut self) {
-		let timed_loop = TimedLoop::with_fps(60);
-		let interval = timed_loop.interval;
-		for (_elapsed_time, delta_time, _fps, _load) in timed_loop {
-			if delta_time > interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
+		for timed_loop_info in TimedLoop::with_fps(60) {
+			if timed_loop_info.delta_time > timed_loop_info.interval {
+				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
 			}
 
 			// receive packets

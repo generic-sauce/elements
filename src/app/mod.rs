@@ -16,7 +16,7 @@ pub struct App {
 // TODO: rename
 pub trait Runnable {
 	fn tick(&mut self, app: &mut App);
-	fn draw(&mut self, app: &mut App, elapsed_time: Duration, fps: u32, load: f32);
+	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo);
 }
 
 impl App {
@@ -47,9 +47,7 @@ impl App {
 	}
 
 	fn run_runnable(&mut self, mut runnable: impl Runnable) {
-		let timed_loop = TimedLoop::with_fps(60);
-		let interval = timed_loop.interval;
-		for (elapsed_time, delta_time, fps, load) in timed_loop {
+		for timed_loop_info in TimedLoop::with_fps(60) {
 			while let Some(event) = self.window.poll_event() {
 				match event {
 					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
@@ -62,12 +60,12 @@ impl App {
 			// process gilrs events
 			while let Some(_) = self.gilrs.next_event() {}
 
-			if delta_time > interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", delta_time.as_millis(), interval.as_millis());
+			if timed_loop_info.delta_time > timed_loop_info.interval {
+				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
 			}
 
 			runnable.tick(self);
-			runnable.draw(self, elapsed_time, fps, load);
+			runnable.draw(self, &timed_loop_info);
 			self.sound_manager.tick();
 
 			if !self.window.is_open() {
