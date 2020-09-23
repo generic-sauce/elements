@@ -45,6 +45,8 @@ impl ClientWorld {
 
 		// draw debug info
 		let text_size = 0.030;
+		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 0.0), text_size,
+						  &format!("{} / {}", self.world.kills[0], self.world.kills[1]), Origin::LeftTop);
 		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 2.0), text_size,
 						  &format!("elapsed time: {}", timed_loop_info.elapsed_time.as_secs()), Origin::LeftTop);
 		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 3.0), text_size,
