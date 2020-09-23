@@ -58,7 +58,7 @@ impl App {
 				}
 			}
 			// process gilrs events
-			while let Some(_) = self.gilrs.next_event() {}
+			while self.gilrs.next_event().is_some() {}
 
 			if timed_loop_info.delta_time > timed_loop_info.interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
