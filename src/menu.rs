@@ -10,6 +10,7 @@ pub struct Button {
 	position: CanvasVec,
 	size: CanvasVec,
 	text: &'static str,
+	is_clicked: bool,
 }
 
 pub struct MenuRunnable {
@@ -21,8 +22,8 @@ impl Menu {
 	pub fn main_menu() -> Menu {
 		Menu {
 			buttons: vec!(
-				Button { position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), size: CanvasVec::new(0.15, 0.05), text: "Best of five" },
-				Button { position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), size: CanvasVec::new(0.15, 0.05), text: "Quit" },
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), CanvasVec::new(0.15, 0.05), "Best of five"),
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), CanvasVec::new(0.15, 0.05), "Quit"),
 			),
 		}
 	}
@@ -38,10 +39,43 @@ impl MenuRunnable {
 	}
 }
 
+impl Button {
+	fn new(position: CanvasVec, size: CanvasVec, text: &'static str) -> Button {
+		Button {
+			position,
+			size,
+			text,
+			is_clicked: false,
+		}
+	}
+
+	fn is_colliding(&self, pos: CanvasVec) -> bool {
+		pos.x >= self.position.x - self.size.x && pos.x <= self.position.x + self.size.x &&
+		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
+	}
+}
+
 impl Runnable for MenuRunnable {
-	fn tick(&mut self, app: &mut App) {
+	fn tick(&mut self, _app: &mut App) {
 		let mouse_update = get_mouse_position_update();
 		self.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
+
+		if sfml::window::mouse::Button::Left.is_pressed() {
+			for (index, button) in self.menu.buttons.iter_mut().enumerate() {
+				if button.is_colliding(self.cursor_position) {
+					if !button.is_clicked {
+						println!("clicked button {}", index);
+						button.is_clicked = true;
+					}
+				} else {
+					button.is_clicked = false;
+				}
+			}
+		} else {
+			for button in &mut self.menu.buttons {
+				button.is_clicked = false;
+			}
+		}
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
@@ -72,7 +106,12 @@ impl Runnable for MenuRunnable {
 
 		// draw buttons
 		for button in &self.menu.buttons {
-			context.draw_rect(&app.window, button.position, button.size, Color::rgb(0, 255, 0), Origin::Center);
+			let color = if button.is_colliding(self.cursor_position) {
+				Color::rgb(46, 94, 140)
+			} else {
+				Color::rgb(21, 67, 109)
+			};
+			context.draw_rect(&app.window, button.position, button.size, color, Origin::Center);
 			context.draw_text(&app.window, button.position - CanvasVec::new(button.text.len() as f32 * BUTTON_TEXT_SIZE / 5.5, 0.45 * BUTTON_TEXT_SIZE), BUTTON_TEXT_SIZE, &button.text, Origin::LeftBottom);
 		}
 
