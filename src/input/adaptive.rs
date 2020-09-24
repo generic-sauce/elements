@@ -32,6 +32,10 @@ impl InputDevice {
 			has_keyboard
 		};
 
+		if has_keyboard {
+			reset_mouse_position();
+		}
+
 		InputDevice::Adaptive(adaptive_input)
 	}
 }
@@ -109,10 +113,7 @@ impl AdaptiveInput {
 		}
 
 		if self.has_keyboard {
-			let new_mouse_pos = get_mouse_position();
-			let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
-
-			sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.to_vector2i());
+			let mouse_diff = get_mouse_position_update();
 			let mouse_diff_scaled = mouse_diff * 9.0;
 			self.cursor += GameVec::new(mouse_diff_scaled.x as i32, -mouse_diff_scaled.y as i32);
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
@@ -134,6 +135,19 @@ impl AdaptiveInput {
 			just_attack2: self.just_attack2,
 		}
 	}
+}
+
+pub fn get_mouse_position_update() -> WindowVec {
+	let new_mouse_pos = get_mouse_position();
+	let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
+
+	reset_mouse_position();
+
+	mouse_diff
+}
+
+pub fn reset_mouse_position() {
+	sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.to_vector2i());
 }
 
 fn apply_deadzone_min(value: f32, deadzone_min: f32) -> f32 {

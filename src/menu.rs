@@ -14,6 +14,7 @@ pub struct Button {
 
 pub struct MenuRunnable {
 	pub menu: Menu,
+	pub cursor_position: CanvasVec,
 }
 
 impl Menu {
@@ -29,14 +30,18 @@ impl Menu {
 
 impl MenuRunnable {
 	pub fn new() -> MenuRunnable {
+		reset_mouse_position();
 		MenuRunnable {
 			menu: Menu::main_menu(),
+			cursor_position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.5),
 		}
 	}
 }
 
 impl Runnable for MenuRunnable {
 	fn tick(&mut self, app: &mut App) {
+		let mouse_update = get_mouse_position_update();
+		self.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
@@ -70,5 +75,9 @@ impl Runnable for MenuRunnable {
 			context.draw_rect(&app.window, button.position, button.size, Color::rgb(0, 255, 0), Origin::Center);
 			context.draw_text(&app.window, button.position - CanvasVec::new(button.text.len() as f32 * BUTTON_TEXT_SIZE / 5.5, 0.45 * BUTTON_TEXT_SIZE), BUTTON_TEXT_SIZE, &button.text, Origin::LeftBottom);
 		}
+
+		// draw cursor
+		context.draw_circle(&app.window, self.cursor_position, 0.01, Color::BLACK);
+		context.draw_circle(&app.window, self.cursor_position, 0.008, Color::WHITE);
 	}
 }
