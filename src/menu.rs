@@ -16,6 +16,7 @@ pub struct Button {
 pub struct MenuRunnable {
 	pub menu: Menu,
 	pub cursor_position: CanvasVec,
+	pub next_runnable_change: RunnableChange,
 }
 
 impl Menu {
@@ -35,6 +36,7 @@ impl MenuRunnable {
 		MenuRunnable {
 			menu: Menu::main_menu(),
 			cursor_position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.5),
+			next_runnable_change: RunnableChange::None,
 		}
 	}
 }
@@ -61,19 +63,24 @@ impl Runnable for MenuRunnable {
 		self.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
 
 		if sfml::window::mouse::Button::Left.is_pressed() {
-			for (index, button) in self.menu.buttons.iter_mut().enumerate() {
+			for button in &mut self.menu.buttons {
 				if button.is_colliding(self.cursor_position) {
-					if !button.is_clicked {
-						println!("clicked button {}", index);
-						button.is_clicked = true;
-					}
+					button.is_clicked = true;
 				} else {
 					button.is_clicked = false;
 				}
 			}
 		} else {
-			for button in &mut self.menu.buttons {
-				button.is_clicked = false;
+			for (index, button) in &mut self.menu.buttons.iter_mut().enumerate() {
+				if button.is_clicked {
+					if index == 0 {
+						self.next_runnable_change = RunnableChange::Game;
+					}
+					if index == 1 {
+						self.next_runnable_change = RunnableChange::Quit;
+					}
+					button.is_clicked = false;
+				}
 			}
 		}
 	}
@@ -106,8 +113,10 @@ impl Runnable for MenuRunnable {
 
 		// draw buttons
 		for button in &self.menu.buttons {
-			let color = if button.is_colliding(self.cursor_position) {
-				Color::rgb(46, 94, 140)
+			let color = if button.is_clicked {
+				Color::rgb(47, 110, 140)
+			} else if button.is_colliding(self.cursor_position) {
+				Color::rgb(32, 82, 120)
 			} else {
 				Color::rgb(21, 67, 109)
 			};
@@ -118,5 +127,9 @@ impl Runnable for MenuRunnable {
 		// draw cursor
 		context.draw_circle(&app.window, self.cursor_position, 0.01, Color::BLACK);
 		context.draw_circle(&app.window, self.cursor_position, 0.008, Color::WHITE);
+	}
+
+	fn get_runnable_change(&mut self) -> RunnableChange {
+		self.next_runnable_change
 	}
 }

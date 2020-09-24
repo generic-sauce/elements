@@ -27,4 +27,8 @@ impl Runnable for Local {
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
 		self.client_world.draw(app, timed_loop_info);
 	}
+
+	fn get_runnable_change(&mut self) -> RunnableChange {
+		RunnableChange::None
+	}
 }

@@ -13,10 +13,17 @@ pub struct App {
 	pub sound_manager: SoundManager,
 }
 
-// TODO: rename
 pub trait Runnable {
 	fn tick(&mut self, app: &mut App);
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo);
+	fn get_runnable_change(&mut self) -> RunnableChange;
+}
+
+#[derive(Copy, Clone)]
+pub enum RunnableChange {
+	None,
+	Quit,
+	Game,
 }
 
 impl App {
@@ -47,10 +54,19 @@ impl App {
 	}
 
 	pub fn run_menu(&mut self) {
-		self.run_runnable(MenuRunnable::new());
+		let runnable_change = self.run_runnable(MenuRunnable::new());
+		loop {
+			match runnable_change {
+				RunnableChange::None => break,
+				RunnableChange::Game => self.run_local(),
+				RunnableChange::Quit => break,
+			}
+		}
 	}
 
-	fn run_runnable(&mut self, mut runnable: impl Runnable) {
+	fn run_runnable(&mut self, mut runnable: impl Runnable) -> RunnableChange {
+		let mut runnable_change = RunnableChange::None;
+
 		for timed_loop_info in TimedLoop::with_fps(60) {
 			while let Some(event) = self.window.poll_event() {
 				match event {
@@ -70,11 +86,18 @@ impl App {
 
 			runnable.tick(self);
 			runnable.draw(self, &timed_loop_info);
+			runnable_change = runnable.get_runnable_change();
+			match runnable_change {
+				RunnableChange::Quit => { self.window.close(); break; },
+				RunnableChange::Game => { break; },
+				RunnableChange::None => {},
+			}
 			self.sound_manager.tick();
 
 			if !self.window.is_open() {
 				std::process::exit(0);
 			}
-		}
+		};
+		runnable_change
 	}
 }
