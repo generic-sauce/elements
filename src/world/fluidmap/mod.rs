@@ -93,8 +93,6 @@ impl FluidMap {
 	}
 
 	pub fn neighbours<'s>(&'s self, f: &'s Fluid) -> impl Iterator<Item=&Fluid> + 's {
-		use itertools::iproduct;
-
 		let fluid_tile = f.position.to_fluid();
 
 		iproduct!(-1..2, -1..2)

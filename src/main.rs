@@ -56,8 +56,15 @@ fn main() {
 		}
 	});
 
-	events_loop.run(|_, _, _| {
-		// TODO handle input events
+	events_loop.run(|event, window_target, control_flow| {
+		*control_flow = pxp::ControlFlow::Wait;
+
+		match event {
+			pxp::Event::WindowEvent { event: pxp::WindowEvent::CloseRequested, .. } => {
+				*control_flow = pxp::ControlFlow::Exit;
+			},
+			_ => {}
+		}
 	});
 }
 

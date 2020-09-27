@@ -6,6 +6,7 @@ pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr};
 pub use std::collections::HashMap;
 pub use std::io::BufReader;
 pub use std::fs::File;
+pub use itertools::iproduct;
 
 #[cfg(feature = "client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
@@ -18,7 +19,7 @@ pub use bincode::{serialize, deserialize};
 #[cfg(feature = "client")] pub mod pxp { // the pixels prelude, release into global scope later
 	pub use pixels::{Error, Pixels, SurfaceTexture};
 	pub use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
-	pub use winit::event::{Event, VirtualKeyCode};
+	pub use winit::event::{Event, VirtualKeyCode, WindowEvent};
 	pub use winit::event_loop::{ControlFlow, EventLoop};
 	pub use winit::window::Window;
 	pub use winit_input_helper::WinitInputHelper;

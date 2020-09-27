@@ -5,7 +5,8 @@ use crate::prelude::*;
 
 pub struct App {
 	pub window: RenderWindow,
-	pub px_window: pxp::Window,
+	pub px_window: Box<pxp::Window>,
+	pub px_pixels: pxp::Pixels<pxp::Window>,
 	pub texture_state: TextureState,
 	pub shader_state: ShaderState,
 	pub font_state: FontState,
@@ -21,16 +22,23 @@ pub trait Runnable {
 }
 
 impl App {
-	pub fn new(px_window: pxp::Window) -> App {
+	pub fn new (px_window: pxp::Window) -> App {
 		let context_settings = ContextSettings::default();
 		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
 		window.set_mouse_cursor_visible(false);
 
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 
+		let px_window = Box::new(px_window);
+		let px_size = (*px_window).inner_size();
+		dbg!(px_size);
+		let px_surface_texture = pxp::SurfaceTexture::new(px_size.width, px_size.height, &*px_window);
+		let px_pixels = pxp::Pixels::new(px_size.width, px_size.height, px_surface_texture).unwrap();
+
 		App {
 			window,
 			px_window,
+			px_pixels,
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
