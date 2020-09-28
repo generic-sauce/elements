@@ -33,6 +33,7 @@ pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::timed_loop::*;
+#[macro_use] pub use crate::time_named;
 pub use crate::net::*;
 pub use crate::animation::*;
 pub use crate::resource::res;
