@@ -1,7 +1,8 @@
 use std::process::{Command, Stdio};
 
 fn main() {
-	// println!("cargo:rerun-if-changed=res/shader/render_vertex.glsl");
+	println!("cargo:rerun-if-changed=res/shader/render.vert");
+	println!("cargo:rerun-if-changed=res/shader/render.frag");
 
 	Command::new("glslangValidator")
 		.arg("-V")

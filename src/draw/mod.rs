@@ -43,16 +43,14 @@ impl ClientWorld {
 
 		let px_window = &app.px_window;
 		let px_pixels = &mut app.px_pixels;
-		let px_size = (*px_window).inner_size();
-		let mut px_grid = Grid::new_random(px_size.width as usize, px_size.height as usize);
-		px_grid.set_rect(10, 10, 100, 100, true);
-		px_grid.draw(px_pixels.get_frame());
-		if px_pixels
-			.render()
+		let render_result = px_pixels.render_with(|encoder, render_target, context| {
+			self.renderer.render(encoder, render_target);
+		});
+
+		if render_result
 			.is_err()
 		{
-			dbg!("pixels unable to render. probably because of resize");
-			// *control_flow = pxp::ControlFlow::Exit;
+			dbg!("errorroooooooooooooorr");
 		}
 
 		// draw game
