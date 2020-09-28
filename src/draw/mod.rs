@@ -41,6 +41,7 @@ impl ClientWorld {
 
 		let px_window = &app.px_window;
 		let px_pixels = &mut app.px_pixels;
+		self.renderer.update(&px_pixels.queue());
 		let render_result = px_pixels.render_with(|encoder, render_target, context| {
 			self.renderer.render(encoder, render_target);
 		});
