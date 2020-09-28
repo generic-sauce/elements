@@ -3,8 +3,9 @@ mod fluidmap;
 mod tilemap;
 mod hud;
 mod grid;
-
+mod render;
 use grid::Grid;
+pub use render::*;
 
 use crate::prelude::*;
 

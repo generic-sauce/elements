@@ -24,6 +24,7 @@ pub use bincode::{serialize, deserialize};
 	pub use winit::window::Window;
 	pub use winit_input_helper::WinitInputHelper;
 }
+#[cfg(feature = "client")] pub use pixels::wgpu as wgpu;
 
 pub use crate::server::*;
 pub use crate::world::*;
@@ -39,6 +40,7 @@ pub use crate::resource::res;
 #[cfg(feature = "client")] pub use crate::client::*;
 #[cfg(feature = "client")] pub use crate::world::client_world::*;
 #[cfg(feature = "client")] pub use crate::draw_context::*;
+#[cfg(feature = "client")] pub use crate::draw::*;
 #[cfg(feature = "client")] pub use crate::local::*;
 #[cfg(feature = "client")] pub use crate::app::*;
 #[cfg(feature = "client")] pub use crate::texture_state::*;

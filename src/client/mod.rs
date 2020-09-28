@@ -8,7 +8,7 @@ pub struct Client {
 }
 
 impl Client {
-	pub fn new(server_ip: &str, gilrs: &Gilrs) -> Client {
+	pub fn new(device: &wgpu::Device, server_ip: &str, gilrs: &Gilrs) -> Client {
 		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.set_nonblocking(true).unwrap();
 		socket.connect((server_ip, PORT)).expect("Could not connect to server");
@@ -22,7 +22,7 @@ impl Client {
 		let input = InputDevice::new_adaptive(0, true, gilrs);
 
 		Client {
-			client_world: ClientWorld::new(),
+			client_world: ClientWorld::new(&device),
 			input,
 			socket,
 			player_id,

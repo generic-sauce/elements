@@ -3,15 +3,17 @@ use crate::prelude::*;
 pub struct ClientWorld {
 	pub world: World,
 	pub tilemap_texture: SfBox<Texture>,
+	pub renderer: Renderer,
 }
 
 impl ClientWorld {
-	pub fn new() -> ClientWorld {
+	pub fn new(device: &wgpu::Device) -> ClientWorld {
 		let world = World::new();
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 		ClientWorld {
 			world,
 			tilemap_texture,
+			renderer: Renderer::new(&device),
 		}
 	}
 

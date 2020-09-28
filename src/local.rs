@@ -6,12 +6,12 @@ pub struct Local {
 }
 
 impl Local {
-	pub fn new(gilrs: &Gilrs) -> Local {
+	pub fn new(device: &wgpu::Device, gilrs: &Gilrs) -> Local {
 		let inputs = [InputDevice::new_adaptive(0, false, gilrs), InputDevice::new_adaptive(1, true, gilrs)];
 
 		Local {
 			inputs,
-			client_world: ClientWorld::new(),
+			client_world: ClientWorld::new(&device),
 		}
 	}
 }
