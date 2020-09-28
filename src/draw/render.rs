@@ -7,6 +7,38 @@ pub struct Renderer {
 
 impl Renderer {
 	pub fn new(device: &wgpu::Device) -> Renderer {
+		// let texture_size = Vec2u::new(512, 512);
+		// let texture_descriptor = wgpu::TextureDescriptor {
+		// 	label: Some("render_texture"),
+		// 	size: pixels::wgpu::Extent3d {
+		// 		width: texture_size.x,
+		// 		height: texture_size.y,
+		// 		depth: 1,
+		// 	},
+		// 	mip_level_count: 1,
+		// 	sample_count: 1,
+		// 	dimension: wgpu::TextureDimension::D2,
+		// 	format: wgpu::TextureFormat::Bgra8UnormSrgb,
+		// 	usage: wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::OUTPUT_ATTACHMENT,
+		// };
+		// let texture_view = device
+		// 	.create_texture(&texture_descriptor)
+		// 	.create_view(&wgpu::TextureViewDescriptor::default());
+    //
+		// let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+		// 	label: Some("render_sampler"),
+		// 	address_mode_u: wgpu::AddressMode::ClampToEdge,
+		// 	address_mode_v: wgpu::AddressMode::ClampToEdge,
+		// 	address_mode_w: wgpu::AddressMode::ClampToEdge,
+		// 	mag_filter: wgpu::FilterMode::Nearest,
+		// 	min_filter: wgpu::FilterMode::Nearest,
+		// 	mipmap_filter: wgpu::FilterMode::Nearest,
+		// 	lod_min_clamp: 0.0,
+		// 	lod_max_clamp: 1.0,
+		// 	compare: None,
+		// 	anisotropy_clamp: None,
+		// });
+
 		let vertex_shader = device.create_shader_module(wgpu::include_spirv!("../../res/shader/render.vert.spv"));
 		let fragment_shader = device.create_shader_module(wgpu::include_spirv!("../../res/shader/render.frag.spv"));
 

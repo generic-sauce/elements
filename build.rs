@@ -1,23 +1,27 @@
-use std::process::{Command, Stdio};
+use std::process::{Command, exit};
+
+fn compile_shader(shader_name: &str) {
+	let glsl_path = format!("res/shader/{}{}", shader_name, ".glsl");
+	let spv_path = format!("res/shader/{}{}", shader_name, ".spv");
+
+	println!("{}{}", "cargo:rerun-if-changed=", glsl_path);
+	// this line is usefull but unfortunately forces linkage of the app
+	// println!("{}{}", "cargo:rerun-if-changed=", spv_path);
+
+	let status = Command::new("glslangValidator")
+		.arg("-V")
+		.arg(glsl_path)
+		.arg("-o").arg(spv_path)
+		.status()
+		.unwrap();
+
+	match status.code() {
+		Some(code) => if code != 0 { exit(code); },
+		None => if !status.success() { exit(1); },
+	}
+}
 
 fn main() {
-	println!("cargo:rerun-if-changed=res/shader/render.vert");
-	println!("cargo:rerun-if-changed=res/shader/render.frag");
-
-	Command::new("glslangValidator")
-		.arg("-V")
-		.arg("res/shader/render.vert")
-		.arg("-o")
-		.arg("res/shader/render.vert.spv")
-		.spawn()
-		.expect("failed to compile glsl shader to spirv");
-
-	Command::new("glslangValidator")
-		.arg("-V")
-		.arg("res/shader/render.frag")
-		.arg("-o")
-		.arg("res/shader/render.frag.spv")
-		.stdout(Stdio::inherit())
-		.spawn()
-		.expect("failed to compile glsl shader to spirv");
+	compile_shader("render.vert");
+	compile_shader("render.frag");
 }

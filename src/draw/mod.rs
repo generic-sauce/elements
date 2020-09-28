@@ -2,9 +2,7 @@ mod player;
 mod fluidmap;
 mod tilemap;
 mod hud;
-mod grid;
 mod render;
-use grid::Grid;
 pub use render::*;
 
 use crate::prelude::*;
@@ -50,7 +48,7 @@ impl ClientWorld {
 		if render_result
 			.is_err()
 		{
-			dbg!("errorroooooooooooooorr");
+			dbg!("error drawing with pixels");
 		}
 
 		// draw game

@@ -16,3 +16,8 @@ pub struct Vec2t<T: Primitive, P> {
 	pub y: T,
 	_p: PhantomData<P>,
 }
+
+#[allow(unused)]
+pub struct DefaultParam;
+#[allow(unused)]
+pub type Vec2u = Vec2t::<u32, DefaultParam>;
