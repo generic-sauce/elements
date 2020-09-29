@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const MIN_DAMAGE: u32 = 40;
+const MIN_DAMAGE: u32 = 30;
 
 const fn update_reference_mixin(s: FluidState) -> (i32, i32) {
 	match s {
