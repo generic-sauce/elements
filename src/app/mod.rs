@@ -32,9 +32,11 @@ impl RunnableChange {
 		if world.best_of_n == 0 {
 			return RunnableChange::None;
 		}
-		for kill in &world.kills {
-			if kill >= &(world.best_of_n / 2 + 1) {
-				return RunnableChange::Menu;
+		if world.restart_state == RestartState::Game {
+			for kill in &world.kills {
+				if kill >= &(world.best_of_n / 2 + 1) {
+					return RunnableChange::Menu;
+				}
 			}
 		}
 		RunnableChange::None
