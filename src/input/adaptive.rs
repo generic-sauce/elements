@@ -68,7 +68,9 @@ impl AdaptiveInput {
 		} else if self.has_keyboard && S.is_pressed() {
 			-MAX_MOVEMENT_VALUE
 		} else if let Some(gamepad) = gamepad {
-			(apply_deadzone(gamepad.value(gilrs::Axis::LeftStickY)) * MAX_MOVEMENT_VALUE as f32) as i32
+			((gamepad.is_pressed(gilrs::Button::DPadUp) as i32 as f32
+			+ apply_deadzone(gamepad.value(gilrs::Axis::LeftStickY))) as f32
+			* MAX_MOVEMENT_VALUE as f32) as i32
 		} else {
 			0
 		};
@@ -84,7 +86,9 @@ impl AdaptiveInput {
 		}
 		if !key_pressed {
 			if let Some(gamepad) = gamepad {
-				direction.x = (apply_deadzone(gamepad.value(gilrs::Axis::LeftStickX)) * MAX_MOVEMENT_VALUE as f32) as i32
+				direction.x = ((apply_deadzone(gamepad.value(gilrs::Axis::LeftStickX))
+				+ gamepad.is_pressed(gilrs::Button::DPadRight) as i32 as f32
+				- gamepad.is_pressed(gilrs::Button::DPadLeft) as i32 as f32) * MAX_MOVEMENT_VALUE as f32) as i32;
 			}
 		}
 
