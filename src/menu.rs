@@ -23,8 +23,10 @@ impl Menu {
 	pub fn main_menu() -> Menu {
 		Menu {
 			buttons: vec!(
-				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9"),
-				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), CanvasVec::new(0.15, 0.05), "Quit"),
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.7), CanvasVec::new(0.15, 0.05), "Best of 9"),
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.5), CanvasVec::new(0.15, 0.05), "Best of 5"),
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), CanvasVec::new(0.15, 0.05), "Infinite Game"),
+				Button::new(CanvasVec::new(0.85 * 16.0 / 9.0, 0.15), CanvasVec::new(0.15, 0.05), "Quit"),
 			),
 		}
 	}
@@ -77,6 +79,12 @@ impl Runnable for MenuRunnable {
 						self.next_runnable_change = RunnableChange::Game(9);
 					}
 					if index == 1 {
+						self.next_runnable_change = RunnableChange::Game(5);
+					}
+					if index == 2 {
+						self.next_runnable_change = RunnableChange::Game(0);
+					}
+					if index == 3 {
 						self.next_runnable_change = RunnableChange::Quit;
 					}
 					button.is_clicked = false;
