@@ -40,9 +40,9 @@ fn main() {
 	let server_arg = std::env::args().nth(1);
 	match server_arg.as_ref().map(|s| s.as_str()) {
 		Some("server") => Server::new().run(),
-		Some("menu") => App::new().run_menu(),
+		Some("menu") => App::new().run_menu_and_game(),
 		Some(ip) => App::new().run_client(ip),
-		None => App::new().run_local(),
+		None => App::new().run_local(0),
 	}
 }
 

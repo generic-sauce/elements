@@ -6,8 +6,8 @@ pub struct ClientWorld {
 }
 
 impl ClientWorld {
-	pub fn new() -> ClientWorld {
-		let world = World::new();
+	pub fn new(best_of_n: u32) -> ClientWorld {
+		let world = World::new(best_of_n);
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 		ClientWorld {
 			world,

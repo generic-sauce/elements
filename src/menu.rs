@@ -23,7 +23,7 @@ impl Menu {
 	pub fn main_menu() -> Menu {
 		Menu {
 			buttons: vec!(
-				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), CanvasVec::new(0.15, 0.05), "Best of five"),
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9"),
 				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), CanvasVec::new(0.15, 0.05), "Quit"),
 			),
 		}
@@ -74,7 +74,7 @@ impl Runnable for MenuRunnable {
 			for (index, button) in &mut self.menu.buttons.iter_mut().enumerate() {
 				if button.is_clicked {
 					if index == 0 {
-						self.next_runnable_change = RunnableChange::Game;
+						self.next_runnable_change = RunnableChange::Game(9);
 					}
 					if index == 1 {
 						self.next_runnable_change = RunnableChange::Quit;

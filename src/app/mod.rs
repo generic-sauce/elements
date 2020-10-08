@@ -23,7 +23,22 @@ pub trait Runnable {
 pub enum RunnableChange {
 	None,
 	Quit,
-	Game,
+	Game(u32),
+	Menu,
+}
+
+impl RunnableChange {
+	pub fn from_world(world: &World) -> RunnableChange {
+		if world.best_of_n == 0 {
+			return RunnableChange::None;
+		}
+		for kill in &world.kills {
+			if kill >= &(world.best_of_n / 2 + 1) {
+				return RunnableChange::Menu;
+			}
+		}
+		RunnableChange::None
+	}
 }
 
 impl App {
@@ -45,21 +60,22 @@ impl App {
 		}
 	}
 
-	pub fn run_local(&mut self) {
-		self.run_runnable(Local::new(&self.gilrs));
+	pub fn run_local(&mut self, best_of_n: u32) {
+		self.run_runnable(Local::new(&self.gilrs, best_of_n));
 	}
 
 	pub fn run_client(&mut self, ip: &str) {
 		self.run_runnable(Client::new(ip, &self.gilrs));
 	}
 
-	pub fn run_menu(&mut self) {
-		let runnable_change = self.run_runnable(MenuRunnable::new());
+	pub fn run_menu_and_game(&mut self) {
+		let mut runnable_change = RunnableChange::Menu;
 		loop {
 			match runnable_change {
-				RunnableChange::None => break,
-				RunnableChange::Game => self.run_local(),
+				RunnableChange::None => panic!("should not receive RunnableChange::None from run_runnable"),
+				RunnableChange::Game(best_of_n) => { self.run_local(best_of_n); runnable_change = RunnableChange::Menu },
 				RunnableChange::Quit => break,
+				RunnableChange::Menu => runnable_change = self.run_runnable(MenuRunnable::new()),
 			}
 		}
 	}
@@ -89,8 +105,9 @@ impl App {
 			runnable_change = runnable.get_runnable_change();
 			match runnable_change {
 				RunnableChange::Quit => { self.window.close(); break; },
-				RunnableChange::Game => { break; },
+				RunnableChange::Game(_) => { break; },
 				RunnableChange::None => {},
+				RunnableChange::Menu => { break; },
 			}
 			self.sound_manager.tick();
 

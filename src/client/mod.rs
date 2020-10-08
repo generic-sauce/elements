@@ -22,7 +22,7 @@ impl Client {
 		let input = InputDevice::new_adaptive(0, true, gilrs);
 
 		Client {
-			client_world: ClientWorld::new(),
+			client_world: ClientWorld::new(0),
 			input,
 			socket,
 			player_id,

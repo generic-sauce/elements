@@ -6,12 +6,12 @@ pub struct Local {
 }
 
 impl Local {
-	pub fn new(gilrs: &Gilrs) -> Local {
+	pub fn new(gilrs: &Gilrs, best_of_n: u32) -> Local {
 		let inputs = [InputDevice::new_adaptive(0, false, gilrs), InputDevice::new_adaptive(1, true, gilrs)];
 
 		Local {
 			inputs,
-			client_world: ClientWorld::new(),
+			client_world: ClientWorld::new(best_of_n),
 		}
 	}
 }
@@ -29,6 +29,6 @@ impl Runnable for Local {
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {
-		RunnableChange::None
+		RunnableChange::from_world(&self.client_world.world)
 	}
 }

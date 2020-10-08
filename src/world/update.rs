@@ -8,6 +8,7 @@ pub struct WorldUpdate {
 	pub frame_id: u32,
 	pub kills: [u32; 2],
 	pub restart_state: RestartState,
+	pub best_of_n: u32,
 }
 
 impl World {
@@ -19,6 +20,7 @@ impl World {
 			frame_id: self.frame_id,
 			kills: self.kills,
 			restart_state: self.restart_state,
+			best_of_n: self.best_of_n,
 		}
 	}
 
@@ -30,8 +32,9 @@ impl World {
 		self.frame_id = u.frame_id;
 		self.kills = u.kills;
 		self.restart_state = u.restart_state;
+		self.best_of_n = u.best_of_n;
 
 		// This exists to generate a compiler error whenever a field will be added to World.
-		let Self { players: _, tilemap: _, fluidmap: _, frame_id: _, kills: _, restart_state: _ } = self;
+		let Self { players: _, tilemap: _, fluidmap: _, frame_id: _, kills: _, restart_state: _, best_of_n: _ } = self;
 	}
 }

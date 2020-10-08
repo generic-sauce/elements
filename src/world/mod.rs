@@ -30,6 +30,7 @@ pub struct World {
 	pub frame_id: u32,
 	pub kills: [u32; 2],
 	pub restart_state: RestartState,
+	pub best_of_n: u32,
 }
 
 fn new_players() -> [Player; 2] {
@@ -48,7 +49,7 @@ impl World {
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new() -> World {
+	pub fn new(best_of_n: u32) -> World {
 		let tilemap = TileMap::new(&res("map/map02.png"));
 
 		World {
@@ -58,6 +59,7 @@ impl World {
 			frame_id: 0,
 			kills: [0, 0],
 			restart_state: RestartState::Game,
+			best_of_n
 		}
 	}
 
