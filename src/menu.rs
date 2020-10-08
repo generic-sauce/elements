@@ -1,9 +1,11 @@
 use crate::prelude::*;
 
 const BUTTON_TEXT_SIZE: f32 = 0.05;
+pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
+pub const ASPECT_RATIO: f32 = 16.0 / 9.0;
 
 pub struct Menu {
-	buttons: Vec<Button>,
+	pub buttons: Vec<Button>,
 }
 
 pub struct Button {
@@ -11,11 +13,11 @@ pub struct Button {
 	size: CanvasVec,
 	text: &'static str,
 	is_clicked: bool,
+	runnable_change: RunnableChange,
 }
 
 pub struct MenuRunnable {
 	pub menu: Menu,
-	pub cursor_position: CanvasVec,
 	pub next_runnable_change: RunnableChange,
 }
 
@@ -23,33 +25,52 @@ impl Menu {
 	pub fn main_menu() -> Menu {
 		Menu {
 			buttons: vec!(
-				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.7), CanvasVec::new(0.15, 0.05), "Best of 9"),
-				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.5), CanvasVec::new(0.15, 0.05), "Best of 5"),
-				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.3), CanvasVec::new(0.15, 0.05), "Infinite Game"),
-				Button::new(CanvasVec::new(0.85 * 16.0 / 9.0, 0.15), CanvasVec::new(0.15, 0.05), "Quit"),
+				Button::new(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", RunnableChange::Game(9)),
+				Button::new(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", RunnableChange::Game(5)),
+				Button::new(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", RunnableChange::Game(0)),
+				Button::new(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect to Server", RunnableChange::Menu(MenuChoice::ConnectServer)),
+				Button::new(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", RunnableChange::Quit),
 			),
 		}
+	}
+
+	pub fn connect_server_menu() -> Menu {
+		Menu {
+			buttons: vec!(
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.6), CanvasVec::new(0.15, 0.05), "Connect", RunnableChange::Game(5)),
+				Button::new(CanvasVec::new(0.5 * 16.0 / 9.0, 0.4), CanvasVec::new(0.15, 0.05), "Back", RunnableChange::Menu(MenuChoice::Main)),
+				Button::new(CanvasVec::new(0.85 * 16.0 / 9.0, 0.15), CanvasVec::new(0.15, 0.05), "Quit", RunnableChange::Quit),
+			)
+		}
+	}
+
+	pub fn get_clicked_button(&mut self) -> Option<&mut Button> {
+		self.buttons.iter_mut().find(|b| b.is_clicked)
 	}
 }
 
 impl MenuRunnable {
-	pub fn new() -> MenuRunnable {
+	pub fn new(menu_choice: MenuChoice) -> MenuRunnable {
 		reset_mouse_position();
+		let menu = match menu_choice {
+			MenuChoice::Main => Menu::main_menu(),
+			MenuChoice::ConnectServer => Menu::connect_server_menu(),
+		};
 		MenuRunnable {
-			menu: Menu::main_menu(),
-			cursor_position: CanvasVec::new(0.5 * 16.0 / 9.0, 0.5),
+			menu,
 			next_runnable_change: RunnableChange::None,
 		}
 	}
 }
 
 impl Button {
-	fn new(position: CanvasVec, size: CanvasVec, text: &'static str) -> Button {
+	fn new(position: CanvasVec, size: CanvasVec, text: &'static str, runnable_change: RunnableChange) -> Button {
 		Button {
 			position,
 			size,
 			text,
 			is_clicked: false,
+			runnable_change
 		}
 	}
 
@@ -60,35 +81,24 @@ impl Button {
 }
 
 impl Runnable for MenuRunnable {
-	fn tick(&mut self, _app: &mut App) {
+	fn tick(&mut self, app: &mut App) {
 		let mouse_update = get_mouse_position_update();
-		self.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
+		app.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
+		app.cursor_position.y = app.cursor_position.y.max(0.0).min(1.0);
+		app.cursor_position.x = app.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 
 		if sfml::window::mouse::Button::Left.is_pressed() {
 			for button in &mut self.menu.buttons {
-				if button.is_colliding(self.cursor_position) {
+				if button.is_colliding(app.cursor_position) {
 					button.is_clicked = true;
 				} else {
 					button.is_clicked = false;
 				}
 			}
 		} else {
-			for (index, button) in &mut self.menu.buttons.iter_mut().enumerate() {
-				if button.is_clicked {
-					if index == 0 {
-						self.next_runnable_change = RunnableChange::Game(9);
-					}
-					if index == 1 {
-						self.next_runnable_change = RunnableChange::Game(5);
-					}
-					if index == 2 {
-						self.next_runnable_change = RunnableChange::Game(0);
-					}
-					if index == 3 {
-						self.next_runnable_change = RunnableChange::Quit;
-					}
-					button.is_clicked = false;
-				}
+			if let Some(button) = self.menu.get_clicked_button() {
+				button.is_clicked = false;
+				self.next_runnable_change = button.runnable_change;
 			}
 		}
 	}
@@ -123,7 +133,7 @@ impl Runnable for MenuRunnable {
 		for button in &self.menu.buttons {
 			let color = if button.is_clicked {
 				Color::rgb(47, 110, 140)
-			} else if button.is_colliding(self.cursor_position) {
+			} else if button.is_colliding(app.cursor_position) {
 				Color::rgb(32, 82, 120)
 			} else {
 				Color::rgb(21, 67, 109)
@@ -133,8 +143,8 @@ impl Runnable for MenuRunnable {
 		}
 
 		// draw cursor
-		context.draw_circle(&app.window, self.cursor_position, 0.01, Color::BLACK);
-		context.draw_circle(&app.window, self.cursor_position, 0.008, Color::WHITE);
+		context.draw_circle(&app.window, app.cursor_position, 0.01, Color::BLACK);
+		context.draw_circle(&app.window, app.cursor_position, 0.008, Color::WHITE);
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {

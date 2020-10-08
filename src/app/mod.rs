@@ -11,6 +11,7 @@ pub struct App {
 	pub animation_state: AnimationState,
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
+	pub cursor_position: CanvasVec,
 }
 
 pub trait Runnable {
@@ -19,12 +20,18 @@ pub trait Runnable {
 	fn get_runnable_change(&mut self) -> RunnableChange;
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
+pub enum MenuChoice {
+	Main,
+	ConnectServer,
+}
+
+#[derive(Copy, Clone, PartialEq)]
 pub enum RunnableChange {
 	None,
 	Quit,
 	Game(u32),
-	Menu,
+	Menu(MenuChoice),
 }
 
 impl RunnableChange {
@@ -35,7 +42,7 @@ impl RunnableChange {
 		if world.restart_state == RestartState::Game {
 			for kill in &world.kills {
 				if kill >= &(world.best_of_n / 2 + 1) {
-					return RunnableChange::Menu;
+					return RunnableChange::Menu(MenuChoice::Main);
 				}
 			}
 		}
@@ -59,6 +66,7 @@ impl App {
 			animation_state: AnimationState::new(),
 			gilrs,
 			sound_manager: SoundManager::new(),
+			cursor_position: DEFAULT_CURSOR_POSITION,
 		}
 	}
 
@@ -71,13 +79,13 @@ impl App {
 	}
 
 	pub fn run_menu_and_game(&mut self) {
-		let mut runnable_change = RunnableChange::Menu;
+		let mut runnable_change = RunnableChange::Menu(MenuChoice::Main);
 		loop {
 			match runnable_change {
 				RunnableChange::None => panic!("should not receive RunnableChange::None from run_runnable"),
-				RunnableChange::Game(best_of_n) => { self.run_local(best_of_n); runnable_change = RunnableChange::Menu },
+				RunnableChange::Game(best_of_n) => { self.run_local(best_of_n); runnable_change = RunnableChange::Menu(MenuChoice::Main) },
 				RunnableChange::Quit => break,
-				RunnableChange::Menu => runnable_change = self.run_runnable(MenuRunnable::new()),
+				RunnableChange::Menu(choice) => runnable_change = self.run_runnable(MenuRunnable::new(choice)),
 			}
 		}
 	}
@@ -109,7 +117,7 @@ impl App {
 				RunnableChange::Quit => { self.window.close(); break; },
 				RunnableChange::Game(_) => { break; },
 				RunnableChange::None => {},
-				RunnableChange::Menu => { break; },
+				RunnableChange::Menu(_) => { break; },
 			}
 			self.sound_manager.tick();
 
