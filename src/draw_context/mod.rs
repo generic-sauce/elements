@@ -106,6 +106,18 @@ impl<'a> DrawContext<'a> {
 	}
 
 	#[allow(unused)]
+	pub fn get_text_width(&self, size: f32, text: &str) -> f32 {
+		let factor = self.window_size.y as u32;
+		let size = (size as f32 * factor as f32) as u32;
+		let factor = ((factor / size) * size) as f32;
+		let &font = &self.font_state.get_font(FontId::DefaultFont);
+		let mut text = Text::new(text, &font, size);
+		text.set_scale(Vector2f::new(1.0 / factor, -1.0 / factor));
+		text.global_bounds().width
+
+	}
+
+	#[allow(unused)]
 	pub fn draw_circle(&self, target: &impl RenderTarget, position: CanvasVec, radius: f32 /* GameVec coordinate system */, color: Color) {
 		let position: Vector2f = conv(position);
 

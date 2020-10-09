@@ -51,6 +51,9 @@ impl Runnable for Client {
 		self.client_world.draw(app, timed_loop_info);
 	}
 
+	fn apply_key(&mut self, _ev: &KeyPressedEvent) {
+	}
+
 	fn get_runnable_change(&mut self) -> RunnableChange {
 		RunnableChange::None
 	}

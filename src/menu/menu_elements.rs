@@ -77,9 +77,10 @@ impl MenuElement {
 			Origin::Center
 		);
 		if selected {
+			let text_width = context.get_text_width(BUTTON_TEXT_SIZE, text);
 			context.draw_rect(
 				target,
-				CanvasVec::new(self.position.x - self.size.x + 0.01, self.position.y),
+				CanvasVec::new(self.position.x - self.size.x + 0.015 + text_width, self.position.y),
 				CanvasVec::new(0.001, self.size.y * 0.7),
 				Color::WHITE,
 				Origin::Center
@@ -87,10 +88,22 @@ impl MenuElement {
 		}
 		context.draw_text(
 			target,
-			self.position - CanvasVec::new(text.len() as f32 * BUTTON_TEXT_SIZE / 5.5, 0.45 * BUTTON_TEXT_SIZE),
+			self.position - CanvasVec::new(self.size.x - 0.01, 0.45 * BUTTON_TEXT_SIZE),
 			BUTTON_TEXT_SIZE,
 			&text,
 			Origin::LeftBottom
 		);
+	}
+
+	pub fn apply_key_press(&mut self, event: &KeyPressedEvent) {
+		if let MenuKind::EditField { text, .. } = &mut self.kind {
+			if let Some(c) = event.to_char() {
+				text.push(c);
+			} else {
+				if event.code == Key::BackSpace {
+					text.pop();
+				}
+			}
+		}
 	}
 }

@@ -31,4 +31,7 @@ impl Runnable for Local {
 	fn get_runnable_change(&mut self) -> RunnableChange {
 		RunnableChange::from_world(&self.client_world.world)
 	}
+
+	fn apply_key(&mut self, _ev: &KeyPressedEvent) {
+	}
 }
