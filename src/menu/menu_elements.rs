@@ -19,6 +19,7 @@ pub enum MenuKind {
 	EditField {
 		text: String,
 		selected: bool,
+		cursor: u32,
 	}
 }
 
@@ -35,7 +36,7 @@ impl MenuElement {
 
 	pub fn new_edit_field(position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement {
 		MenuElement {
-			kind: MenuKind::EditField { text: String::from(text), selected: false },
+			kind: MenuKind::EditField { text: String::from(text), selected: false, cursor: 0 },
 			position,
 			size,
 			hovered: false,
@@ -58,7 +59,7 @@ impl MenuElement {
 		};
 		match &self.kind {
 			MenuKind::Button { text, runnable_change: _runnable_change } => { self.draw_button(target, context, text, color) },
-			MenuKind::EditField { text, selected } => { self.draw_edit_field(target, context, text, color, *selected) },
+			MenuKind::EditField { text, selected, cursor } => { self.draw_edit_field(target, context, text, color, *selected, *cursor) },
 		}
 	}
 
@@ -67,7 +68,7 @@ impl MenuElement {
 		context.draw_text(target, self.position - CanvasVec::new(text.len() as f32 * BUTTON_TEXT_SIZE / 5.5, 0.45 * BUTTON_TEXT_SIZE), BUTTON_TEXT_SIZE, &text, Origin::LeftBottom);
 	}
 
-	fn draw_edit_field(&self, target: &RenderWindow, context: &mut DrawContext, text: &str, color: Color, selected: bool) {
+	fn draw_edit_field(&self, target: &RenderWindow, context: &mut DrawContext, text: &str, color: Color, selected: bool, cursor: u32) {
 		context.draw_rect(target, self.position, self.size, color, Origin::Center);
 		context.draw_rect(
 			target,
@@ -77,10 +78,10 @@ impl MenuElement {
 			Origin::Center
 		);
 		if selected {
-			let text_width = context.get_text_width(BUTTON_TEXT_SIZE, text);
+			let text_width = context.get_text_width(BUTTON_TEXT_SIZE, &text[..cursor as usize]);
 			context.draw_rect(
 				target,
-				CanvasVec::new(self.position.x - self.size.x + 0.015 + text_width, self.position.y),
+				CanvasVec::new(self.position.x - self.size.x + 0.012 + text_width, self.position.y),
 				CanvasVec::new(0.001, self.size.y * 0.7),
 				Color::WHITE,
 				Origin::Center
@@ -96,13 +97,23 @@ impl MenuElement {
 	}
 
 	pub fn apply_key_press(&mut self, event: &KeyPressedEvent) {
-		if let MenuKind::EditField { text, .. } = &mut self.kind {
+		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
 			if let Some(c) = event.to_char() {
 				text.push(c);
-			} else {
-				if event.code == Key::BackSpace {
-					text.pop();
+				*cursor += 1;
+			} else if event.code == Key::BackSpace {
+				if *cursor != 0 {
+					text.drain((*cursor - 1) as usize..(*cursor) as usize);
+					*cursor = (*cursor - 1).max(0);
 				}
+			} else if event.code == Key::Delete {
+				if *cursor < text.len() as u32 {
+					text.drain((*cursor) as usize..(*cursor + 1) as usize);
+				}
+			} else if event.code == Key::Left {
+				*cursor = cursor.checked_sub(1).unwrap_or(0);
+			} else if event.code == Key::Right {
+				*cursor = (*cursor + 1).min(text.len() as u32);
 			}
 		}
 	}
