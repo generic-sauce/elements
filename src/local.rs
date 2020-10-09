@@ -24,6 +24,8 @@ impl Local {
 
 	fn draw(&mut self) {
 		alert(&self.world.fluidmap.iter().count().to_string());
+		let x = wasm_bindgen::JsValue::from_serde(&self.world).unwrap();
+		draw_world(&x);
 	}
 }
 
