@@ -1,5 +1,5 @@
 pub use std::sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError};
-pub use std::thread::{self, sleep};
+pub use std::thread::{self};
 pub use std::rc::Rc;
 pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr};
 pub use std::collections::HashMap;

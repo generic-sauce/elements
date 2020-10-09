@@ -3,8 +3,20 @@
   <head>
     <meta charset="utf-8">
     <title>hello-wasm example</title>
+
+	<!-- this gets rid of the nasty border around the canvas -->
+	<style>
+		canvas, body {
+			outline: none;
+			border: none;
+			display: block;
+			margin: 0;
+		}
+	</style>
+
   </head>
   <body>
+	<canvas id="main-canvas"> </canvas>
     <script src="./index.js"></script>
   </body>
 </html>

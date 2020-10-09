@@ -23,24 +23,15 @@ impl Local {
 	}
 
 	fn draw(&mut self) {
-		alert(&self.world.fluidmap.iter().count().to_string());
 		let x = wasm_bindgen::JsValue::from_serde(&self.world).unwrap();
 		draw_world(&x);
 	}
 }
 
-pub fn run(mut runnable: Local) {
-	alert("pre!");
-	loop {
-		// TODO force correct fps
-		runnable.tick();
-		runnable.draw();
-
-		/* TODO
-		if !self.window.is_open() {
-			std::process::exit(0);
-		}
-		*/
-	};
+#[wasm_bindgen]
+pub fn work_local(runnable: *mut Local) {
+	unsafe {
+		(*runnable).tick();
+		(*runnable).draw();
+	}
 }
-
