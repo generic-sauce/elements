@@ -19,9 +19,9 @@ impl Menu {
 	pub fn main_menu() -> Menu {
 		Menu {
 			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", RunnableChange::Game(9)),
-				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", RunnableChange::Game(5)),
-				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", RunnableChange::Game(0)),
+				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", RunnableChange::Local(9)),
+				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", RunnableChange::Local(5)),
+				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", RunnableChange::Local(0)),
 				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect to Server", RunnableChange::Menu(MenuChoice::ConnectServer)),
 				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", RunnableChange::Quit),
 			),
@@ -31,7 +31,7 @@ impl Menu {
 	pub fn connect_server_menu() -> Menu {
 		Menu {
 			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect", RunnableChange::Game(5)),
+				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect", RunnableChange::Client(String::from(""))),
 				MenuElement::new_button(CanvasVec::new(0.15 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Back", RunnableChange::Menu(MenuChoice::Main)),
 				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", RunnableChange::Quit),
 				MenuElement::new_edit_field(CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), ""),
@@ -83,7 +83,7 @@ impl Runnable for MenuRunnable {
 				element.clicked = false;
 				match &mut element.kind {
 					MenuKind::Button { runnable_change, .. } => {
-						self.next_runnable_change = *runnable_change;
+						self.next_runnable_change = runnable_change.clone();
 					}
 					MenuKind::EditField { selected, .. } => {
 						*selected = true;
@@ -129,13 +129,13 @@ impl Runnable for MenuRunnable {
 		context.draw_circle(&app.window, app.cursor_position, 0.008, Color::WHITE);
 	}
 
-	fn get_runnable_change(&mut self) -> RunnableChange {
-		self.next_runnable_change
-	}
-
 	fn apply_key(&mut self, ev: &KeyPressedEvent) {
 		if let Some(element) = self.menu.get_selected_element() {
 			element.apply_key_press(ev);
 		}
+	}
+
+	fn get_runnable_change(&mut self) -> RunnableChange {
+		self.next_runnable_change.clone()
 	}
 }

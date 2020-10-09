@@ -89,12 +89,13 @@ pub enum MenuChoice {
 	ConnectServer,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum RunnableChange {
 	None,
 	Quit,
-	Game(u32),
+	Local(u32),
 	Menu(MenuChoice),
+	Client(String),
 }
 
 impl RunnableChange {
@@ -146,9 +147,10 @@ impl App {
 		loop {
 			match runnable_change {
 				RunnableChange::None => panic!("should not receive RunnableChange::None from run_runnable"),
-				RunnableChange::Game(best_of_n) => { self.run_local(best_of_n); runnable_change = RunnableChange::Menu(MenuChoice::Main) },
+				RunnableChange::Local(best_of_n) => { self.run_local(best_of_n); runnable_change = RunnableChange::Menu(MenuChoice::Main) },
 				RunnableChange::Quit => break,
 				RunnableChange::Menu(choice) => runnable_change = self.run_runnable(MenuRunnable::new(choice)),
+				RunnableChange::Client(ip) => { self.run_client(&ip); runnable_change = RunnableChange::Menu(MenuChoice::Main) },
 			}
 		}
 	}
@@ -179,9 +181,10 @@ impl App {
 			runnable_change = runnable.get_runnable_change();
 			match runnable_change {
 				RunnableChange::Quit => { self.window.close(); break; },
-				RunnableChange::Game(_) => { break; },
+				RunnableChange::Local(_) => { break; },
 				RunnableChange::None => {},
 				RunnableChange::Menu(_) => { break; },
+				RunnableChange::Client(_) => { break; },
 			}
 			self.sound_manager.tick();
 
