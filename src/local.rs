@@ -22,21 +22,19 @@ impl Local {
 		self.world.tick(&mut ());
 	}
 
-	fn draw(&mut self, _: &TimedLoopInfo) {
+	fn draw(&mut self) {
 		// TODO
 	}
 }
 
 pub fn run(mut runnable: Local) {
 	alert("pre!");
-	for timed_loop_info in TimedLoop::with_fps(60) {
+	loop {
+		// TODO force correct fps
 		alert("test!");
-		if timed_loop_info.delta_time > timed_loop_info.interval {
-			println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
-		}
 
 		runnable.tick();
-		runnable.draw(&timed_loop_info);
+		runnable.draw();
 
 		/* TODO
 		if !self.window.is_open() {

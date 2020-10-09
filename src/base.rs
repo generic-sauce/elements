@@ -7,7 +7,6 @@ mod input;
 #[macro_use]
 mod fps_timer;
 
-mod timed_loop;
 mod world;
 mod vec;
 mod prelude;

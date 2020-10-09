@@ -1,5 +1,4 @@
 pub use std::sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError};
-pub use std::time::{Duration, SystemTime, Instant};
 pub use std::thread::{self, sleep};
 pub use std::rc::Rc;
 pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr};
@@ -15,7 +14,6 @@ pub use crate::world::player::{*, sensor::*};
 pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
-pub use crate::timed_loop::*;
 
 pub use crate::local::*;
 pub use crate::input::*;
