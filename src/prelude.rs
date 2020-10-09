@@ -19,3 +19,4 @@ pub use crate::timed_loop::*;
 
 pub use crate::local::*;
 pub use crate::input::*;
+pub use wasm_bindgen::prelude::*;
