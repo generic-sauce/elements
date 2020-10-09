@@ -3,7 +3,6 @@ extern crate serde_derive;
 
 mod local;
 mod input;
-mod window_vec;
 
 #[macro_use]
 mod fps_timer;

@@ -47,7 +47,7 @@ impl World {
 	}
 
 	pub fn new() -> World {
-		let tilemap = TileMap::new(unimplemented!());
+		let tilemap = TileMap::new();
 
 		World {
 			players: new_players(),

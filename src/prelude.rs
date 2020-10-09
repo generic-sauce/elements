@@ -19,4 +19,3 @@ pub use crate::timed_loop::*;
 
 pub use crate::local::*;
 pub use crate::input::*;
-pub use crate::window_vec::*;
