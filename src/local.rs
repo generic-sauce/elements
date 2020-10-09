@@ -29,6 +29,7 @@ impl Local {
 
 pub fn run(mut runnable: Local) {
 	for timed_loop_info in TimedLoop::with_fps(60) {
+		alert("test!");
 		if timed_loop_info.delta_time > timed_loop_info.interval {
 			println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
 		}
