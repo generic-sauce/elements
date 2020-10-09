@@ -8,7 +8,6 @@ impl EventHandler for () {
 	fn damage_inflicted(&mut self, _damage: i32, _player: usize) {}
 }
 
-#[cfg(feature = "client")]
 mod client {
 	use super::EventHandler;
 
@@ -36,5 +35,4 @@ mod client {
 		}
 	}
 }
-#[cfg(feature = "client")]
 pub use client::*;

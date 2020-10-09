@@ -2,33 +2,45 @@ use crate::prelude::*;
 
 pub struct Local {
 	inputs: [InputDevice; 2],
-	client_world: ClientWorld,
+	world: World,
 }
 
 impl Local {
-	pub fn new(gilrs: &Gilrs) -> Local {
-		let inputs = [InputDevice::new_adaptive(0, false, gilrs), InputDevice::new_adaptive(1, true, gilrs)];
+	pub fn new() -> Local {
+		let inputs = [InputDevice, InputDevice];
 
 		Local {
 			inputs,
-			client_world: ClientWorld::new(),
+			world: World::new(),
 		}
 	}
-}
 
-impl Runnable for Local {
-	fn tick(&mut self, app: &mut App) {
+	fn tick(&mut self) {
 		for (i, input) in self.inputs.iter_mut().enumerate() {
-			self.client_world.world.players[i].input = input.update(&app.gilrs);
+			self.world.players[i].input = input.update();
 		}
-		self.client_world.tick(app);
+		self.world.tick(&mut ());
 	}
 
-	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
-		self.client_world.draw(app, timed_loop_info);
-	}
-
-	fn get_runnable_change(&mut self) -> RunnableChange {
-		RunnableChange::None
+	fn draw(&mut self, _: &TimedLoopInfo) {
+		// TODO
 	}
 }
+
+pub fn run(mut runnable: Local) {
+	for timed_loop_info in TimedLoop::with_fps(60) {
+		if timed_loop_info.delta_time > timed_loop_info.interval {
+			println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
+		}
+
+		runnable.tick();
+		runnable.draw(&timed_loop_info);
+
+		/* TODO
+		if !self.window.is_open() {
+			std::process::exit(0);
+		}
+		*/
+	};
+}
+

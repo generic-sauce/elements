@@ -2,8 +2,6 @@ pub mod player;
 pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
-#[cfg(feature = "client")]
-pub mod client_world;
 mod update;
 mod event;
 
@@ -34,8 +32,8 @@ pub struct World {
 
 fn new_players() -> [Player; 2] {
 	[
-		Player::new(TileVec::new(37, 39).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
-		Player::new(TileVec::new(88, 40).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
+		Player::new(TileVec::new(37, 39).into(), PlayerDirection::Right),
+		Player::new(TileVec::new(88, 40).into(), PlayerDirection::Left),
 	]
 }
 
@@ -49,7 +47,7 @@ impl World {
 	}
 
 	pub fn new() -> World {
-		let tilemap = TileMap::new(&res("map/map02.png"));
+		let tilemap = TileMap::new(unimplemented!());
 
 		World {
 			players: new_players(),

@@ -49,7 +49,6 @@ pub struct Player {
 	pub free_wall: u32,
 	pub last_wall_pos: Option<GameVec>,
 	pub grab_cooldown: Option<u32>,
-	pub animation: Animation,
 	pub direction: PlayerDirection,
 	pub walljumped: bool,
 	pub input: InputState,
@@ -58,8 +57,6 @@ pub struct Player {
 impl World {
 	pub fn tick_player(&mut self, p: usize) {
 		let pl = &mut self.players[p];
-		pl.animation.tick();
-		pl.select_animation(p, &self.tilemap);
 		pl.apply_forces(&self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
 
@@ -72,7 +69,7 @@ impl World {
 }
 
 impl Player {
-	pub fn new(left_bot: GameVec, animation_id: AnimationId, direction: PlayerDirection) -> Player {
+	pub fn new(left_bot: GameVec, direction: PlayerDirection) -> Player {
 		Player {
 			left_bot,
 			velocity: GameVec::new(0, 0),
@@ -81,43 +78,9 @@ impl Player {
 			free_wall: 0,
 			last_wall_pos: None,
 			grab_cooldown: None,
-			animation: Animation::new(animation_id),
 			direction,
 			walljumped: true,
 			input: InputState::new(),
-		}
-	}
-
-	fn select_animation(&mut self, player_id: usize, t: &TileMap) {
-		let (run, idle, jump, fall, fall_slow) = if player_id == 0 {
-			(AnimationId::BluePlayerRun, AnimationId::BluePlayerIdle, AnimationId::BluePlayerJump, AnimationId::BluePlayerFall, AnimationId::BluePlayerFallSlow)
-		} else {
-			(AnimationId::RedPlayerRun, AnimationId::RedPlayerIdle, AnimationId::RedPlayerJump, AnimationId::RedPlayerFall, AnimationId::RedPlayerFallSlow)
-		};
-
-		let animation_id = if self.is_grounded(t) {
-			if self.velocity.x.abs() > 10 {
-				run
-			} else {
-				idle
-			}
-		} else {
-			if self.velocity.y > 70 {
-				jump
-			} else if self.velocity.y > -70 {
-				fall_slow
-			} else {
-				fall
-			}
-		};
-
-		self.direction =
-			if self.velocity.x < 0 { PlayerDirection::Left }
-			else if self.velocity.x > 0 { PlayerDirection::Right }
-			else { self.direction };
-
-		if self.animation.animation_id != animation_id {
-			self.animation = Animation::new(animation_id);
 		}
 	}
 
