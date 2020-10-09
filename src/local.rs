@@ -28,6 +28,7 @@ impl Local {
 }
 
 pub fn run(mut runnable: Local) {
+	alert("pre!");
 	for timed_loop_info in TimedLoop::with_fps(60) {
 		alert("test!");
 		if timed_loop_info.delta_time > timed_loop_info.interval {
