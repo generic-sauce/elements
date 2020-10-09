@@ -74,14 +74,14 @@ impl MenuElement {
 			target,
 			self.position,
 			self.size - CanvasVec::new(EDIT_FIELD_BORDER_WIDTH, EDIT_FIELD_BORDER_WIDTH),
-			Color::BLACK,
+			Color::rgb(0, 10, 40),
 			Origin::Center
 		);
 		if selected {
 			let text_width = context.get_text_width(BUTTON_TEXT_SIZE, &text[..cursor as usize]);
 			context.draw_rect(
 				target,
-				CanvasVec::new(self.position.x - self.size.x + 0.012 + text_width, self.position.y),
+				CanvasVec::new(self.position.x - self.size.x + 0.013 + text_width, self.position.y),
 				CanvasVec::new(0.001, self.size.y * 0.7),
 				Color::WHITE,
 				Origin::Center
