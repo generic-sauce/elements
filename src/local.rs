@@ -23,7 +23,7 @@ impl Local {
 	}
 
 	fn draw(&mut self) {
-		// TODO
+		alert(&self.world.fluidmap.iter().count().to_string());
 	}
 }
 
@@ -31,8 +31,6 @@ pub fn run(mut runnable: Local) {
 	alert("pre!");
 	loop {
 		// TODO force correct fps
-		alert("test!");
-
 		runnable.tick();
 		runnable.draw();
 
