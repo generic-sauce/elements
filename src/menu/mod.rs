@@ -22,7 +22,7 @@ impl Menu {
 				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", RunnableChange::Local(9)),
 				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", RunnableChange::Local(5)),
 				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", RunnableChange::Local(0)),
-				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect to Server", RunnableChange::Menu(MenuChoice::ConnectServer)),
+				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Join Server", RunnableChange::Menu(MenuChoice::ConnectServer)),
 				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", RunnableChange::Quit),
 			),
 		}
@@ -34,7 +34,7 @@ impl Menu {
 				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect", RunnableChange::Client(String::from(""))),
 				MenuElement::new_button(CanvasVec::new(0.15 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Back", RunnableChange::Menu(MenuChoice::Main)),
 				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", RunnableChange::Quit),
-				MenuElement::new_edit_field(CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), ""),
+				MenuElement::new_edit_field("ip", CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), ""),
 			)
 		}
 	}
@@ -45,6 +45,10 @@ impl Menu {
 
 	pub fn get_selected_element(&mut self) -> Option<&mut MenuElement> {
 		self.elements.iter_mut().find(|e| if let MenuKind::EditField { selected, .. } = e.kind { selected } else { false })
+	}
+
+	pub fn get_element_by_name(&mut self, name: &'static str) -> Option<&mut MenuElement> {
+		self.elements.iter_mut().find(|e| e.name == name)
 	}
 }
 
@@ -84,6 +88,11 @@ impl Runnable for MenuRunnable {
 				match &mut element.kind {
 					MenuKind::Button { runnable_change, .. } => {
 						self.next_runnable_change = runnable_change.clone();
+						if let RunnableChange::Client(ip) = &mut self.next_runnable_change {
+							if let MenuKind::EditField { text, .. } = &self.menu.get_element_by_name("ip").unwrap().kind {
+								*ip = text.clone();
+							}
+						}
 					}
 					MenuKind::EditField { selected, .. } => {
 						*selected = true;

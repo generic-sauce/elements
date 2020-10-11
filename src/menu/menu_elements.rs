@@ -4,6 +4,7 @@ const BUTTON_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 
 pub struct MenuElement {
+	pub name: &'static str,
 	pub kind: MenuKind,
 	pub position: CanvasVec,
 	pub size: CanvasVec,
@@ -26,6 +27,7 @@ pub enum MenuKind {
 impl MenuElement {
 	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, runnable_change: RunnableChange) -> MenuElement {
 		MenuElement {
+			name: "",
 			kind: MenuKind::Button { runnable_change, text },
 			position,
 			size,
@@ -34,8 +36,9 @@ impl MenuElement {
 		}
 	}
 
-	pub fn new_edit_field(position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement {
+	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement {
 		MenuElement {
+			name,
 			kind: MenuKind::EditField { text: String::from(text), selected: false, cursor: 0 },
 			position,
 			size,
