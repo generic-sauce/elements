@@ -73,13 +73,9 @@ window.drawScene = function(gl, programInfo, buffers) {
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
-	// Now create an array of positions for the square.
-
-	const positions = player_rect(0);
-
-	// Now pass the list of positions into WebGL to build the
-	// shape. We do this by creating a Float32Array from the
-	// JavaScript array, then use it to fill the current buffer.
+	const r0 = player_rect(0);
+	const r1 = player_rect(1);
+	const positions = [r0.slice(0, 6), r0.slice(2,8), r1.slice(0, 6), r1.slice(2,8)].flat();
 
 	gl.bufferData(gl.ARRAY_BUFFER,
 								new Float32Array(positions),
@@ -111,8 +107,8 @@ window.drawScene = function(gl, programInfo, buffers) {
 
 	{
 		const offset = 0;
-		const vertexCount = 4;
-		gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+		const vertexCount = 12;
+		gl.drawArrays(gl.TRIANGLES, offset, vertexCount);
 	}
 }
 
