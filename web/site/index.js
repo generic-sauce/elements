@@ -10,5 +10,6 @@ function schedule(local, js) {
 const js = import("./node_modules/elements2/elements2.js");
 js.then(js => {
 	var local = js.init();
+	init_drawing();
 	schedule(local, js);
 });
