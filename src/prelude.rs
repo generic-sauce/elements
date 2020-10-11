@@ -36,4 +36,5 @@ impl Constants {
 extern {
 	pub fn alert(s: &str);
 	pub fn draw_world(w: &JsValue, constants: JsValue);
+	pub fn get_wasd() -> JsValue;
 }
