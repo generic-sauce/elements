@@ -1,4 +1,4 @@
-import "./draw.js"
+import "./draw.js";
 
 // TODO nice main-loop
 function schedule(local, js) {
