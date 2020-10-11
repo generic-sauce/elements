@@ -24,7 +24,8 @@ impl Local {
 
 	fn draw(&mut self) {
 		let x = wasm_bindgen::JsValue::from_serde(&self.world).unwrap();
-		draw_world(&x);
+		let y = wasm_bindgen::JsValue::from_serde(&Constants::new()).unwrap();
+		draw_world(&x, y);
 	}
 }
 

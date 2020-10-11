@@ -19,8 +19,21 @@ pub use crate::local::*;
 pub use crate::input::*;
 pub use wasm_bindgen::prelude::*;
 
+#[derive(Serialize, Deserialize)]
+pub struct Constants {
+	player_size: GameVec,
+}
+
+impl Constants {
+	pub fn new() -> Constants {
+		Constants {
+			player_size: PLAYER_SIZE,
+		}
+	}
+}
+
 #[wasm_bindgen]
 extern {
 	pub fn alert(s: &str);
-	pub fn draw_world(w: &JsValue);
+	pub fn draw_world(w: &JsValue, constants: JsValue);
 }

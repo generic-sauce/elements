@@ -33,10 +33,40 @@ window.init_drawing = function() {
 	window.buffers = { position: gl.createBuffer() };
 }
 
-window.draw_world = function(world) {
+window.draw_world = function(world, constants) {
 	window.world = world;
+	window.constants = constants;
 
 	drawScene(window.gl, window.programInfo, window.buffers);
+}
+
+function max_game_point() {
+	return world.tilemap.size
+		.map(x => x * 256);
+}
+
+function game_to_screen_point(p) {
+	return [p[0] / max_game_point()[0], p[1] / max_game_point()[1]]
+		.map(x => 2*x - 1);
+}
+
+function player_rect(i) {
+	const lb = window.world.players[i].left_bot;
+	const s = window.constants.player_size;
+	const game_rect = [
+		[lb[0]       , lb[1]],
+		[lb[0] + s[0], lb[1]],
+		[lb[0]       , lb[1] + s[1]],
+		[lb[0] + s[0], lb[1] + s[1]],
+	];
+	let screen_rect = game_rect.map(game_to_screen_point);
+	return [
+		screen_rect[0][0], screen_rect[0][1],
+		screen_rect[1][0], screen_rect[1][1],
+		screen_rect[2][0], screen_rect[2][1],
+		screen_rect[3][0], screen_rect[3][1],
+	];
+
 }
 
 window.drawScene = function(gl, programInfo, buffers) {
@@ -45,13 +75,7 @@ window.drawScene = function(gl, programInfo, buffers) {
 
 	// Now create an array of positions for the square.
 
-	const p = window.world.players[0].left_bot[1] / 12000;
-	const positions = [
-		-p,	p,
-		 p,	p,
-		-p, -p,
-		 p, -p,
-	];
+	const positions = player_rect(0);
 
 	// Now pass the list of positions into WebGL to build the
 	// shape. We do this by creating a Float32Array from the
