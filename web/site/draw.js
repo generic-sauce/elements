@@ -13,7 +13,7 @@ window.init_drawing = function() {
 		varying highp vec2 vTextureCoord;
 
 		void main() {
-			gl_Position = vec4(aVertexPosition, 0, 0);
+			gl_Position = vec4(aVertexPosition, 0, 1);
 			vTextureCoord = aTextureCoord;
 		}
 	`;
@@ -24,6 +24,7 @@ window.init_drawing = function() {
 		uniform sampler2D uSampler;
 
 		void main() {
+			// gl_FragColor = vec4(texture2D(uSampler, vTextureCoord).rgb, 1.0);
 			gl_FragColor = texture2D(uSampler, vTextureCoord);
 		}
 	`;
@@ -46,8 +47,8 @@ window.init_drawing = function() {
 	const r = [
 		0.0,  0.0,
 		1.0,  0.0,
-		1.0,  1.0,
 		0.0,  1.0,
+		1.0,  1.0,
 	];
 	const tc = [r.slice(0, 6), r.slice(2,8), r.slice(0, 6), r.slice(2,8)].flat();
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tc), gl.STATIC_DRAW);
@@ -106,7 +107,7 @@ window.drawScene = function(gl, programInfo, buffers) {
 								new Float32Array(positions),
 								gl.STATIC_DRAW);
 
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
+	gl.clearColor(0.3, 0.0, 0.0, 1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	{
