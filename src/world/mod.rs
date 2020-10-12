@@ -12,15 +12,24 @@ pub use event::*;
 
 use crate::prelude::*;
 
-const RESTART_DELAY_COUNT: u32 = 90;
+const RESTART_DELAY_COUNT: u32 = 120;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum RestartState {
 	Game,
-	Restart { counter: u32 },
+	Restart { counter: u32, tick_value: f32 },
 }
 
+impl RestartState {
+	pub fn new_restart() -> RestartState {
+		RestartState::Restart { counter: 0, tick_value: 1.0 }
+	}
+}
+
+pub fn get_frame_tick_probability(counter: u32) -> f32 {
+	1.0 - counter as f32 / RESTART_DELAY_COUNT as f32
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct World {
@@ -64,32 +73,45 @@ impl World {
 	}
 
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
+		let mut should_tick = false;
 		// sub-tick
-		match self.restart_state {
+		match &mut self.restart_state {
 			RestartState::Game => {
-				self.tick_fluidmap();
-				self.tick_players();
-				self.handle_skills(handler);
-				self.spawn_fluids();
-				self.despawn_fluids();
-				self.despawn_walls(handler);
-				self.check_damage(handler);
+				self.tick_impl(handler);
 				if let Some(p) = self.player_dead() {
 					self.kills[1-p] += 1;
-					self.restart_state = RestartState::Restart { counter: 0 };
+					self.restart_state = RestartState::new_restart();
 				}
 				self.frame_id += 1;
 			},
-			RestartState::Restart { counter } => {
-				self.restart_state = RestartState::Restart { counter: counter + 1 };
-				if counter >= RESTART_DELAY_COUNT {
+			RestartState::Restart { counter, tick_value } => {
+				*counter += 1;
+				*tick_value += get_frame_tick_probability(*counter);
+				if *counter >= RESTART_DELAY_COUNT {
 					if self.players.iter().any(|p| p.input.restart()) {
 						self.reset(handler);
 						self.restart_state = RestartState::Game;
 					}
+				} else if *tick_value >= 1.0 {
+					*tick_value -= 1.0;
+					should_tick = true;
 				}
 			}
 		}
+
+		if should_tick {
+			self.tick_impl(handler);
+		}
+	}
+
+	fn tick_impl(&mut self, handler: &mut impl EventHandler) {
+		self.tick_fluidmap();
+		self.tick_players();
+		self.handle_skills(handler);
+		self.spawn_fluids();
+		self.despawn_fluids();
+		self.despawn_walls(handler);
+		self.check_damage(handler);
 	}
 
 	fn tick_players(&mut self) {
