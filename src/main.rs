@@ -61,7 +61,7 @@ fn main() {
 		.build(&event_loop)
 		.unwrap();
 
-	let (window, mut graphics) = Graphics::new(window);
+	let mut graphics = Graphics::new(&window);
 
 	event_loop.run(move |event, window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
@@ -72,63 +72,12 @@ fn main() {
 			},
 			win::Event::WindowEvent {event: win::WindowEvent::Resized(size), ..} => {
 				graphics.resize(Vec2u::new(size.width, size.height));
-				// swap_chain_desc.width = size.width;
-				// swap_chain_desc.height = size.height;
-				// swap_chain = device.create_swap_chain(&surface, &swap_chain_desc);
 			},
 			win::Event::MainEventsCleared => {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
 				graphics.render();
-				// let frame = swap_chain
-				// 	.get_current_frame()
-				// 	.unwrap()
-				// 	.output;
-
-				// let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-				// 	label: Some("command encoder")
-				// });
-        //
-				// let dur = start_time.elapsed().as_millis() as f32 / 1000.0;
-				// let uniforms = vec!(
-				// 	(dur + std::f32::consts::PI * 0.0/3.0).sin() * 0.5 + 0.5,
-				// 	(dur + std::f32::consts::PI * 1.0/3.0).sin() * 0.5 + 0.5,
-				// 	(dur + std::f32::consts::PI * 2.0/3.0).sin() * 0.5 + 0.5,
-				// );
-				// queue.write_buffer(&uniform_buffer, 0, bytemuck::cast_slice(&uniforms));
-        //
-				// {
-				// 	let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-				// 		color_attachments: &[
-				// 			wgpu::RenderPassColorAttachmentDescriptor {
-				// 				attachment: &frame.view,
-				// 				resolve_target: None,
-				// 				ops: wgpu::Operations {
-				// 					load: wgpu::LoadOp::Clear(wgpu::Color {
-				// 						r: 0.03,
-				// 						g: 0.025,
-				// 						b: 0.025,
-				// 						a: 1.0,
-				// 					}),
-				// 					store: true
-				// 				}
-				// 			},
-				// 		],
-				// 		depth_stencil_attachment: None
-				// 	});
-        //
-				// 	render_pass.set_pipeline(&render_pipeline);
-				// 	render_pass.set_bind_group(
-				// 		0,
-				// 		&bind_group,
-				// 		&[]
-				// 	);
-				// 	render_pass.set_vertex_buffer(0, vert_buffer.slice(..));
-				// 	render_pass.draw(0..3, 0..1);
-				// }
-        //
-				// queue.submit(Some(encoder.finish()));
 			},
 			_ => ()
 		}
