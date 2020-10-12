@@ -45,10 +45,10 @@ window.init_drawing = function() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
 
 	const r = [
-		0.0,  0.0,
-		1.0,  0.0,
 		0.0,  1.0,
 		1.0,  1.0,
+		0.0,  0.0,
+		1.0,  0.0,
 	];
 	const tc = [r.slice(0, 6), r.slice(2,8), r.slice(0, 6), r.slice(2,8)].flat();
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tc), gl.STATIC_DRAW);
