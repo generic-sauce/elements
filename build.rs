@@ -22,6 +22,6 @@ fn compile_shader(shader_name: &str) {
 }
 
 fn main() {
-	compile_shader("render.vert");
-	compile_shader("render.frag");
+	compile_shader("shader.vert");
+	compile_shader("shader.frag");
 }

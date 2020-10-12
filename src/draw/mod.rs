@@ -2,8 +2,8 @@ mod player;
 mod fluidmap;
 mod tilemap;
 mod hud;
-mod render;
-pub use render::*;
+// mod render;
+// pub use render::*;
 
 use crate::prelude::*;
 
@@ -17,7 +17,7 @@ impl ClientWorld {
 		let aspect_ratio = 16.0 / 9.0;
 		let (window_view, view, view_pixel_size) = self.get_views(app, aspect_ratio);
 
-		// declare render target
+		// // declare render target
 		let mut game_texture_target = RenderTexture::new(view_pixel_size.x as u32, view_pixel_size.y as u32, false).unwrap();
 		let mut game_noise_target = RenderTexture::new(view_pixel_size.x as u32, view_pixel_size.y as u32, false).unwrap();
 
@@ -39,18 +39,18 @@ impl ClientWorld {
 			aspect_ratio,
 		};
 
-		let px_window = &app.px_window;
-		let px_pixels = &mut app.px_pixels;
-		self.renderer.update(&px_pixels.queue());
-		let render_result = px_pixels.render_with(|encoder, render_target, context| {
-			self.renderer.render(encoder, render_target);
-		});
-
-		if render_result
-			.is_err()
-		{
-			dbg!("error drawing with pixels");
-		}
+		// let px_window = &app.px_window;
+		// let px_pixels = &mut app.px_pixels;
+		// self.renderer.update(&px_pixels.queue());
+		// let render_result = px_pixels.render_with(|encoder, render_target, context| {
+		// 	self.renderer.render(encoder, render_target);
+		// });
+    //
+		// if render_result
+		// 	.is_err()
+		// {
+		// 	dbg!("error drawing with pixels");
+		// }
 
 		// draw game
 		context.fill_canvas_with_color(&game_texture_target, Color::rgb(115, 128, 56));

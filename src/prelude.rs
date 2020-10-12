@@ -16,15 +16,15 @@ pub use itertools::iproduct;
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
 
-#[cfg(feature = "client")] pub mod pxp { // the pixels prelude, release into global scope later
-	pub use pixels::{Error, Pixels, SurfaceTexture};
-	pub use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
-	pub use winit::event::{Event, VirtualKeyCode, WindowEvent};
-	pub use winit::event_loop::{ControlFlow, EventLoop};
-	pub use winit::window::Window;
-	pub use winit_input_helper::WinitInputHelper;
+#[cfg(feature = "client")] pub use winit_input_helper::WinitInputHelper;
+#[cfg(feature = "client")] pub mod win {
+	pub use winit::{
+			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, },
+			window::{ Window, WindowBuilder, },
+			event::{ Event, VirtualKeyCode, WindowEvent, },
+			event_loop::{ EventLoop, ControlFlow, },
+	};
 }
-#[cfg(feature = "client")] pub use pixels::wgpu as wgpu;
 
 pub use crate::server::*;
 pub use crate::world::*;
@@ -51,4 +51,4 @@ pub use crate::resource::res;
 #[cfg(feature = "client")] pub use crate::input::*;
 #[cfg(feature = "client")] pub use crate::window_vec::*;
 #[cfg(feature = "client")] pub use crate::menu::*;
-#[cfg(feature = "client")] pub use crate::px::*;
+#[cfg(feature = "client")] pub use crate::graphics::*;
