@@ -59,6 +59,13 @@ window.init_drawing = function() {
 	window.texture = loadTexture(gl, './file.png');
 }
 
+window.addEventListener("gamepadconnected", function(e) {
+  // TODO really handle controller input
+
+  // alert("Gamepad connected at index %d: %s. %d buttons, %d axes.");
+  // alert([e.gamepad.index, e.gamepad.id, e.gamepad.buttons.length, e.gamepad.axes.length]);
+});
+
 window.draw_world = function(world, constants) {
 	window.world = world;
 	window.constants = constants;
