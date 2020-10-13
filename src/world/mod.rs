@@ -59,7 +59,7 @@ impl World {
 	}
 
 	pub fn new(best_of_n: u32) -> World {
-		let tilemap = TileMap::new(&res("map/map02.png"));
+		let tilemap = TileMap::new(&res("map/map04.png"));
 
 		World {
 			players: new_players(),
