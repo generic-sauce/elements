@@ -3,7 +3,8 @@
     "serve": "webpack-dev-server"
   },
   "dependencies": {
-    "elements2": "^0.1.0"
+    "elements2": "^0.1.0",
+    "package.json": "^2.0.1"
   },
   "devDependencies": {
     "webpack": "^4.25.1",

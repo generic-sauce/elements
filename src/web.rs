@@ -8,6 +8,11 @@ pub fn tick_world_nohandler(w: *mut World) {
 }
 
 #[wasm_bindgen]
+pub fn world_to_json(w: *const World) -> JsValue {
+	JsValue::from_serde(unsafe { & *w }).unwrap()
+}
+
+#[wasm_bindgen]
 pub fn new_world() -> *mut World {
 	Box::leak(Box::new(World::new())) as *mut World
 }

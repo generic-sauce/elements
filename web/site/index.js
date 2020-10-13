@@ -9,6 +9,9 @@ function schedule(local, js) {
 
 const js = import("./node_modules/elements2/elements2.js");
 js.then(js => {
-	var local = js.init();
-	schedule(local, js);
+	const w = js.new_world();
+	alert(w);
+	const jsonw = js.world_to_json(w);
+	alert(jsonw);
+	schedule(new Object(), js);
 });
