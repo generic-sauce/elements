@@ -19,6 +19,8 @@ extern crate lazy_static;
 #[cfg(feature = "native-client")] mod window_vec;
 #[cfg(feature = "native-client")] mod menu;
 
+#[cfg(feature = "web-client")] mod web;
+
 #[cfg(not(feature = "web-client"))] mod server;
 #[cfg(not(feature = "web-client"))] mod net;
 #[cfg(not(feature = "web-client"))] mod resource;
