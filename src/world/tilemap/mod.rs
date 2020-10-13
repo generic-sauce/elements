@@ -20,8 +20,10 @@ pub struct TileMap {
 }
 
 impl TileMap {
-	pub fn new(filename: &str) -> TileMap {
+	#[cfg(not(feature = "web-client"))]
+	pub fn new() -> TileMap {
 		use image::{GenericImageView, Rgba};
+		let filename = res("map/map02.png");
 
 		let image = image::open(filename).unwrap();
 		let (width, height) = image.dimensions();
@@ -35,6 +37,27 @@ impl TileMap {
 					c => panic!("tile color out of range! {:?}", c),
 				};
 				tiles.push(tile);
+			}
+		}
+
+		let size = TileVec::new(width as i32, height as i32);
+		TileMap {
+			tiles,
+			size,
+		}
+	}
+
+	#[cfg(feature = "web-client")]
+	pub fn new() -> TileMap {
+		let width = 128;
+		let height = 72;
+		let mut tiles = vec![Tile::Void; (width * height) as usize];
+
+		for y in 0..height {
+			for x in 0..width {
+				if x == 0 || y == 0 || x == width-1 || y == height-1 {
+					tiles[x + y * width] = Tile::Ground;
+				}
 			}
 		}
 

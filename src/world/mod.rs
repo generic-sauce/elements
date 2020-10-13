@@ -48,8 +48,7 @@ impl World {
 	}
 
 	pub fn new() -> World {
-		#[cfg(not(feature = "web-client"))] let tilemap = TileMap::new(&res("map/map02.png"));
-		#[cfg(feature = "web-client")]		let tilemap = TileMap::new(unimplemented!("tilemap loading"));
+		let tilemap = TileMap::new();
 
 		World {
 			players: new_players(),
