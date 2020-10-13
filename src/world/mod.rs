@@ -2,13 +2,12 @@ pub mod player;
 pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
-#[cfg(feature = "client")]
-pub mod client_world;
-mod update;
-mod event;
 
-pub use update::*;
+mod event;
 pub use event::*;
+
+mod update;
+pub use update::*;
 
 use crate::prelude::*;
 
@@ -49,7 +48,8 @@ impl World {
 	}
 
 	pub fn new() -> World {
-		let tilemap = TileMap::new(&res("map/map02.png"));
+		#[cfg(not(feature = "web-client"))] let tilemap = TileMap::new(&res("map/map02.png"));
+		#[cfg(feature = "web-client")]		let tilemap = TileMap::new(unimplemented!("tilemap loading"));
 
 		World {
 			players: new_players(),

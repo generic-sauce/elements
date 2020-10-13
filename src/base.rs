@@ -5,18 +5,23 @@ extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
 
-#[cfg(feature = "client")] mod animation_state;
-#[cfg(feature = "client")] mod client;
-#[cfg(feature = "client")] mod texture_state;
-#[cfg(feature = "client")] mod shader_state;
-#[cfg(feature = "client")] mod font_state;
-#[cfg(feature = "client")] mod draw_context;
-#[cfg(feature = "client")] mod app;
-#[cfg(feature = "client")] mod local;
-#[cfg(feature = "client")] mod draw;
-#[cfg(feature = "client")] mod input;
-#[cfg(feature = "client")] mod window_vec;
-#[cfg(feature = "client")] mod menu;
+#[cfg(feature = "native-client")] mod animation_state;
+#[cfg(feature = "native-client")] mod client;
+#[cfg(feature = "native-client")] mod client_world;
+#[cfg(feature = "native-client")] mod texture_state;
+#[cfg(feature = "native-client")] mod shader_state;
+#[cfg(feature = "native-client")] mod font_state;
+#[cfg(feature = "native-client")] mod draw_context;
+#[cfg(feature = "native-client")] mod app;
+#[cfg(feature = "native-client")] mod local;
+#[cfg(feature = "native-client")] mod draw;
+#[cfg(feature = "native-client")] mod input;
+#[cfg(feature = "native-client")] mod window_vec;
+#[cfg(feature = "native-client")] mod menu;
+
+#[cfg(not(feature = "web-client"))] mod server;
+#[cfg(not(feature = "web-client"))] mod net;
+#[cfg(not(feature = "web-client"))] mod resource;
 
 #[macro_use]
 mod fps_timer;
@@ -24,8 +29,5 @@ mod fps_timer;
 mod timed_loop;
 mod world;
 mod vec;
-mod server;
-mod net;
 mod animation;
-mod resource;
 mod prelude;
