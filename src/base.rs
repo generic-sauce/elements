@@ -24,11 +24,11 @@ extern crate lazy_static;
 #[cfg(not(feature = "web-client"))] mod server;
 #[cfg(not(feature = "web-client"))] mod net;
 #[cfg(not(feature = "web-client"))] mod resource;
+#[cfg(not(feature = "web-client"))] mod timed_loop;
 
 #[macro_use]
 mod fps_timer;
 
-mod timed_loop;
 mod world;
 mod vec;
 mod animation;

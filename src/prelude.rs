@@ -15,17 +15,17 @@ pub use std::fs::File;
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
 
-#[cfg(not(feature = "web-client"))] pub use crate::server::*;
 pub use crate::world::*;
 pub use crate::world::player::{*, sensor::*};
 pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
-pub use crate::timed_loop::*;
 pub use crate::animation::*;
 
 #[cfg(not(feature = "web-client"))] pub use crate::net::*;
 #[cfg(not(feature = "web-client"))] pub use crate::resource::res;
+#[cfg(not(feature = "web-client"))] pub use crate::timed_loop::*;
+#[cfg(not(feature = "web-client"))] pub use crate::server::*;
 
 #[cfg(feature = "web-client")] pub use crate::web::*;
 
