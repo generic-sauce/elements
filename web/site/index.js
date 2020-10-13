@@ -1,17 +1,16 @@
 // TODO nice main-loop
-function schedule(local, js) {
+function schedule(w, js) {
 
-	// TODO call wasm-tick here
+	js.tick_world_nohandler(w);
+	console.log(js.world_to_json(w).players[0].left_bot);
 
-	const re_schedule = function() { schedule(local, js); }
+	const re_schedule = function() { schedule(w, js); }
 	setTimeout(re_schedule, 16);
 }
 
 const js = import("./node_modules/elements2/elements2.js");
 js.then(js => {
+	js.init();
 	const w = js.new_world();
-	alert(w);
-	const jsonw = js.world_to_json(w);
-	alert(jsonw);
-	schedule(new Object(), js);
+	schedule(w, js);
 });
