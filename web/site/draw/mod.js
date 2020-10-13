@@ -62,7 +62,7 @@ e2.draw_world = function() {
 
 	gl.useProgram(programInfo.program);
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, window.texture);
+	gl.bindTexture(gl.TEXTURE_2D, e2.texture);
 	gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
 	{
