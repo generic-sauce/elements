@@ -8,12 +8,11 @@ function init() {
 	e2.rust.init();
 	e2.cnst = e2.rust.constants();
 	e2.init_drawing();
-	e2.init_input();
 	e2.world_ptr = e2.rust.new_world();
 }
 
 function tick() {
-	e2.rust.tick_world(e2.world_ptr, e2.input_states);
+	e2.rust.tick_world(e2.world_ptr, e2.get_input_states());
 	e2.world = e2.rust.world_to_json(e2.world_ptr);
 	e2.draw_world();
 }
