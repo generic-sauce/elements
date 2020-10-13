@@ -29,5 +29,3 @@ mod net;
 mod animation;
 mod resource;
 mod prelude;
-
-use crate::prelude::*;

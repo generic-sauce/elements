@@ -3,6 +3,8 @@
 
 include!("base.rs");
 
+use crate::prelude::*;
+
 #[cfg(feature = "client")]
 fn main() {
 	let server_arg = std::env::args().nth(1);
