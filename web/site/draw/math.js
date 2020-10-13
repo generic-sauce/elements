@@ -11,7 +11,7 @@ e2.game_to_screen_point = function(p) {
 
 e2.player_rect = function(i) {
 	const lb = e2.world.players[i].left_bot;
-	const s = [2000, 2000]; // TODO window.constants.player_size;
+	const s = e2.cnst.PLAYER_SIZE;
 	const game_rect = [
 		[lb[0]       , lb[1]],
 		[lb[0] + s[0], lb[1]],

@@ -16,6 +16,7 @@ js.then(rust => {
 	e2.rust = rust;
 
 	e2.rust.init();
+	e2.cnst = e2.rust.constants();
 	e2.init_drawing();
 	e2.world_ptr = e2.rust.new_world();
 
