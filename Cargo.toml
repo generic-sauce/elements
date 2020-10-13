@@ -10,7 +10,7 @@ edition = "2018"
 default = ["native-client"]
 client = []
 native-client = ["client", "sfml", "gilrs", "rodio", "lazy_static"]
-web-client =    ["client", "sfml", "gilrs", "rodio", "lazy_static"] # TODO remove these obsolete dependencies
+web-client =    ["client", "sfml", "gilrs", "lazy_static"] # TODO remove these obsolete dependencies
 
 [dependencies]
 image = "0.23"
