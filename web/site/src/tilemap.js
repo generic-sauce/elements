@@ -1,4 +1,4 @@
-e2.load_tilemap = function(filename, callback) {
+export function load(filename, callback) {
 	// TODO allow changing map size
 	var width = 128;
 	var height = 72;

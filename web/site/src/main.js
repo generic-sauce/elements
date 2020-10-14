@@ -1,25 +1,33 @@
 // the object storing the state of our application
 window.e2 = {};
 
-import("./draw/mod.js");
-import("./input.js");
-import("./tilemap.js");
+import * as drawmod from "./draw/mod.js";
+import * as inputmod from "./input.js";
+import * as tilemapmod from "./tilemap.js";
+import("../node_modules/elements2/elements2.js")
+	.then(rust => {
+		e2.rust = rust;
+		init();
+	});
 
 function init() {
 	e2.world_occupied = false
 	e2.rust.init();
 	e2.cnst = e2.rust.constants();
-	e2.init_drawing();
-	e2.load_tilemap("map/map02.png", function(img) {
+
+	drawmod.init();
+	inputmod.init();
+
+	tilemapmod.load("map/map02.png", function(img) {
 		e2.world_ptr = e2.rust.new_world(img);
 		setInterval(meta_tick, 1000.0/60.0);
 	})
 }
 
 function tick() {
-	e2.rust.tick_world(e2.world_ptr, e2.get_input_states());
+	e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
 	e2.world = e2.rust.world_to_json(e2.world_ptr);
-	e2.draw_world();
+	drawmod.draw();
 }
 
 function meta_tick() {
@@ -32,10 +40,3 @@ function meta_tick() {
 	tick();
 	e2.world_occupied = false;
 }
-
-const js = import("../node_modules/elements2/elements2.js");
-js.then(rust => {
-	e2.rust = rust;
-
-	init();
-});

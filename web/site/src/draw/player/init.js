@@ -1,4 +1,4 @@
-e2.init_drawing = function() {
+export function init() {
 	var canvas = e2.canvas;
 	var gl = canvas.getContext("webgl");
 

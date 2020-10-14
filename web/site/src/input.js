@@ -1,7 +1,7 @@
 
 // calculating the input states
 
-e2.get_input_states = function() {
+export function get_input_states() {
 	return [calc_input_state(0), calc_input_state(1)];
 }
 
@@ -42,7 +42,7 @@ function current_hardware_input_state(i) {
 
 // init
 
-function init_inputs() {
+export function init() {
 	function gamepadHandler(ev, connecting) {
 	  var gamepad = ev.gamepad;
 	  // Note:
@@ -75,5 +75,3 @@ function init_inputs() {
 	window.addEventListener("gamepadconnected", function(e) { gamepadHandler(e, true); }, false);
 	window.addEventListener("gamepaddisconnected", function(e) { gamepadHandler(e, false); }, false);
 }
-
-init_inputs();
