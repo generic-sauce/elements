@@ -1,9 +1,9 @@
 import { init, state } from "./init.js";
 import { player_rect } from "./math.js";
 
-export { init }
+export { init, draw }
 
-export function draw() {
+function draw() {
 	const { gl, programInfo, buffers, texture } = state;
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
