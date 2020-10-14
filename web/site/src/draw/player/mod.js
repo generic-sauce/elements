@@ -1,11 +1,10 @@
-export { init } from "./init.js";
-import { player_rect, game_to_screen_point } from "./math.js";
+import { init, state } from "./init.js";
+import { player_rect } from "./math.js";
+
+export { init }
 
 export function draw() {
-	var gl = e2.gl;
-	var buffers = e2.buffers;
-	var programInfo = e2.programInfo;
-
+	const { gl, programInfo, buffers, texture } = state;
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
 	const r0 = player_rect(0);
@@ -57,7 +56,7 @@ export function draw() {
 
 	gl.useProgram(programInfo.program);
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, e2.texture);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
 	{

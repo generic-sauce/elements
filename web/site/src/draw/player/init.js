@@ -1,8 +1,8 @@
-export function init() {
-	var canvas = e2.canvas;
-	var gl = canvas.getContext("webgl");
+export var state = {};
 
-	e2.gl = gl;
+export function init() {
+	var gl = e2.gl;
+	state.gl = gl;
 
 	const vsSource = `
 		attribute vec2 aVertexPosition;
@@ -28,7 +28,7 @@ export function init() {
 	`;
 
 	const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
-	e2.programInfo = {
+	state.programInfo = {
 		program: shaderProgram,
 		attribLocations: {
 			vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
@@ -49,12 +49,12 @@ export function init() {
 		1.0,  0.0,
 	];
 	const tc = [r.slice(0, 6), r.slice(2,8), r.slice(0, 6), r.slice(2,8)].flat();
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tc), gl.STATIC_DRAW);
-	e2.buffers = {
+	state.gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tc), gl.STATIC_DRAW);
+	state.buffers = {
 		position: gl.createBuffer(),
 		textureCoord: textureCoordBuffer,
 	};
-	e2.texture = loadTexture(gl, './file.png');
+	state.texture = loadTexture(gl, './file.png');
 }
 
 function initShaderProgram(gl, vsSource, fsSource) {
