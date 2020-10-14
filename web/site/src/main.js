@@ -20,7 +20,7 @@ function tick() {
 
 function meta_tick() {
 	if (e2.world_occupied) {
-		alert("framedrop!");
+		console.log("framedrop!");
 		return;
 	}
 
