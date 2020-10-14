@@ -18,11 +18,9 @@ function tick() {
 	e2.draw_world();
 }
 
-function schedule() {
-	setTimeout(schedule, 1000.0/60.0);
-
+function meta_tick() {
 	if (e2.world_occupied) {
-		console.log("framedrop!");
+		alert("framedrop!");
 		return;
 	}
 
@@ -37,5 +35,5 @@ js.then(rust => {
 
 	init();
 
-	schedule();
+	setInterval(meta_tick, 1000.0/60.0);
 });
