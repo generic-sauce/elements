@@ -5,6 +5,7 @@ import("./draw/mod.js");
 import("./input.js");
 
 function init() {
+	e2.world_occupied = false
 	e2.rust.init();
 	e2.cnst = e2.rust.constants();
 	e2.init_drawing();
@@ -18,8 +19,16 @@ function tick() {
 }
 
 function schedule() {
+	setTimeout(schedule, 1000.0/60.0);
+
+	if (e2.world_occupied) {
+		console.log("framedrop!");
+		return;
+	}
+
+	e2.world_occupied = true;
 	tick();
-	setTimeout(schedule, 16);
+	e2.world_occupied = false;
 }
 
 const js = import("../node_modules/elements2/elements2.js");
