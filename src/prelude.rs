@@ -28,6 +28,7 @@ pub use crate::animation::*;
 #[cfg(not(feature = "web-client"))] pub use crate::server::*;
 
 #[cfg(feature = "web-client")] pub use crate::web::*;
+#[cfg(feature = "web-client")] pub use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "native-client")] pub use crate::client::*;
 #[cfg(feature = "native-client")] pub use crate::client_world::*;

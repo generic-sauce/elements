@@ -3,6 +3,7 @@ window.e2 = {};
 
 import("./draw/mod.js");
 import("./input.js");
+import("./tilemap.js");
 
 function init() {
 	e2.world_occupied = false
