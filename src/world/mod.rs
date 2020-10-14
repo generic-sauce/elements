@@ -48,7 +48,7 @@ impl World {
 	}
 
 	pub fn new() -> World {
-		let tilemap = TileMap::new();
+		let tilemap = TileMap::new("map/map02.png");
 
 		World {
 			players: new_players(),
