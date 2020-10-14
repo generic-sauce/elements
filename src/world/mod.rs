@@ -47,8 +47,13 @@ impl World {
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new() -> World {
-		let tilemap = TileMap::new("map/map02.png");
+	#[cfg(not(feature = "web-client"))]
+	pub fn new_defaultmap() -> World {
+		Self::new("map/map02.png")
+	}
+
+	pub fn new(mapsrc: impl MapSrc) -> World {
+		let tilemap = TileMap::new(mapsrc);
 
 		World {
 			players: new_players(),

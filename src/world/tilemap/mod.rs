@@ -1,8 +1,8 @@
 mod update;
 pub use update::*;
 
-mod new;
-pub use new::*;
+mod src;
+pub use src::*;
 
 use crate::prelude::*;
 
@@ -22,6 +22,27 @@ pub struct TileMap {
 }
 
 impl TileMap {
+	pub fn new(src: impl MapSrc) -> TileMap {
+		let TileMapImage { pixels, size } = src.image();
+		let mut tiles = Vec::with_capacity((size.x * size.y) as usize);
+
+		for y in 0..size.y {
+			for x in 0..size.x {
+				let tile = match pixels[x as usize][y as usize] {
+					[255, 255, 255, 255] => Tile::Void,
+					[0, 0, 0, 255] => Tile::Ground,
+					c => panic!("tile color out of range! {:?}", c),
+				};
+				tiles.push(tile);
+			}
+		}
+
+		TileMap {
+			tiles,
+			size,
+		}
+	}
+
 	pub fn reset(&mut self, handler: &mut impl EventHandler) {
 		for x in &mut self.tiles {
 			if let Tile::Wall { .. } = x {

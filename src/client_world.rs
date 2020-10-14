@@ -7,7 +7,7 @@ pub struct ClientWorld {
 
 impl ClientWorld {
 	pub fn new() -> ClientWorld {
-		let world = World::new();
+		let world = World::new_defaultmap();
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 		ClientWorld {
 			world,

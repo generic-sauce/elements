@@ -37,6 +37,7 @@ pub fn world_to_json(w: *const World) -> JsValue {
 }
 
 #[wasm_bindgen]
-pub fn new_world() -> *mut World {
-	Box::leak(Box::new(World::new())) as *mut World
+pub fn new_world(map: JsValue) -> *mut World {
+	let x: TileMapImage = map.into_serde().unwrap();
+	Box::leak(Box::new(World::new(x))) as *mut World
 }

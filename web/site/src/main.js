@@ -10,7 +10,10 @@ function init() {
 	e2.rust.init();
 	e2.cnst = e2.rust.constants();
 	e2.init_drawing();
-	e2.world_ptr = e2.rust.new_world();
+	e2.load_tilemap("map/map02.png", function(img) {
+		e2.world_ptr = e2.rust.new_world(img);
+		setInterval(meta_tick, 1000.0/60.0);
+	})
 }
 
 function tick() {
@@ -35,6 +38,4 @@ js.then(rust => {
 	e2.rust = rust;
 
 	init();
-
-	setInterval(meta_tick, 1000.0/60.0);
 });

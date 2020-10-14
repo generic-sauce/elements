@@ -18,7 +18,7 @@ impl Server {
 		let peers = wait_for_players(&mut socket);
 
 		Server {
-			world: World::new(),
+			world: World::new_defaultmap(),
 			socket,
 			peers,
 			update_desire: [0, 0],
