@@ -88,7 +88,11 @@ impl Graphics {
 			a: 1.0,
 		};
 
-		self.render_triangles.render(
+		self.render_triangles.draw_rectangle(v(0.0, 0.0), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::RED));
+
+		self.render_triangles.flush(
+			&self.device,
+			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
 			wgpu::LoadOp::Clear(clear_color)
