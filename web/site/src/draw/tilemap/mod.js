@@ -46,7 +46,22 @@ function updateTexture() {
 	const width = 128;
 	const height = 72;
 
-	const raw_data = range(width * height * 4).map(_ => 10); // TODO load real map here
+	var raw_data = [];
+
+	for (var x = 0; x < width; x++) {
+		for (var y = 0; y < height; y++) {
+			const c = e2.world.tilemap.tiles[x + y * width];
+			if (c == "Ground") {
+				raw_data.push(50, 50, 10, 255);
+			} else if (c == "Void") {
+				raw_data.push(200, 200, 255, 255);
+			} else {
+				raw_data.push(0, 0, 0, 255);
+				console.log("error: unsupported tile type: ", c);
+			}
+		}
+	}
+
 	const data = Uint8Array.from(raw_data);
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
