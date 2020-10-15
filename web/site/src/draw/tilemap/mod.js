@@ -46,7 +46,7 @@ function updateTexture() {
 	const width = 128;
 	const height = 72;
 
-	const raw_data = range(width * height * 4).map(_ => 100);
+	const raw_data = range(width * height * 4).map(_ => 10); // TODO load real map here
 	const data = Uint8Array.from(raw_data);
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);

@@ -24,7 +24,8 @@ export function init() {
 			vec2 p = vec2(gl_FragCoord.x/1920.0, gl_FragCoord.y/1080.0);
 			vec2 p2 = vec2(p.x, -p.y);
 			vec2 p3 = vec2(p2.x * mapsize.x, p2.y * mapsize.y);
-			gl_FragColor = texture2D(uMapSampler, p3);
+			vec3 texel = texture2D(uMapSampler, p3).xyz;
+			gl_FragColor = vec4(texel, 1.0);
 		}
 	`;
 
