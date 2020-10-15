@@ -22,9 +22,7 @@ export function init() {
 
 			// TODO make resolution independent
 			vec2 p = vec2(gl_FragCoord.x/1920.0, gl_FragCoord.y/1080.0);
-			vec2 p2 = vec2(p.x, -p.y);
-			vec2 p3 = vec2(p2.x * mapsize.x, p2.y * mapsize.y);
-			vec3 texel = texture2D(uMapSampler, p3).xyz;
+			vec3 texel = texture2D(uMapSampler, p).xyz;
 			gl_FragColor = vec4(texel, 1.0);
 		}
 	`;
@@ -57,7 +55,8 @@ export function init() {
 	gl.bindTexture(gl.TEXTURE_2D, state.mapTexture);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
 
 function initShaderProgram(gl, vsSource, fsSource) {
