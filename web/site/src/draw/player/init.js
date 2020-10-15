@@ -2,7 +2,6 @@ export var state = {};
 
 export function init() {
 	var gl = e2.gl;
-	state.gl = gl;
 
 	const vsSource = `
 		attribute vec2 aVertexPosition;
@@ -49,7 +48,7 @@ export function init() {
 		1.0,  0.0,
 	];
 	const tc = [r.slice(0, 6), r.slice(2,8), r.slice(0, 6), r.slice(2,8)].flat();
-	state.gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tc), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tc), gl.STATIC_DRAW);
 	state.buffers = {
 		position: gl.createBuffer(),
 		textureCoord: textureCoordBuffer,

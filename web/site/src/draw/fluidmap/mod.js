@@ -3,7 +3,8 @@ import { init, state } from "./init.js";
 export { init, draw }
 
 function draw() {
-	const { gl, programInfo, vsBuffer, mapTexture } = state;
+	const { programInfo, vsBuffer, mapTexture } = state;
+	const gl = e2.gl;
 
 	updateTexture();
 
@@ -38,7 +39,8 @@ function draw() {
 }
 
 function updateTexture() {
-	const { gl, programInfo, vsBuffer, mapTexture } = state;
+	const { programInfo, vsBuffer, mapTexture } = state;
+	const gl = e2.gl;
 
 	gl.bindTexture(gl.TEXTURE_2D, mapTexture);
 

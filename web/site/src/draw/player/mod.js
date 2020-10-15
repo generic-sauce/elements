@@ -4,7 +4,9 @@ import { player_rect } from "./math.js";
 export { init, draw }
 
 function draw() {
-	const { gl, programInfo, buffers, texture } = state;
+	const { programInfo, buffers, texture } = state;
+	const gl = e2.gl;
+
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
 	const r0 = player_rect(0);
