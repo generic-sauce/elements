@@ -9,7 +9,7 @@ function draw() {
 
 	{
 		const numComponents = 2;
-		const type = gl.FLOAT; // TODO is it?
+		const type = gl.FLOAT;
 		const normalize = false;
 		const stride = 0;
 		const offset = 0;
@@ -46,8 +46,8 @@ function updateTexture() {
 	const width = 128;
 	const height = 72;
 
-	const raw_data = range(width * height).map(_ => [0, 255, 0, 255]);
-	const data = null;  // Uint8Array.from(raw_data);
+	const raw_data = range(width * height * 4).map(_ => 100);
+	const data = Uint8Array.from(raw_data);
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 }

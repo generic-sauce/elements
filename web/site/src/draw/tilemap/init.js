@@ -20,7 +20,8 @@ export function init() {
 			// TODO un-hardcode
 			vec2 mapsize = vec2(128.0, 72.0);
 
-			vec2 p = (gl_FragCoord.xy + 1.0) / 2.0;
+			// TODO make resolution independent
+			vec2 p = vec2(gl_FragCoord.x/1920.0, gl_FragCoord.y/1080.0);
 			vec2 p2 = vec2(p.x, -p.y);
 			vec2 p3 = vec2(p2.x * mapsize.x, p2.y * mapsize.y);
 			gl_FragColor = texture2D(uMapSampler, p3);
