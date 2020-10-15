@@ -32,7 +32,7 @@ function draw() {
 
 	{
 		const offset = 0;
-		const vertexCount = 12;
+		const vertexCount = 4;
 		gl.drawArrays(gl.TRIANGLES, offset, vertexCount);
 	}
 }
@@ -47,7 +47,7 @@ function updateTexture() {
 	const height = 72;
 
 	const raw_data = range(width * height).map(_ => [0, 255, 0, 255]);
-	const data = Uint8Array.from(raw_data);
+	const data = null;  // Uint8Array.from(raw_data);
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 }

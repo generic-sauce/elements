@@ -51,6 +51,11 @@ export function init() {
 	state.vsBuffer = vsBuffer;
 
 	state.mapTexture = gl.createTexture();
+
+	gl.bindTexture(gl.TEXTURE_2D, state.mapTexture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 }
 
 function initShaderProgram(gl, vsSource, fsSource) {
