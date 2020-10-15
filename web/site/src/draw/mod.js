@@ -4,6 +4,7 @@ import * as playermod from "./player/mod.js";
 
 export function init() {
 	e2.canvas = document.getElementById("main-canvas");
+	window.onresize = update_canvas_size
 	update_canvas_size()
 
 	tilemapmod.init();
@@ -12,8 +13,6 @@ export function init() {
 }
 
 export function draw() {
-	update_canvas_size()
-
 	const gl = e2.gl;
 
 	gl.clearColor(0.3, 0.0, 0.0, 1.0);
