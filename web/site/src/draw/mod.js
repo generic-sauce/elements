@@ -12,6 +12,11 @@ export function init() {
 }
 
 export function draw() {
+	const gl = e2.gl;
+
+	gl.clearColor(0.3, 0.0, 0.0, 1.0);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
 	tilemapmod.draw();
 	playermod.draw();
 }

@@ -15,9 +15,6 @@ function draw() {
 								new Float32Array(positions),
 								gl.STATIC_DRAW);
 
-	gl.clearColor(0.3, 0.0, 0.0, 1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT);
-
 	{
     const numComponents = 2;
     const type = gl.FLOAT;
