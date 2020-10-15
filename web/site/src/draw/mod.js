@@ -19,6 +19,9 @@ export function draw() {
 	gl.clearColor(0.3, 0.0, 0.0, 1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
 	tilemapmod.draw();
 	fluidmapmod.draw();
 	playermod.draw();
