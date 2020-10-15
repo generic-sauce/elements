@@ -1,4 +1,5 @@
 import * as tilemapmod from "./tilemap/mod.js";
+import * as fluidmapmod from "./fluidmap/mod.js";
 import * as playermod from "./player/mod.js";
 
 export function init() {
@@ -8,6 +9,7 @@ export function init() {
 	e2.gl = e2.canvas.getContext("webgl");
 
 	tilemapmod.init();
+	fluidmapmod.init();
 	playermod.init();
 }
 
@@ -18,5 +20,6 @@ export function draw() {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	tilemapmod.draw();
+	fluidmapmod.draw();
 	playermod.draw();
 }

@@ -20,7 +20,9 @@ export function init() {
 			// TODO make resolution independent
 			vec2 p = vec2(gl_FragCoord.x/1920.0, gl_FragCoord.y/1080.0);
 			vec3 texel = texture2D(uMapSampler, p).xyz;
-			gl_FragColor = vec4(texel, 1.0);
+			if (texel != vec3(0, 0, 0)) {
+				gl_FragColor = vec4(texel, 1.0);
+			}
 		}
 	`;
 
