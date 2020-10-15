@@ -27,7 +27,7 @@ function draw() {
 
 	gl.useProgram(programInfo.program);
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.bindTexture(gl.TEXTURE_2D, mapTexture);
 	gl.uniform1i(programInfo.uniformLocations.uMapSampler, 0);
 
 	{
@@ -46,7 +46,8 @@ function updateTexture() {
 	const width = 128;
 	const height = 72;
 
-	const data = range(width * height).map(_ => [0, 255, 0, 255]);
+	const raw_data = range(width * height).map(_ => [0, 255, 0, 255]);
+	const data = Uint8Array.from(raw_data);
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 }

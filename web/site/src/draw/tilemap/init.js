@@ -13,16 +13,17 @@ export function init() {
 	`;
 
 	const fsSource = `
+		precision mediump float;
 		uniform sampler2D uMapSampler;
 
 		void main() {
 			// TODO un-hardcode
-			vec2 mapsize = vec2(128, 72);
+			vec2 mapsize = vec2(128.0, 72.0);
 
-			vec2 p = (gl_FragCoord + 1.0) / 2.0;
+			vec2 p = (gl_FragCoord.xy + 1.0) / 2.0;
 			vec2 p2 = vec2(p.x, -p.y);
-			vec2 p3 = vec2(p2.x * mapsize.x, p3.y * mapsize.y);
-			gl_FragColor = texture(uMapSampler, p3);
+			vec2 p3 = vec2(p2.x * mapsize.x, p2.y * mapsize.y);
+			gl_FragColor = texture2D(uMapSampler, p3);
 		}
 	`;
 
