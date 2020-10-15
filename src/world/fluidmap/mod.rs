@@ -40,7 +40,6 @@ pub struct FluidMap {
 
 impl World {
 	pub fn tick_fluidmap(&mut self) {
-		dbg!(self.fluidmap.size);
 		let iter = self.fluidmap.iter()
 			.cloned()
 			.map(|f| self.fluidmap.apply_grab(f, &self.players))
