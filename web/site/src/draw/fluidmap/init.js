@@ -6,8 +6,11 @@ export function init() {
 	const vsSource = `
 		attribute vec2 aVertexPosition;
 
+		varying highp vec2 pos;
+
 		void main() {
 			gl_Position = vec4(aVertexPosition, 0, 1);
+			pos = aVertexPosition;
 		}
 	`;
 
@@ -15,9 +18,10 @@ export function init() {
 		precision mediump float;
 		uniform sampler2D uMapSampler;
 
+		varying highp vec2 pos;
+
 		void main() {
-			// TODO make resolution independent
-			vec2 p = vec2(gl_FragCoord.x/1920.0, gl_FragCoord.y/1080.0);
+			vec2 p = (pos + vec2(1.0, 1.0)) / 2.0;
 			vec3 texel = texture2D(uMapSampler, p).xyz;
 			if (texel != vec3(0, 0, 0)) {
 				gl_FragColor = vec4(texel, 1.0);
