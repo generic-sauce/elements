@@ -6,15 +6,8 @@ export function get_input_states() {
 }
 
 function calc_input_state(i) {
-	const last = e2.input_states[i];
-	const current = current_hardware_input_state(i);
-
-	// TODO merge them
-	return current;
-}
-
-function current_hardware_input_state(i) {
 	const gp = e2.gamepads[i];
+	const last = e2.input_states[i];
 
 	// fallback!
 	if (!gp) {
@@ -41,17 +34,23 @@ function current_hardware_input_state(i) {
 		cursor[1] = Math.floor(-y * 2000.0);
 	}
 
-	return {
+	var attack2 = gp.buttons[5].pressed;
+	var just_attack2 = (!last.attack2) && attack2;
+
+	var ret = {
 		direction: direction,
 		cursor: cursor,
-		just_up: false,
-		just_down: false,
-		special1: false,
-		special2: false,
-		attack1: false,
-		attack2: false,
-		just_attack2: false,
+		just_up: false, // never read
+		just_down: false, // never read
+		special1: gp.axes[2] >= 0.1,
+		special2: false, // never read
+		attack1: gp.axes[5] >= 0.1,
+		attack2: attack2,
+		just_attack2: just_attack2,
 	};
+
+	e2.input_states[i] = ret;
+	return ret;
 }
 
 // init
