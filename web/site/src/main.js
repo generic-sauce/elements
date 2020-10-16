@@ -10,8 +10,9 @@ import("../node_modules/elements2/elements2.js")
 		init();
 	});
 
+const FPS = 60.0;
+
 function init() {
-	e2.world_occupied = false
 	e2.rust.init();
 	e2.cnst = e2.rust.constants();
 
@@ -20,7 +21,7 @@ function init() {
 
 	tilemapmod.load("map/map02.png", function(img) {
 		e2.world_ptr = e2.rust.new_world(img);
-		setInterval(meta_tick, 1000.0/60.0);
+		setInterval(meta_tick, 1000.0/FPS);
 	})
 }
 
@@ -31,12 +32,14 @@ function tick() {
 }
 
 function meta_tick() {
-	if (e2.world_occupied) {
-		console.log("framedrop!");
-		return;
+	const frame_start = new Date();
+
+	tick();
+
+	const frame_time = new Date() - frame_start;
+
+	if (frame_time >= 1000.0/FPS) {
+		console.log("frame took too long: ", frame_time);
 	}
 
-	e2.world_occupied = true;
-	tick();
-	e2.world_occupied = false;
 }
