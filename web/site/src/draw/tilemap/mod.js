@@ -44,38 +44,10 @@ function updateTexture() {
 
 	gl.bindTexture(gl.TEXTURE_2D, mapTexture);
 
-	// TODO un-hardode
-	const width = 128;
-	const height = 72;
+	const width = e2.render_world.tilemap_size[0];
+	const height = e2.render_world.tilemap_size[1];
 
-	var raw_data = [];
-
-	for (var y = 0; y < height; y++) {
-		for (var x = 0; x < width; x++) {
-			const c = e2.world.tilemap.tiles[x + y * width];
-			if (c == "Ground") {
-				raw_data.push(50, 50, 10, 255);
-			} else if (c == "Void") {
-				raw_data.push(200, 200, 255, 255);
-			} else if (c.Wall) {
-				if (c.Wall.owner == 0) {
-					raw_data.push(0, 0, 40, 255);
-				} else {
-					raw_data.push(40, 0, 0, 255);
-				}
-			} else {
-				raw_data.push(0, 0, 0, 255);
-				console.log("error: unsupported tile type: ", c);
-			}
-		}
-	}
-
-	const data = Uint8Array.from(raw_data);
+	const data = Uint8Array.from(e2.render_world.tilemap_data);
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 }
-
-function range(n) {
-	return [...Array(n).keys()];
-}
-

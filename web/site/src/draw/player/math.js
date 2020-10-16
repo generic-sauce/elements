@@ -1,6 +1,6 @@
 export function player_rect(i) {
-	const lb = e2.world.players[i].left_bot;
-	const s = e2.cnst.PLAYER_SIZE;
+	const lb = e2.render_world.players[i].left_bot;
+	const s = e2.render_world.player_size;
 	const game_rect = [
 		[lb[0]       , lb[1]],
 		[lb[0] + s[0], lb[1]],
@@ -18,7 +18,7 @@ export function player_rect(i) {
 }
 
 function max_game_point() {
-	return e2.world.tilemap.size
+	return e2.render_world.tilemap_size
 		.map(x => x * 256);
 }
 

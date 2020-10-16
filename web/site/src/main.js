@@ -14,7 +14,6 @@ const FPS = 60.0;
 
 function init() {
 	e2.rust.init();
-	e2.cnst = e2.rust.constants();
 
 	drawmod.init();
 	inputmod.init();
@@ -27,7 +26,7 @@ function init() {
 
 function tick() {
 	e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
-	e2.world = e2.rust.world_to_json(e2.world_ptr);
+	e2.render_world = e2.rust.to_render_world(e2.world_ptr);
 	drawmod.draw();
 }
 

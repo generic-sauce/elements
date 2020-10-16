@@ -44,33 +44,10 @@ function updateTexture() {
 
 	gl.bindTexture(gl.TEXTURE_2D, mapTexture);
 
-	// TODO un-hardode
-	const width = 65;
-	const height = 36;
+	const data = Uint8Array.from(e2.render_world.fluidmap_data);
 
-	var raw_data = [];
-
-	for (var y = 0; y < height; y++) {
-		for (var x = 0; x < width; x++) {
-			const v = e2.world.fluidmap.grid[x + y * width];
-
-			var col = [0, 0, 0, 0];
-
-			for (var i = 0; i < v.length; i++) {
-				col[3] = 255;
-
-				if (v[i].owner == 0) {
-					col[2] = 255;
-				} else if (v[i].owner == 1) {
-					col[0] = 255;
-				}
-			}
-
-			raw_data.push(...col);
-		}
-	}
-
-	const data = Uint8Array.from(raw_data);
+	const width =  e2.render_world.fluidmap_size[0];
+	const height =  e2.render_world.fluidmap_size[1];
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 }

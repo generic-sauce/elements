@@ -1,17 +1,7 @@
+mod render;
+pub use render::*;
+
 use crate::prelude::*;
-
-#[wasm_bindgen]
-pub fn constants() -> JsValue {
-
-	#[derive(Serialize, Deserialize)]
-	#[allow(non_snake_case)]
-	struct Constants {
-		PLAYER_SIZE: GameVec,
-	}
-
-	let constants = Constants { PLAYER_SIZE };
-	JsValue::from_serde(&constants).unwrap()
-}
 
 #[wasm_bindgen]
 pub fn init() {
@@ -32,8 +22,9 @@ pub fn tick_world(w: *mut World, input_states: JsValue) {
 }
 
 #[wasm_bindgen]
-pub fn world_to_json(w: *const World) -> JsValue {
-	JsValue::from_serde(unsafe { & *w }).unwrap()
+pub fn to_render_world(w: *const World) -> JsValue {
+	let render_world = unsafe { & *w }.render_world();
+	JsValue::from_serde(&render_world).unwrap()
 }
 
 #[wasm_bindgen]
