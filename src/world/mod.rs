@@ -73,7 +73,7 @@ impl World {
 
 	#[cfg(not(feature = "web-client"))]
 	pub fn new_defaultmap(best_of_n: u32) -> World {
-		Self::new(best_of_n, "map/map02.png")
+		Self::new(best_of_n, "map/map04.png")
 	}
 
 
