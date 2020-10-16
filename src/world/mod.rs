@@ -2,13 +2,12 @@ pub mod player;
 pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;
-#[cfg(feature = "client")]
-pub mod client_world;
-mod update;
-mod event;
 
-pub use update::*;
+mod event;
 pub use event::*;
+
+mod update;
+pub use update::*;
 
 use crate::prelude::*;
 
@@ -58,8 +57,8 @@ impl World {
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new(best_of_n: u32) -> World {
-		let tilemap = TileMap::new(&res("map/map02.png"));
+	pub fn new(best_of_n: u32, mapsrc: impl MapSrc) -> World {
+		let tilemap = TileMap::new(mapsrc);
 
 		World {
 			players: new_players(),
@@ -71,6 +70,12 @@ impl World {
 			best_of_n
 		}
 	}
+
+	#[cfg(not(feature = "web-client"))]
+	pub fn new_defaultmap(best_of_n: u32) -> World {
+		Self::new(best_of_n, "map/map02.png")
+	}
+
 
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
 		let mut should_tick = false;
