@@ -15,6 +15,7 @@ pub use std::fs::File;
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use bincode::{serialize, deserialize};
 
+pub use crate::rng::*;
 pub use crate::world::*;
 pub use crate::world::player::{*, sensor::*};
 pub use crate::world::tilemap::*;

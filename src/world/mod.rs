@@ -163,8 +163,9 @@ impl World {
 	}
 
 	fn despawn_fluids(&mut self) {
+		let frame_id = self.frame_id;
 		for cell in self.fluidmap.grid.iter_mut() {
-			cell.drain_filter(|f| f.check_despawn());
+			cell.drain_filter(|f| f.check_despawn(frame_id));
 		}
 	}
 

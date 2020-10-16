@@ -29,6 +29,7 @@ extern crate lazy_static;
 #[macro_use]
 mod fps_timer;
 
+mod rng;
 mod world;
 mod vec;
 mod animation;

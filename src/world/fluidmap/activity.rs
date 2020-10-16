@@ -26,10 +26,9 @@ impl Fluid {
 		}
 	}
 
-	pub fn check_despawn(&self) -> bool {
+	pub fn check_despawn(&self, frame_id: u32) -> bool {
 		let (rate, antirate) = self.despawn_rate();
-		// rand::random::<u32>() % (rate + antirate) <= rate
-		false // TODO implement without using thread_rng (and deterministically!)
+		rng(rate, antirate, [self.id, frame_id, 0, 0])
 	}
 
 	pub(in super) fn update_reference_position(&mut self) {
