@@ -20,16 +20,30 @@ function current_hardware_input_state(i) {
 	if (!gp) {
 		return e2.input_states[i];
 	}
-	var r = 0;
-	if (gp.axes[0] < -0.3) { r = -100; }
-	if (gp.axes[0] > 0.3) { r = 100; }
 
-	var u = 0;
-	if (gp.axes[1] < -0.3) { u = 100; }
+	var direction = [0, 0];
+	{
+		const x = gp.axes[0];
+		const y = gp.axes[1];
+
+		if (x < -0.3) { direction[0] = -100; }
+		if (x > 0.3) { direction[0] = 100; }
+
+		if (y < -0.3) { direction[1] = 100; }
+	}
+
+	var cursor = [0, 0];
+	{
+		const x = gp.axes[3];
+		const y = gp.axes[4];
+
+		cursor[0] = Math.floor(x * 2000.0);
+		cursor[1] = Math.floor(-y * 2000.0);
+	}
 
 	return {
-		direction: [r, u],
-		cursor: [0.0, 0.0],
+		direction: direction,
+		cursor: cursor,
 		just_up: false,
 		just_down: false,
 		special1: false,
