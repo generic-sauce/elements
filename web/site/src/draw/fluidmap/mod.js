@@ -53,11 +53,20 @@ function updateTexture() {
 	for (var y = 0; y < height; y++) {
 		for (var x = 0; x < width; x++) {
 			const v = e2.world.fluidmap.grid[x + y * width];
-			if (v.length == 0) {
-				raw_data.push(0, 0, 0, 0);
-			} else {
-				raw_data.push(100, 100, 100, 255);
+
+			var col = [0, 0, 0, 0];
+
+			for (var i = 0; i < v.length; i++) {
+				col[3] = 255;
+
+				if (v[i].owner == 0) {
+					col[2] = 255;
+				} else if (v[i].owner == 1) {
+					col[0] = 255;
+				}
 			}
+
+			raw_data.push(...col);
 		}
 	}
 
