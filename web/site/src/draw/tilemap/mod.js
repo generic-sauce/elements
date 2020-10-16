@@ -57,6 +57,12 @@ function updateTexture() {
 				raw_data.push(50, 50, 10, 255);
 			} else if (c == "Void") {
 				raw_data.push(200, 200, 255, 255);
+			} else if (c.Wall) {
+				if (c.Wall.owner == 0) {
+					raw_data.push(0, 0, 40, 255);
+				} else {
+					raw_data.push(40, 0, 0, 255);
+				}
 			} else {
 				raw_data.push(0, 0, 0, 255);
 				console.log("error: unsupported tile type: ", c);
