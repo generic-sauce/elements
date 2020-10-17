@@ -6,13 +6,15 @@ export function get_input_states() {
 }
 
 function calc_input_state(i) {
-	const gp = e2.gamepads[i];
+	const gp = navigator.getGamepads()[i];
 	const last = e2.input_states[i];
 
 	// fallback!
 	if (!gp) {
 		return e2.input_states[i];
 	}
+
+	const chrome = navigator.userAgent.toLowerCase().indexOf("chrom") != -1;
 
 	var direction = [0, 0];
 	{
@@ -27,25 +29,37 @@ function calc_input_state(i) {
 
 	var cursor = [0, 0];
 	{
-		const x = gp.axes[3];
-		const y = gp.axes[4];
+		var xi = 3;
+		if (chrome) xi = 2;
+
+		var yi = 4;
+		if (chrome) yi = 3;
+
+		const x = gp.axes[xi];
+		const y = gp.axes[yi];
 
 		cursor[0] = Math.floor(x * 2000.0);
 		cursor[1] = Math.floor(-y * 2000.0);
 	}
 
-	var attack2 = gp.buttons[5].pressed;
-	var just_attack2 = (!last.attack2) && attack2;
+	const attack2 = gp.buttons[5].pressed;
+	const just_attack2 = (!last.attack2) && attack2;
+
+	var special1 = gp.axes[2] >= 0.1;
+	if (chrome) special1 = gp.buttons[6].pressed;
+
+	var attack1 = gp.axes[5] >= 0.1;
+	if (chrome) attack1 = gp.buttons[7].pressed;
 
 	var ret = {
-		direction: direction,
+		direction,
 		cursor: cursor,
 		just_up: false, // never read
 		just_down: false, // never read
-		special1: gp.axes[2] >= 0.1,
+		special1,
 		special2: false, // never read
-		attack1: gp.axes[5] >= 0.1,
-		attack2: attack2,
+		attack1,
+		attack2,
 		just_attack2: just_attack2,
 	};
 
@@ -56,18 +70,6 @@ function calc_input_state(i) {
 // init
 
 export function init() {
-	function gamepadHandler(ev, connecting) {
-	  var gamepad = ev.gamepad;
-	  // Note:
-	  // gamepad === navigator.getGamepads()[gamepad.index]
-
-	  if (connecting) {
-		e2.gamepads[gamepad.index] = gamepad;
-	  } else {
-		delete e2.gamepads[gamepad.index];
-	  }
-	}
-
 	function default_input_state() {
 		return {
 			direction: [0.0, 0.0],
@@ -83,8 +85,4 @@ export function init() {
 	}
 
 	e2.input_states = [default_input_state(), default_input_state()];
-	e2.gamepads = {};
-
-	window.addEventListener("gamepadconnected", function(e) { gamepadHandler(e, true); }, false);
-	window.addEventListener("gamepaddisconnected", function(e) { gamepadHandler(e, false); }, false);
 }
