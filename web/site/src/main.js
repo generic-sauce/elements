@@ -26,11 +26,19 @@ function init() {
 
 function tick() {
 	const a = performance.now();
+
 	e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
+
 	const b = performance.now();
+
 	e2.render_world = e2.rust.to_render_world(e2.world_ptr);
+	e2.render_world.tilemap_data = e2.rust.tilemap_data(e2.world_ptr);
+	e2.render_world.fluidmap_data = e2.rust.fluidmap_data(e2.world_ptr);
+
 	const c = performance.now();
+
 	drawmod.draw();
+
 	const d = performance.now();
 
 	return {
@@ -48,3 +56,4 @@ function meta_tick() {
 		console.log("frame took too long:", timestats);
 	}
 }
+

@@ -47,7 +47,7 @@ function updateTexture() {
 	const width = e2.render_world.tilemap_size[0];
 	const height = e2.render_world.tilemap_size[1];
 
-	const data = Uint8Array.from(e2.render_world.tilemap_data);
+	const data = e2.render_world.tilemap_data;
 
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 }

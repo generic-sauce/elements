@@ -22,12 +22,6 @@ pub fn tick_world(w: *mut World, input_states: JsValue) {
 }
 
 #[wasm_bindgen]
-pub fn to_render_world(w: *const World) -> JsValue {
-	let render_world = unsafe { & *w }.render_world();
-	JsValue::from_serde(&render_world).unwrap()
-}
-
-#[wasm_bindgen]
 pub fn new_world(map: JsValue) -> *mut World {
 	let x: TileMapImage = map.into_serde().unwrap();
 	Box::leak(Box::new(World::new(0, x))) as *mut World

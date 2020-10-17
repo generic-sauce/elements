@@ -44,7 +44,7 @@ function updateTexture() {
 
 	gl.bindTexture(gl.TEXTURE_2D, mapTexture);
 
-	const data = Uint8Array.from(e2.render_world.fluidmap_data);
+	const data = e2.render_world.fluidmap_data;
 
 	const width =  e2.render_world.fluidmap_size[0];
 	const height =  e2.render_world.fluidmap_size[1];
