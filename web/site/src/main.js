@@ -25,13 +25,13 @@ function init() {
 }
 
 function tick() {
-	const a = new Date();
+	const a = performance.now();
 	e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
-	const b = new Date();
+	const b = performance.now();
 	e2.render_world = e2.rust.to_render_world(e2.world_ptr);
-	const c = new Date();
+	const c = performance.now();
 	drawmod.draw();
-	const d = new Date();
+	const d = performance.now();
 
 	return {
 		tick: b - a,
