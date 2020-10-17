@@ -12,6 +12,8 @@ import("../node_modules/elements2/elements2.js")
 
 const FPS = 60.0;
 var last_tick = performance.now();
+var frame_counter = 0;
+const program_start_time = performance.now();
 
 function init() {
 	e2.rust.init();
@@ -26,6 +28,7 @@ function init() {
 }
 
 function tick() {
+	frame_counter += 1;
 	const a = performance.now();
 
 	e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
@@ -42,7 +45,10 @@ function tick() {
 
 	const d = performance.now();
 
+	const fps = frame_counter * 1000 / (a - program_start_time);
+
 	const ret = {
+		fps,
 		tick: b - a,
 		render_world: c - b,
 		draw: d - c,
