@@ -25,20 +25,26 @@ function init() {
 }
 
 function tick() {
+	const a = new Date();
 	e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
+	const b = new Date();
 	e2.render_world = e2.rust.to_render_world(e2.world_ptr);
+	const c = new Date();
 	drawmod.draw();
+	const d = new Date();
+
+	return {
+		tick: b - a,
+		render_world: c - b,
+		draw: d - c,
+		sum: d - a,
+	};
 }
 
 function meta_tick() {
-	const frame_start = new Date();
+	const timestats = tick();
 
-	tick();
-
-	const frame_time = new Date() - frame_start;
-
-	if (frame_time >= 1000.0/FPS) {
-		console.log("frame took too long: ", frame_time);
+	if (timestats.sum >= 1000.0/FPS) {
+		console.log("frame took too long:", timestats);
 	}
-
 }
