@@ -7,6 +7,10 @@ export function init() {
 	window.onresize = update_canvas_size
 	update_canvas_size()
 
+	e2.gl.enable(e2.gl.BLEND);
+	e2.gl.blendFunc(e2.gl.SRC_ALPHA, e2.gl.ONE_MINUS_SRC_ALPHA);
+	e2.gl.clearColor(0.3, 0.0, 0.0, 1.0);
+
 	tilemapmod.init();
 	fluidmapmod.init();
 	playermod.init();
@@ -15,11 +19,7 @@ export function init() {
 export function draw() {
 	const gl = e2.gl;
 
-	gl.clearColor(0.3, 0.0, 0.0, 1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
-
-	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 	tilemapmod.draw();
 	fluidmapmod.draw();
