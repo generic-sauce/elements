@@ -46,6 +46,7 @@ function tick() {
 		tick: b - a,
 		render_world: c - b,
 		draw: d - c,
+		sum: d - a,
 		all: a - last_tick,
 	};
 	last_tick = a;
