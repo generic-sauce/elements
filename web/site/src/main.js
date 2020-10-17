@@ -11,6 +11,7 @@ import("../node_modules/elements2/elements2.js")
 	});
 
 const FPS = 60.0;
+var last_tick = performance.now();
 
 function init() {
 	e2.rust.init();
@@ -41,18 +42,20 @@ function tick() {
 
 	const d = performance.now();
 
-	return {
+	const ret = {
 		tick: b - a,
 		render_world: c - b,
 		draw: d - c,
-		sum: d - a,
+		all: a - last_tick,
 	};
+	last_tick = a;
+	return ret;
 }
 
 function meta_tick() {
 	const timestats = tick();
 
-	if (timestats.sum >= 1000.0/FPS) {
+	if (timestats.all >= 1000.0/FPS) {
 		console.log("frame took too long:", timestats);
 	}
 }
