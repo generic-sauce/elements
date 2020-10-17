@@ -30,4 +30,5 @@ function update_canvas_size() {
 	e2.canvas.width = window.innerWidth;
 	e2.canvas.height = window.innerHeight;
 	e2.gl = e2.canvas.getContext("webgl");
+	e2.gl.viewport(0, 0, e2.canvas.width, e2.canvas.height);
 }
