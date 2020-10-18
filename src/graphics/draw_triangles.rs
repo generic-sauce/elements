@@ -31,7 +31,7 @@ fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 	bytes
 }
 
-pub struct RenderTriangles {
+pub struct DrawTriangles {
 	pipeline: wgpu::RenderPipeline,
 	// texture: wgpu::Texture,
 	// texture_view: wgpu::TextureView,
@@ -40,7 +40,7 @@ pub struct RenderTriangles {
 	capacity: u64,
 }
 
-impl RenderTriangles {
+impl DrawTriangles {
 	fn create_vertex_buffer(device: &wgpu::Device, capacity: u64) -> wgpu::Buffer {
 		let triangle_size = std::mem::size_of::<Triangle>() as u64;
 		let triangles_size = capacity * triangle_size;
@@ -66,7 +66,7 @@ impl RenderTriangles {
 	 * compile shaders
 	 * create pipeline
 	 */
-	pub fn new(device: &wgpu::Device) -> RenderTriangles {
+	pub fn new(device: &wgpu::Device) -> DrawTriangles {
 		let capacity = 128 as u64;
 		let vertex_buffer = Self::create_vertex_buffer(device, capacity);
 
@@ -109,7 +109,7 @@ impl RenderTriangles {
 		});
 
 		let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-			label: Some("render pipeline"),
+			label: Some("Render pipeline"),
 			layout: Some(&pipeline_layout),
 			vertex_stage: wgpu::ProgrammableStageDescriptor {
 					module: &vert,
@@ -138,7 +138,7 @@ impl RenderTriangles {
 
 		let triangles = Vec::with_capacity(capacity as usize);
 
-		RenderTriangles {
+		DrawTriangles {
 			pipeline,
 			triangles,
 			vertex_buffer,
@@ -146,7 +146,7 @@ impl RenderTriangles {
 		}
 	}
 
-	pub fn render(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
+	fn render(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
 		if self.capacity < self.triangles.len() as u64 {
 			self.enlarge_vertex_buffer(device, self.triangles.len() as u64);
 		}
@@ -168,7 +168,7 @@ impl RenderTriangles {
 		});
 
 		render_pass.set_pipeline(&self.pipeline);
-		// render_pass.set_bind_group(
+		// draw_pass.set_bind_group(
 		// 	0,
 		// 	&bind_group,
 		// 	&[]
@@ -201,7 +201,8 @@ impl RenderTriangles {
 	// let v = GameVec::new(0, 0);
 	// draw_rectangle(Origin::LeftBot(v));
 
-	pub fn draw_rectangle(&mut self, left_bot: CanvasVec, size: CanvasVec, color: Option<wgpu::Color>) {
+	#[allow(unused)]
+	pub fn draw_sprite(&mut self, left_bot: CanvasVec, size: CanvasVec, color: Option<wgpu::Color>) {
 		let color = if let Some(color) = color { color } else { wgpu::Color::WHITE };
 		self.triangles.push([
 			Vertex { position: left_bot, uv: CanvasVec::new(0.0, 0.0), color: color },

@@ -77,7 +77,8 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
-				graphics.render();
+				graphics.draw();
+				graphics.flush();
 			},
 			_ => ()
 		}

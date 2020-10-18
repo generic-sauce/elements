@@ -1,7 +1,7 @@
-mod render_triangles;
+mod draw_triangles;
 
 use crate::prelude::*;
-use render_triangles::*;
+use draw_triangles::*;
 
 pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
@@ -12,7 +12,19 @@ pub struct Graphics {
 	queue: wgpu::Queue,
 	window_size: Vec2u,
 	swap_chain: wgpu::SwapChain,
-	render_triangles: RenderTriangles,
+	pub triangles: DrawTriangles,
+}
+
+fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u) -> wgpu::SwapChain {
+	let mut swap_chain_desc = wgpu::SwapChainDescriptor {
+		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
+		format: SURFACE_FORMAT,
+		width: size.x,
+		height: size.y,
+		present_mode: wgpu::PresentMode::Fifo,
+	};
+
+	device.create_swap_chain(surface, &swap_chain_desc)
 }
 
 impl Graphics {
@@ -44,17 +56,9 @@ impl Graphics {
 		let window_size = window.inner_size();
 		let window_size = Vec2u::new(window_size.width, window_size.height);
 
-		let mut swap_chain_desc = wgpu::SwapChainDescriptor {
-			usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
-			format: SURFACE_FORMAT,
-			width: window_size.x,
-			height: window_size.y,
-			present_mode: wgpu::PresentMode::Fifo,
-		};
+		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
-		let mut swap_chain = device.create_swap_chain(&surface, &swap_chain_desc);
-
-		let render_triangles = RenderTriangles::new(&device);
+		let triangles = DrawTriangles::new(&device);
 
 		Graphics {
 			instance,
@@ -63,15 +67,29 @@ impl Graphics {
 			queue,
 			window_size,
 			swap_chain,
-			render_triangles,
+			triangles,
 		}
 	}
 
-	/* create and fill render pass
+	pub fn draw(&mut self) {
+		// self.draw_hud(...);
+		self.draw_players();
+		// self.draw_tilemap(...);
+		// self.draw_fluids(...);
+		// self.draw_background(...);
+	}
+
+	fn draw_players(&mut self) {
+		self.triangles.draw_sprite(CanvasVec::new(0.0, 0.0), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::RED));
+		self.triangles.draw_sprite(CanvasVec::new(-0.3, -0.3), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::GREEN));
+		self.triangles.draw_sprite(CanvasVec::new(0.1, -0.4), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::BLUE));
+	}
+
+	/* create and fill draw pass
 	 * create and fill command buffer
 	 * submit command buffer to queue
 	 */
-	pub fn render(&mut self) {
+	pub fn flush(&mut self) {
 		let swap_chain_texture = self.swap_chain
 			.get_current_frame()
 			.unwrap()
@@ -88,9 +106,7 @@ impl Graphics {
 			a: 1.0,
 		};
 
-		self.render_triangles.draw_rectangle(v(0.0, 0.0), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::RED));
-
-		self.render_triangles.flush(
+		self.triangles.flush(
 			&self.device,
 			&self.queue,
 			&mut encoder,
@@ -101,18 +117,8 @@ impl Graphics {
 		self.queue.submit(Some(encoder.finish()));
 	}
 
-	/* recreate swap chain
-	 */
 	pub fn resize(&mut self, size: Vec2u) {
-		let mut swap_chain_desc = wgpu::SwapChainDescriptor {
-			usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
-			format: SURFACE_FORMAT,
-			width: size.x,
-			height: size.y,
-			present_mode: wgpu::PresentMode::Fifo,
-		};
-
 		self.window_size = size;
-		self.swap_chain = self.device.create_swap_chain(&self.surface, &swap_chain_desc);
+		self.swap_chain = create_swap_chain(&self.device, &self.surface, size);
 	}
 }
