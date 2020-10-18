@@ -1,6 +1,9 @@
 mod render;
 pub use render::*;
 
+mod client;
+pub use client::*;
+
 use crate::prelude::*;
 
 #[wasm_bindgen]

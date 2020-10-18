@@ -20,48 +20,51 @@ function fps() {
 }
 
 function init() {
-	e2.socket = new WebSocket("ws://127.0.0.1:7575");
-
-	e2.socket.onopen = function(e) {
-		alert("yay!");
-	}
-
-	e2.socket.onerror = function(e) {
-		console.log(e);
-		alert("error!");
-	}
-
-	// TODO
-	// while (true) {
-	//		receive go
-	// }
-
 	e2.rust.init();
 
 	drawmod.init();
 	inputmod.init();
 
+	e2.socket = new WebSocket("ws://127.0.0.1:7575");
+
+	e2.webclient = e2.rust.new_webclient();
+
+	e2.socket.onerror = function(e) {
+		console.log("socket error:", e);
+	}
+
+	e2.socket.onmessage = function(e) {
+		e2.rust.webclient_received_message(e2.webclient, e.data);
+	}
+
 	tilemapmod.load("map/map02.png", function(img) {
-		e2.world_ptr = e2.rust.new_world(img);
+		e2.world_ptr = null;
 		setInterval(tick, 1000.0/FPS);
 	})
 }
 
 function tick() {
-	// TODO if let recv-world-update -> apply
-
-	// TODO re-apply inputs
-
-	// TODO send input-state packet
-
 	while (fps() < FPS) {
-		e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
+		e2.rust.webclient_tick(e2.webclient, inputmod.get_input_states())
+			.forEach(cmd => {
+				if (cmd.SendMsg) {
+					e2.socket.send(cmd.SendMsg.msg);
+				} else if (cmd.Go) {
+					e2.world_ptr = cmd.Go.world;
+				} else {
+					alert("unknown cmd!");
+				}
+			});
 		e2.frame_counter += 1;
+
+		// TODO send input-state packet
 	}
 
-	e2.render_world = e2.rust.to_render_world(e2.world_ptr);
-	e2.render_world.tilemap_data = e2.rust.tilemap_data(e2.world_ptr);
-	e2.render_world.fluidmap_data = e2.rust.fluidmap_data(e2.world_ptr);
+	if (e2.world_ptr) {
+		e2.render_world = e2.rust.to_render_world(e2.world_ptr);
+		e2.render_world.tilemap_data = e2.rust.tilemap_data(e2.world_ptr);
+		e2.render_world.fluidmap_data = e2.rust.fluidmap_data(e2.world_ptr);
 
-	drawmod.draw();
+		drawmod.draw();
+	}
 }
