@@ -31,6 +31,11 @@ function init() {
 		alert("error!");
 	}
 
+	// TODO
+	// while (true) {
+	//		receive go
+	// }
+
 	e2.rust.init();
 
 	drawmod.init();
@@ -43,6 +48,12 @@ function init() {
 }
 
 function tick() {
+	// TODO if let recv-world-update -> apply
+
+	// TODO re-apply inputs
+
+	// TODO send input-state packet
+
 	while (fps() < FPS) {
 		e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
 		e2.frame_counter += 1;
