@@ -23,6 +23,10 @@ pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
 
+pub use std::net::TcpStream;
+pub use tungstenite::Message;
+pub type WebSocket = tungstenite::protocol::WebSocket<TcpStream>;
+ 
 #[cfg(not(feature = "web-client"))] pub use crate::net::*;
 #[cfg(not(feature = "web-client"))] pub use crate::resource::res;
 #[cfg(not(feature = "web-client"))] pub use crate::timed_loop::*;
