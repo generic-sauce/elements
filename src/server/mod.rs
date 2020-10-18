@@ -60,5 +60,6 @@ fn wait_for_players() -> [WebSocket; 2] {
 			let stream = stream_res.unwrap();
 			tungstenite::server::accept(stream).unwrap()
 		}).collect();
+	println!("starting!");
 	[peers.remove(0), peers.remove(0)]
 }
