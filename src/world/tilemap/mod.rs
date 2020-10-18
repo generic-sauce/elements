@@ -1,6 +1,8 @@
 mod update;
-
 pub use update::*;
+
+mod src;
+pub use src::*;
 
 use crate::prelude::*;
 
@@ -20,25 +22,21 @@ pub struct TileMap {
 }
 
 impl TileMap {
-	pub fn new(filename: &str) -> TileMap {
-		use image::{GenericImageView, Rgba};
+	pub fn new(src: impl MapSrc) -> TileMap {
+		let TileMapImage { pixels, size } = src.image();
+		let mut tiles = Vec::with_capacity((size.x * size.y) as usize);
 
-		let image = image::open(filename).unwrap();
-		let (width, height) = image.dimensions();
-		let mut tiles = Vec::with_capacity((width * height) as usize);
-
-		for y in (0..height).rev() {
-			for x in 0..width {
-				let tile = match image.get_pixel(x as u32, y as u32) {
-					Rgba([255, 255, 255, 255]) => Tile::Void,
-					Rgba([0, 0, 0, 255]) => Tile::Ground,
+		for y in 0..size.y {
+			for x in 0..size.x {
+				let tile = match pixels[x as usize][y as usize] {
+					[255, 255, 255, 255] => Tile::Void,
+					[0, 0, 0, 255] => Tile::Ground,
 					c => panic!("tile color out of range! {:?}", c),
 				};
 				tiles.push(tile);
 			}
 		}
 
-		let size = TileVec::new(width as i32, height as i32);
 		TileMap {
 			tiles,
 			size,

@@ -75,14 +75,8 @@ fn apply_cursor_steering(velocity: &mut GameVec, f: &Fluid, cursor: GameVec) {
 
 // returns -1 or 1
 fn noise(fluid_id: u32, frame_id: u32, num: u32) -> i32 {
-	use rand::{SeedableRng, RngCore};
-	use rand_xorshift::XorShiftRng;
-
-	let seed = (fluid_id + num * 7) as u64;
-	let seed = XorShiftRng::seed_from_u64(seed).next_u64() / 2 + frame_id as u64; // the / 2 prevents overflows
-	let result = XorShiftRng::seed_from_u64(seed).next_u32();
-	match result % 2 {
-		0 => -1,
-		_ => 1,
+	match rng(1, 1, [fluid_id, num, frame_id, 0]) {
+		true => 1,
+		false => -1,
 	}
 }

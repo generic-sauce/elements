@@ -87,7 +87,7 @@ impl FluidMap {
 			.flat_map(|x| x.iter_mut())
 	}
 
-	fn index(&self, t: FluidVec) -> &'_ [Fluid] {
+	pub fn index(&self, t: FluidVec) -> &'_ [Fluid] {
 		let i = (t.x + t.y * self.size.x) as usize;
 		self.grid.get(i).map(|v| &v[..]).unwrap_or(&[])
 	}

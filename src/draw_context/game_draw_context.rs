@@ -7,12 +7,14 @@ pub struct GameDrawContext<'a> {
 }
 
 impl<'a> GameDrawContext<'a> {
+	#[allow(unused)]
 	pub fn draw_texture(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture: Option<&Texture>, flip: Flip) {
 		let position = position.to_canvas(self.tilemap_size);
 		let radius = radius.to_canvas(self.tilemap_size);
 		self.ctxt.draw_texture(target, position, radius, color, texture, flip);
 	}
 
+	#[allow(unused)]
 	pub fn draw_sprite(&self, target: &impl RenderTarget, position: impl IntoCanvasVec, radius: impl IntoCanvasVec, color: Color, texture_id: Option<TextureId>, flip: Flip) {
 		let position = position.to_canvas(self.tilemap_size);
 		let radius = radius.to_canvas(self.tilemap_size);

@@ -1,3 +1,4 @@
+pub mod world;
 mod draw_triangles;
 
 use crate::prelude::*;
