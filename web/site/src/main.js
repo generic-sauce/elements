@@ -20,6 +20,17 @@ function fps() {
 }
 
 function init() {
+	e2.socket = new WebSocket("ws://127.0.0.1:7575");
+
+	e2.socket.onopen = function(e) {
+		alert("yay!");
+	}
+
+	e2.socket.onerror = function(e) {
+		console.log(e);
+		alert("error!");
+	}
+
 	e2.rust.init();
 
 	drawmod.init();

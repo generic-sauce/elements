@@ -52,13 +52,13 @@ impl Server {
 	}
 }
 
-/// A WebSocket echo server
 fn wait_for_players() -> [WebSocket; 2] {
     let server = TcpListener::bind(format!("127.0.0.1:{}", PORT)).unwrap();
     let mut peers: Vec<_> = server.incoming()
 		.take(2)
-		.map(|stream|
-			tungstenite::server::accept(stream.unwrap()).unwrap()
-		).collect();
+		.map(|stream_res| {
+			let stream = stream_res.unwrap();
+			tungstenite::server::accept(stream).unwrap()
+		}).collect();
 	[peers.remove(0), peers.remove(0)]
 }
