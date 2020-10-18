@@ -22,7 +22,7 @@ impl Client {
 		let input = InputDevice::new_adaptive(0, true, gilrs);
 
 		Client {
-			client_world: ClientWorld::new(),
+			client_world: ClientWorld::new(0),
 			input,
 			socket,
 			player_id,
@@ -49,5 +49,12 @@ impl Runnable for Client {
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
 		self.client_world.draw(app, timed_loop_info);
+	}
+
+	fn apply_key(&mut self, _ev: &KeyPressedEvent) {
+	}
+
+	fn get_runnable_change(&mut self) -> RunnableChange {
+		RunnableChange::None
 	}
 }

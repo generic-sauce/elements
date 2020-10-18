@@ -38,20 +38,13 @@ use crate::prelude::*;
 
 #[cfg(feature = "client")]
 fn main() {
-	let arg = std::env::args().nth(1);
-
-	if let Some("server") = arg.as_deref() {
-		Server::new().run();
-		return;
+	let server_arg = std::env::args().nth(1);
+	match server_arg.as_ref().map(|s| s.as_str()) {
+		Some("server") => Server::new().run(),
+		Some("menu") => App::new().run_menu_and_game(),
+		Some(ip) => App::new().run_client(ip),
+		None => App::new().run_local(0),
 	}
-
-	// main program
-	thread::spawn(move || {
-		match arg.as_deref() {
-			Some(ip) => App::new().run_client(ip),
-			None => App::new().run_local(),
-		}
-	});
 
 	let event_loop = win::EventLoop::new();
 	let window = win::WindowBuilder::new()

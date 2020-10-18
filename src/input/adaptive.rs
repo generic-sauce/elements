@@ -32,6 +32,10 @@ impl InputDevice {
 			has_keyboard
 		};
 
+		if has_keyboard {
+			reset_mouse_position();
+		}
+
 		InputDevice::Adaptive(adaptive_input)
 	}
 }
@@ -64,7 +68,9 @@ impl AdaptiveInput {
 		} else if self.has_keyboard && S.is_pressed() {
 			-MAX_MOVEMENT_VALUE
 		} else if let Some(gamepad) = gamepad {
-			(apply_deadzone(gamepad.value(gilrs::Axis::LeftStickY)) * MAX_MOVEMENT_VALUE as f32) as i32
+			((gamepad.is_pressed(gilrs::Button::DPadUp) as i32 as f32
+			+ apply_deadzone(gamepad.value(gilrs::Axis::LeftStickY))) as f32
+			* MAX_MOVEMENT_VALUE as f32) as i32
 		} else {
 			0
 		};
@@ -80,7 +86,9 @@ impl AdaptiveInput {
 		}
 		if !key_pressed {
 			if let Some(gamepad) = gamepad {
-				direction.x = (apply_deadzone(gamepad.value(gilrs::Axis::LeftStickX)) * MAX_MOVEMENT_VALUE as f32) as i32
+				direction.x = ((apply_deadzone(gamepad.value(gilrs::Axis::LeftStickX))
+				+ gamepad.is_pressed(gilrs::Button::DPadRight) as i32 as f32
+				- gamepad.is_pressed(gilrs::Button::DPadLeft) as i32 as f32) * MAX_MOVEMENT_VALUE as f32) as i32;
 			}
 		}
 
@@ -109,10 +117,7 @@ impl AdaptiveInput {
 		}
 
 		if self.has_keyboard {
-			let new_mouse_pos = get_mouse_position();
-			let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
-
-			sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.to_vector2i());
+			let mouse_diff = get_mouse_position_update();
 			let mouse_diff_scaled = mouse_diff * 9.0;
 			self.cursor += GameVec::new(mouse_diff_scaled.x as i32, -mouse_diff_scaled.y as i32);
 			self.cursor = self.cursor.length_clamped(JOYSTICK_DISTANCE);
@@ -134,6 +139,19 @@ impl AdaptiveInput {
 			just_attack2: self.just_attack2,
 		}
 	}
+}
+
+pub fn get_mouse_position_update() -> WindowVec {
+	let new_mouse_pos = get_mouse_position();
+	let mouse_diff = new_mouse_pos - DEFAULT_MOUSE_POSITION;
+
+	reset_mouse_position();
+
+	mouse_diff
+}
+
+pub fn reset_mouse_position() {
+	sfml::window::mouse::set_desktop_position(DEFAULT_MOUSE_POSITION.to_vector2i());
 }
 
 fn apply_deadzone_min(value: f32, deadzone_min: f32) -> f32 {

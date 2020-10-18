@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub(in super) fn draw(pl: &Player, target: &impl RenderTarget, context: &DrawContext) {
+pub(in super) fn draw(pl: &Player, target: &impl RenderTarget, context: &GameDrawContext) {
 	let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 3);
 	let offset = GameVec::new(-PLAYER_SIZE.x, PLAYER_SIZE.y + TILESIZE);
 	let left_bot = pl.left_bot + offset;

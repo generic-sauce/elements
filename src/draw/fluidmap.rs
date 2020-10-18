@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub(in super) fn draw(fluidmap: &FluidMap, target: &impl RenderTarget, context: &mut DrawContext) {
+pub(in super) fn draw(fluidmap: &FluidMap, target: &impl RenderTarget, context: &mut GameDrawContext) {
 	let size = (context.tilemap_size.x * context.tilemap_size.y) as usize;
 	let mut pixels = Vec::with_capacity(size);
 	pixels.resize(size * 4, 0 as u8);
@@ -16,12 +16,12 @@ pub(in super) fn draw(fluidmap: &FluidMap, target: &impl RenderTarget, context: 
 		pixels[cell_index+0] = local_position.0 as u8;
 	}
 
-	let shader = &mut context.shader_state.get_shader(ShaderId::Fluid);
+	let shader = &mut context.ctxt.shader_state.get_shader(ShaderId::Fluid);
 
 	let image = Image::create_from_pixels(context.tilemap_size.x as u32, context.tilemap_size.y as u32, &pixels).unwrap();
 	let container = TextureContainer::Boxed(Texture::from_image(&image).unwrap());
 
-	shader.set_uniform_float("elapsed_time", context.elapsed_time.as_secs_f32());
+	shader.set_uniform_float("elapsed_time", context.ctxt.elapsed_time.as_secs_f32());
 	shader.set_uniform_texture("fluid_tex", container);
 	let v = Vector2f::new(context.tilemap_size.x as f32, context.tilemap_size.y as f32); // TODO make nicer
 	shader.set_uniform_vec2("fluid_tex_size", v);
@@ -30,8 +30,8 @@ pub(in super) fn draw(fluidmap: &FluidMap, target: &impl RenderTarget, context: 
 	states.shader = Some(&shader.inner_shader);
 
 	let mut rect = RectangleShape::default();
-	rect.set_texture(context.texture_state.get_texture(TextureId::Any), true);
-	rect.set_size(Vector2f::new(context.aspect_ratio, 1.0));
+	rect.set_texture(context.ctxt.texture_state.get_texture(TextureId::Any), true);
+	rect.set_size(Vector2f::new(context.ctxt.aspect_ratio, 1.0));
 	target.draw_rectangle_shape(&rect, states);
 
 	#[cfg(debug_assertions)]
