@@ -1,8 +1,10 @@
 pub mod world;
 mod draw_triangles;
+mod draw_tilemap;
 
 use crate::prelude::*;
 use draw_triangles::*;
+use draw_tilemap::*;
 
 pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
@@ -13,7 +15,8 @@ pub struct Graphics {
 	queue: wgpu::Queue,
 	window_size: Vec2u,
 	swap_chain: wgpu::SwapChain,
-	pub triangles: DrawTriangles,
+	triangles: DrawTriangles,
+	tilemap: DrawTilemap,
 }
 
 fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u) -> wgpu::SwapChain {
@@ -22,7 +25,7 @@ fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u
 		format: SURFACE_FORMAT,
 		width: size.x,
 		height: size.y,
-		present_mode: wgpu::PresentMode::Fifo,
+		present_mode: wgpu::PresentMode::Immediate,
 	};
 
 	device.create_swap_chain(surface, &swap_chain_desc)
@@ -60,6 +63,7 @@ impl Graphics {
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
 		let triangles = DrawTriangles::new(&device);
+		let tilemap = DrawTilemap::new(&device, &queue);
 
 		Graphics {
 			instance,
@@ -69,21 +73,19 @@ impl Graphics {
 			window_size,
 			swap_chain,
 			triangles,
+			tilemap,
 		}
 	}
 
-	pub fn draw(&mut self) {
+	pub fn draw(&mut self, receiver: &Receiver<GraphicsWorld>) {
+		let world = receiver.recv().unwrap();
+
+		let players = &world.players;
 		// self.draw_hud(...);
-		self.draw_players();
-		// self.draw_tilemap(...);
+		self.draw_players(&world);
+		// self.draw_tilemap(&world);
 		// self.draw_fluids(...);
 		// self.draw_background(...);
-	}
-
-	fn draw_players(&mut self) {
-		self.triangles.draw_sprite(CanvasVec::new(0.0, 0.0), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::RED));
-		self.triangles.draw_sprite(CanvasVec::new(-0.3, -0.3), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::GREEN));
-		self.triangles.draw_sprite(CanvasVec::new(0.1, -0.4), CanvasVec::new(0.5, 0.5), Some(wgpu::Color::BLUE));
 	}
 
 	/* create and fill draw pass
@@ -107,12 +109,20 @@ impl Graphics {
 			a: 1.0,
 		};
 
-		self.triangles.flush(
+		self.tilemap.render(
 			&self.device,
 			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
 			wgpu::LoadOp::Clear(clear_color)
+		);
+
+		self.triangles.flush(
+			&self.device,
+			&self.queue,
+			&mut encoder,
+			&swap_chain_texture,
+			wgpu::LoadOp::Load
 		);
 
 		self.queue.submit(Some(encoder.finish()));

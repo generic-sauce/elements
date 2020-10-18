@@ -14,6 +14,7 @@ pub struct App {
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
 	pub cursor_position: CanvasVec,
+	pub sender: Sender<GraphicsWorld>,
 }
 
 pub struct KeyPressedEvent {
@@ -117,7 +118,7 @@ impl RunnableChange {
 }
 
 impl App {
-	pub fn new () -> App {
+	pub fn new (sender: Sender<GraphicsWorld>) -> App {
 		let context_settings = ContextSettings::default();
 		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
 		window.set_mouse_cursor_visible(false);
@@ -133,6 +134,7 @@ impl App {
 			gilrs,
 			sound_manager: SoundManager::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
+			sender,
 		}
 	}
 
@@ -147,12 +149,18 @@ impl App {
 	pub fn run_menu_and_game(&mut self) {
 		let mut runnable_change = RunnableChange::Menu(MenuChoice::Main);
 		loop {
-			match runnable_change {
+			runnable_change = match runnable_change {
 				RunnableChange::None => panic!("should not receive RunnableChange::None from run_runnable"),
-				RunnableChange::Local(best_of_n) => { self.run_local(best_of_n); runnable_change = RunnableChange::Menu(MenuChoice::Main) },
+				RunnableChange::Local(best_of_n) => {
+					self.run_local(best_of_n);
+					RunnableChange::Menu(MenuChoice::Main)
+				},
 				RunnableChange::Quit => break,
-				RunnableChange::Menu(choice) => runnable_change = self.run_runnable(MenuRunnable::new(choice)),
-				RunnableChange::Client(ip) => { self.run_client(&ip); runnable_change = RunnableChange::Menu(MenuChoice::Main) },
+				RunnableChange::Menu(choice) => self.run_runnable(MenuRunnable::new(choice)),
+				RunnableChange::Client(ip) => {
+					self.run_client(&ip);
+					RunnableChange::Menu(MenuChoice::Main)
+				},
 			}
 		}
 	}

@@ -26,6 +26,14 @@ impl Runnable for Local {
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
 		self.client_world.draw(app, timed_loop_info);
+
+		let world = &self.client_world.world;
+		let graphics_world = GraphicsWorld::new(
+			world.tilemap.size,
+			world.players.clone(),
+			&world.tilemap,
+		);
+		app.sender.send(graphics_world).unwrap();
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {

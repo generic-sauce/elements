@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 #[derive(Copy, Clone)]
-pub struct Vertex {
+struct Vertex {
 	position: CanvasVec,
 	uv: CanvasVec,
 	color: wgpu::Color,
@@ -37,13 +37,13 @@ pub struct DrawTriangles {
 	// texture_view: wgpu::TextureView,
 	triangles: Vec<Triangle>,
 	vertex_buffer: wgpu::Buffer,
-	capacity: u64,
+	triangles_capacity: u64,
 }
 
 impl DrawTriangles {
-	fn create_vertex_buffer(device: &wgpu::Device, capacity: u64) -> wgpu::Buffer {
+	fn create_vertex_buffer(device: &wgpu::Device, triangles_capacity: u64) -> wgpu::Buffer {
 		let triangle_size = std::mem::size_of::<Triangle>() as u64;
-		let triangles_size = capacity * triangle_size;
+		let triangles_size = triangles_capacity * triangle_size;
 		let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
 			label: Some("vertex buffer"),
 			size: triangles_size,
@@ -54,21 +54,16 @@ impl DrawTriangles {
 		vertex_buffer
 	}
 
-	fn enlarge_vertex_buffer(&mut self, device: &wgpu::Device, min_capacity: u64) {
-		while self.capacity < min_capacity {
-			self.capacity = self.capacity * 2;
+	fn enlarge_vertex_buffer(&mut self, device: &wgpu::Device, min_triangles_capacity: u64) {
+		while self.triangles_capacity < min_triangles_capacity {
+			self.triangles_capacity = self.triangles_capacity * 2;
 		}
-		self.vertex_buffer = Self::create_vertex_buffer(device, self.capacity);
+		self.vertex_buffer = Self::create_vertex_buffer(device, self.triangles_capacity);
 	}
 
-	/* create vertex buffers
-	 * crate uniform buffers
-	 * compile shaders
-	 * create pipeline
-	 */
 	pub fn new(device: &wgpu::Device) -> DrawTriangles {
-		let capacity = 128 as u64;
-		let vertex_buffer = Self::create_vertex_buffer(device, capacity);
+		let triangles_capacity = 128 as u64;
+		let vertex_buffer = Self::create_vertex_buffer(device, triangles_capacity);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
 			stride: 7 * std::mem::size_of::<f32>() as u64,
@@ -92,8 +87,8 @@ impl DrawTriangles {
 			]
 		};
 
-		let vert = device.create_shader_module(wgpu::include_spirv!("../../res/shader/shader.vert.spv"));
-		let frag = device.create_shader_module(wgpu::include_spirv!("../../res/shader/shader.frag.spv"));
+		let vert = device.create_shader_module(wgpu::include_spirv!("../../res/shader/triangles.vert.spv"));
+		let frag = device.create_shader_module(wgpu::include_spirv!("../../res/shader/triangles.frag.spv"));
 
 		let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
 			label: Some("bind group layout"),
@@ -136,18 +131,18 @@ impl DrawTriangles {
 			alpha_to_coverage_enabled: false,
 		});
 
-		let triangles = Vec::with_capacity(capacity as usize);
+		let triangles = Vec::with_capacity(triangles_capacity as usize);
 
 		DrawTriangles {
 			pipeline,
 			triangles,
 			vertex_buffer,
-			capacity
+			triangles_capacity
 		}
 	}
 
 	fn render(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
-		if self.capacity < self.triangles.len() as u64 {
+		if self.triangles_capacity < self.triangles.len() as u64 {
 			self.enlarge_vertex_buffer(device, self.triangles.len() as u64);
 		}
 

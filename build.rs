@@ -22,6 +22,8 @@ fn compile_shader(shader_name: &str) {
 }
 
 fn main() {
-	compile_shader("shader.vert");
-	compile_shader("shader.frag");
+	compile_shader("triangles.vert");
+	compile_shader("triangles.frag");
+	compile_shader("tilemap.vert");
+	compile_shader("tilemap.frag");
 }
