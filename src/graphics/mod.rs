@@ -117,9 +117,9 @@ impl Graphics {
 		let elapsed_time = world.elapsed_time.as_millis();
 
 		let clear_color = wgpu::Color {
-			r: 0.03,
-			g: 0.025,
-			b: 0.025,
+			r: 118.0 / 255.0,
+			g: 160.0 / 255.0,
+			b:  40.0 / 255.0,
 			a: 1.0,
 		};
 
