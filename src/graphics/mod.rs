@@ -1,10 +1,12 @@
 pub mod world;
 mod draw_triangles;
 mod draw_tilemap;
+mod draw_fluidmap;
 
 use crate::prelude::*;
 use draw_triangles::*;
 use draw_tilemap::*;
+use draw_fluidmap::*;
 
 pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
@@ -17,6 +19,7 @@ pub struct Graphics {
 	swap_chain: wgpu::SwapChain,
 	triangles: DrawTriangles,
 	tilemap: DrawTilemap,
+	fluidmap: DrawFluidmap,
 }
 
 fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u) -> wgpu::SwapChain {
@@ -64,6 +67,7 @@ impl Graphics {
 
 		let triangles = DrawTriangles::new(&device);
 		let tilemap = DrawTilemap::new(&device, &queue);
+		let fluidmap = DrawFluidmap::new(&device, &queue);
 
 		Graphics {
 			instance,
@@ -74,6 +78,7 @@ impl Graphics {
 			swap_chain,
 			triangles,
 			tilemap,
+			fluidmap,
 		}
 	}
 
@@ -115,6 +120,16 @@ impl Graphics {
 			wgpu::LoadOp::Clear(clear_color),
 			world.tilemap_size,
 			&world.tilemap_data,
+		);
+
+		self.fluidmap.render(
+			&self.device,
+			&self.queue,
+			&mut encoder,
+			&swap_chain_texture,
+			wgpu::LoadOp::Load,
+			world.fluidmap_size,
+			&world.fluidmap_data,
 		);
 
 		self.triangles.flush(

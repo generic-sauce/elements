@@ -21,3 +21,5 @@ pub struct Vec2t<T: Primitive, P> {
 pub struct DefaultParam;
 #[allow(unused)]
 pub type Vec2u = Vec2t::<u32, DefaultParam>;
+#[allow(unused)]
+pub type Vec2f = Vec2t::<f32, DefaultParam>;

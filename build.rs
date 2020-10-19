@@ -26,4 +26,6 @@ fn main() {
 	compile_shader("triangles.frag");
 	compile_shader("tilemap.vert");
 	compile_shader("tilemap.frag");
+	compile_shader("fluidmap.vert");
+	compile_shader("fluidmap.frag");
 }
