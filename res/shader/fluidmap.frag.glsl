@@ -58,8 +58,9 @@ void main() {
 
 	float alpha = smoothstep(r/4., r/5., d);
 
-	if (alpha < .1)
+	if (alpha < .5)
 		discard;
 
+	c = pow(c, vec3(2.2));
 	frag_color = vec4(c, alpha);
 }
