@@ -2,8 +2,8 @@ use crate::prelude::*;
 
 #[derive(Copy, Clone)]
 struct Vertex {
-	position: CanvasVec,
-	uv: CanvasVec,
+	position: SurfaceVec,
+	uv: Vec2f,
 }
 
 fn vertex_to_bytes_len() -> u64 {
@@ -93,10 +93,10 @@ impl DrawTilemap {
 	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
 		let vertex_buffer = Self::create_vertex_buffer(device, 4);
 		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
-			Vertex { position: CanvasVec::new(0.0, 0.0), uv: CanvasVec::new(0.0, 0.0) },
-			Vertex { position: CanvasVec::new(1.0, 0.0), uv: CanvasVec::new(1.0, 0.0) },
-			Vertex { position: CanvasVec::new(0.0, 1.0), uv: CanvasVec::new(0.0, 1.0) },
-			Vertex { position: CanvasVec::new(1.0, 1.0), uv: CanvasVec::new(1.0, 1.0) },
+			Vertex { position: (-1.0, -1.0).into(), uv: (0.0, 0.0).into() },
+			Vertex { position: ( 1.0, -1.0).into(), uv: (1.0, 0.0).into() },
+			Vertex { position: (-1.0,  1.0).into(), uv: (0.0, 1.0).into() },
+			Vertex { position: ( 1.0,  1.0).into(), uv: (1.0, 1.0).into() },
 		))[..]);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
