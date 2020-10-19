@@ -58,7 +58,7 @@ fn main() {
 
 #[cfg(feature = "web-client")]
 fn main() {
-	panic!("web version does not have a main()!A")
+	panic!("web version does not have a main()!")
 }
 
 #[cfg(not(feature = "client"))]
