@@ -31,14 +31,14 @@ void main() {
 			vec2 o = vec2(x, y);
 			/* vec2 gid = id + o; */
 			vec2 guv = uv + o / fluidmap_tex_size;
-			/* vec4 tile = texture(sampler2D(fluidmap_tex, fluidmap_sam), guv); */
-			/* vec2 glv = lv - o - (tile.xy - .5); */
-			/* float team_ = tile.b; */
-			int fluid = int(255.9 * texture(sampler2D(fluidmap_tex, fluidmap_sam), uv).r);
-			vec2 glv = lv - o;
-			float team_ = float(fluid);
-			/* if (tile.a > .5) { */
-			if (fluid > 1) {
+			vec4 tile = texture(sampler2D(fluidmap_tex, fluidmap_sam), guv);
+			vec2 glv = lv - o - (tile.xy - .5);
+			float team_ = tile.b;
+			/* int fluid = int(255.9 * texture(sampler2D(fluidmap_tex, fluidmap_sam), guv).r); */
+			/* vec2 glv = lv - o; */
+			/* float team_ = float(fluid); */
+			if (tile.a > .5) {
+			/* if (fluid < 2) { */
 				float l = length(glv);
 				team += (team_ - .5) * max(0., r - l);
 				d = smin(d, l, r);
@@ -57,5 +57,9 @@ void main() {
 	c += vec3(team0, teams, team1) * (2. - wave);
 
 	float alpha = smoothstep(r/4., r/5., d);
+
+	if (alpha < .1)
+		discard;
+
 	frag_color = vec4(c, alpha);
 }

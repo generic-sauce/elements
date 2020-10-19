@@ -24,18 +24,18 @@ fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
 	bytes
 }
 
-fn create_fluidmap_texture(device: &wgpu::Device, fluidmap_size: FluidVec) -> (wgpu::Texture, wgpu::TextureView) {
+fn create_fluidmap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu::Texture, wgpu::TextureView) {
 	let fluidmap_texture = device.create_texture(&wgpu::TextureDescriptor {
 		label: Some("fluidmap texture"),
 		size: wgpu::Extent3d {
-			width: fluidmap_size.x as u32,
-			height: fluidmap_size.y as u32,
+			width: tilemap_size.x as u32,
+			height: tilemap_size.y as u32,
 			depth: 1,
 		},
 		mip_level_count: 1,
 		sample_count: 1,
 		dimension: wgpu::TextureDimension::D2,
-		format: wgpu::TextureFormat::R8Unorm,
+		format: wgpu::TextureFormat::Rgba8Unorm,
 		usage: wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
 	});
 
@@ -100,7 +100,7 @@ fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::
 pub struct DrawFluidmap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
-	fluidmap_size: FluidVec,
+	tilemap_size: TileVec,
 	fluidmap_texture: Option<wgpu::Texture>,
 	fluidmap_texture_view: Option<wgpu::TextureView>,
 	fluidmap_sampler: wgpu::Sampler,
@@ -218,7 +218,7 @@ impl DrawFluidmap {
 		DrawFluidmap {
 			pipeline,
 			vertex_buffer,
-			fluidmap_size: FluidVec::new(0, 0),
+			tilemap_size: TileVec::new(0, 0),
 			fluidmap_texture: None,
 			fluidmap_texture_view: None,
 			fluidmap_sampler,
@@ -228,13 +228,13 @@ impl DrawFluidmap {
 		}
 	}
 
-	pub fn resize_fluidmap(&mut self, device: &wgpu::Device, fluidmap_size: FluidVec) {
-		if fluidmap_size != self.fluidmap_size {
-			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, fluidmap_size);
+	pub fn resize_fluidmap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
+		if tilemap_size != self.tilemap_size {
+			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, tilemap_size);
 
 			self.fluidmap_texture = Some(fluidmap_texture);
 			self.fluidmap_texture_view = Some(fluidmap_texture_view);
-			self.fluidmap_size = fluidmap_size;
+			self.tilemap_size = tilemap_size;
 		}
 	}
 
@@ -247,8 +247,8 @@ impl DrawFluidmap {
 		load: wgpu::LoadOp::<wgpu::Color>,
 		world: &GraphicsWorld,
 	) {
-		assert!(world.fluidmap_size != FluidVec::new(0, 0));
-		self.resize_fluidmap(device, world.fluidmap_size);
+		assert!(world.tilemap_size != TileVec::new(0, 0));
+		self.resize_fluidmap(device, world.tilemap_size);
 
 		queue.write_texture(
 			wgpu::TextureCopyView {
@@ -259,17 +259,17 @@ impl DrawFluidmap {
 			&world.fluidmap_data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: world.fluidmap_size.x as u32,
-				rows_per_image: world.fluidmap_size.y as u32,
+				bytes_per_row: 4 * world.tilemap_size.x as u32,
+				rows_per_image: world.tilemap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: world.fluidmap_size.x as u32,
-				height: world.fluidmap_size.y as u32,
+				width: world.tilemap_size.x as u32,
+				height: world.tilemap_size.y as u32,
 				depth: 1,
 			}
 		);
 
-		let elapsed_time = world.elapsed_time.as_millis() as f32;
+		let elapsed_time = world.elapsed_time.as_millis() as f32 / 1009.0;
 		queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
 		self.bind_group = Some(create_bind_group(
 			device,

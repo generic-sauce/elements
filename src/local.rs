@@ -29,11 +29,10 @@ impl Runnable for Local {
 
 		let world = &self.client_world.world;
 		let graphics_world = GraphicsWorld::new(
-			world.tilemap.size,
-			world.fluidmap.size,
 			&world.tilemap,
 			&world.fluidmap,
 			world.players.clone(),
+			timed_loop_info.elapsed_time,
 		);
 		app.sender.send(graphics_world).unwrap();
 	}

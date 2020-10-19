@@ -12,9 +12,6 @@ void main() {
 
 	int tile = int(255.9 * texture(sampler2D(tilemap_tex, tilemap_sam), uv).r);
 	switch (tile) {
-	case 0:
-		c = vec3(uv, 1);
-		break;
 	case 1:
 		c = vec3(uv, 0);
 		break;
@@ -24,8 +21,9 @@ void main() {
 	case 3:
 		c = vec3(1. - uv, 0);
 		break;
+	case 0:
 	default:
-		c = vec3(0);
+		discard;
 	}
 
 	frag_color = vec4(c, 1);

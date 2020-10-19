@@ -123,23 +123,23 @@ impl Graphics {
 			a: 1.0,
 		};
 
-		self.tilemap.render(
-			&self.device,
-			&self.queue,
-			&mut encoder,
-			&swap_chain_texture,
-			wgpu::LoadOp::Clear(clear_color),
-			world.tilemap_size,
-			&world.tilemap_data,
-		);
-
 		self.fluidmap.render(
 			&self.device,
 			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
-			wgpu::LoadOp::Load,
+			wgpu::LoadOp::Clear(clear_color),
 			&world,
+		);
+
+		self.tilemap.render(
+			&self.device,
+			&self.queue,
+			&mut encoder,
+			&swap_chain_texture,
+			wgpu::LoadOp::Load,
+			world.tilemap_size,
+			&world.tilemap_data,
 		);
 
 		self.triangles.flush(
