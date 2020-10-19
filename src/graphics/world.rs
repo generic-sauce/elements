@@ -6,6 +6,7 @@ pub struct GraphicsWorld {
 	pub tilemap_data: Vec<u8>,
 	pub fluidmap_data: Vec<u8>,
 	pub players: [Player; 2],
+	pub elapsed_time: Duration,
 }
 
 impl GraphicsWorld {
@@ -35,6 +36,7 @@ impl GraphicsWorld {
 			tilemap_data,
 			fluidmap_data,
 			players,
+			elapsed_time: Duration::from_millis(0),
 		}
 	}
 }

@@ -47,24 +47,55 @@ fn create_fluidmap_texture(device: &wgpu::Device, fluidmap_size: FluidVec) -> (w
 	(fluidmap_texture, fluidmap_texture_view)
 }
 
-	fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, fluidmap_texture_view: &wgpu::TextureView, fluidmap_sampler: &wgpu::Sampler) -> wgpu::BindGroup {
-		let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-			label: Some("fluidmap bind group"),
-			layout: bind_group_layout,
-			entries: &[
-				wgpu::BindGroupEntry {
-					binding: 0,
-					resource: wgpu::BindingResource::TextureView(fluidmap_texture_view),
-				},
-				wgpu::BindGroupEntry {
-					binding: 1,
-					resource: wgpu::BindingResource::Sampler(fluidmap_sampler),
-				},
-			]
-		});
+fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, fluidmap_texture_view: &wgpu::TextureView, fluidmap_sampler: &wgpu::Sampler, uniform_buffer: &wgpu::Buffer) -> wgpu::BindGroup {
+	let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+		label: Some("fluidmap bind group"),
+		layout: bind_group_layout,
+		entries: &[
+			wgpu::BindGroupEntry {
+				binding: 0,
+				resource: wgpu::BindingResource::TextureView(fluidmap_texture_view),
+			},
+			wgpu::BindGroupEntry {
+				binding: 1,
+				resource: wgpu::BindingResource::Sampler(fluidmap_sampler),
+			},
+			wgpu::BindGroupEntry {
+				binding: 2,
+				resource: wgpu::BindingResource::Buffer(uniform_buffer.slice(..)),
+			},
+		]
+	});
 
-		bind_group
-	}
+	bind_group
+}
+
+fn create_uniform_buffer(device: &wgpu::Device) -> wgpu::Buffer {
+	let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+		label: Some("uniform buffer"),
+		size: 2 * std::mem::size_of::<f32>() as u64,
+		usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+		mapped_at_creation: false
+	});
+
+	uniform_buffer
+}
+
+fn uniform_to_bytes(elapsed_time: f32) -> Vec<u8> {
+	bytemuck::cast_slice(&[elapsed_time]).to_vec()
+}
+
+fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
+	let vertices_size = vertices_capacity * vertex_to_bytes_len();
+	let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+		label: Some("vertex buffer"),
+		size: vertices_size,
+		usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
+		mapped_at_creation: false
+	});
+
+	vertex_buffer
+}
 
 pub struct DrawFluidmap {
 	pipeline: wgpu::RenderPipeline,
@@ -73,25 +104,14 @@ pub struct DrawFluidmap {
 	fluidmap_texture: Option<wgpu::Texture>,
 	fluidmap_texture_view: Option<wgpu::TextureView>,
 	fluidmap_sampler: wgpu::Sampler,
+	uniform_buffer: wgpu::Buffer,
 	bind_group_layout: wgpu::BindGroupLayout,
 	bind_group: Option<wgpu::BindGroup>,
 }
 
 impl DrawFluidmap {
-	fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
-		let vertices_size = vertices_capacity * vertex_to_bytes_len();
-		let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
-			label: Some("vertex buffer"),
-			size: vertices_size,
-			usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
-			mapped_at_creation: false
-		});
-
-		vertex_buffer
-	}
-
 	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawFluidmap {
-		let vertex_buffer = Self::create_vertex_buffer(device, 4);
+		let vertex_buffer = create_vertex_buffer(device, 4);
 		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
 			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
 			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
@@ -139,7 +159,16 @@ impl DrawFluidmap {
 					ty: wgpu::BindingType::Sampler {
 						comparison: false
 					},
-				}
+				},
+				wgpu::BindGroupLayoutEntry {
+					binding: 2,
+					visibility: wgpu::ShaderStage::FRAGMENT,
+					count: None,
+					ty: wgpu::BindingType::UniformBuffer {
+						dynamic: false,
+						min_binding_size: None
+					},
+				},
 			]
 		});
 
@@ -184,6 +213,8 @@ impl DrawFluidmap {
 			..Default::default()
 		});
 
+		let uniform_buffer = create_uniform_buffer(device);
+
 		DrawFluidmap {
 			pipeline,
 			vertex_buffer,
@@ -191,6 +222,7 @@ impl DrawFluidmap {
 			fluidmap_texture: None,
 			fluidmap_texture_view: None,
 			fluidmap_sampler,
+			uniform_buffer,
 			bind_group_layout,
 			bind_group: None,
 		}
@@ -199,11 +231,9 @@ impl DrawFluidmap {
 	pub fn resize_fluidmap(&mut self, device: &wgpu::Device, fluidmap_size: FluidVec) {
 		if fluidmap_size != self.fluidmap_size {
 			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, fluidmap_size);
-			let bind_group = create_bind_group(device, &self.bind_group_layout, &fluidmap_texture_view, &self.fluidmap_sampler);
 
 			self.fluidmap_texture = Some(fluidmap_texture);
 			self.fluidmap_texture_view = Some(fluidmap_texture_view);
-			self.bind_group = Some(bind_group);
 			self.fluidmap_size = fluidmap_size;
 		}
 	}
@@ -215,11 +245,10 @@ impl DrawFluidmap {
 		encoder: &mut wgpu::CommandEncoder,
 		swap_chain_texture: &wgpu::SwapChainTexture,
 		load: wgpu::LoadOp::<wgpu::Color>,
-		fluidmap_size: FluidVec,
-		fluidmap_data: &[u8]
+		world: &GraphicsWorld,
 	) {
-		assert!(fluidmap_size != FluidVec::new(0, 0));
-		self.resize_fluidmap(device, fluidmap_size);
+		assert!(world.fluidmap_size != FluidVec::new(0, 0));
+		self.resize_fluidmap(device, world.fluidmap_size);
 
 		queue.write_texture(
 			wgpu::TextureCopyView {
@@ -227,18 +256,28 @@ impl DrawFluidmap {
 				mip_level: 0,
 				origin: wgpu::Origin3d::ZERO,
 			},
-			fluidmap_data,
+			&world.fluidmap_data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: fluidmap_size.x as u32,
-				rows_per_image: fluidmap_size.y as u32,
+				bytes_per_row: world.fluidmap_size.x as u32,
+				rows_per_image: world.fluidmap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: fluidmap_size.x as u32,
-				height: fluidmap_size.y as u32,
+				width: world.fluidmap_size.x as u32,
+				height: world.fluidmap_size.y as u32,
 				depth: 1,
 			}
 		);
+
+		let elapsed_time = world.elapsed_time.as_millis() as f32;
+		queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
+		self.bind_group = Some(create_bind_group(
+			device,
+			&self.bind_group_layout,
+			&self.fluidmap_texture_view.as_ref().unwrap(),
+			&self.fluidmap_sampler,
+			&self.uniform_buffer
+		));
 
 		let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[

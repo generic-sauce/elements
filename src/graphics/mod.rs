@@ -114,6 +114,8 @@ impl Graphics {
 			label: Some("command encoder")
 		});
 
+		let elapsed_time = world.elapsed_time.as_millis();
+
 		let clear_color = wgpu::Color {
 			r: 0.03,
 			g: 0.025,
@@ -137,8 +139,7 @@ impl Graphics {
 			&mut encoder,
 			&swap_chain_texture,
 			wgpu::LoadOp::Load,
-			world.fluidmap_size,
-			&world.fluidmap_data,
+			&world,
 		);
 
 		self.triangles.flush(
