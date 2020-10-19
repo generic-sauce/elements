@@ -2,8 +2,8 @@ use crate::prelude::*;
 
 #[derive(Copy, Clone)]
 struct Vertex {
-	position: CanvasVec,
-	uv: CanvasVec,
+	position: SurfaceVec,
+	uv: Vec2f,
 	color: wgpu::Color,
 }
 
@@ -90,10 +90,10 @@ impl DrawTriangles {
 		let vert = device.create_shader_module(wgpu::include_spirv!("../../res/shader/triangles.vert.spv"));
 		let frag = device.create_shader_module(wgpu::include_spirv!("../../res/shader/triangles.frag.spv"));
 
-		let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-			label: Some("bind group layout"),
-			entries: &[]
-		});
+		// let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+		// 	label: Some("bind group layout"),
+		// 	entries: &[]
+		// });
 
 		let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
 			label: Some("pipeline layout descriptor"),
@@ -197,18 +197,21 @@ impl DrawTriangles {
 	// draw_rectangle(Origin::LeftBot(v));
 
 	#[allow(unused)]
-	pub fn draw_sprite(&mut self, left_bot: CanvasVec, size: CanvasVec, color: Option<wgpu::Color>) {
+	pub fn draw_sprite(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, color: Option<wgpu::Color>) {
+		let left_bot = left_bot.to_surface(context.window_size);
+		let right_top = right_top.to_surface(context.window_size);
 		let color = if let Some(color) = color { color } else { wgpu::Color::WHITE };
+
 		self.triangles.push([
-			Vertex { position: left_bot, uv: CanvasVec::new(0.0, 0.0), color: color },
-			Vertex { position: left_bot + (size.x, 0.0), uv: CanvasVec::new(1.0, 0.0), color: color },
-			Vertex { position: left_bot + size, uv: CanvasVec::new(1.0, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
+			Vertex { position: (right_top.x, left_bot.y).into(), uv: Vec2f::new(1.0, 0.0), color: color },
+			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
 		]);
 
 		self.triangles.push([
-			Vertex { position: left_bot, uv: CanvasVec::new(0.0, 0.0), color: color },
-			Vertex { position: left_bot + size, uv: CanvasVec::new(1.0, 1.0), color: color },
-			Vertex { position: left_bot + (0.0, size.y), uv: CanvasVec::new(0.0, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
+			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
+			Vertex { position: (left_bot.x, right_top.y).into(), uv: Vec2f::new(0.0, 1.0), color: color },
 		]);
 	}
 }

@@ -1,3 +1,4 @@
+pub mod surface_vec;
 pub mod world;
 mod draw_triangles;
 mod draw_tilemap;
@@ -9,6 +10,10 @@ use draw_tilemap::*;
 use draw_fluidmap::*;
 
 pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
+
+pub struct DrawContext2 {
+	window_size: Vec2u,
+}
 
 pub struct Graphics {
 	instance: wgpu::Instance,
@@ -23,7 +28,7 @@ pub struct Graphics {
 }
 
 fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u) -> wgpu::SwapChain {
-	let mut swap_chain_desc = wgpu::SwapChainDescriptor {
+	let swap_chain_desc = wgpu::SwapChainDescriptor {
 		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
 		format: SURFACE_FORMAT,
 		width: size.x,
@@ -83,9 +88,13 @@ impl Graphics {
 	}
 
 	pub fn draw(&mut self, world: &GraphicsWorld) {
-		let players = &world.players;
+		let window_size = Vec2u::new(self.window_size.x as u32, self.window_size.y as u32);
+		let context = DrawContext2 {
+			window_size,
+		};
+
 		// self.draw_hud(...);
-		self.draw_players(&world);
+		self.draw_players(&context, &world);
 		// self.draw_tilemap(&world);
 		// self.draw_fluids(...);
 		// self.draw_background(...);
