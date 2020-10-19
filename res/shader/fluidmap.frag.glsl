@@ -61,6 +61,6 @@ void main() {
 	if (alpha < .5)
 		discard;
 
-	c = pow(c, vec3(2.2));
+	c = pow(c, vec3(2));
 	frag_color = vec4(c, alpha);
 }
