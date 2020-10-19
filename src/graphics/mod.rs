@@ -77,9 +77,7 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw(&mut self, receiver: &Receiver<GraphicsWorld>) {
-		let world = receiver.recv().unwrap();
-
+	pub fn draw(&mut self, world: &GraphicsWorld) {
 		let players = &world.players;
 		// self.draw_hud(...);
 		self.draw_players(&world);
@@ -92,7 +90,7 @@ impl Graphics {
 	 * create and fill command buffer
 	 * submit command buffer to queue
 	 */
-	pub fn flush(&mut self) {
+	pub fn flush(&mut self, world: &GraphicsWorld) {
 		let swap_chain_texture = self.swap_chain
 			.get_current_frame()
 			.unwrap()
@@ -114,7 +112,9 @@ impl Graphics {
 			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
-			wgpu::LoadOp::Clear(clear_color)
+			wgpu::LoadOp::Clear(clear_color),
+			world.tilemap_size,
+			&world.tilemap_data,
 		);
 
 		self.triangles.flush(
@@ -122,7 +122,7 @@ impl Graphics {
 			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
-			wgpu::LoadOp::Load
+			wgpu::LoadOp::Load,
 		);
 
 		self.queue.submit(Some(encoder.finish()));

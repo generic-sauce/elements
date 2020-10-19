@@ -14,9 +14,8 @@ impl GraphicsWorld {
 			.map(|t| match t {
 				Tile::Void => 0,
 				Tile::Ground => 1,
-				Tile::Wall { owner, .. } => 2 + owner,
+				Tile::Wall { owner, .. } => 2 + owner as u8,
 			})
-			.map(|t| t as u8)
 			.collect();
 
 		GraphicsWorld {

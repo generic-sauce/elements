@@ -47,8 +47,9 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
-				graphics.draw(&receiver);
-				graphics.flush();
+				let graphics_world = receiver.recv().unwrap();
+				graphics.draw(&graphics_world);
+				graphics.flush(&graphics_world);
 			},
 			_ => ()
 		}

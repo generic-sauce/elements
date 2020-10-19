@@ -24,9 +24,57 @@ fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
 	bytes
 }
 
+fn create_tilemap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu::Texture, wgpu::TextureView) {
+	let tilemap_texture = device.create_texture(&wgpu::TextureDescriptor {
+		label: Some("tilemap texture"),
+		size: wgpu::Extent3d {
+			width: tilemap_size.x as u32,
+			height: tilemap_size.y as u32,
+			depth: 1,
+		},
+		mip_level_count: 1,
+		sample_count: 1,
+		dimension: wgpu::TextureDimension::D2,
+		format: wgpu::TextureFormat::R8Unorm,
+		usage: wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
+	});
+
+	let tilemap_texture_view = tilemap_texture.create_view(&wgpu::TextureViewDescriptor {
+		label: Some("tilemap texture view"),
+		..Default::default()
+	});
+
+	(tilemap_texture, tilemap_texture_view)
+}
+
+	fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, tilemap_texture_view: &wgpu::TextureView, tilemap_sampler: &wgpu::Sampler) -> wgpu::BindGroup {
+		let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+			label: Some("tilemap bind group"),
+			layout: bind_group_layout,
+			entries: &[
+				wgpu::BindGroupEntry {
+					binding: 0,
+					resource: wgpu::BindingResource::TextureView(tilemap_texture_view),
+				},
+				wgpu::BindGroupEntry {
+					binding: 1,
+					resource: wgpu::BindingResource::Sampler(tilemap_sampler),
+				},
+			]
+		});
+
+		bind_group
+	}
+
 pub struct DrawTilemap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
+	tilemap_size: TileVec,
+	tilemap_texture: Option<wgpu::Texture>,
+	tilemap_texture_view: Option<wgpu::TextureView>,
+	tilemap_sampler: wgpu::Sampler,
+	bind_group_layout: wgpu::BindGroupLayout,
+	bind_group: Option<wgpu::BindGroup>,
 }
 
 impl DrawTilemap {
@@ -73,13 +121,32 @@ impl DrawTilemap {
 
 		let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
 			label: Some("bind group layout"),
-			entries: &[]
+			entries: &[
+				wgpu::BindGroupLayoutEntry {
+					binding: 0,
+					visibility: wgpu::ShaderStage::FRAGMENT,
+					count: None,
+					ty: wgpu::BindingType::SampledTexture {
+						dimension: wgpu::TextureViewDimension::D2,
+						component_type: wgpu::TextureComponentType::Float,
+						multisampled: false
+					},
+				},
+				wgpu::BindGroupLayoutEntry {
+					binding: 1,
+					visibility: wgpu::ShaderStage::FRAGMENT,
+					count: None,
+					ty: wgpu::BindingType::Sampler {
+						comparison: false
+					},
+				}
+			]
 		});
 
 		let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
 			label: Some("pipeline layout descriptor"),
 			bind_group_layouts: &[
-				// &bind_group_layout,
+				&bind_group_layout,
 			],
 			push_constant_ranges: &[]
 		});
@@ -112,13 +179,67 @@ impl DrawTilemap {
 			alpha_to_coverage_enabled: false,
 		});
 
+		let tilemap_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+			label: Some("tilemap sampler"),
+			..Default::default()
+		});
+
 		DrawTilemap {
 			pipeline,
 			vertex_buffer,
+			tilemap_size: TileVec::new(0, 0),
+			tilemap_texture: None,
+			tilemap_texture_view: None,
+			tilemap_sampler,
+			bind_group_layout,
+			bind_group: None,
 		}
 	}
 
-	pub fn render(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
+	pub fn resize_tilemap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
+		if tilemap_size != self.tilemap_size {
+			let (tilemap_texture, tilemap_texture_view) = create_tilemap_texture(device, tilemap_size);
+			let bind_group = create_bind_group(device, &self.bind_group_layout, &tilemap_texture_view, &self.tilemap_sampler);
+
+			self.tilemap_texture = Some(tilemap_texture);
+			self.tilemap_texture_view = Some(tilemap_texture_view);
+			self.bind_group = Some(bind_group);
+			self.tilemap_size = tilemap_size;
+		}
+	}
+
+	pub fn render(
+		&mut self,
+		device: &wgpu::Device,
+		queue: &wgpu::Queue,
+		encoder: &mut wgpu::CommandEncoder,
+		swap_chain_texture: &wgpu::SwapChainTexture,
+		load: wgpu::LoadOp::<wgpu::Color>,
+		tilemap_size: TileVec,
+		tilemap_data: &[u8]
+	) {
+		assert!(tilemap_size != TileVec::new(0, 0));
+		self.resize_tilemap(device, tilemap_size);
+
+		queue.write_texture(
+			wgpu::TextureCopyView {
+				texture: self.tilemap_texture.as_ref().unwrap(),
+				mip_level: 0,
+				origin: wgpu::Origin3d::ZERO,
+			},
+			tilemap_data,
+			wgpu::TextureDataLayout {
+				offset: 0,
+				bytes_per_row: tilemap_size.x as u32,
+				rows_per_image: tilemap_size.y as u32,
+			},
+			wgpu::Extent3d {
+				width: tilemap_size.x as u32,
+				height: tilemap_size.y as u32,
+				depth: 1,
+			}
+		);
+
 		let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
@@ -134,11 +255,11 @@ impl DrawTilemap {
 		});
 
 		render_pass.set_pipeline(&self.pipeline);
-		// draw_pass.set_bind_group(
-		// 	0,
-		// 	&bind_group,
-		// 	&[]
-		// );
+		render_pass.set_bind_group(
+			0,
+			self.bind_group.as_ref().unwrap(),
+			&[]
+		);
 		render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
 		render_pass.draw(0 .. 4, 0 .. 1);
 	}
