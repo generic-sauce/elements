@@ -23,3 +23,7 @@ pub struct DefaultParam;
 pub type Vec2u = Vec2t::<u32, DefaultParam>;
 #[allow(unused)]
 pub type Vec2f = Vec2t::<f32, DefaultParam>;
+
+pub fn v<T: Primitive, P>(x: T, y: T) -> Vec2t<T, P> {
+	Vec2t::<T, P>::new(x, y)
+}

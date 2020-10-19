@@ -93,10 +93,10 @@ impl DrawTilemap {
 	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
 		let vertex_buffer = Self::create_vertex_buffer(device, 4);
 		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
-			Vertex { position: (-1.0, -1.0).into(), uv: (0.0, 0.0).into() },
-			Vertex { position: ( 1.0, -1.0).into(), uv: (1.0, 0.0).into() },
-			Vertex { position: (-1.0,  1.0).into(), uv: (0.0, 1.0).into() },
-			Vertex { position: ( 1.0,  1.0).into(), uv: (1.0, 1.0).into() },
+			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
+			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
+			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
+			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
 		))[..]);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
