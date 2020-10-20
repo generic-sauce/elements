@@ -7,36 +7,51 @@ layout (set = 0, binding = 1) uniform sampler tilemap_sam;
 
 layout (location = 0) in vec2 uv;
 
-float n21(ivec2 s) {
-	vec2 sf = vec2(s);
-	return fract(9542.276 * sin(dot(vec2(527.831, 699.258), sf)));
+float n21(vec2 s) {
+	return fract(9542.276 * sin(dot(vec2(527.831, 699.258), s)));
 }
 
-float smooth_n21(ivec2 s) {
-	float n0 = n21(s);
-	float n1 = n21(s / 2 * 2 + 1000);
-	float n2 = n21(s / 4 * 4 + 2000);
-	float n3 = n21(s / 8 * 8 + 2000);
+float smooth_n21(vec2 seed) {
+	vec2 id = floor(seed);
+	float nlb = n21(id);
+	float nlt = n21(id + vec2(0, 1));
+	float nrb = n21(id + vec2(1, 0));
+	float nrt = n21(id + vec2(1, 1));
 
-	return n0 * .2 + n1 * .3 + n2 * .3 + n3 * .2;
+	vec2 frac = smoothstep(0., 1., fract(seed));
+	float nl = mix(nlb, nlt, frac.y);
+	float nr = mix(nrb, nrt, frac.y);
+	float n = mix(nl, nr, frac.x);
+	return n;
+}
+
+float round_n21(vec2 seed) {
+	float n0 = smooth_n21(seed);
+	float n1 = smooth_n21(seed * 2.);
+	float n2 = smooth_n21(seed * 4.);
+	float n3 = smooth_n21(seed * 8.);
+
+	return n0 * .1 + n1 * .2 + n2 * .3 + n3 * .4;
 }
 
 vec3 ground_color(vec2 uv) {
-	vec2 tilemap_tex_size = textureSize(sampler2D(tilemap_tex, tilemap_sam), 0);
-
-	const vec3 colors[] = vec3[] (
-		vec3(69, 48, 31),
-		vec3(75, 55, 44),
-		vec3(86, 67, 48),
-		vec3(95, 78, 60),
-		vec3(48, 30, 11),
-		vec3(65, 45, 29),
-		vec3(88, 63, 48)
+	const int count = 5;
+	const vec3 colors[] = vec3[count] (
+			vec3(76, 74, 68), // stone
+			vec3(74, 69, 62), // dark dirt
+			vec3(82, 77, 69), // light dirt
+			vec3(78, 71, 59), // clay
+			vec3(83, 77, 63)  // bright clay
 	);
 
-	ivec2 uvi = ivec2(uv * tilemap_tex_size);
-	int i = int(smooth_n21(uvi) * 7.);
-	return colors[i] / 255.;
+	vec2 tilemap_tex_size = textureSize(sampler2D(tilemap_tex, tilemap_sam), 0);
+
+	float h = round_n21(uv * tilemap_tex_size / 16.);
+	h = sign(h - .5) * pow(abs(h * 2. - 1.), .8) * .5 + .5;
+	int i = int(count * h);
+	vec3 c = colors[i];
+
+	return pow(c / 100., vec3(5.)) * .3;
 }
 
 void main() {
@@ -59,6 +74,6 @@ void main() {
 		discard;
 	}
 
-	c = pow(c, vec3(2.2));
+	/* c = pow(c, vec3(2.2)); */
 	frag_color = vec4(c, 1);
 }
