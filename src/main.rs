@@ -26,7 +26,7 @@ fn main() {
 	let event_loop = win::EventLoop::new();
 	let window = win::WindowBuilder::new()
 		.with_inner_size(win::PhysicalSize::new(1280, 720))
-		.with_resizable(false)
+		// .with_resizable(false)
 		.with_title("Elements")
 		.build(&event_loop)
 		.unwrap();
