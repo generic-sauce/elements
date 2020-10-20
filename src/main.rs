@@ -35,7 +35,7 @@ fn main() {
 	let mut graphics_world = receiver.recv().unwrap();
 	let mut frames = 0;
 
-	event_loop.run(move |event, window_target, control_flow| {
+	event_loop.run(move |event, _window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
 
 		match event {

@@ -16,7 +16,7 @@ pub struct DrawContext2 {
 }
 
 pub struct Graphics {
-	instance: wgpu::Instance,
+	#[allow(unused)] instance: wgpu::Instance,
 	surface: wgpu::Surface,
 	device: wgpu::Device,
 	queue: wgpu::Queue,
@@ -113,8 +113,6 @@ impl Graphics {
 		let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
 			label: Some("command encoder")
 		});
-
-		let elapsed_time = world.elapsed_time.as_millis();
 
 		let clear_color = wgpu::Color {
 			r: 0.008,
