@@ -78,6 +78,6 @@ void main() {
 		}
 	}
 
-	/* c = pow(c, vec3(2.2)); */
+	c = pow(c, vec3(2.2));
 	frag_color = vec4(c, 1);
 }
