@@ -37,11 +37,11 @@ float round_n21(vec2 seed) {
 vec3 ground_color(vec2 uv) {
 	const int count = 5;
 	const vec3 colors[] = vec3[count] (
-			vec3(76, 74, 68), // stone
-			vec3(74, 69, 62), // dark dirt
-			vec3(82, 77, 69), // light dirt
-			vec3(78, 71, 59), // clay
-			vec3(83, 77, 63)  // bright clay
+			vec3(21,29,15),
+			vec3(20,36,21),
+			vec3(24,43,29),
+			vec3(28,48,27),
+			vec3(35,49,27)
 	);
 
 	vec2 tilemap_tex_size = textureSize(sampler2D(tilemap_tex, tilemap_sam), 0);
@@ -51,7 +51,7 @@ vec3 ground_color(vec2 uv) {
 	int i = int(count * h);
 	vec3 c = colors[i];
 
-	return pow(c / 100., vec3(5.)) * .3;
+	return c / 255.;
 }
 
 void main() {
@@ -71,7 +71,11 @@ void main() {
 		break;
 	case 0:
 	default:
-		discard;
+		{
+			vec3 bright_bg = vec3(133, 178, 215) / 255.;
+			vec3 dark_bg = vec3(37, 78, 205) / 255.;
+			c = mix(dark_bg, bright_bg, vec3(uv.y));
+		}
 	}
 
 	/* c = pow(c, vec3(2.2)); */

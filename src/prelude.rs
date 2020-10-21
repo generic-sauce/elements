@@ -53,7 +53,7 @@ pub use crate::animation::*;
 	pub use winit::{
 			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, },
 			window::{ Window, WindowBuilder, },
-			event::{ Event, VirtualKeyCode, WindowEvent, },
+			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput },
 			event_loop::{ EventLoop, ControlFlow, },
 	};
 }
