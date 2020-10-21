@@ -37,11 +37,11 @@ float round_n21(vec2 seed) {
 vec3 ground_color(vec2 uv) {
 	const int count = 5;
 	const vec3 colors[] = vec3[count] (
-			vec3(21,29,15),
 			vec3(20,36,21),
+			vec3(21,29,15),
 			vec3(24,43,29),
-			vec3(28,48,27),
-			vec3(35,49,27)
+			vec3(35,49,27),
+			vec3(28,48,27)
 	);
 
 	vec2 tilemap_tex_size = textureSize(sampler2D(tilemap_tex, tilemap_sam), 0);
