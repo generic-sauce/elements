@@ -14,7 +14,7 @@ default = ["server"]
 server = ["tungstenite"]
 client = []
 native-client = ["client", "sfml", "gilrs", "rodio", "lazy_static"]
-web-client =    ["client", "wasm-bindgen", "lazy_static", "console_error_panic_hook", "js-sys"]
+web-client =    ["client", "wasm-bindgen", "lazy_static", "console_error_panic_hook", "js-sys", "web-sys"]
 
 [dependencies]
 image = "0.23"
@@ -37,6 +37,7 @@ rodio = { version = "0.11", optional = true }
 wasm-bindgen = { features = ["serde-serialize"], version = "0.2", optional = true }
 console_error_panic_hook = { version = "0.1.6", optional = true }
 js-sys = { version = "0.3.45", optional = true }
+web-sys = { version = "0.3.45", optional = true, features = ["Window", "Performance"] }
 
 # server
 tungstenite = { version = "0.11", optional = true }

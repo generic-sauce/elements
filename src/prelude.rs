@@ -33,7 +33,8 @@ pub use crate::animation::*;
 #[cfg(not(feature = "web-client"))] pub use crate::server::*;
 
 #[cfg(feature = "web-client")] pub use crate::web::*;
-#[cfg(feature = "web-client")] pub use wasm_bindgen::prelude::*;
+#[cfg(feature = "web-client")] pub use wasm_bindgen::{convert::IntoWasmAbi, prelude::*};
+#[cfg(feature = "web-client")] pub use js_sys::Uint8Array;
 
 #[cfg(feature = "native-client")] pub use crate::client::*;
 #[cfg(feature = "native-client")] pub use crate::client_world::*;
