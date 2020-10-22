@@ -44,10 +44,17 @@ impl GraphicsWorld {
 	}
 }
 
+const IMG_SIZE: i32 = 64;
+const IMG_PLAYER_HEIGHT: i32 = 54;
+const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
+
 impl Graphics {
 	pub fn draw_players(&mut self, context: &DrawContext2, world: &GraphicsWorld) {
 		for p in &world.players {
-			self.triangles.draw_sprite(context, p.left_bot, p.left_bot + PLAYER_SIZE, TextureId2::BluePlayerIdle1, None);
+			let center = p.center_position();
+			let left_bot = GameVec::new(center.x - RADIUS, p.left_bot.y);
+			let right_top = GameVec::new(center.x + RADIUS, p.left_bot.y + RADIUS * 2);
+			self.triangles.draw_sprite(context, left_bot, right_top, TextureId2::BluePlayerIdle1, None);
 		}
 	}
 }
