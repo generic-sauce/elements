@@ -1,5 +1,6 @@
 pub mod surface_vec;
 pub mod world;
+pub mod texture_state2;
 mod draw_triangles;
 mod draw_tilemap;
 mod draw_fluidmap;
@@ -70,7 +71,7 @@ impl Graphics {
 
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
-		let triangles = DrawTriangles::new(&device);
+		let triangles = DrawTriangles::new(&device, &queue);
 		let tilemap = DrawTilemap::new(&device, &queue);
 		let fluidmap = DrawFluidmap::new(&device, &queue);
 

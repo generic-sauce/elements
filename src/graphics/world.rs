@@ -47,7 +47,7 @@ impl GraphicsWorld {
 impl Graphics {
 	pub fn draw_players(&mut self, context: &DrawContext2, world: &GraphicsWorld) {
 		for p in &world.players {
-			self.triangles.draw_sprite(context, p.left_bot, p.left_bot + PLAYER_SIZE, Some(wgpu::Color::RED));
+			self.triangles.draw_sprite(context, p.left_bot, p.left_bot + PLAYER_SIZE, TextureId2::BluePlayerIdle1, None);
 		}
 	}
 }
