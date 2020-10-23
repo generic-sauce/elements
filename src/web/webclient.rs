@@ -63,7 +63,7 @@ impl WebClient {
 		self.draw();
 	}
 
-	pub fn tick(&mut self) {
+	fn handle_packets(&mut self) {
 		match self.state {
 			WebClientState::WaitingForGo => {
 				let go_bytes = match self.receiver.try_recv() {
@@ -74,7 +74,27 @@ impl WebClient {
 				self.state = WebClientState::InGame { player_id: your_player_id };
 				log("game is starting!");
 			},
-			WebClientState::InGame { .. } => self.world.tick(&mut ()),
+			WebClientState::InGame { .. } => {
+				loop {
+					let update_bytes = match self.receiver.try_recv() {
+						Err(TryRecvError::Empty) => return,
+						x => x.unwrap(),
+					};
+					let update = deser::<WorldUpdate>(&update_bytes[..]);
+
+					self.world.apply_update(update, &mut ());
+				}
+			},
+		}
+	}
+
+	pub fn tick(&mut self) {
+		self.handle_packets();
+		if let WebClientState::InGame { player_id } = self.state {
+			self.world.players[player_id].input = input_state(0).into_serde().unwrap();
+			let input_bytes = ser(&self.world.players[player_id].input);
+			self.socket.send_with_u8_array(&input_bytes[..]).unwrap();
+			self.world.tick(&mut ());
 		}
 	}
 
