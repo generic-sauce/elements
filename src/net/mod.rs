@@ -21,10 +21,17 @@ pub fn send_packet_to(socket: &mut TungSocket, p: &impl Packet) {
 #[cfg(feature = "server")]
 pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 	while socket.can_read() {
-		let bytes = match socket.read_message().unwrap() {
-			Message::Binary(b) => b,
-			Message::Text(_) => panic!("text should not be sent!"),
-			_ => continue,
+		let bytes = match socket.read_message() {
+			Ok(Message::Binary(b)) => b,
+			Ok(Message::Text(_)) => panic!("text should not be sent!"),
+			Ok(_) => continue,
+			Err(tungstenite::error::Error::Io(io_err)) => {
+				if io_err.kind() == std::io::ErrorKind::WouldBlock {
+					return None;
+				}
+				panic!("rcv error");
+			}
+			Err(_) => panic!("recv error"),
 		};
 		let p = deser::<P>(&bytes[..]);
 		return Some(p);

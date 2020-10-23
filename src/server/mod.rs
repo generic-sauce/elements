@@ -62,8 +62,10 @@ fn wait_for_players() -> [TungSocket; 2] {
 		.take(2)
 		.map(|stream_res| {
 			let stream = stream_res.unwrap();
+			stream.set_nonblocking(true).unwrap();
 			tungstenite::server::accept(stream).unwrap()
 		}).collect();
+
 	println!("starting!");
 	[peers.remove(0), peers.remove(0)]
 }
