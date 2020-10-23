@@ -26,14 +26,16 @@ fn main() {
 	let event_loop = win::EventLoop::new();
 	let window = win::WindowBuilder::new()
 		.with_inner_size(win::PhysicalSize::new(1280, 720))
-		.with_resizable(false)
+		// .with_resizable(false)
 		.with_title("Elements")
 		.build(&event_loop)
 		.unwrap();
 
 	let mut graphics = Graphics::new(&window);
+	let mut graphics_world = receiver.recv().unwrap();
+	let mut frames = 0;
 
-	event_loop.run(move |event, window_target, control_flow| {
+	event_loop.run(move |event, _window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
 
 		match event {
@@ -47,9 +49,13 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
-				let graphics_world = receiver.recv().unwrap();
+				if let Ok(world) = receiver.try_recv() { graphics_world = world };
 				graphics.draw(&graphics_world);
 				graphics.flush(&graphics_world);
+				frames += 1;
+				if frames % 1000 == 0 {
+					println!("{} fps on wgpu", frames / (graphics_world.elapsed_time.as_secs() + 1));
+				}
 			},
 			_ => ()
 		}

@@ -51,12 +51,13 @@ pub use crate::net::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::world::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::surface_vec::*;
+#[cfg(feature = "native-client")] pub use crate::graphics::texture_state2::*;
 #[cfg(feature = "native-client")] pub use winit_input_helper::WinitInputHelper;
 #[cfg(feature = "native-client")] pub mod win {
 	pub use winit::{
 			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, },
 			window::{ Window, WindowBuilder, },
-			event::{ Event, VirtualKeyCode, WindowEvent, },
+			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput },
 			event_loop::{ EventLoop, ControlFlow, },
 	};
 }

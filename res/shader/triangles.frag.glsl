@@ -2,10 +2,18 @@
 
 layout(location = 0) out vec4 frag_color;
 
-layout (location = 0) in vec3 uv;
+layout (set = 0, binding = 0) uniform texture2D tex;
+layout (set = 0, binding = 1) uniform sampler sam;
+
+layout (location = 0) in vec2 uv;
 layout (location = 1) in vec3 color;
 
 void main() {
-	vec3 c = color;
+	vec4 t = texture(sampler2D(tex, sam), uv);
+	if (t.a < .5)
+		discard;
+
+	vec3 c = color * t.rgb;
+	c = pow(c, vec3(2.2));
 	frag_color = vec4(c, 1);
 }

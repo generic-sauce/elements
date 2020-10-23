@@ -1,5 +1,6 @@
 pub mod surface_vec;
 pub mod world;
+pub mod texture_state2;
 mod draw_triangles;
 mod draw_tilemap;
 mod draw_fluidmap;
@@ -16,7 +17,7 @@ pub struct DrawContext2 {
 }
 
 pub struct Graphics {
-	instance: wgpu::Instance,
+	#[allow(unused)] instance: wgpu::Instance,
 	surface: wgpu::Surface,
 	device: wgpu::Device,
 	queue: wgpu::Queue,
@@ -70,7 +71,7 @@ impl Graphics {
 
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
-		let triangles = DrawTriangles::new(&device);
+		let triangles = DrawTriangles::new(&device, &queue);
 		let tilemap = DrawTilemap::new(&device, &queue);
 		let fluidmap = DrawFluidmap::new(&device, &queue);
 
@@ -95,6 +96,8 @@ impl Graphics {
 
 		// self.draw_hud(...);
 		self.draw_players(&context, &world);
+		self.draw_cursors(&context, &world);
+		// self.draw_cursors(&context, &world);
 		// self.draw_tilemap(&world);
 		// self.draw_fluids(...);
 		// self.draw_background(...);
@@ -114,32 +117,30 @@ impl Graphics {
 			label: Some("command encoder")
 		});
 
-		let elapsed_time = world.elapsed_time.as_millis();
-
 		let clear_color = wgpu::Color {
-			r: 118.0 / 255.0,
-			g: 160.0 / 255.0,
-			b:  40.0 / 255.0,
+			r: 0.008,
+			g: 0.005,
+			b: 0.003,
 			a: 1.0,
 		};
-
-		self.fluidmap.render(
-			&self.device,
-			&self.queue,
-			&mut encoder,
-			&swap_chain_texture,
-			wgpu::LoadOp::Clear(clear_color),
-			&world,
-		);
 
 		self.tilemap.render(
 			&self.device,
 			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
-			wgpu::LoadOp::Load,
+			wgpu::LoadOp::Clear(clear_color),
 			world.tilemap_size,
 			&world.tilemap_data,
+		);
+
+		self.fluidmap.render(
+			&self.device,
+			&self.queue,
+			&mut encoder,
+			&swap_chain_texture,
+			wgpu::LoadOp::Load,
+			&world,
 		);
 
 		self.triangles.flush(
