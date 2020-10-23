@@ -13,7 +13,11 @@ pub struct Server {
 
 impl Server {
 	pub fn new() -> Server {
-		let peers = wait_for_players();
+		let mut peers = wait_for_players();
+
+		for (i, peer) in peers.iter_mut().enumerate() {
+			send_packet_to(peer, &Go { your_player_id: i });
+		}
 
 		Server {
 			world: World::new_defaultmap(0),

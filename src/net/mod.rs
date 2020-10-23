@@ -15,11 +15,7 @@ impl Packet for WorldUpdate {}
 
 #[cfg(feature = "server")]
 pub fn send_packet_to(socket: &mut TungSocket, p: &impl Packet) {
-	let packet_bytes = ser(p);
-	let n: u32 = packet_bytes.len() as u32;
-	let mut bytes = ser(&n);
-	bytes.extend(packet_bytes);
-	socket.write_message(bytes.into()).unwrap();
+	socket.write_message(ser(p).into()).unwrap();
 }
 
 #[cfg(feature = "server")]
@@ -32,7 +28,7 @@ pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 		Message::Binary(b) => b,
 		x => panic!("wrong message-format: {:?}", x),
 	};
-	let p = deser::<P>(&bytes[4..]);
+	let p = deser::<P>(&bytes[..]);
 	Some(p)
 }
 
