@@ -8,6 +8,7 @@ pub struct WebClient {
 	tick_counter: u32,
 	start_time: f64,
 	socket: WebSocket,
+	receiver: Receiver<Vec<u8>>,
 }
 
 pub enum WebClientState {
@@ -17,13 +18,24 @@ pub enum WebClientState {
 
 impl WebClient {
 	pub fn new(server: &'static str, src: TileMapImage) -> Self {
-		WebClient {
+		let (sender, receiver) = channel();
+
+		let client = WebClient {
 			world: World::new(0, src),
 			state: WebClientState::WaitingForGo,
 			tick_counter: 0,
 			start_time: now(),
 			socket: WebSocket::new(&format!("ws://{}:{}", server, PORT)).unwrap(),
-		}
+			receiver,
+		};
+
+		let cb = Closure::<dyn Fn(JsValue)>::wrap(Box::new(move |ev| {
+			sender.send(vec![]).unwrap(); // TODO
+		}));
+		let leaked_cb = Box::leak(Box::new(cb)); // TODO
+		client.socket.set_onmessage(Some(leaked_cb.as_ref().dyn_ref().unwrap()));
+
+		client
 	}
 
 	pub fn schedule(mut self) {

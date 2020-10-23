@@ -35,7 +35,7 @@ pub use crate::animation::*;
 #[cfg(not(feature = "web-client"))] pub use crate::server::*;
 
 #[cfg(feature = "web-client")] pub use crate::web::*;
-#[cfg(feature = "web-client")] pub use wasm_bindgen::{convert::IntoWasmAbi, prelude::*};
+#[cfg(feature = "web-client")] pub use wasm_bindgen::{convert::IntoWasmAbi, JsCast, prelude::*};
 #[cfg(feature = "web-client")] pub use js_sys::Uint8Array;
 #[cfg(feature = "web-client")] pub use web_sys::WebSocket;
 
