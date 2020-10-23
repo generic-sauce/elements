@@ -29,7 +29,7 @@ impl WebClient {
 			receiver,
 		};
 
-		let cb = Closure::<dyn Fn(JsValue)>::wrap(Box::new(move |ev| {
+		let cb = Closure::<dyn Fn(web_sys::MessageEvent)>::wrap(Box::new(move |ev| {
 			sender.send(vec![]).unwrap(); // TODO
 		}));
 		let leaked_cb = Box::leak(Box::new(cb)); // TODO
