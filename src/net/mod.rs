@@ -24,6 +24,7 @@ pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
 	socket.send(&bytes[..]).unwrap();
 }
 
+#[cfg(not(feature = "web-client"))]
 pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAddr) {
 	let packet_bytes = ser(p);
 	let n: u32 = packet_bytes.len() as u32;
@@ -32,6 +33,7 @@ pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAdd
 	socket.send_to(&bytes[..], target).unwrap();
 }
 
+#[cfg(not(feature = "web-client"))]
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
 	let mut n_bytes = [0u8; 4];
 	assert_eq!(match socket.peek(&mut n_bytes[..]) {
@@ -47,10 +49,10 @@ pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)>
 	Some((p, addr))
 }
 
-fn ser<P: Serialize>(p: &P) -> Vec<u8> {
+pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
 	serialize(p).unwrap()
 }
 
-fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
+pub fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
 	deserialize(bytes).unwrap()
 }

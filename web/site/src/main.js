@@ -1,45 +1,24 @@
-// the object storing the state of our application
-window.e2 = {
-	frame_counter: 0,
-	program_start_time: performance.now(),
-};
-
-const FPS = 60.0;
-
 import * as drawmod from "./draw/mod.js";
 import * as inputmod from "./input.js";
 import * as tilemapmod from "./tilemap.js";
-import("../node_modules/elements2/elements2.js")
-	.then(rust => {
-		e2.rust = rust;
-		init();
-	});
 
-function fps() {
-	return e2.frame_counter * 1000 / (performance.now() - e2.program_start_time);
-}
-
-function init() {
-	e2.rust.init();
-
+window.e2 = {};
+window.init_js = function(f) {
 	drawmod.init();
 	inputmod.init();
-
-	tilemapmod.load("map/map02.png", function(img) {
-		e2.world_ptr = e2.rust.new_world(img);
-		setInterval(tick, 1000.0/FPS);
-	})
-}
-
-function tick() {
-	while (fps() < FPS) {
-		e2.rust.tick_world(e2.world_ptr, inputmod.get_input_states());
-		e2.frame_counter += 1;
-	}
-
-	e2.render_world = e2.rust.to_render_world(e2.world_ptr);
-	e2.render_world.tilemap_data = e2.rust.tilemap_data(e2.world_ptr);
-	e2.render_world.fluidmap_data = e2.rust.fluidmap_data(e2.world_ptr);
+};
+window.draw_render_world = function(rw, tilemap_data, fluidmap_data) {
+	e2.render_world = rw;
+	e2.render_world.tilemap_data = tilemap_data;
+	e2.render_world.fluidmap_data = fluidmap_data;
 
 	drawmod.draw();
-}
+};
+window.input_state = function(i) {
+	return inputmod.calc_input_state(i);
+};
+window.load_tilemap = function(src, callback) {
+	tilemapmod.load(src, callback);
+};
+
+import("../node_modules/elements2/elements2.js");

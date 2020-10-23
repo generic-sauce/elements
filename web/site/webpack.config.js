@@ -5,5 +5,9 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "index.js",
   },
-  mode: "development"
+  mode: "development",
+  devServer: {
+    disableHostCheck: true,
+    host: '0.0.0.0',
+  },
 };

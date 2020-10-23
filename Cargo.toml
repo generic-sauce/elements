@@ -4,15 +4,19 @@ version = "0.1.0"
 authors = ["Bluemi <bruno.schilling@protonmail.ch>", "memoryleak47 <memoryleak47@protonmail.ch>", "ichinii <ogtoad@protonmail.com>"]
 edition = "2018"
 
+[package.metadata.wasm-pack.profile.release] # because wasm-opt crashed
+wasm-opt = false
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
 default = ["native-client"]
+server = ["tungstenite"]
 client = []
 native-client = ["client", "sfml", "gilrs", "rodio", "lazy_static", "wgpu", "winit", "winit_input_helper", "bytemuck"]
-web-client =    ["client", "wasm-bindgen", "lazy_static", "console_error_panic_hook", "js-sys"]
+web-client =    ["client", "wasm-bindgen", "lazy_static", "console_error_panic_hook", "js-sys", "web-sys"]
 
-[dependencies]
+[dependencies] # TODO not all of those dependencies are always required!
 image = "0.23"
 itertools = "0.9"
 num-traits = "0.2"
@@ -39,6 +43,10 @@ bytemuck = { version = "1.4.1", optional = true }
 wasm-bindgen = { features = ["serde-serialize"], version = "0.2", optional = true }
 console_error_panic_hook = { version = "0.1.6", optional = true }
 js-sys = { version = "0.3.45", optional = true }
+web-sys = { version = "0.3.45", optional = true, features = ["Window", "Performance", "WebSocket", "MessageEvent", "BinaryType"] }
+
+# server
+tungstenite = { version = "0.11", optional = true }
 
 [lib]
 crate-type = ["cdylib", "rlib"]

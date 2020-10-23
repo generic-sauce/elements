@@ -1,11 +1,6 @@
-
 // calculating the input states
 
-export function get_input_states() {
-	return [calc_input_state(0), calc_input_state(1)];
-}
-
-function calc_input_state(i) {
+export function calc_input_state(i) {
 	const gp = navigator.getGamepads()[i];
 	const last = e2.input_states[i];
 

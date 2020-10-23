@@ -2,11 +2,12 @@ pub use std::sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError};
 pub use std::time::{Duration, SystemTime, Instant};
 pub use std::thread::{self, sleep};
 pub use std::rc::Rc;
-pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr};
+pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream};
 pub use std::collections::HashMap;
 pub use std::io::BufReader;
 pub use std::fs::File;
 pub use itertools::iproduct;
+pub use std::any::Any;
 
 #[cfg(feature = "native-client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "native-client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
@@ -24,13 +25,15 @@ pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
 
-#[cfg(not(feature = "web-client"))] pub use crate::net::*;
+pub use crate::net::*;
 #[cfg(not(feature = "web-client"))] pub use crate::resource::res;
 #[cfg(not(feature = "web-client"))] pub use crate::timed_loop::*;
 #[cfg(not(feature = "web-client"))] pub use crate::server::*;
 
 #[cfg(feature = "web-client")] pub use crate::web::*;
-#[cfg(feature = "web-client")] pub use wasm_bindgen::prelude::*;
+#[cfg(feature = "web-client")] pub use wasm_bindgen::{prelude::*, JsCast};
+#[cfg(feature = "web-client")] pub use web_sys::{WebSocket};
+#[cfg(feature = "web-client")] pub use js_sys::{Uint8Array};
 
 #[cfg(feature = "native-client")] pub use crate::client::*;
 #[cfg(feature = "native-client")] pub use crate::client_world::*;
