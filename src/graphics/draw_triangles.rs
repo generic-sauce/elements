@@ -224,7 +224,6 @@ impl DrawTriangles {
 		let mut slice_ends = Vec::new();
 		for triangles in self.texture_triangles.iter() {
 			let bytes = triangles_to_bytes(&triangles[..]);
-			dbg!(bytes.len());
 			slice_end += bytes.len();
 			slice_ends.push(slice_end as u64);
 			all_bytes.extend(&bytes);
@@ -237,7 +236,6 @@ impl DrawTriangles {
 				let slice_end = slice_ends[i];
 				render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(slice_begin .. slice_end));
 				slice_begin = slice_end;
-			dbg!(slice_begin);
 				render_pass.set_bind_group(0, &self.bind_groups[i], &[]);
 				render_pass.draw(0 .. (3 * triangles.len() as u32), 0 .. 1);
 			}
