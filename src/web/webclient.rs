@@ -30,7 +30,10 @@ impl WebClient {
 		};
 
 		let cb = Closure::<dyn Fn(web_sys::MessageEvent)>::wrap(Box::new(move |ev| {
-			sender.send(vec![]).unwrap(); // TODO
+			let data: JsValue = ev.data();
+			let data: Uint8Array = data.into();
+			let data: Vec<u8> = data.to_vec();
+			sender.send(data).unwrap();
 		}));
 		let leaked_cb = Box::leak(Box::new(cb)); // TODO
 		client.socket.set_onmessage(Some(leaked_cb.as_ref().dyn_ref().unwrap()));
