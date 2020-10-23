@@ -32,6 +32,7 @@ macro_rules! setup {
 
 setup!(
 	Unknown: "images/checkerboard.png",
+	White: "images/white.png",
 	BluePlayerIdle1: "images/player_blue/player_idle/player_idle1.png"
 );
 

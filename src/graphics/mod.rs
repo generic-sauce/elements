@@ -96,6 +96,8 @@ impl Graphics {
 
 		// self.draw_hud(...);
 		self.draw_players(&context, &world);
+		self.draw_cursors(&context, &world);
+		// self.draw_cursors(&context, &world);
 		// self.draw_tilemap(&world);
 		// self.draw_fluids(...);
 		// self.draw_background(...);

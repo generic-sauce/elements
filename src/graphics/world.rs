@@ -57,4 +57,15 @@ impl Graphics {
 			self.triangles.draw_sprite(context, left_bot, right_top, TextureId2::BluePlayerIdle1, None);
 		}
 	}
+
+	pub fn draw_cursors(&mut self, context: &DrawContext2, world: &GraphicsWorld) {
+		for p in &world.players {
+			let radius = TILESIZE / 2;
+			let radius = GameVec::new(radius, radius);
+			let center = p.cursor_position();
+			let left_bot = center - radius;
+			let right_top = center + radius;
+			self.triangles.draw_rectangle(context, left_bot, right_top, wgpu::Color::BLACK);
+		}
+	}
 }

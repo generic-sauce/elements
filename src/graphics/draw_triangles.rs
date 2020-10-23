@@ -199,8 +199,7 @@ impl DrawTriangles {
 	fn render(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
 		let max_triangles = self.texture_triangles.iter()
 			.map(|x| x.len())
-			.max()
-			.unwrap();
+			.fold(0, |acc, x| acc + x);
 		self.enlarge_vertex_buffer(device, max_triangles as u64);
 
 		let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -219,11 +218,27 @@ impl DrawTriangles {
 
 		render_pass.set_pipeline(&self.pipeline);
 
-		for (texture_id, triangles) in self.texture_triangles.iter().enumerate() {
+		// copy all triangles
+		let mut all_bytes = Vec::new();
+		let mut slice_end = 0;
+		let mut slice_ends = Vec::new();
+		for triangles in self.texture_triangles.iter() {
+			let bytes = triangles_to_bytes(&triangles[..]);
+			dbg!(bytes.len());
+			slice_end += bytes.len();
+			slice_ends.push(slice_end as u64);
+			all_bytes.extend(&bytes);
+		}
+		queue.write_buffer(&self.vertex_buffer, 0, &all_bytes[..]);
+
+		let mut slice_begin = 0;
+		for (i, triangles) in self.texture_triangles.iter().enumerate() {
 			if triangles.len() > 0 {
-				queue.write_buffer(&self.vertex_buffer, 0, &triangles_to_bytes(&triangles[..]));
-				render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
-				render_pass.set_bind_group(0, &self.bind_groups[texture_id], &[]);
+				let slice_end = slice_ends[i];
+				render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(slice_begin .. slice_end));
+				slice_begin = slice_end;
+			dbg!(slice_begin);
+				render_pass.set_bind_group(0, &self.bind_groups[i], &[]);
 				render_pass.draw(0 .. (3 * triangles.len() as u32), 0 .. 1);
 			}
 		}
@@ -261,6 +276,24 @@ impl DrawTriangles {
 		let left_bot = left_bot.to_surface(context.window_size);
 		let right_top = right_top.to_surface(context.window_size);
 		let color = if let Some(color) = color { color } else { wgpu::Color::WHITE };
+
+		triangles.push([
+			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
+			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(1.0, 0.0), color: color },
+			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
+		]);
+
+		triangles.push([
+			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
+			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
+			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(0.0, 1.0), color: color },
+		]);
+	}
+
+	pub fn draw_rectangle(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, color: wgpu::Color) {
+		let triangles = &mut self.texture_triangles[TextureId2::White as usize];
+		let left_bot = left_bot.to_surface(context.window_size);
+		let right_top = right_top.to_surface(context.window_size);
 
 		triangles.push([
 			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
