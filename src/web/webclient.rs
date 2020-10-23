@@ -28,9 +28,12 @@ impl WebClient {
 			receiver,
 		};
 
+		client.socket.set_binary_type(web_sys::BinaryType::Arraybuffer);
+
 		let cb = Closure::<dyn Fn(web_sys::MessageEvent)>::wrap(Box::new(move |ev| {
 			let data: JsValue = ev.data();
-			let data: Uint8Array = data.into();
+			let data: js_sys::ArrayBuffer = data.dyn_into().unwrap();
+			let data: Uint8Array = Uint8Array::new(&data);
 			let data: Vec<u8> = data.to_vec();
 			sender.send(data).unwrap();
 		}));
