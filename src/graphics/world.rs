@@ -54,7 +54,8 @@ impl Graphics {
 			let center = p.center_position();
 			let left_bot = GameVec::new(center.x - RADIUS, p.left_bot.y);
 			let right_top = GameVec::new(center.x + RADIUS, p.left_bot.y + RADIUS * 2);
-			self.triangles.draw_sprite(context, left_bot, right_top, TextureId2::BluePlayerIdle1, None);
+			// self.triangles.draw_sprite(context, left_bot, right_top, TextureId2::BluePlayerIdle1, None);
+			self.triangles.draw_animation(context, left_bot, right_top, p.animation, None);
 		}
 	}
 
