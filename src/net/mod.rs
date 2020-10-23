@@ -28,7 +28,10 @@ pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 		return None;
 	}
 
-	let bytes = if let Message::Binary(b) = socket.read_message().unwrap() { b } else { panic!("non-binary message!"); };
+	let bytes = match socket.read_message().unwrap() {
+		Message::Binary(b) => b,
+		x => panic!("wrong message-format: {:?}", x),
+	};
 	let p = deser::<P>(&bytes[4..]);
 	Some(p)
 }

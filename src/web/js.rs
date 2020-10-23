@@ -15,6 +15,9 @@ extern {
 #[wasm_bindgen]
 extern {
 	pub fn setInterval(closure: &Closure<dyn FnMut()>, time_ms: f64);
+
+	#[wasm_bindgen(js_namespace = console)]
+	pub fn log(txt: &str);
 }
 
 pub fn now() -> f64 {

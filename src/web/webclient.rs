@@ -13,8 +13,7 @@ pub struct WebClient {
 
 pub enum WebClientState {
 	WaitingForGo,
-	InGame { player_id: usize }
-}
+	InGame { player_id: usize } }
 
 impl WebClient {
 	pub fn new(server: &'static str, src: TileMapImage) -> Self {
@@ -70,6 +69,7 @@ impl WebClient {
 				};
 				let Go { your_player_id } = deser::<Go>(&go_bytes[..]);
 				self.state = WebClientState::InGame { player_id: your_player_id };
+				log("game is starting!");
 			},
 			WebClientState::InGame { .. } => self.world.tick(&mut ()),
 		}
