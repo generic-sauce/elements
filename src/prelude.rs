@@ -2,12 +2,13 @@ pub use std::sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError};
 pub use std::time::{Duration, SystemTime, Instant};
 pub use std::thread::{self, sleep};
 pub use std::rc::Rc;
-pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream};
+pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener};
 pub use std::collections::HashMap;
 pub use std::io::BufReader;
 pub use std::fs::File;
 pub use itertools::iproduct;
 pub use std::any::Any;
+pub use std::io::ErrorKind;
 
 #[cfg(feature = "native-client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "native-client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
@@ -24,6 +25,9 @@ pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
+
+#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
+#[cfg(feature = "server")] pub use tungstenite::Message;
 
 pub use crate::net::*;
 #[cfg(not(feature = "web-client"))] pub use crate::resource::res;

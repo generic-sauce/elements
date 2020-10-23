@@ -1,46 +1,45 @@
 use crate::prelude::*;
 
+mod peer;
+pub use peer::*;
+
 // update_desire is within 0..=1000
 const UPDATE_DESIRE_PER_FRAME: u32 = 350;
 
 pub struct Server {
 	world: World,
-	socket: UdpSocket,
-	peers: [SocketAddr; 2],
 	update_desire: [u32; 2],
+	peer_manager: PeerManager,
 }
 
 impl Server {
 	pub fn new() -> Server {
-		let mut socket = UdpSocket::bind(("0.0.0.0", PORT)).expect("Could not create server socket");
-		socket.set_nonblocking(true).unwrap();
-
-		let peers = wait_for_players(&mut socket);
-
 		Server {
 			world: World::new_defaultmap(0),
-			socket,
-			peers,
 			update_desire: [0, 0],
+			peer_manager: PeerManager::wait_for_players(),
 		}
 	}
 
 	pub fn run(&mut self) {
+		for i in 0..2 {
+			let go = Go { your_player_id: i };
+			self.peer_manager.send_to(i, &go);
+		}
+
+		println!("server has started!");
+
 		for timed_loop_info in TimedLoop::with_fps(60) {
 			if timed_loop_info.delta_time > timed_loop_info.interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
 			}
 
 			// receive packets
-			while let Some((input_state, recv_addr)) = recv_packet(&mut self.socket) {
-				if let Some(index) = (0..2).find(|&i| recv_addr == self.peers[i]) {
-					let diff = self.world.players[index].input.diff(&input_state);
-					self.update_desire[0] += diff;
-					self.update_desire[1] += diff;
-					self.world.players[index].input = input_state;
-				} else {
-					eprintln!("got packet from {}, which is not a known peer", recv_addr);
-				};
+			while let Some((input_state, i)) = self.peer_manager.recv_from() {
+				let diff = self.world.players[i].input.diff(&input_state);
+				self.update_desire[0] += diff;
+				self.update_desire[1] += diff;
+				self.world.players[i].input = input_state;
 			}
 
 			self.world.tick(&mut ());
@@ -51,30 +50,9 @@ impl Server {
 				if self.update_desire[i] >= 1000 {
 					self.update_desire[i] = 0;
 					let update = self.world.update();
-					send_packet_to(&mut self.socket, &update, self.peers[i]);
+					self.peer_manager.send_to(i, &update);
 				}
 			}
 		}
 	}
-}
-
-fn wait_for_players(socket: &mut UdpSocket) -> [SocketAddr; 2] {
-	let mut peers = vec!();
-
-	for _ in TimedLoop::with_fps(10) {
-		if let Some((Init::Init, recv_addr)) = recv_packet(socket) {
-			peers.push(recv_addr);
-			println!("new player joined {}", recv_addr);
-			if peers.len() == 2 {
-				break;
-			}
-		}
-	}
-
-	for (i, peer) in peers.iter().enumerate() {
-		let go = Go { your_player_id: i };
-		send_packet_to(socket, &go, *peer);
-	}
-
-	return [peers[0], peers[1]];
 }

@@ -10,7 +10,7 @@ wasm-opt = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["native-client"]
+default = ["native-client", "server"]
 server = ["tungstenite"]
 client = []
 native-client = ["client", "sfml", "gilrs", "rodio", "lazy_static", "wgpu", "winit", "winit_input_helper", "bytemuck"]
