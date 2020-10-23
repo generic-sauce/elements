@@ -57,13 +57,14 @@ impl Server {
 }
 
 fn wait_for_players() -> [TungSocket; 2] {
-    let server = TcpListener::bind(format!("127.0.0.1:{}", PORT)).unwrap();
+    let server = TcpListener::bind(format!("0.0.0.0:{}", PORT)).unwrap();
     let mut peers: Vec<_> = server.incoming()
 		.take(2)
 		.map(|stream_res| {
 			let stream = stream_res.unwrap();
-			stream.set_nonblocking(true).unwrap();
-			tungstenite::server::accept(stream).unwrap()
+			let mut a = tungstenite::server::accept(stream).unwrap();
+			a.get_mut().set_nonblocking(true).unwrap();
+			a
 		}).collect();
 
 	println!("starting!");

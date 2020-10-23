@@ -17,6 +17,7 @@ pub enum WebClientState {
 
 impl WebClient {
 	pub fn new(server: &'static str, src: TileMapImage) -> Self {
+		let server = "192.168.178.126";
 		let (sender, receiver) = channel();
 
 		let client = WebClient {
