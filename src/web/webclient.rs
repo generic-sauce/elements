@@ -62,8 +62,16 @@ impl WebClient {
 	}
 
 	pub fn tick(&mut self) {
-		if let WebClientState::InGame { .. } = self.state {
-			self.world.tick(&mut ());
+		match self.state {
+			WebClientState::WaitingForGo => {
+				let go_bytes = match self.receiver.try_recv() {
+					Err(TryRecvError::Empty) => return,
+					x => x.unwrap(),
+				};
+				let Go { your_player_id } = deser::<Go>(&go_bytes[..]);
+				self.state = WebClientState::InGame { player_id: your_player_id };
+			},
+			WebClientState::InGame { .. } => self.world.tick(&mut ()),
 		}
 	}
 

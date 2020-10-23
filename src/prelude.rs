@@ -24,7 +24,7 @@ pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
-#[cfg(feature = "server")] pub use crate::net::*;
+pub use crate::net::*;
 
 #[cfg(feature = "server")] pub use std::net::TcpStream;
 #[cfg(feature = "server")] pub use tungstenite::Message;

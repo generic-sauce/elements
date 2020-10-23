@@ -13,6 +13,7 @@ impl Packet for Init {}
 impl Packet for InputState {}
 impl Packet for WorldUpdate {}
 
+#[cfg(feature = "server")]
 pub fn send_packet_to(socket: &mut TungSocket, p: &impl Packet) {
 	let packet_bytes = ser(p);
 	let n: u32 = packet_bytes.len() as u32;
@@ -21,6 +22,7 @@ pub fn send_packet_to(socket: &mut TungSocket, p: &impl Packet) {
 	socket.write_message(bytes.into()).unwrap();
 }
 
+#[cfg(feature = "server")]
 pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 	if !socket.can_read() {
 		return None;
@@ -31,10 +33,10 @@ pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 	Some(p)
 }
 
-fn ser<P: Serialize>(p: &P) -> Vec<u8> {
+pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
 	serialize(p).unwrap()
 }
 
-fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
+pub fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
 	deserialize(bytes).unwrap()
 }

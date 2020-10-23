@@ -5,7 +5,6 @@ extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
 
-#[cfg(feature = "server")] mod net;
 #[cfg(feature = "native-client")] mod animation_state;
 #[cfg(feature = "native-client")] mod client;
 #[cfg(feature = "native-client")] mod client_world;
@@ -29,6 +28,7 @@ extern crate lazy_static;
 #[macro_use]
 mod fps_timer;
 
+mod net;
 mod rng;
 mod world;
 mod vec;
