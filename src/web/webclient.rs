@@ -52,7 +52,9 @@ impl WebClient {
 	}
 
 	fn run_once(&mut self) {
-		while self.fps() < FPS {
+		for _ in 0..10 {
+			if self.fps() >= FPS { break; }
+
 			self.tick();
 			self.tick_counter += 1;
 		}
