@@ -20,16 +20,16 @@ pub fn send_packet_to(socket: &mut TungSocket, p: &impl Packet) {
 
 #[cfg(feature = "server")]
 pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
-	if !socket.can_read() {
-		return None;
+	while socket.can_read() {
+		let bytes = match socket.read_message().unwrap() {
+			Message::Binary(b) => b,
+			Message::Text(_) => panic!("text should not be sent!"),
+			_ => continue,
+		};
+		let p = deser::<P>(&bytes[..]);
+		return Some(p);
 	}
-
-	let bytes = match socket.read_message().unwrap() {
-		Message::Binary(b) => b,
-		x => panic!("wrong message-format: {:?}", x),
-	};
-	let p = deser::<P>(&bytes[..]);
-	Some(p)
+	None
 }
 
 pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
