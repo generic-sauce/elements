@@ -7,6 +7,8 @@ pub use std::collections::HashMap;
 pub use std::io::BufReader;
 pub use std::fs::File;
 
+pub const PORT: u16 = 7575;
+
 #[cfg(feature = "native-client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "native-client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
 #[cfg(feature = "native-client")] pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
@@ -22,12 +24,12 @@ pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
+#[cfg(feature = "server")] pub use crate::net::*;
 
 #[cfg(feature = "server")] pub use std::net::TcpStream;
 #[cfg(feature = "server")] pub use tungstenite::Message;
-#[cfg(feature = "server")] pub type WebSocket = tungstenite::protocol::WebSocket<TcpStream>;
+#[cfg(feature = "server")] pub type TungSocket = tungstenite::protocol::WebSocket<TcpStream>;
  
-#[cfg(not(feature = "web-client"))] pub use crate::net::*;
 #[cfg(not(feature = "web-client"))] pub use crate::resource::res;
 #[cfg(not(feature = "web-client"))] pub use crate::timed_loop::*;
 #[cfg(not(feature = "web-client"))] pub use crate::server::*;
@@ -35,6 +37,7 @@ pub use crate::animation::*;
 #[cfg(feature = "web-client")] pub use crate::web::*;
 #[cfg(feature = "web-client")] pub use wasm_bindgen::{convert::IntoWasmAbi, prelude::*};
 #[cfg(feature = "web-client")] pub use js_sys::Uint8Array;
+#[cfg(feature = "web-client")] pub use web_sys::WebSocket;
 
 #[cfg(feature = "native-client")] pub use crate::client::*;
 #[cfg(feature = "native-client")] pub use crate::client_world::*;

@@ -7,6 +7,7 @@ pub struct WebClient {
 	state: WebClientState,
 	tick_counter: u32,
 	start_time: f64,
+	socket: WebSocket,
 }
 
 pub enum WebClientState {
@@ -15,12 +16,13 @@ pub enum WebClientState {
 }
 
 impl WebClient {
-	pub fn new(src: TileMapImage) -> Self {
+	pub fn new(server: &'static str, src: TileMapImage) -> Self {
 		WebClient {
 			world: World::new(0, src),
 			state: WebClientState::WaitingForGo,
 			tick_counter: 0,
 			start_time: now(),
+			socket: WebSocket::new(&format!("ws://{}:{}", server, PORT)).unwrap(),
 		}
 	}
 

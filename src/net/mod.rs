@@ -3,8 +3,6 @@ pub use go::*;
 
 use crate::prelude::*;
 
-pub const PORT: u16 = 7575;
-
 pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
@@ -15,7 +13,7 @@ impl Packet for Init {}
 impl Packet for InputState {}
 impl Packet for WorldUpdate {}
 
-pub fn send_packet_to(socket: &mut WebSocket, p: &impl Packet) {
+pub fn send_packet_to(socket: &mut TungSocket, p: &impl Packet) {
 	let packet_bytes = ser(p);
 	let n: u32 = packet_bytes.len() as u32;
 	let mut bytes = ser(&n);
@@ -23,7 +21,7 @@ pub fn send_packet_to(socket: &mut WebSocket, p: &impl Packet) {
 	socket.write_message(bytes.into()).unwrap();
 }
 
-pub fn recv_packet<P: Packet>(socket: &mut WebSocket) -> Option<P> {
+pub fn recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 	if !socket.can_read() {
 		return None;
 	}

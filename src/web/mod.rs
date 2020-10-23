@@ -17,7 +17,7 @@ pub fn client_main() {
 
 	let cb = Closure::<dyn Fn(JsValue)>::wrap(Box::new(|map_src| {
 			let map_src: TileMapImage = map_src.into_serde().unwrap();
-			let client = WebClient::new(map_src);
+			let client = WebClient::new("localhost", map_src); // TODO non-hardcode localhost
 			client.schedule();
 	}));
 	let leaked_cb = Box::leak(Box::new(cb)); // TODO

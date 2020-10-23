@@ -7,7 +7,7 @@ const UPDATE_DESIRE_PER_FRAME: u32 = 350;
 
 pub struct Server {
 	world: World,
-	peers: [WebSocket; 2],
+	peers: [TungSocket; 2],
 	update_desire: [u32; 2],
 }
 
@@ -52,7 +52,7 @@ impl Server {
 	}
 }
 
-fn wait_for_players() -> [WebSocket; 2] {
+fn wait_for_players() -> [TungSocket; 2] {
     let server = TcpListener::bind(format!("127.0.0.1:{}", PORT)).unwrap();
     let mut peers: Vec<_> = server.incoming()
 		.take(2)
