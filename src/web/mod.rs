@@ -22,7 +22,6 @@ pub struct Webapp {
 pub struct WebappData {
 	tick_counter: u32,
 	start_time: f64,
-	closures: Vec<Box<dyn Any>>,
 	pub world: World,
 }
 
@@ -85,7 +84,6 @@ pub fn client_main() {
 					tick_counter: 0,
 					start_time: now(),
 					world,
-					closures: Vec::new(),
 				},
 				mode: WebappMode::Menu,
 			}.schedule();
