@@ -15,6 +15,8 @@ const X_DRAG: i32 = 30;
 const MAX_X_VEL: i32 = 120;
 const JUMP_POWER: i32 = 300;
 const X_ACCELERATION: i32 = 55;
+const JOYSTICK_DISTANCE: i32 = 2600;
+const MAX_MOVEMENT_VALUE: i32 = 100;
 
 // also required for fluids!
 pub const GRAVITY: i32 = 15;
@@ -127,7 +129,7 @@ impl Player {
 		else { self.velocity.x -= X_DRAG * self.velocity.x.signum(); }
 
 		// walk
-		self.velocity.x += self.input.horizontal_dir() * X_ACCELERATION;
+		self.velocity.x += (self.input.horizontal_dir() * X_ACCELERATION as f32 * MAX_MOVEMENT_VALUE as f32) as i32;
 		if self.velocity.x.abs() > MAX_X_VEL { self.velocity.x = MAX_X_VEL * self.velocity.x.signum(); }
 
 		// jump
@@ -140,7 +142,7 @@ impl Player {
 		if !self.walljumped && !self.is_grounded(t) && self.input.up() && (
 				self.is_left_walled(t) && self.input.right() ||
 				self.is_right_walled(t) && self.input.left()) {
-			let horizontal_dir = i32::signum(self.input.horizontal_dir()) * 100;
+			let horizontal_dir = f32::signum(self.input.horizontal_dir()) as i32 * 100;
 			let force = GameVec::new(horizontal_dir, JUMP_POWER);
 			self.velocity = force;
 			self.walljumped = true;
@@ -152,7 +154,8 @@ impl Player {
 		// aim
 		let largest = (t.size + 1).to_game() - 1; // TODO correct?
 		let ctr = self.center_position();
-		let mut global_cursor = ctr + self.input.cursor;
+		let cursor = GameVec::new((self.input.cursor.x * JOYSTICK_DISTANCE as f32) as i32, (self.input.cursor.y * JOYSTICK_DISTANCE as f32) as i32);
+		let mut global_cursor = ctr + cursor;
 		global_cursor.x = global_cursor.x.max(0).min(largest.x);
 		global_cursor.y = global_cursor.y.max(0).min(largest.y);
 		self.cursor.x = global_cursor.x - ctr.x;

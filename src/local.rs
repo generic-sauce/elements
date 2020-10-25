@@ -1,16 +1,16 @@
 use crate::prelude::*;
 
 pub struct Local {
-	inputs: [InputDevice; 2],
+	input_devices: [InputDevice; 2],
 	client_world: ClientWorld,
 }
 
 impl Local {
 	pub fn new(gilrs: &Gilrs, best_of_n: u32) -> Local {
-		let inputs = [InputDevice::new_adaptive(0, false, gilrs), InputDevice::new_adaptive(1, true, gilrs)];
+		let input_devices = [InputDevice::new(0, gilrs), InputDevice::new(1, gilrs)];
 
 		Local {
-			inputs,
+			input_devices,
 			client_world: ClientWorld::new(best_of_n),
 		}
 	}
@@ -18,8 +18,8 @@ impl Local {
 
 impl Runnable for Local {
 	fn tick(&mut self, app: &mut App) {
-		for (i, input) in self.inputs.iter_mut().enumerate() {
-			self.client_world.world.players[i].input = input.update(&app.gilrs);
+		for (i, input) in self.input_devices.iter_mut().enumerate() {
+			self.client_world.world.players[i].input.update(&input.get_state(&app.gilrs));
 		}
 		self.client_world.tick(app);
 	}
@@ -37,10 +37,9 @@ impl Runnable for Local {
 		app.sender.send(graphics_world).unwrap();
 	}
 
+	fn apply_key(&mut self, _ev: &KeyPressedEvent) {}
+
 	fn get_runnable_change(&mut self) -> RunnableChange {
 		RunnableChange::from_world(&self.client_world.world)
-	}
-
-	fn apply_key(&mut self, _ev: &KeyPressedEvent) {
 	}
 }

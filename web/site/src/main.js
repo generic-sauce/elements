@@ -5,7 +5,6 @@ import * as tilemapmod from "./tilemap.js";
 window.e2 = {};
 window.init_js = function(f) {
 	drawmod.init();
-	inputmod.init();
 };
 window.draw_render_world = function(rw, tilemap_data, fluidmap_data) {
 	e2.render_world = rw;

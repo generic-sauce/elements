@@ -65,7 +65,7 @@ impl WebClient {
 	pub fn tick(&mut self, webapp_data: &mut WebappData) {
 		self.handle_packets(webapp_data);
 		if let WebClientMode::InGame { player_id } = self.mode {
-			webapp_data.world.players[player_id].input = input_state(0);
+			webapp_data.world.players[player_id].input.update(&input_state(0));
 			let input_bytes = ser(&webapp_data.world.players[player_id].input);
 			self.socket.send_with_u8_array(&input_bytes[..]).unwrap();
 			webapp_data.world.tick(&mut ());

@@ -9,7 +9,7 @@ impl WebLocal {
 
 	pub fn tick(&mut self, webapp_data: &mut WebappData) {
 		for i in 0..2 {
-			webapp_data.world.players[i].input = input_state(i);
+			webapp_data.world.players[i].input.update(&input_state(i));
 		}
 		webapp_data.world.tick(&mut ());
 	}
