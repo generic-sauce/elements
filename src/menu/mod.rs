@@ -102,6 +102,7 @@ impl Runnable for MenuRunnable {
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
+		/*
 		app.window.display();
 		app.window.clear(Color::BLACK);
 
@@ -135,6 +136,7 @@ impl Runnable for MenuRunnable {
 		// draw cursor
 		context.draw_circle(&app.window, app.cursor_position, 0.01, Color::BLACK);
 		context.draw_circle(&app.window, app.cursor_position, 0.008, Color::WHITE);
+		 */
 	}
 
 	fn apply_key(&mut self, ev: &KeyPressedEvent) {

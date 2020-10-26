@@ -4,7 +4,6 @@ pub use sound::*;
 use crate::prelude::*;
 
 pub struct App {
-	pub window: RenderWindow,
 	// pub winit_window: Box<winit::Window>,
 	// pub wgpu_instance: wgpu::Instance,
 	pub texture_state: TextureState,
@@ -119,14 +118,9 @@ impl RunnableChange {
 
 impl App {
 	pub fn new (sender: Sender<GraphicsWorld>) -> App {
-		let context_settings = ContextSettings::default();
-		let mut window = RenderWindow::new(VideoMode::desktop_mode(), "Elements 2", Style::DEFAULT, &context_settings);
-		window.set_mouse_cursor_visible(false);
-
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 
 		App {
-			window,
 			texture_state: TextureState::new(),
 			shader_state: ShaderState::new(),
 			font_state: FontState::new(),
@@ -169,16 +163,6 @@ impl App {
 		let mut runnable_change = RunnableChange::None;
 
 		for timed_loop_info in TimedLoop::with_fps(60) {
-			while let Some(event) = self.window.poll_event() {
-				match event {
-					Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => {
-						self.window.close();
-						std::process::exit(0);
-					}
-					Event::KeyPressed { code, shift, ctrl, .. } => { runnable.apply_key(&KeyPressedEvent { code, shift, ctrl })},
-					_ => {},
-				}
-			}
 			// process gilrs events
 			while self.gilrs.next_event().is_some() {}
 
@@ -190,17 +174,13 @@ impl App {
 			runnable.draw(self, &timed_loop_info);
 			runnable_change = runnable.get_runnable_change();
 			match runnable_change {
-				RunnableChange::Quit => { self.window.close(); break; },
+				RunnableChange::Quit => { break; },
 				RunnableChange::Local(_) => { break; },
 				RunnableChange::None => {},
 				RunnableChange::Menu(_) => { break; },
 				RunnableChange::Client(_) => { break; },
 			}
 			self.sound_manager.tick();
-
-			if !self.window.is_open() {
-				std::process::exit(0);
-			}
 		};
 		runnable_change
 	}

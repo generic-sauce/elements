@@ -25,7 +25,7 @@ impl Runnable for Local {
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
-		self.client_world.draw(app, timed_loop_info);
+		// self.client_world.draw(app, timed_loop_info);
 
 		let world = &self.client_world.world;
 		let graphics_world = GraphicsWorld::new(
