@@ -31,14 +31,20 @@ export function calc_input_state(i) {
 	let trigger_right = gp.axes[5];
 	if (chrome) trigger_right = gp.buttons[7].pressed * 1.0;
 
+	let dpad;
+	{
+		if (chrome) dpad = [gp.buttons[15].value - gp.buttons[14].value, gp.buttons[12].value - gp.buttons[13].value];
+		else dpad = [gp.axes[6], -gp.axes[7]];
+	}
+
 	return {
 		stick_left,
         stick_right,
 		trigger_left,
 		trigger_right,
 		bumper_right,
+		dpad,
         // TODO
-		dpad: [0.0, 0.0],
 		bumper_left: false,
 		button_north: false,
 		button_west: false,
