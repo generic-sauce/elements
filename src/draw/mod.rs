@@ -75,6 +75,12 @@ impl ClientWorld {
 						  &format!("fps: {}", timed_loop_info.fps as u32), Origin::LeftTop);
 		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 4.0), text_size,
 						  &format!("load: {:.2}%", timed_loop_info.load * 100.0), Origin::LeftTop);
+		context.draw_text(&app.window, CanvasVec::new(0.0, 1.0 - text_size * 5.0), text_size,
+						  &format!(
+							  "num fluids: {} / {}",
+							  self.world.fluidmap.iter().filter(|f| f.owner == 0).count(),
+							  self.world.fluidmap.iter().filter(|f| f.owner == 1).count()
+						  ), Origin::LeftTop);
 	}
 
 }
