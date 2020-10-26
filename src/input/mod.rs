@@ -1,23 +1,19 @@
-mod adaptive;
-pub use adaptive::*;
+#[cfg(feature = "native-client")] mod device;
+#[cfg(feature = "native-client")] pub use device::*;
 
 use crate::prelude::*;
 
-const DEADZONE_MIN: f32 = 0.35;
-const CURSOR_DEADZONE: f32 = 0.1;
-const MAX_MOVEMENT_VALUE: i32 = 100;
-const JOYSTICK_DISTANCE: i32 = 2600;
-const DEFAULT_MOUSE_POSITION: WindowVec = WindowVec::new(300.0, 300.0);
-
-// TODO: use bitmask instead of booleans
-pub enum InputDevice {
-	Adaptive(AdaptiveInput),
-}
-
-impl InputDevice {
-	pub fn update(&mut self, gilrs: &Gilrs) -> InputState {
-		match self {
-			InputDevice::Adaptive(x) => x.update(gilrs),
-		}
-	}
+#[derive(Serialize, Deserialize)]
+pub struct RawInputState {
+	pub stick_left: Vec2f, // the length should be less or equal to 1.0
+	pub stick_right: Vec2f, // the length should be less or equal to 1.0
+	pub dpad: Vec2f, // x, y coordinates can be -1.0, 0.0 or 1.0
+	pub trigger_left: f32, // between 0.0 and 1.0
+	pub trigger_right: f32, // between 0.0 and 1.0
+	pub bumper_left: bool,
+	pub bumper_right: bool,
+	pub button_north: bool,
+	pub button_west: bool,
+	pub button_east: bool,
+	pub button_south: bool,
 }

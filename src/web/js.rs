@@ -12,7 +12,7 @@ extern {
 	fn input_state_js(i: usize) -> JsValue;
 }
 
-pub fn input_state(i: usize) -> InputState {
+pub fn input_state(i: usize) -> RawInputState {
 	input_state_js(i).into_serde().unwrap()
 }
 

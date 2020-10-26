@@ -54,7 +54,6 @@ impl Menu {
 
 impl MenuRunnable {
 	pub fn new(menu_choice: MenuChoice) -> MenuRunnable {
-		reset_mouse_position();
 		let menu = match menu_choice {
 			MenuChoice::Main => Menu::main_menu(),
 			MenuChoice::ConnectServer => Menu::connect_server_menu(),
@@ -68,7 +67,7 @@ impl MenuRunnable {
 
 impl Runnable for MenuRunnable {
 	fn tick(&mut self, app: &mut App) {
-		let mouse_update = get_mouse_position_update();
+		let mouse_update: WindowVec = unimplemented!("get_mouse_position_update()");
 		app.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
 		app.cursor_position.y = app.cursor_position.y.max(0.0).min(1.0);
 		app.cursor_position.x = app.cursor_position.x.max(0.0).min(ASPECT_RATIO);

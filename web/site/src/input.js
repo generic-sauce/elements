@@ -2,82 +2,63 @@
 
 export function calc_input_state(i) {
 	const gp = navigator.getGamepads()[i];
-	const last = e2.input_states[i];
 
 	// fallback!
 	if (!gp) {
-		return e2.input_states[i];
+		return default_input_state();
 	}
 
 	const chrome = navigator.userAgent.toLowerCase().indexOf("chrom") != -1;
 
-	var direction = [0, 0];
+	const stick_left = [gp.axes[0], -gp.axes[1]];
+
+	let stick_right;
 	{
-		const x = gp.axes[0];
-		const y = gp.axes[1];
-
-		if (x < -0.3) { direction[0] = -100; }
-		if (x > 0.3) { direction[0] = 100; }
-
-		if (y < -0.3) { direction[1] = 100; }
-	}
-
-	var cursor = [0, 0];
-	{
-		var xi = 3;
+		let xi = 3;
 		if (chrome) xi = 2;
 
-		var yi = 4;
+		let yi = 4;
 		if (chrome) yi = 3;
 
-		const x = gp.axes[xi];
-		const y = gp.axes[yi];
-
-		cursor[0] = Math.floor(x * 2000.0);
-		cursor[1] = Math.floor(-y * 2000.0);
+		stick_right = [gp.axes[xi], -gp.axes[yi]];
 	}
 
-	const attack2 = gp.buttons[5].pressed;
-	const just_attack2 = (!last.attack2) && attack2;
+	const bumper_right = gp.buttons[5].pressed;
 
-	var special1 = gp.axes[2] >= 0.1;
-	if (chrome) special1 = gp.buttons[6].pressed;
+	let trigger_left = gp.axes[2];
+	if (chrome) trigger_left = gp.buttons[6].pressed * 1.0;
 
-	var attack1 = gp.axes[5] >= 0.1;
-	if (chrome) attack1 = gp.buttons[7].pressed;
+	let trigger_right = gp.axes[5];
+	if (chrome) trigger_right = gp.buttons[7].pressed * 1.0;
 
-	var ret = {
-		direction,
-		cursor: cursor,
-		just_up: false, // never read
-		just_down: false, // never read
-		special1,
-		special2: false, // never read
-		attack1,
-		attack2,
-		just_attack2: just_attack2,
+	return {
+		stick_left,
+        stick_right,
+		trigger_left,
+		trigger_right,
+		bumper_right,
+        // TODO
+		dpad: [0.0, 0.0],
+		bumper_left: false,
+		button_north: false,
+		button_west: false,
+		button_east: false,
+		button_south: false,
 	};
-
-	e2.input_states[i] = ret;
-	return ret;
 }
 
-// init
-
-export function init() {
-	function default_input_state() {
-		return {
-			direction: [0.0, 0.0],
-			cursor: [0.0, 0.0],
-			just_up: false,
-			just_down: false,
-			special1: false,
-			special2: false,
-			attack1: false,
-			attack2: false,
-			just_attack2: false,
-		};
-	}
-
-	e2.input_states = [default_input_state(), default_input_state()];
+function default_input_state() {
+	return {
+		stick_left: [0, 0],
+		stick_right: [0, 0],
+		dpad: [0.0, 0.0],
+		trigger_left: 0,
+		trigger_right: 0,
+		bumper_right: false,
+		bumper_left: false,
+		button_north: false,
+		button_west: false,
+		button_east: false,
+		button_south: false,
+	};
 }

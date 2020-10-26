@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub struct Client {
 	client_world: ClientWorld,
-	input: InputDevice,
+	input_device: InputDevice,
 	socket: UdpSocket,
 	player_id: usize,
 }
@@ -19,11 +19,11 @@ impl Client {
 			recv_packet::<Go>(&mut socket).map(|(go_packet, _)| go_packet.your_player_id)
 		}).next().unwrap();
 
-		let input = InputDevice::new_adaptive(0, true, gilrs);
+		let input_device = InputDevice::new(0, gilrs);
 
 		Client {
 			client_world: ClientWorld::new(0),
-			input,
+			input_device,
 			socket,
 			player_id,
 		}
@@ -38,7 +38,7 @@ impl Runnable for Client {
 		}
 
 		// handle inputs
-		self.client_world.world.players[self.player_id].input = self.input.update(&app.gilrs);
+		self.client_world.world.players[self.player_id].input.update(&self.input_device.get_state(&app.gilrs));
 
 		// send packets
 		send_packet(&mut self.socket, &self.client_world.world.players[self.player_id].input);

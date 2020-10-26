@@ -25,6 +25,7 @@ pub use crate::world::tilemap::*;
 pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
+pub use crate::input::*;
 
 #[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
 #[cfg(feature = "server")] pub use tungstenite::Message;
@@ -49,7 +50,6 @@ pub use crate::net::*;
 #[cfg(feature = "native-client")] pub use crate::shader_state::*;
 #[cfg(feature = "native-client")] pub use crate::font_state::*;
 #[cfg(feature = "native-client")] pub use crate::animation_state::*;
-#[cfg(feature = "native-client")] pub use crate::input::*;
 #[cfg(feature = "native-client")] pub use crate::window_vec::*;
 #[cfg(feature = "native-client")] pub use crate::menu::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::*;
