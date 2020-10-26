@@ -61,7 +61,8 @@ impl World {
 		// allocate free_wall
 		if pl.free_wall_lifetime < amount {
 			for inner_v in self.fluidmap.grid.iter_mut() {
-				for _ in inner_v.drain_filter(|x| x.owner == p) {
+				while let Some(i) = inner_v.iter().position(|x| x.owner == p) {
+					inner_v.swap_remove(i);
 					pl.free_wall_lifetime += WALLS_PER_FLUID * WALL_LIFETIME;
 					if pl.free_wall_lifetime >= amount { break; }
 				}
