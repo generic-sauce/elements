@@ -99,6 +99,7 @@ impl MenuElement {
 		);
 	}
 
+	/*
 	pub fn apply_key_press(&mut self, event: &KeyPressedEvent) {
 		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
 			if let Some(c) = event.to_char() {
@@ -120,4 +121,5 @@ impl MenuElement {
 			}
 		}
 	}
+	 */
 }

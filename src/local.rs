@@ -18,9 +18,11 @@ impl Local {
 
 impl Runnable for Local {
 	fn tick(&mut self, app: &mut App) {
-		for (i, input) in self.input_devices.iter_mut().enumerate() {
-			self.client_world.world.players[i].input.update(&input.get_state(&app.gilrs));
+		self.client_world.fetch_keyboard_updates(&app.input_receiver);
+		for (i, input_device) in self.input_devices.iter_mut().enumerate() {
+			self.client_world.world.players[i].input.update(&input_device.get_state(&app.gilrs));
 		}
+		self.client_world.world.players.last_mut().unwrap().input.update_keyboard(&self.client_world.keyboard_state);
 		self.client_world.tick(app);
 	}
 
@@ -34,10 +36,8 @@ impl Runnable for Local {
 			world.players.clone(),
 			timed_loop_info.elapsed_time,
 		);
-		app.sender.send(graphics_world).unwrap();
+		app.graphics_sender.send(graphics_world).unwrap();
 	}
-
-	fn apply_key(&mut self, _ev: &KeyPressedEvent) {}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {
 		RunnableChange::from_world(&self.client_world.world)

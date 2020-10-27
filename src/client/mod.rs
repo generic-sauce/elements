@@ -37,8 +37,11 @@ impl Runnable for Client {
 			self.client_world.apply_update(update, &mut app.sound_manager);
 		}
 
+		self.client_world.fetch_keyboard_updates(&app.input_receiver);
+
 		// handle inputs
 		self.client_world.world.players[self.player_id].input.update(&self.input_device.get_state(&app.gilrs));
+		self.client_world.world.players[self.player_id].input.update_keyboard(&self.client_world.keyboard_state);
 
 		// send packets
 		send_packet(&mut self.socket, &self.client_world.world.players[self.player_id].input);
@@ -49,9 +52,6 @@ impl Runnable for Client {
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
 		self.client_world.draw(app, timed_loop_info);
-	}
-
-	fn apply_key(&mut self, _ev: &KeyPressedEvent) {
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {
