@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use rodio::*;
 
-const START_MUSIC_OFFSET: Duration = Duration::from_micros(200);
+const START_MUSIC_OFFSET: Duration = Duration::from_micros(1000);
 const NUM_PARTS: usize = 4;
 const WHIZ_VOLUME: f32 = 0.1;
 
