@@ -38,7 +38,8 @@ impl World {
 			let after_gap = path.iter().enumerate().position(|(j, tile)| j > i && !self.coll(*tile)).unwrap();
 			let dir = Direction::from_diff(path[before_gap], path[i]).unwrap();
 			let inner_path = self.pathfind(path[before_gap], dir, path[after_gap]);
-			path = path.splice(before_gap..=after_gap, inner_path).collect();
+			assert!(inner_path.iter().all(|t| !self.coll(*t)));
+			path.splice(before_gap..=after_gap, inner_path);
 		}
 		path
 	}
