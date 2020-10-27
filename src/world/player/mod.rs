@@ -42,14 +42,21 @@ pub enum PlayerDirection {
 	Right,
 }
 
+#[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+pub enum WallMode {
+	NoFluids, // when you are InProgress, and then the fluids run out.
+	InProgress(GameVec), // while you are drawing the wall.
+	NotWalling, // when you are not drawing the wall.
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
 	pub cursor: GameVec,
 	pub health: i32,
+	pub wall_mode: WallMode,
 	pub free_wall_lifetime: u32,
-	pub last_wall_pos: Option<GameVec>,
 	pub grab_cooldown: Option<u32>,
 	pub animation: Animation,
 	pub direction: PlayerDirection,
@@ -80,8 +87,8 @@ impl Player {
 			velocity: GameVec::new(0, 0),
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
+			wall_mode: WallMode::NotWalling,
 			free_wall_lifetime: 0,
-			last_wall_pos: None,
 			grab_cooldown: None,
 			animation: Animation::new(animation_id),
 			direction,
