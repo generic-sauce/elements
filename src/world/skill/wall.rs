@@ -33,9 +33,9 @@ impl World {
 
 	fn generate_wall_path(&self, p: usize, from: GameVec, to: GameVec) -> Vec<TileVec> {
 		let mut path = self.direct_path(p, from, to);
-		while let Some(i) = path.iter().position(|tile| self.players.iter().any(|pl| pl.collides_tile(*tile))) {
+		while let Some(i) = path.iter().position(|tile| self.coll(*tile)) {
 			let before_gap = i-1;
-			let after_gap = path.iter().enumerate().position(|(j, tile)| j > i && !self.players.iter().any(|pl| pl.collides_tile(*tile))).expect("gap never stopped?!");
+			let after_gap = path.iter().enumerate().position(|(j, tile)| j > i && !self.coll(*tile)).unwrap();
 			let dir = Direction::from_diff(path[before_gap], path[i]).unwrap();
 			let inner_path = self.pathfind(path[before_gap], dir, path[after_gap]);
 			path = path.splice(before_gap..=after_gap, inner_path).collect();
@@ -68,9 +68,7 @@ impl World {
 	}
 
 	fn wall(&mut self, p: usize, pos_tile: TileVec, handler: &mut impl EventHandler) -> Option<()> {
-		if (0..2).any(|i| i != p && self.players[i].collides_tile(pos_tile)) {
-			return Some(()); // we don't wall on other players!
-		}
+		assert!(!self.coll(pos_tile));
 
 		let tile = self.tilemap.get(pos_tile);
 
@@ -139,27 +137,35 @@ impl World {
 		if p1.len() < p2.len() { p1 } else { p2 }
 	}
 
+	fn coll(&self, tile_pos: TileVec) -> bool {
+		self.players.iter().any(|pl| pl.collides_tile(tile_pos))
+	}
+
 	// TODO may infinite-loop if you have >= 4 players
 	fn pathfind_impl(&self, start: TileVec, mut gap_dir: Direction, goal: TileVec, clockwise: bool) -> Vec<TileVec> {
 		let mut current = start;
 		let mut path = vec![start];
 
-		let coll = |tile_pos| self.players.iter().any(|pl| pl.collides_tile(tile_pos));
+		assert!(!self.coll(start));
+		assert!(self.coll(start + gap_dir));
+
 		let mut push = |tile_pos| {
 			if path.len() >= 2 && path[0] == tile_pos { panic!("infinite loop!"); }
+
+			assert!(!self.coll(tile_pos));
 
 			path.push(tile_pos);
 		};
 
 		while current != goal {
 			let forward = gap_dir.turn(!clockwise);
-			if coll(current + forward) {
+			if self.coll(current + forward) {
 				gap_dir = forward;
 			} else {
 				current += forward;
 				push(current);
 
-				if !coll(current + gap_dir) {
+				if !self.coll(current + gap_dir) {
 					current += gap_dir;
 					push(current);
 
