@@ -84,28 +84,26 @@ impl InputState {
 	}
 
 	pub fn update_keyboard(&mut self, keyboard_state: &KeyboardState) {
-		let mut right = self.direction.x;
 		if keyboard_state.key_pressed(&Key::A) {
-			right -= 1.0;
+			self.direction.x -= 1.0;
 		}
 		if keyboard_state.key_pressed(&Key::D) {
-			right += 1.0;
+			self.direction.x += 1.0;
 		}
 
-		let mut up = self.direction.y;
 		if keyboard_state.key_pressed(&Key::W) {
 			if keyboard_state.key_just_pressed(&Key::W) {
 				self.just_up = true;
 			}
-			up += 1.0;
+			self.direction.y += 1.0;
 		}
 		if keyboard_state.key_pressed(&Key::S) {
 			if keyboard_state.key_just_pressed(&Key::S) {
 				self.just_down = true;
 			}
-			up -= 1.0;
+			self.direction.y -= 1.0;
 		}
-		self.direction = Vec2f::new(right, up).clamped(-1.0, 1.0);
+		self.direction = self.direction.clamped(-1.0, 1.0);
 
 		if keyboard_state.key_pressed(&Key::Q) {
 			self.attack1 = true;
