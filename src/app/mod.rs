@@ -3,6 +3,8 @@ mod sound;
 pub use sound::*;
 use crate::prelude::*;
 
+pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
+
 pub struct App {
 	// pub winit_window: Box<winit::Window>,
 	// pub wgpu_instance: wgpu::Instance,
@@ -14,7 +16,7 @@ pub struct App {
 	pub sound_manager: SoundManager,
 	pub cursor_position: CanvasVec,
 	pub graphics_sender: Sender<GraphicsWorld>,
-	pub input_receiver: Receiver<KeyboardUpdate>,
+	pub input_receiver: Receiver<PeripheralsUpdate>,
 }
 
 pub trait Runnable {
@@ -55,7 +57,7 @@ impl RunnableChange {
 }
 
 impl App {
-	pub fn new(graphics_sender: Sender<GraphicsWorld>, input_receiver: Receiver<KeyboardUpdate>) -> App {
+	pub fn new(graphics_sender: Sender<GraphicsWorld>, input_receiver: Receiver<PeripheralsUpdate>) -> App {
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 
 		App {

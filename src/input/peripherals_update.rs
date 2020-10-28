@@ -1,9 +1,10 @@
 use crate::prelude::*;
 
-pub enum KeyboardUpdate {
+pub enum PeripheralsUpdate {
 	KeyPress(Key),
 	KeyRelease(Key),
 	Text(char),
+	MouseMove(WindowVec),
 }
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]

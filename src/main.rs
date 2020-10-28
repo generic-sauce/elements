@@ -5,6 +5,8 @@ include!("base.rs");
 
 use crate::prelude::*;
 
+const DEFAULT_CURSOR_POSITION: WindowVec = WindowVec::new(300.0, 300.0);
+
 #[cfg(feature = "native-client")]
 fn main() {
 	let server_arg = std::env::args().nth(1);
@@ -14,7 +16,7 @@ fn main() {
 	}
 
 	let (graphics_sender, graphics_receiver) = channel::<GraphicsWorld>();
-	let (input_sender, input_receiver) = channel::<KeyboardUpdate>();
+	let (input_sender, input_receiver) = channel::<PeripheralsUpdate>();
 
 	thread::spawn(move || {
 		match server_arg.as_deref() {
@@ -39,25 +41,33 @@ fn main() {
 	event_loop.run(move |event, _window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
 
-		let mut keyboard_update: Option<KeyboardUpdate> = None;
+		let mut input_update: Option<PeripheralsUpdate> = None;
 
 		match event {
 			win::Event::WindowEvent { event: win::WindowEvent::CloseRequested, .. } => {
 				*control_flow = win::ControlFlow::Exit;
 			},
+			win::Event::WindowEvent { event: win::WindowEvent::CursorMoved { position, .. }, .. } => {
+				let cursor_position = WindowVec::new(position.x as f32, position.y as f32);
+				let cursor_move = cursor_position - DEFAULT_CURSOR_POSITION;
+				if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
+					input_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
+					window.set_cursor_position(win::PhysicalPosition { x: DEFAULT_CURSOR_POSITION.x as f64, y: DEFAULT_CURSOR_POSITION.y as f64 }).unwrap();
+				}
+			},
 			win::Event::WindowEvent { event: win::WindowEvent::Resized(size), .. } => {
 				graphics.resize(Vec2u::new(size.width, size.height));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::ReceivedCharacter(c), .. } => {
-				keyboard_update = Some(KeyboardUpdate::Text(c));
+				input_update = Some(PeripheralsUpdate::Text(c));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::KeyboardInput { input: win::KeyboardInput { virtual_keycode: Some(virtual_keycode), state, .. }, .. }, .. } => {
 				match state {
 					win::ElementState::Pressed => {
-						keyboard_update = Some(KeyboardUpdate::KeyPress(Key::from(virtual_keycode)));
+						input_update = Some(PeripheralsUpdate::KeyPress(Key::from(virtual_keycode)));
 					}
 					win::ElementState::Released => {
-						keyboard_update = Some(KeyboardUpdate::KeyRelease(Key::from(virtual_keycode)));
+						input_update = Some(PeripheralsUpdate::KeyRelease(Key::from(virtual_keycode)));
 					}
 				}
 			},
@@ -76,10 +86,12 @@ fn main() {
 			_ => ()
 		}
 
-		if let Some(keyboard_update) = keyboard_update {
-			input_sender.send(keyboard_update);
+		if let Some(keyboard_update) = input_update {
+			input_sender.send(keyboard_update).unwrap();
 		}
 
+		window.set_cursor_grab(true).unwrap();
+		window.set_cursor_visible(false);
 	});
 }
 

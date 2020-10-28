@@ -3,7 +3,7 @@ use crate::prelude::*;
 pub struct ClientWorld {
 	pub world: World,
 	pub tilemap_texture: SfBox<Texture>,
-	pub keyboard_state: KeyboardState,
+	pub keyboard_state: PeripheralsState,
 }
 
 impl ClientWorld {
@@ -13,7 +13,7 @@ impl ClientWorld {
 		ClientWorld {
 			world,
 			tilemap_texture,
-			keyboard_state: KeyboardState::new(),
+			keyboard_state: PeripheralsState::new(),
 		}
 	}
 
@@ -22,7 +22,7 @@ impl ClientWorld {
 		self.world.tick(&mut handler);
 		self.handle(&handler, &mut app.sound_manager);
 		self.update_music(&mut app.sound_manager);
-		self.keyboard_state.reset_just_pressed();
+		self.keyboard_state.reset();
 	}
 
 	fn handle(&mut self, handler: &AppEventHandler, sound_manager: &mut SoundManager) {
@@ -56,7 +56,7 @@ impl ClientWorld {
 		}
 	}
 
-	pub fn fetch_keyboard_updates(&mut self, input_receiver: &Receiver<KeyboardUpdate>) {
+	pub fn fetch_keyboard_updates(&mut self, input_receiver: &Receiver<PeripheralsUpdate>) {
 		while let Ok(keyboard_update) = input_receiver.try_recv() {
 			self.keyboard_state.update(&keyboard_update);
 		}

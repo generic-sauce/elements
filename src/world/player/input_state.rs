@@ -2,11 +2,13 @@ use crate::prelude::*;
 
 const DEADZONE_MIN: f32 = 0.35;
 const CURSOR_DEADZONE: f32 = 0.1;
+const CURSOR_MOUSE_SPEED: f32 = 0.001;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InputState {
 	pub direction: Vec2f,
 	pub cursor: Vec2f,
+	pub last_gamepad_cursor: Vec2f,
 	pub special1: bool,
 	pub special2: bool,
 	pub attack1: bool,
@@ -21,6 +23,7 @@ impl InputState {
 		InputState {
 			direction: Vec2f::new(0.0, 0.0),
 			cursor: Vec2f::new(0.0, 0.0),
+			last_gamepad_cursor: Vec2f::new(0.0, 0.0),
 			special1: false,
 			special2: false,
 			attack1: false,
@@ -58,7 +61,7 @@ impl InputState {
 		(1000.0 * cursor_diff).min(1000.0) as u32
 	}
 
-	pub fn update(&mut self, current_input: &RawInputState) {
+	pub fn update_gamepad(&mut self, current_input: &RawInputState) {
 		let last_frame_up = self.up();
 		let last_frame_down = self.down();
 		let last_frame_attack2 = self.attack2;
@@ -68,10 +71,14 @@ impl InputState {
 			(current_input.dpad.y + apply_deadzone(current_input.stick_left.y)).min(1.0).max(-1.0)
 		);
 
-		self.cursor = Vec2f::new(
+		let gamepad_cursor = Vec2f::new(
 			apply_deadzone_min(current_input.stick_right.x, CURSOR_DEADZONE),
 			apply_deadzone_min(current_input.stick_right.y, CURSOR_DEADZONE)
 		).length_clamped(1.0);
+
+		if gamepad_cursor != self.last_gamepad_cursor {
+			self.cursor = gamepad_cursor;
+		}
 
 		self.attack1 = current_input.trigger_right > 0.5;
 		self.attack2 = current_input.bumper_right;
@@ -81,9 +88,10 @@ impl InputState {
 		self.just_up = !last_frame_up && self.up();
 		self.just_down = !last_frame_down && self.down();
 		self.just_attack2 = !last_frame_attack2 && self.attack2;
+		self.last_gamepad_cursor = gamepad_cursor;
 	}
 
-	pub fn update_keyboard(&mut self, keyboard_state: &KeyboardState) {
+	pub fn update_keyboard(&mut self, keyboard_state: &PeripheralsState) {
 		if keyboard_state.key_pressed(&Key::A) {
 			self.direction.x -= 1.0;
 		}
@@ -121,6 +129,12 @@ impl InputState {
 		if keyboard_state.key_pressed(&Key::R) {
 			self.special2 = true;
 		}
+	}
+
+	pub fn update_cursor(&mut self, cursor_move: &WindowVec) {
+		self.cursor.x += cursor_move.x * CURSOR_MOUSE_SPEED;
+		self.cursor.y -= cursor_move.y * CURSOR_MOUSE_SPEED;
+		self.cursor = self.cursor.length_clamped(1.0);
 	}
 }
 

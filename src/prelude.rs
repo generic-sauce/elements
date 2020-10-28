@@ -58,7 +58,7 @@ pub use crate::net::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::texture_state2::*;
 #[cfg(feature = "native-client")] pub mod win {
 	pub use winit::{
-			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, },
+			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, PhysicalPosition, },
 			window::{ Window, WindowBuilder, },
 			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput, ElementState },
 			event_loop::{ EventLoop, ControlFlow, },
