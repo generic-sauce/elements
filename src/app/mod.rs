@@ -13,75 +13,13 @@ pub struct App {
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
 	pub cursor_position: CanvasVec,
-	pub sender: Sender<GraphicsWorld>,
-}
-
-pub struct KeyPressedEvent {
-	pub code: Key,
-	pub shift: bool,
-	pub ctrl: bool,
-}
-
-impl KeyPressedEvent {
-	pub fn to_char(&self) -> Option<char> {
-		let mut c = match self.code {
-			Key::A => 'a',
-			Key::B => 'b',
-			Key::C => 'c',
-			Key::D => 'd',
-			Key::E => 'e',
-			Key::F => 'f',
-			Key::G => 'g',
-			Key::H => 'h',
-			Key::I => 'i',
-			Key::J => 'j',
-			Key::K => 'k',
-			Key::L => 'l',
-			Key::M => 'm',
-			Key::N => 'n',
-			Key::O => 'o',
-			Key::P => 'p',
-			Key::Q => 'q',
-			Key::R => 'r',
-			Key::S => 's',
-			Key::T => 't',
-			Key::U => 'u',
-			Key::V => 'v',
-			Key::W => 'w',
-			Key::X => 'x',
-			Key::Y => 'y',
-			Key::Z => 'z',
-			Key::Num0 => '0',
-			Key::Num1 => '1',
-			Key::Num2 => '2',
-			Key::Num3 => '3',
-			Key::Num4 => '4',
-			Key::Num5 => '5',
-			Key::Num6 => '6',
-			Key::Num7 => '7',
-			Key::Num8 => '8',
-			Key::Num9 => '9',
-			Key::Period => '.',
-			Key::Dash => '-',
-			Key::Space => ' ',
-			_ => return None,
-		};
-		if self.shift {
-			c = c.to_uppercase().next().unwrap();
-			if c == '.' {
-				c = ':';
-			} else if c == '-' {
-				c = '_';
-			}
-		}
-		Some(c)
-	}
+	pub graphics_sender: Sender<GraphicsWorld>,
+	pub input_receiver: Receiver<KeyboardUpdate>,
 }
 
 pub trait Runnable {
 	fn tick(&mut self, app: &mut App);
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo);
-	fn apply_key(&mut self, ev: &KeyPressedEvent);
 	fn get_runnable_change(&mut self) -> RunnableChange;
 }
 
@@ -117,7 +55,7 @@ impl RunnableChange {
 }
 
 impl App {
-	pub fn new (sender: Sender<GraphicsWorld>) -> App {
+	pub fn new(graphics_sender: Sender<GraphicsWorld>, input_receiver: Receiver<KeyboardUpdate>) -> App {
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 
 		App {
@@ -128,7 +66,8 @@ impl App {
 			gilrs,
 			sound_manager: SoundManager::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
-			sender,
+			graphics_sender,
+			input_receiver
 		}
 	}
 

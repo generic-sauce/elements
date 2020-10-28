@@ -3,7 +3,7 @@ pub use std::time::{Duration, SystemTime, Instant};
 pub use std::thread::{self, sleep};
 pub use std::rc::Rc;
 pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener};
-pub use std::collections::HashMap;
+pub use std::collections::{HashMap, HashSet};
 pub use std::io::BufReader;
 pub use std::fs::File;
 pub use itertools::iproduct;
@@ -12,7 +12,7 @@ pub use std::io::ErrorKind;
 
 #[cfg(feature = "native-client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "native-client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
-#[cfg(feature = "native-client")] pub use sfml::window::{Style, VideoMode, Event, Key, joystick, ContextSettings};
+// #[cfg(feature = "native-client")] pub use sfml::window::{Style, VideoMode, joystick, ContextSettings};
 #[cfg(feature = "native-client")] pub use gilrs::{GamepadId, Gilrs};
 
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
@@ -56,12 +56,11 @@ pub use crate::net::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::world::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::surface_vec::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::texture_state2::*;
-#[cfg(feature = "native-client")] pub use winit_input_helper::WinitInputHelper;
 #[cfg(feature = "native-client")] pub mod win {
 	pub use winit::{
 			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, },
 			window::{ Window, WindowBuilder, },
-			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput },
+			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput, ElementState },
 			event_loop::{ EventLoop, ControlFlow, },
 	};
 }

@@ -1,5 +1,10 @@
 #[cfg(feature = "native-client")] mod device;
+mod keyboard;
+mod keyboard_state;
+
 #[cfg(feature = "native-client")] pub use device::*;
+pub use keyboard::*;
+pub use keyboard_state::*;
 
 use crate::prelude::*;
 

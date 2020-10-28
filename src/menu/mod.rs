@@ -139,12 +139,6 @@ impl Runnable for MenuRunnable {
 		 */
 	}
 
-	fn apply_key(&mut self, ev: &KeyPressedEvent) {
-		if let Some(element) = self.menu.get_selected_element() {
-			element.apply_key_press(ev);
-		}
-	}
-
 	fn get_runnable_change(&mut self) -> RunnableChange {
 		self.next_runnable_change.clone()
 	}

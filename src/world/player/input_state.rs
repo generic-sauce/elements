@@ -82,6 +82,46 @@ impl InputState {
 		self.just_down = !last_frame_down && self.down();
 		self.just_attack2 = !last_frame_attack2 && self.attack2;
 	}
+
+	pub fn update_keyboard(&mut self, keyboard_state: &KeyboardState) {
+		if keyboard_state.key_pressed(&Key::A) {
+			self.direction.x -= 1.0;
+		}
+		if keyboard_state.key_pressed(&Key::D) {
+			self.direction.x += 1.0;
+		}
+
+		if keyboard_state.key_pressed(&Key::W) {
+			if keyboard_state.key_just_pressed(&Key::W) {
+				self.just_up = true;
+			}
+			self.direction.y += 1.0;
+		}
+		if keyboard_state.key_pressed(&Key::S) {
+			if keyboard_state.key_just_pressed(&Key::S) {
+				self.just_down = true;
+			}
+			self.direction.y -= 1.0;
+		}
+		self.direction = self.direction.clamped(-1.0, 1.0);
+
+		if keyboard_state.key_pressed(&Key::Q) {
+			self.attack1 = true;
+		}
+		if keyboard_state.key_pressed(&Key::E) {
+			self.attack2 = true;
+			if keyboard_state.key_just_pressed(&Key::E) {
+				self.just_attack2 = true;
+			}
+		}
+
+		if keyboard_state.key_pressed(&Key::F) {
+			self.special1 = true;
+		}
+		if keyboard_state.key_pressed(&Key::R) {
+			self.special2 = true;
+		}
+	}
 }
 
 fn apply_deadzone_min(value: f32, deadzone_min: f32) -> f32 {
