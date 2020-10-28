@@ -31,16 +31,40 @@ impl World {
 		}
 	}
 
+	fn assert_unglitched_path(&self, path: &[TileVec]) {
+		assert!(path.iter().all(|t| !self.coll(*t)));
+		self.assert_path(path);
+	}
+
+	fn assert_path(&self, path: &[TileVec]) {
+		for i in 0..path.len()-1 {
+			assert_eq!((path[i] - path[i+1]).length_squared(), 1);
+		}
+	}
+
 	fn generate_wall_path(&self, p: usize, from: GameVec, to: GameVec) -> Vec<TileVec> {
 		let mut path = self.direct_path(p, from, to);
+
+		self.assert_path(&path[..]);
+
 		while let Some(i) = path.iter().position(|tile| self.coll(*tile)) {
 			let before_gap = i-1;
 			let after_gap = path.iter().enumerate().position(|(j, tile)| j > i && !self.coll(*tile)).unwrap();
+
+			self.assert_path(&path[..]);
+
 			let dir = Direction::from_diff(path[before_gap], path[i]).unwrap();
 			let inner_path = self.pathfind(path[before_gap], dir, path[after_gap]);
-			assert!(inner_path.iter().all(|t| !self.coll(*t)));
+
+			self.assert_path(&inner_path[..]);
+			let n = inner_path.len();
+
 			path.splice(before_gap..=after_gap, inner_path);
+
+			self.assert_path(&path[..]);
+			self.assert_unglitched_path(&path[..(i - 1 + n)]);
 		}
+		self.assert_unglitched_path(&path[..]);
 		path
 	}
 
