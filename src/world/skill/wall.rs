@@ -38,7 +38,10 @@ impl World {
 
 	fn assert_path(&self, path: &[TileVec]) {
 		for i in 0..path.len()-1 {
-			assert_eq!((path[i] - path[i+1]).length_squared(), 1);
+			let diff = path[i] - path[i+1];
+			assert!(diff.x.abs() <= 1);
+			assert!(diff.y.abs() <= 1);
+			assert_ne!(diff, v(0,0));
 		}
 	}
 
@@ -53,7 +56,12 @@ impl World {
 
 			self.assert_path(&path[..]);
 
-			let dir = Direction::from_diff(path[before_gap], path[i]).unwrap();
+			let mut diff = path[i] - path[before_gap];
+
+			// for diagonal steps, prefer x
+			if diff.x.abs() == 1 && diff.y.abs() == 1 { diff.y = 0; }
+
+			let dir = Direction::from_diff(diff).unwrap();
 			let inner_path = self.pathfind(path[before_gap], dir, path[after_gap]);
 
 			self.assert_path(&inner_path[..]);
@@ -249,8 +257,8 @@ impl Direction {
 		}
 	}
 
-	fn from_diff(from: TileVec, to: TileVec) -> Option<Direction> {
-		match to - from {
+	fn from_diff(diff: TileVec) -> Option<Direction> {
+		match diff {
 			TileVec { x: 1, y: 0, .. } => Some(Direction::Right),
 			TileVec { x: -1, y: 0, .. } => Some(Direction::Left),
 			TileVec { x: 0, y: 1, .. } => Some(Direction::Up),
