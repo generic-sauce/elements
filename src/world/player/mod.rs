@@ -26,14 +26,15 @@ static GROUND_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x, TILESIZE+1),
 };
 
+const WALL_JUMP_SENSOR_WIDTH: i32 = TILESIZE;
 static LEFT_SENSOR: Sensor = Sensor {
-	left_bot_offset: GameVec::new(-TILESIZE/2, PLAYER_SIZE.y / 4),
-	size: GameVec::new(0, PLAYER_SIZE.y * 3 / 4),
+	left_bot_offset: v(-WALL_JUMP_SENSOR_WIDTH, 0),
+	size: v(WALL_JUMP_SENSOR_WIDTH, PLAYER_SIZE.y * 3 / 4),
 };
 
 static RIGHT_SENSOR: Sensor = Sensor {
-	left_bot_offset: GameVec::new(PLAYER_SIZE.x, PLAYER_SIZE.y / 4),
-	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
+	left_bot_offset: v(PLAYER_SIZE.x, 0),
+	size: v(WALL_JUMP_SENSOR_WIDTH, PLAYER_SIZE.y * 3 / 4),
 };
 
 #[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
@@ -42,18 +43,30 @@ pub enum PlayerDirection {
 	Right,
 }
 
+#[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+pub enum XDir {
+	Left, Right
+}
+
+#[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+pub enum WallMode {
+	NoFluids, // when you are InProgress, and then the fluids run out.
+	InProgress(GameVec), // while you are drawing the wall.
+	NotWalling, // when you are not drawing the wall.
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
 	pub cursor: GameVec,
 	pub health: i32,
+	pub wall_mode: WallMode,
 	pub free_wall_lifetime: u32,
-	pub last_wall_pos: Option<GameVec>,
 	pub grab_cooldown: Option<u32>,
 	pub animation: Animation,
 	pub direction: PlayerDirection,
-	pub walljumped: bool,
+	pub last_walljump: Option<XDir>, // XDir::Left means the last walljump happened to a wall on a wall left of the player
 	pub input: InputState,
 }
 
@@ -80,12 +93,12 @@ impl Player {
 			velocity: GameVec::new(0, 0),
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
+			wall_mode: WallMode::NotWalling,
 			free_wall_lifetime: 0,
-			last_wall_pos: None,
 			grab_cooldown: None,
 			animation: Animation::new(animation_id),
 			direction,
-			walljumped: true,
+			last_walljump: None,
 			input: InputState::new(),
 		}
 	}
@@ -135,17 +148,25 @@ impl Player {
 		// jump
 		if self.is_grounded(t) && self.input.up() && self.velocity.y <= 0 {
 			self.velocity.y = JUMP_POWER;
-			self.walljumped = false;
+			self.last_walljump = None;
 		}
 
 		// walljump
-		if !self.walljumped && !self.is_grounded(t) && self.input.up() && (
-				self.is_left_walled(t) && self.input.right() ||
-				self.is_right_walled(t) && self.input.left()) {
-			let horizontal_dir = f32::signum(self.input.horizontal_dir()) as i32 * 100;
-			let force = GameVec::new(horizontal_dir, JUMP_POWER);
-			self.velocity = force;
-			self.walljumped = true;
+		if !self.is_grounded(t) && self.input.up() {
+			let arr = [
+				Some(XDir::Left).filter(|_| self.is_left_walled(t) && self.input.right() && self.last_walljump != Some(XDir::Left)),
+				Some(XDir::Right).filter(|_| self.is_right_walled(t) && self.input.left() && self.last_walljump != Some(XDir::Right)),
+			];
+			let mut iter = arr.iter().filter_map(|x| x.clone());
+
+			if let Some(dir) = iter.next() {
+				let horizontal_dir = match dir {
+					XDir::Left => -1,
+					XDir::Right => 1,
+				} * -100;
+				self.last_walljump = Some(dir);
+				self.velocity = v(horizontal_dir, JUMP_POWER);
+			}
 		}
 
 		// gravity

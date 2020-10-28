@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use rodio::*;
 
-const START_MUSIC_OFFSET: Duration = Duration::from_micros(200);
+const START_MUSIC_OFFSET: Duration = Duration::from_micros(1000);
 const NUM_PARTS: usize = 4;
 const WHIZ_VOLUME: f32 = 0.1;
 
@@ -106,7 +106,7 @@ impl SoundManager {
 		let should_refresh = self.next_music_refresh_time.saturating_duration_since(Instant::now()) < START_MUSIC_OFFSET;
 		if should_refresh {
 			if let Some(next_music_id) = self.next_music_id {
-				assert_eq!(self.music_sink.len(), 1);
+				// assert_eq!(self.music_sink.len(), 1);
 				self.start_music_sample(next_music_id);
 			}
 		}
