@@ -39,9 +39,7 @@ impl World {
 	fn assert_path(&self, path: &[TileVec]) {
 		for i in 0..path.len()-1 {
 			let diff = path[i] - path[i+1];
-			assert!(diff.x.abs() <= 1);
-			assert!(diff.y.abs() <= 1);
-			assert_ne!(diff, v(0,0));
+			assert_eq!(diff.x.abs() + diff.y.abs(), 1);
 		}
 	}
 
@@ -56,11 +54,7 @@ impl World {
 
 			self.assert_path(&path[..]);
 
-			let mut diff = path[i] - path[before_gap];
-
-			// for diagonal steps, prefer x
-			if diff.x.abs() == 1 && diff.y.abs() == 1 { diff.y = 0; }
-
+			let diff = path[i] - path[before_gap];
 			let dir = Direction::from_diff(diff).unwrap();
 			let inner_path = self.pathfind(path[before_gap], dir, path[after_gap]);
 
@@ -95,6 +89,16 @@ impl World {
 		}
 		if direct_path.last().unwrap() != &to.to_tile() {
 			direct_path.push(to.to_tile());
+		}
+
+		// remove diagonals
+		while let Some(i) = (0..direct_path.len() - 1).find(|&i| (direct_path[i] - direct_path[i+1]).length_squared() > 1) {
+			let new: TileVec = v(direct_path[i].x, direct_path[i+1].y);
+
+			assert_eq!((new - direct_path[i]).length_squared(), 1);
+			assert_eq!((new - direct_path[i+1]).length_squared(), 1);
+
+			direct_path.insert(i+1, new);
 		}
 
 		direct_path
