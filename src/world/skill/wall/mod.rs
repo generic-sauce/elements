@@ -8,6 +8,12 @@ impl World {
 	pub(in super) fn handle_wall(&mut self, p: usize, handler: &mut impl EventHandler) {
 		let player = &mut self.players[p];
 		let cursor = player.cursor_position();
+
+		// deadzone
+		if (cursor - player.center_position()).as_short_as(TILESIZE/2) {
+			return;
+		}
+
 		let from = match player.wall_mode {
 			WallMode::NoFluids => return,
 			WallMode::NotWalling => cursor,
