@@ -26,14 +26,15 @@ static GROUND_SENSOR: Sensor = Sensor {
 	size: GameVec::new(PLAYER_SIZE.x, TILESIZE+1),
 };
 
+const WALL_JUMP_SENSOR_WIDTH: i32 = TILESIZE;
 static LEFT_SENSOR: Sensor = Sensor {
-	left_bot_offset: GameVec::new(-TILESIZE/2, PLAYER_SIZE.y / 4),
-	size: GameVec::new(0, PLAYER_SIZE.y * 3 / 4),
+	left_bot_offset: v(-WALL_JUMP_SENSOR_WIDTH, 0),
+	size: v(WALL_JUMP_SENSOR_WIDTH, PLAYER_SIZE.y * 3 / 4),
 };
 
 static RIGHT_SENSOR: Sensor = Sensor {
-	left_bot_offset: GameVec::new(PLAYER_SIZE.x, PLAYER_SIZE.y / 4),
-	size: GameVec::new(PLAYER_SIZE.x + TILESIZE/2, PLAYER_SIZE.y * 3 / 4),
+	left_bot_offset: v(PLAYER_SIZE.x, 0),
+	size: v(WALL_JUMP_SENSOR_WIDTH, PLAYER_SIZE.y * 3 / 4),
 };
 
 #[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
