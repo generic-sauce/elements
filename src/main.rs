@@ -71,6 +71,16 @@ fn main() {
 					}
 				}
 			},
+			win::Event::WindowEvent { event: win::WindowEvent::MouseInput { state, button, .. }, .. } => {
+				match state {
+					win::ElementState::Pressed => {
+						peripherals_update = Some(PeripheralsUpdate::KeyPress(Key::from(button)));
+					}
+					win::ElementState::Released => {
+						peripherals_update = Some(PeripheralsUpdate::KeyRelease(Key::from(button)));
+					}
+				}
+			},
 			win::Event::MainEventsCleared => {
 				window.request_redraw();
 			},

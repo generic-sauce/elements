@@ -9,6 +9,10 @@ pub enum PeripheralsUpdate {
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
 pub enum Key {
+	LeftMouse,
+	RightMouse,
+	MiddleMouse,
+	OtherMouse(u8),
 	Key1,
 	Key2,
 	Key3,
@@ -325,6 +329,18 @@ impl From<win::VirtualKeyCode> for Key {
 			win::VirtualKeyCode::Paste => Key::Paste,
 			win::VirtualKeyCode::Cut => Key::Cut,
 			_ => Key::Unknown,
+		}
+	}
+}
+
+#[cfg(feature = "native-client")]
+impl From<win::MouseButton> for Key {
+	fn from(key_code: win::MouseButton) -> Self {
+		match key_code {
+			win::MouseButton::Left => Key::LeftMouse,
+			win::MouseButton::Right => Key::RightMouse,
+			win::MouseButton::Middle => Key::MiddleMouse,
+			win::MouseButton::Other(id) => Key::OtherMouse(id),
 		}
 	}
 }

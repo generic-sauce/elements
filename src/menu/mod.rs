@@ -39,6 +39,36 @@ impl Menu {
 		}
 	}
 
+	pub fn tick(&mut self, app: &App, next_runnable_change: &mut RunnableChange) {
+		if sfml::window::mouse::Button::Left.is_pressed() {
+			for element in &mut self.elements {
+				element.clicked = element.is_colliding(&app.cursor_position);
+			}
+			if let Some(elem) = self.get_selected_element() {
+				if let MenuKind::EditField { selected, .. } = &mut elem.kind {
+					*selected = false;
+				}
+			}
+		} else {
+			if let Some(element) = self.get_clicked_element() {
+				element.clicked = false;
+				match &mut element.kind {
+					MenuKind::Button { runnable_change, .. } => {
+						*next_runnable_change = runnable_change.clone();
+						if let RunnableChange::Client(ip) = next_runnable_change {
+							if let MenuKind::EditField { text, .. } = &self.get_element_by_name("ip").unwrap().kind {
+								*ip = text.clone();
+							}
+						}
+					}
+					MenuKind::EditField { selected, .. } => {
+						*selected = true;
+					}
+				}
+			}
+		}
+	}
+
 	pub fn get_clicked_element(&mut self) -> Option<&mut MenuElement> {
 		self.elements.iter_mut().find(|e| e.clicked)
 	}
@@ -67,38 +97,13 @@ impl MenuRunnable {
 
 impl Runnable for MenuRunnable {
 	fn tick(&mut self, app: &mut App) {
-		let mouse_update: WindowVec = unimplemented!("get_mouse_position_update()");
+		let mouse_update: WindowVec = app.peripherals_state.cursor_move;
 		app.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
 		app.cursor_position.y = app.cursor_position.y.max(0.0).min(1.0);
 		app.cursor_position.x = app.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 
-		if sfml::window::mouse::Button::Left.is_pressed() {
-			for element in &mut self.menu.elements {
-				element.clicked = element.is_colliding(&app.cursor_position);
-			}
-			if let Some(elem) = self.menu.get_selected_element() {
-				if let MenuKind::EditField { selected, .. } = &mut elem.kind {
-					*selected = false;
-				}
-			}
-		} else {
-			if let Some(element) = self.menu.get_clicked_element() {
-				element.clicked = false;
-				match &mut element.kind {
-					MenuKind::Button { runnable_change, .. } => {
-						self.next_runnable_change = runnable_change.clone();
-						if let RunnableChange::Client(ip) = &mut self.next_runnable_change {
-							if let MenuKind::EditField { text, .. } = &self.menu.get_element_by_name("ip").unwrap().kind {
-								*ip = text.clone();
-							}
-						}
-					}
-					MenuKind::EditField { selected, .. } => {
-						*selected = true;
-					}
-				}
-			}
-		}
+		self.menu.tick(app, &mut self.next_runnable_change);
+
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
