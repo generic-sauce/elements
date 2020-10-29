@@ -91,42 +91,47 @@ impl InputState {
 		self.last_gamepad_cursor = gamepad_cursor;
 	}
 
-	pub fn update_keyboard(&mut self, keyboard_state: &PeripheralsState) {
-		if keyboard_state.key_pressed(&Key::A) {
+	pub fn update_peripherals(&mut self, peripherals_state: &PeripheralsState) {
+		self.update_keyboard(peripherals_state);
+		self.update_cursor(&peripherals_state.cursor_move);
+	}
+
+	pub fn update_keyboard(&mut self, peripherals_state: &PeripheralsState) {
+		if peripherals_state.key_pressed(&Key::A) {
 			self.direction.x -= 1.0;
 		}
-		if keyboard_state.key_pressed(&Key::D) {
+		if peripherals_state.key_pressed(&Key::D) {
 			self.direction.x += 1.0;
 		}
 
-		if keyboard_state.key_pressed(&Key::W) {
-			if keyboard_state.key_just_pressed(&Key::W) {
+		if peripherals_state.key_pressed(&Key::W) {
+			if peripherals_state.key_just_pressed(&Key::W) {
 				self.just_up = true;
 			}
 			self.direction.y += 1.0;
 		}
-		if keyboard_state.key_pressed(&Key::S) {
-			if keyboard_state.key_just_pressed(&Key::S) {
+		if peripherals_state.key_pressed(&Key::S) {
+			if peripherals_state.key_just_pressed(&Key::S) {
 				self.just_down = true;
 			}
 			self.direction.y -= 1.0;
 		}
 		self.direction = self.direction.clamped(-1.0, 1.0);
 
-		if keyboard_state.key_pressed(&Key::Q) {
+		if peripherals_state.key_pressed(&Key::Q) {
 			self.attack1 = true;
 		}
-		if keyboard_state.key_pressed(&Key::E) {
+		if peripherals_state.key_pressed(&Key::E) {
 			self.attack2 = true;
-			if keyboard_state.key_just_pressed(&Key::E) {
+			if peripherals_state.key_just_pressed(&Key::E) {
 				self.just_attack2 = true;
 			}
 		}
 
-		if keyboard_state.key_pressed(&Key::F) {
+		if peripherals_state.key_pressed(&Key::F) {
 			self.special1 = true;
 		}
-		if keyboard_state.key_pressed(&Key::R) {
+		if peripherals_state.key_pressed(&Key::R) {
 			self.special2 = true;
 		}
 	}

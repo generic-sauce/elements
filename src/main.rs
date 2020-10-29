@@ -41,7 +41,7 @@ fn main() {
 	event_loop.run(move |event, _window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
 
-		let mut input_update: Option<PeripheralsUpdate> = None;
+		let mut peripherals_update: Option<PeripheralsUpdate> = None;
 
 		match event {
 			win::Event::WindowEvent { event: win::WindowEvent::CloseRequested, .. } => {
@@ -51,7 +51,7 @@ fn main() {
 				let cursor_position = WindowVec::new(position.x as f32, position.y as f32);
 				let cursor_move = cursor_position - DEFAULT_CURSOR_POSITION;
 				if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
-					input_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
+					peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
 					window.set_cursor_position(win::PhysicalPosition { x: DEFAULT_CURSOR_POSITION.x as f64, y: DEFAULT_CURSOR_POSITION.y as f64 }).unwrap();
 				}
 			},
@@ -59,15 +59,15 @@ fn main() {
 				graphics.resize(Vec2u::new(size.width, size.height));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::ReceivedCharacter(c), .. } => {
-				input_update = Some(PeripheralsUpdate::Text(c));
+				peripherals_update = Some(PeripheralsUpdate::Text(c));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::KeyboardInput { input: win::KeyboardInput { virtual_keycode: Some(virtual_keycode), state, .. }, .. }, .. } => {
 				match state {
 					win::ElementState::Pressed => {
-						input_update = Some(PeripheralsUpdate::KeyPress(Key::from(virtual_keycode)));
+						peripherals_update = Some(PeripheralsUpdate::KeyPress(Key::from(virtual_keycode)));
 					}
 					win::ElementState::Released => {
-						input_update = Some(PeripheralsUpdate::KeyRelease(Key::from(virtual_keycode)));
+						peripherals_update = Some(PeripheralsUpdate::KeyRelease(Key::from(virtual_keycode)));
 					}
 				}
 			},
@@ -86,8 +86,8 @@ fn main() {
 			_ => ()
 		}
 
-		if let Some(keyboard_update) = input_update {
-			input_sender.send(keyboard_update).unwrap();
+		if let Some(update) = peripherals_update {
+			input_sender.send(update).unwrap();
 		}
 
 		window.set_cursor_grab(true).unwrap();
