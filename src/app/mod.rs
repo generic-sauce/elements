@@ -17,6 +17,7 @@ pub struct App {
 	pub cursor_position: CanvasVec,
 	pub graphics_sender: Sender<GraphicsWorld>,
 	pub input_receiver: Receiver<PeripheralsUpdate>,
+	pub peripherals_state: PeripheralsState,
 }
 
 pub trait Runnable {
@@ -69,7 +70,8 @@ impl App {
 			sound_manager: SoundManager::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			graphics_sender,
-			input_receiver
+			input_receiver,
+			peripherals_state: PeripheralsState::new(),
 		}
 	}
 
@@ -100,12 +102,24 @@ impl App {
 		}
 	}
 
+	fn fetch_peripherals_update(&mut self) {
+		let receive = |app: &mut App| app.input_receiver.try_recv().map_err(|err| match err {
+			TryRecvError::Disconnected => panic!("PeripheralsUpdate Sender disconnected!"),
+			x => x,
+		});
+		while let Ok(peripherals_update) = receive(self) {
+			self.peripherals_state.update(&peripherals_update);
+		}
+	}
+
 	fn run_runnable(&mut self, mut runnable: impl Runnable) -> RunnableChange {
 		let mut runnable_change = RunnableChange::None;
 
 		for timed_loop_info in TimedLoop::with_fps(60) {
 			// process gilrs events
 			while self.gilrs.next_event().is_some() {}
+
+			self.fetch_peripherals_update();
 
 			if timed_loop_info.delta_time > timed_loop_info.interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
@@ -115,13 +129,11 @@ impl App {
 			runnable.draw(self, &timed_loop_info);
 			runnable_change = runnable.get_runnable_change();
 			match runnable_change {
-				RunnableChange::Quit => { break; },
-				RunnableChange::Local(_) => { break; },
 				RunnableChange::None => {},
-				RunnableChange::Menu(_) => { break; },
-				RunnableChange::Client(_) => { break; },
+				_ => { break; },
 			}
 			self.sound_manager.tick();
+			self.peripherals_state.reset();
 		};
 		runnable_change
 	}
