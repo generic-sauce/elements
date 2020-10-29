@@ -1,10 +1,10 @@
 #[cfg(feature = "native-client")] mod device;
 mod peripherals_update;
-mod keyboard_state;
+mod peripherals_state;
 
 #[cfg(feature = "native-client")] pub use device::*;
 pub use peripherals_update::*;
-pub use keyboard_state::*;
+pub use peripherals_state::*;
 
 use crate::prelude::*;
 
