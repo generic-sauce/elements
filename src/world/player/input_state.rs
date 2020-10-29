@@ -118,12 +118,12 @@ impl InputState {
 		}
 		self.direction = self.direction.clamped(-1.0, 1.0);
 
-		if peripherals_state.key_pressed(&Key::Q) {
+		if peripherals_state.key_pressed(&Key::Q) || peripherals_state.key_pressed(&Key::LeftMouse) {
 			self.attack1 = true;
 		}
-		if peripherals_state.key_pressed(&Key::E) {
+		if peripherals_state.key_pressed(&Key::E) || peripherals_state.key_pressed(&Key::RightMouse) {
 			self.attack2 = true;
-			if peripherals_state.key_just_pressed(&Key::E) {
+			if peripherals_state.key_just_pressed(&Key::E) || peripherals_state.key_just_pressed(&Key::RightMouse) {
 				self.just_attack2 = true;
 			}
 		}

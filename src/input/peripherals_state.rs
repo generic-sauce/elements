@@ -23,10 +23,6 @@ impl PeripheralsState {
 		self.just_pressed_keys.contains(key)
 	}
 
-	pub fn get_cursor_move(&self) -> WindowVec {
-		self.cursor_move
-	}
-
 	pub fn update(&mut self, key_update: &PeripheralsUpdate) {
 		match key_update {
 			PeripheralsUpdate::KeyPress(key) => self.update_press(key),

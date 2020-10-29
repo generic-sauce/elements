@@ -60,7 +60,7 @@ pub use crate::net::*;
 	pub use winit::{
 			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, PhysicalPosition, },
 			window::{ Window, WindowBuilder, },
-			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput, ElementState },
+			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput, ElementState, MouseButton },
 			event_loop::{ EventLoop, ControlFlow, },
 	};
 }
