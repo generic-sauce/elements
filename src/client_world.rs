@@ -3,7 +3,6 @@ use crate::prelude::*;
 pub struct ClientWorld {
 	pub world: World,
 	pub tilemap_texture: SfBox<Texture>,
-	pub peripherals_state: PeripheralsState,
 }
 
 impl ClientWorld {
@@ -13,7 +12,6 @@ impl ClientWorld {
 		ClientWorld {
 			world,
 			tilemap_texture,
-			peripherals_state: PeripheralsState::new(),
 		}
 	}
 
@@ -22,7 +20,6 @@ impl ClientWorld {
 		self.world.tick(&mut handler);
 		self.handle(&handler, &mut app.sound_manager);
 		self.update_music(&mut app.sound_manager);
-		self.peripherals_state.reset();
 	}
 
 	fn handle(&mut self, handler: &AppEventHandler, sound_manager: &mut SoundManager) {
@@ -53,16 +50,6 @@ impl ClientWorld {
 		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
 		if sound_manager.current_music_id.map_or(true, |music_id| music_id != sound_id) {
 			sound_manager.play_music(sound_id);
-		}
-	}
-
-	pub fn fetch_peripherals_update(&mut self, input_receiver: &Receiver<PeripheralsUpdate>) {
-		let f = || input_receiver.try_recv().map_err(|err| match err {
-			e @ TryRecvError::Disconnected => panic!(e),
-			x => x,
-		});
-		while let Ok(peripherals_update) = f() {
-			self.peripherals_state.update(&peripherals_update);
 		}
 	}
 }

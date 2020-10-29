@@ -18,11 +18,10 @@ impl Local {
 
 impl Runnable for Local {
 	fn tick(&mut self, app: &mut App) {
-		self.client_world.fetch_peripherals_update(&app.input_receiver);
 		for (i, input_device) in self.input_devices.iter_mut().enumerate() {
 			self.client_world.world.players[i].input.update_gamepad(&input_device.get_state(&app.gilrs));
 		}
-		self.client_world.world.players.last_mut().unwrap().input.update_peripherals(&self.client_world.peripherals_state);
+		self.client_world.world.players.last_mut().unwrap().input.update_peripherals(&app.peripherals_state);
 		self.client_world.tick(app);
 	}
 
