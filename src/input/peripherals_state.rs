@@ -23,8 +23,8 @@ impl PeripheralsState {
 		self.just_pressed_keys.contains(key)
 	}
 
-	pub fn update(&mut self, key_update: &PeripheralsUpdate) {
-		match key_update {
+	pub fn update(&mut self, peripherals_update: &PeripheralsUpdate) {
+		match peripherals_update {
 			PeripheralsUpdate::KeyPress(key) => self.update_press(key),
 			PeripheralsUpdate::KeyRelease(key) => self.update_release(key),
 			PeripheralsUpdate::MouseMove(cursor_move) => {

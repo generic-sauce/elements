@@ -40,7 +40,7 @@ impl Menu {
 	}
 
 	pub fn tick(&mut self, app: &App, next_runnable_change: &mut RunnableChange) {
-		if sfml::window::mouse::Button::Left.is_pressed() {
+		if app.peripherals_state.key_pressed(&Key::LeftMouse) {
 			for element in &mut self.elements {
 				element.clicked = element.is_colliding(&app.cursor_position);
 			}
@@ -103,7 +103,6 @@ impl Runnable for MenuRunnable {
 		app.cursor_position.x = app.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 
 		self.menu.tick(app, &mut self.next_runnable_change);
-
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {

@@ -17,7 +17,7 @@ fn compile_shader(shader_name: &str) {
 
     let status = match status.map_err(|e| e.kind()) {
         Err(ErrorKind::NotFound) => {
-            println!("cargo:warning=glslangValidator not installed. Skipping shader checks.");
+            println!("cargo:warning=glslangValidator not installed. Skipping shader compilation.");
             exit(0)
         },
         Err(e) => Err(e).unwrap(),
