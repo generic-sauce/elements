@@ -26,7 +26,7 @@ impl PeripheralsState {
 	pub fn update(&mut self, key_update: &PeripheralsUpdate) {
 		match key_update {
 			PeripheralsUpdate::KeyPress(key) => self.update_press(key),
-			PeripheralsUpdate::KeyRelease(key) => { self.pressed_keys.remove(key); },
+			PeripheralsUpdate::KeyRelease(key) => self.update_release(key),
 			PeripheralsUpdate::MouseMove(cursor_move) => {
 				self.cursor_move.x += cursor_move.x;
 				self.cursor_move.y += cursor_move.y;
