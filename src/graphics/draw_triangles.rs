@@ -299,29 +299,32 @@ impl DrawTriangles {
 	// let v = GameVec::new(0, 0);
 	// draw_rectangle(Origin::LeftBot(v));
 
-	#[allow(unused)]
-	fn draw_texture_by_index(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, texture_index: usize, color: Option<wgpu::Color>) {
+	fn draw_texture_by_index(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, texture_index: usize, flip: Flip2, color: Option<wgpu::Color>) {
 		let triangles = &mut self.texture_triangles[texture_index];
 		let left_bot = left_bot.to_surface(context.window_size);
 		let right_top = right_top.to_surface(context.window_size);
 		let color = if let Some(color) = color { color } else { wgpu::Color::WHITE };
+		let (left_uv, right_uv) = match flip {
+			Flip2::Normal => (0.0, 1.0),
+			Flip2::Horizontal => (1.0, 0.0),
+		};
 
 		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(1.0, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color: color },
+			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(right_uv, 0.0), color: color },
+			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color: color },
 		]);
 
 		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(0.0, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color: color },
+			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color: color },
+			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(left_uv, 1.0), color: color },
 		]);
 	}
 
 	#[allow(unused)]
-	pub fn draw_texture(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, texture_id: TextureId2, color: Option<wgpu::Color>) {
-		self.draw_texture_by_index(context, left_bot, right_top, texture_id as usize, color);
+	pub fn draw_texture(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, texture_id: TextureId2, flip: Flip2, color: Option<wgpu::Color>) {
+		self.draw_texture_by_index(context, left_bot, right_top, texture_id as usize, flip, color);
 	}
 
 	fn animation_texture_index(&self, animation: Animation) -> usize {
@@ -335,9 +338,9 @@ impl DrawTriangles {
 	}
 
 	#[allow(unused)]
-	pub fn draw_animation(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, animation: Animation, color: Option<wgpu::Color>) {
+	pub fn draw_animation(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, animation: Animation, flip: Flip2, color: Option<wgpu::Color>) {
 		let texture_index = self.animation_texture_index(animation);
-		self.draw_texture_by_index(context, left_bot, right_top, texture_index, color);
+		self.draw_texture_by_index(context, left_bot, right_top, texture_index, flip, color);
 	}
 
 	pub fn draw_rectangle(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, color: wgpu::Color) {
