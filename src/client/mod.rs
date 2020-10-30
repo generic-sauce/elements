@@ -37,11 +37,9 @@ impl Runnable for Client {
 			self.client_world.apply_update(update, &mut app.sound_manager);
 		}
 
-		self.client_world.fetch_keyboard_updates(&app.input_receiver);
-
 		// handle inputs
-		self.client_world.world.players[self.player_id].input.update(&self.input_device.get_state(&app.gilrs));
-		self.client_world.world.players[self.player_id].input.update_keyboard(&self.client_world.keyboard_state);
+		self.client_world.world.players[self.player_id].input.update_gamepad(&self.input_device.get_state(&app.gilrs));
+		self.client_world.world.players[self.player_id].input.update_peripherals(&app.peripherals_state);
 
 		// send packets
 		send_packet(&mut self.socket, &self.client_world.world.players[self.player_id].input);

@@ -1,15 +1,17 @@
 use crate::prelude::*;
 
-pub struct KeyboardState {
+pub struct PeripheralsState {
 	pub pressed_keys: HashSet<Key>,
 	pub just_pressed_keys: HashSet<Key>,
+	pub cursor_move: WindowVec,
 }
 
-impl KeyboardState {
-	pub fn new() -> KeyboardState {
-		KeyboardState {
+impl PeripheralsState {
+	pub fn new() -> PeripheralsState {
+		PeripheralsState {
 			pressed_keys: HashSet::new(),
 			just_pressed_keys: HashSet::new(),
+			cursor_move: WindowVec::new(0.0, 0.0),
 		}
 	}
 
@@ -21,11 +23,15 @@ impl KeyboardState {
 		self.just_pressed_keys.contains(key)
 	}
 
-	pub fn update(&mut self, key_update: &KeyboardUpdate) {
+	pub fn update(&mut self, key_update: &PeripheralsUpdate) {
 		match key_update {
-			KeyboardUpdate::KeyPress(key) => { self.update_press(key) },
-			KeyboardUpdate::KeyRelease(key) => { self.pressed_keys.remove(key); },
-			KeyboardUpdate::Text(_) => {},
+			PeripheralsUpdate::KeyPress(key) => self.update_press(key),
+			PeripheralsUpdate::KeyRelease(key) => self.update_release(key),
+			PeripheralsUpdate::MouseMove(cursor_move) => {
+				self.cursor_move.x += cursor_move.x;
+				self.cursor_move.y += cursor_move.y;
+			},
+			_ => {},
 		};
 	}
 
@@ -41,7 +47,8 @@ impl KeyboardState {
 		self.just_pressed_keys.remove(key);
 	}
 
-	pub fn reset_just_pressed(&mut self) {
+	pub fn reset(&mut self) {
 		self.just_pressed_keys.clear();
+		self.cursor_move = WindowVec::new(0.0, 0.0);
 	}
 }

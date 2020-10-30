@@ -174,6 +174,34 @@ impl<T: Primitive, P> Vec2t<T, P> {
 	}
 }
 
+pub trait FloorIfInt {
+	fn floor_if_int(arg: f64) -> f64;
+}
+
+impl FloorIfInt for i32 {
+	fn floor_if_int(arg: f64) -> f64 {
+		arg.floor()
+	}
+}
+
+impl FloorIfInt for u32 {
+	fn floor_if_int(arg: f64) -> f64 {
+		arg.floor()
+	}
+}
+
+impl FloorIfInt for f32 {
+	fn floor_if_int(arg: f64) -> f64 {
+		arg
+	}
+}
+
+impl FloorIfInt for f64 {
+	fn floor_if_int(arg: f64) -> f64 {
+		arg
+	}
+}
+
 impl<T: Primitive, P> Vec2t<T, P> {
 	#[allow(unused)]
 	pub fn clamped(self, min: T, max: T) -> Vec2t<T, P> {
@@ -197,12 +225,12 @@ impl<T: Primitive, P> Vec2t<T, P> {
 
 	pub fn length(self) -> T {
 		let ls = self.length_squared().to_f64().unwrap();
-		T::from::<f64>(ls.sqrt().floor()).unwrap()
+		T::from::<f64>(T::floor_if_int(ls.sqrt())).unwrap()
 	}
 
 	pub fn with_length(self, l: T) -> Vec2t<T, P> {
 		let orig_len_sqr = self.x * self.x + self.y * self.y;
-		let orig_len = T::from::<f64>((orig_len_sqr.to_f64().unwrap()).sqrt().floor()).unwrap();
+		let orig_len = T::from::<f64>(T::floor_if_int((orig_len_sqr.to_f64().unwrap()).sqrt())).unwrap();
 		if orig_len == Default::default() { return Vec2t::default(); }
 		(self * l) / orig_len
 	}

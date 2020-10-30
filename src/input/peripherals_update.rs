@@ -1,14 +1,18 @@
 use crate::prelude::*;
 
-pub enum KeyboardUpdate {
+pub enum PeripheralsUpdate {
 	KeyPress(Key),
 	KeyRelease(Key),
 	Text(char),
+	MouseMove(WindowVec),
 }
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
 pub enum Key {
-	Unknown,
+	LeftMouse,
+	RightMouse,
+	MiddleMouse,
+	OtherMouse(u8),
 	Key1,
 	Key2,
 	Key3,
@@ -99,17 +103,11 @@ pub enum Key {
 	Numpad7,
 	Numpad8,
 	Numpad9,
-	NumpadAdd,
-	NumpadDivide,
-	NumpadDecimal,
 	NumpadComma,
 	NumpadEnter,
 	NumpadEquals,
-	NumpadMultiply,
-	NumpadSubtract,
 	Apostrophe,
 	Apps,
-	Asterisk,
 	At,
 	Ax,
 	Backslash,
@@ -140,7 +138,6 @@ pub enum Key {
 	OEM102,
 	Period,
 	PlayPause,
-	Plus,
 	Power,
 	PrevTrack,
 	RAlt,
@@ -170,6 +167,7 @@ pub enum Key {
 	Copy,
 	Paste,
 	Cut,
+	Unknown,
 }
 
 #[cfg(feature = "native-client")]
@@ -331,6 +329,18 @@ impl From<win::VirtualKeyCode> for Key {
 			win::VirtualKeyCode::Paste => Key::Paste,
 			win::VirtualKeyCode::Cut => Key::Cut,
 			_ => Key::Unknown,
+		}
+	}
+}
+
+#[cfg(feature = "native-client")]
+impl From<win::MouseButton> for Key {
+	fn from(key_code: win::MouseButton) -> Self {
+		match key_code {
+			win::MouseButton::Left => Key::LeftMouse,
+			win::MouseButton::Right => Key::RightMouse,
+			win::MouseButton::Middle => Key::MiddleMouse,
+			win::MouseButton::Other(id) => Key::OtherMouse(id),
 		}
 	}
 }
