@@ -44,7 +44,7 @@ impl World {
 				let color: [u8; 4] =
 					match w.tilemap.get(TileVec::new(x, y)) {
 						Tile::Ground => [50, 50, 10, 255],
-						Tile::Void => [200, 200, 255, 255],
+						Tile::Void => [0, 0, 0, 0],
 						Tile::Wall { owner: 0, .. } => [0, 0, 40, 255],
 						Tile::Wall { owner: 1, .. } => [40, 0, 0, 255],
 						Tile::Wall { owner: _, .. } => panic!("more than two players are not yet supported"),
