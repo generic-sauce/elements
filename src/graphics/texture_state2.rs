@@ -121,9 +121,3 @@ impl TextureState2 {
 		self.textures.len()
 	}
 }
-
-#[derive(PartialEq, Eq)]
-pub enum Flip2 {
-	Normal,
-	Horizontal,
-}

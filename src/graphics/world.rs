@@ -54,9 +54,8 @@ impl Graphics {
 			let center = p.center_position();
 			let left_bot = GameVec::new(center.x - RADIUS, p.left_bot.y);
 			let right_top = GameVec::new(center.x + RADIUS, p.left_bot.y + RADIUS * 2);
-			let flip = if p.direction == PlayerDirection::Right { Flip2::Normal } else { Flip2::Horizontal };
 			// self.triangles.draw_sprite(context, left_bot, right_top, TextureId2::BluePlayerIdle1, None);
-			self.triangles.draw_animation(context, left_bot, right_top, p.animation, flip, None);
+			self.triangles.draw_animation(context, left_bot, right_top, p.animation, None);
 		}
 	}
 
