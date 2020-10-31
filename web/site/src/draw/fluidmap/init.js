@@ -22,9 +22,11 @@ export function init() {
 
 		void main() {
 			vec2 p = (pos + vec2(1.0, 1.0)) / 2.0;
-			vec3 texel = texture2D(uMapSampler, p).xyz;
-			if (texel != vec3(0, 0, 0)) {
-				gl_FragColor = vec4(texel, 1.0);
+			vec4 texel = texture2D(uMapSampler, p);
+			if (texel.w == 0.0) {
+				discard;
+			} else {
+				gl_FragColor = texel;
 			}
 		}
 	`;
