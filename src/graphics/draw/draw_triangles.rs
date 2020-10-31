@@ -84,8 +84,8 @@ impl DrawTriangles {
 			]
 		};
 
-		let vert = device.create_shader_module(wgpu::include_spirv!("../../res/shader/triangles.vert.spv"));
-		let frag = device.create_shader_module(wgpu::include_spirv!("../../res/shader/triangles.frag.spv"));
+		let vert = device.create_shader_module(wgpu::include_spirv!("../../../res/shader/triangles.vert.spv"));
+		let frag = device.create_shader_module(wgpu::include_spirv!("../../../res/shader/triangles.frag.spv"));
 
 		let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
 			label: Some("bind group layout"),

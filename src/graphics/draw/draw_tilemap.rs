@@ -24,9 +24,9 @@ fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
 	bytes
 }
 
-fn create_fluidmap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu::Texture, wgpu::TextureView) {
-	let fluidmap_texture = device.create_texture(&wgpu::TextureDescriptor {
-		label: Some("fluidmap texture"),
+fn create_tilemap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu::Texture, wgpu::TextureView) {
+	let tilemap_texture = device.create_texture(&wgpu::TextureDescriptor {
+		label: Some("tilemap texture"),
 		size: wgpu::Extent3d {
 			width: tilemap_size.x as u32,
 			height: tilemap_size.y as u32,
@@ -35,83 +35,63 @@ fn create_fluidmap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgp
 		mip_level_count: 1,
 		sample_count: 1,
 		dimension: wgpu::TextureDimension::D2,
-		format: wgpu::TextureFormat::Rgba8Unorm,
+		format: wgpu::TextureFormat::R8Unorm,
 		usage: wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
 	});
 
-	let fluidmap_texture_view = fluidmap_texture.create_view(&wgpu::TextureViewDescriptor {
-		label: Some("fluidmap texture view"),
+	let tilemap_texture_view = tilemap_texture.create_view(&wgpu::TextureViewDescriptor {
+		label: Some("tilemap texture view"),
 		..Default::default()
 	});
 
-	(fluidmap_texture, fluidmap_texture_view)
+	(tilemap_texture, tilemap_texture_view)
 }
 
-fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, fluidmap_texture_view: &wgpu::TextureView, fluidmap_sampler: &wgpu::Sampler, uniform_buffer: &wgpu::Buffer) -> wgpu::BindGroup {
-	let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-		label: Some("fluidmap bind group"),
-		layout: bind_group_layout,
-		entries: &[
-			wgpu::BindGroupEntry {
-				binding: 0,
-				resource: wgpu::BindingResource::TextureView(fluidmap_texture_view),
-			},
-			wgpu::BindGroupEntry {
-				binding: 1,
-				resource: wgpu::BindingResource::Sampler(fluidmap_sampler),
-			},
-			wgpu::BindGroupEntry {
-				binding: 2,
-				resource: wgpu::BindingResource::Buffer(uniform_buffer.slice(..)),
-			},
-		]
-	});
+	fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, tilemap_texture_view: &wgpu::TextureView, tilemap_sampler: &wgpu::Sampler) -> wgpu::BindGroup {
+		let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+			label: Some("tilemap bind group"),
+			layout: bind_group_layout,
+			entries: &[
+				wgpu::BindGroupEntry {
+					binding: 0,
+					resource: wgpu::BindingResource::TextureView(tilemap_texture_view),
+				},
+				wgpu::BindGroupEntry {
+					binding: 1,
+					resource: wgpu::BindingResource::Sampler(tilemap_sampler),
+				},
+			]
+		});
 
-	bind_group
-}
+		bind_group
+	}
 
-fn create_uniform_buffer(device: &wgpu::Device) -> wgpu::Buffer {
-	let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
-		label: Some("uniform buffer"),
-		size: 2 * std::mem::size_of::<f32>() as u64,
-		usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-		mapped_at_creation: false
-	});
-
-	uniform_buffer
-}
-
-fn uniform_to_bytes(elapsed_time: f32) -> Vec<u8> {
-	bytemuck::cast_slice(&[elapsed_time]).to_vec()
-}
-
-fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
-	let vertices_size = vertices_capacity * vertex_to_bytes_len();
-	let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
-		label: Some("vertex buffer"),
-		size: vertices_size,
-		usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
-		mapped_at_creation: false
-	});
-
-	vertex_buffer
-}
-
-pub struct DrawFluidmap {
+pub struct DrawTilemap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
 	tilemap_size: TileVec,
-	fluidmap_texture: Option<wgpu::Texture>,
-	fluidmap_texture_view: Option<wgpu::TextureView>,
-	fluidmap_sampler: wgpu::Sampler,
-	uniform_buffer: wgpu::Buffer,
+	tilemap_texture: Option<wgpu::Texture>,
+	tilemap_texture_view: Option<wgpu::TextureView>,
+	tilemap_sampler: wgpu::Sampler,
 	bind_group_layout: wgpu::BindGroupLayout,
 	bind_group: Option<wgpu::BindGroup>,
 }
 
-impl DrawFluidmap {
-	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawFluidmap {
-		let vertex_buffer = create_vertex_buffer(device, 4);
+impl DrawTilemap {
+	fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
+		let vertices_size = vertices_capacity * vertex_to_bytes_len();
+		let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+			label: Some("vertex buffer"),
+			size: vertices_size,
+			usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
+			mapped_at_creation: false
+		});
+
+		vertex_buffer
+	}
+
+	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
+		let vertex_buffer = Self::create_vertex_buffer(device, 4);
 		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
 			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
 			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
@@ -136,8 +116,8 @@ impl DrawFluidmap {
 			]
 		};
 
-		let vert = device.create_shader_module(wgpu::include_spirv!("../../res/shader/fluidmap.vert.spv"));
-		let frag = device.create_shader_module(wgpu::include_spirv!("../../res/shader/fluidmap.frag.spv"));
+		let vert = device.create_shader_module(wgpu::include_spirv!("../../../res/shader/tilemap.vert.spv"));
+		let frag = device.create_shader_module(wgpu::include_spirv!("../../../res/shader/tilemap.frag.spv"));
 
 		let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
 			label: Some("bind group layout"),
@@ -159,16 +139,7 @@ impl DrawFluidmap {
 					ty: wgpu::BindingType::Sampler {
 						comparison: false
 					},
-				},
-				wgpu::BindGroupLayoutEntry {
-					binding: 2,
-					visibility: wgpu::ShaderStage::FRAGMENT,
-					count: None,
-					ty: wgpu::BindingType::UniformBuffer {
-						dynamic: false,
-						min_binding_size: None
-					},
-				},
+				}
 			]
 		});
 
@@ -208,32 +179,31 @@ impl DrawFluidmap {
 			alpha_to_coverage_enabled: false,
 		});
 
-		let fluidmap_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
-			label: Some("fluidmap sampler"),
+		let tilemap_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+			label: Some("tilemap sampler"),
 			..Default::default()
 		});
 
-		let uniform_buffer = create_uniform_buffer(device);
-
-		DrawFluidmap {
+		DrawTilemap {
 			pipeline,
 			vertex_buffer,
 			tilemap_size: TileVec::new(0, 0),
-			fluidmap_texture: None,
-			fluidmap_texture_view: None,
-			fluidmap_sampler,
-			uniform_buffer,
+			tilemap_texture: None,
+			tilemap_texture_view: None,
+			tilemap_sampler,
 			bind_group_layout,
 			bind_group: None,
 		}
 	}
 
-	pub fn resize_fluidmap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
+	pub fn resize_tilemap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
 		if tilemap_size != self.tilemap_size {
-			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, tilemap_size);
+			let (tilemap_texture, tilemap_texture_view) = create_tilemap_texture(device, tilemap_size);
+			let bind_group = create_bind_group(device, &self.bind_group_layout, &tilemap_texture_view, &self.tilemap_sampler);
 
-			self.fluidmap_texture = Some(fluidmap_texture);
-			self.fluidmap_texture_view = Some(fluidmap_texture_view);
+			self.tilemap_texture = Some(tilemap_texture);
+			self.tilemap_texture_view = Some(tilemap_texture_view);
+			self.bind_group = Some(bind_group);
 			self.tilemap_size = tilemap_size;
 		}
 	}
@@ -242,39 +212,30 @@ impl DrawFluidmap {
 		&mut self,
 		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,
-		world: &GraphicsWorld,
+		tilemap_size: TileVec,
+		tilemap_data: &[u8]
 	) {
-		assert!(world.tilemap_size != TileVec::new(0, 0));
-		self.resize_fluidmap(context.device, world.tilemap_size);
+		assert!(tilemap_size != TileVec::new(0, 0));
+		self.resize_tilemap(context.device, tilemap_size);
 
 		context.queue.write_texture(
 			wgpu::TextureCopyView {
-				texture: self.fluidmap_texture.as_ref().unwrap(),
+				texture: self.tilemap_texture.as_ref().unwrap(),
 				mip_level: 0,
 				origin: wgpu::Origin3d::ZERO,
 			},
-			&world.fluidmap_data,
+			tilemap_data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: 4 * world.tilemap_size.x as u32,
-				rows_per_image: world.tilemap_size.y as u32,
+				bytes_per_row: tilemap_size.x as u32,
+				rows_per_image: tilemap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: world.tilemap_size.x as u32,
-				height: world.tilemap_size.y as u32,
+				width: tilemap_size.x as u32,
+				height: tilemap_size.y as u32,
 				depth: 1,
 			}
 		);
-
-		let elapsed_time = world.elapsed_time.as_millis() as f32 / 1009.0;
-		context.queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
-		self.bind_group = Some(create_bind_group(
-			context.device,
-			&self.bind_group_layout,
-			&self.fluidmap_texture_view.as_ref().unwrap(),
-			&self.fluidmap_sampler,
-			&self.uniform_buffer
-		));
 
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
