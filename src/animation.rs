@@ -15,10 +15,6 @@ impl Animation {
 	pub fn tick(&mut self) {
 		self.index = (self.index + 1) % (self.animation_id.frame_count() * self.animation_id.interval());
 	}
-
-	pub fn texture_index(&self) -> usize {
-		self.index / self.animation_id.interval()
-	}
 }
 
 macro_rules! setup {
@@ -44,17 +40,6 @@ macro_rules! setup {
 			#[allow(unused)]
 			pub fn iter() -> impl Iterator<Item=AnimationId> {
 				[$(AnimationId::$id),*].iter().cloned()
-			}
-
-			#[allow(unused)]
-			pub fn iter_animations() -> impl Iterator<Item=Animation> {
-				Self::iter()
-					.flat_map(|id| (0..id.frame_count())
-						.map(move |index| Animation {
-							animation_id: id,
-							index,
-						})
-					)
 			}
 
 			#[allow(unused)]

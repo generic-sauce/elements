@@ -1,7 +1,6 @@
 pub mod surface_vec;
 pub mod world;
 pub mod texture_state2;
-pub mod animation_state2;
 mod draw_triangles;
 mod draw_tilemap;
 mod draw_fluidmap;
