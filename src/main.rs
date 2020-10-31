@@ -36,7 +36,6 @@ fn main() {
 
 	let mut graphics = Graphics::new(&window);
 	let mut graphics_world = graphics_receiver.recv().unwrap();
-	let mut frames = 0;
 
 	event_loop.run(move |event, _window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
@@ -88,10 +87,6 @@ fn main() {
 				if let Ok(world) = graphics_receiver.try_recv() { graphics_world = world };
 				graphics.draw(&graphics_world);
 				graphics.flush(&graphics_world);
-				frames += 1;
-				if frames % 1000 == 0 {
-					println!("{} fps on wgpu", frames / (graphics_world.elapsed_time.as_secs() + 1));
-				}
 			},
 			_ => ()
 		}
