@@ -126,29 +126,29 @@ impl Graphics {
 		});
 
 		let clear_color = wgpu::Color {
-			r: 0.008,
-			g: 0.005,
-			b: 0.003,
+			r: 50.0 / 255.0,
+			g: 120.0 / 255.0,
+			b: 215.0 / 255.0,
 			a: 1.0,
 		};
-
-		self.tilemap.render(
-			&self.device,
-			&self.queue,
-			&mut encoder,
-			&swap_chain_texture,
-			wgpu::LoadOp::Clear(clear_color),
-			world.tilemap_size,
-			&world.tilemap_data,
-		);
 
 		self.fluidmap.render(
 			&self.device,
 			&self.queue,
 			&mut encoder,
 			&swap_chain_texture,
-			wgpu::LoadOp::Load,
+			wgpu::LoadOp::Clear(clear_color),
 			&world,
+		);
+
+		self.tilemap.render(
+			&self.device,
+			&self.queue,
+			&mut encoder,
+			&swap_chain_texture,
+			wgpu::LoadOp::Load,
+			world.tilemap_size,
+			&world.tilemap_data,
 		);
 
 		self.triangles.flush(
