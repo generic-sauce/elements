@@ -71,7 +71,7 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw_health(&mut self, context: &DrawContext2, world: &GraphicsWorld) {
+	pub fn draw_healthbars(&mut self, context: &DrawContext2, world: &GraphicsWorld) {
 		for p in &world.players {
 			let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 2);
 			let left_bot = p.left_bot + GameVec::new(0, PLAYER_SIZE.y + TILESIZE);

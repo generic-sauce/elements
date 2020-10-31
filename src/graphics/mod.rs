@@ -99,14 +99,9 @@ impl Graphics {
 			window_size,
 		};
 
-		// self.draw_hud(...);
 		self.draw_players(&context, &world);
 		self.draw_cursors(&context, &world);
-		self.draw_health(&context, &world);
-		// self.draw_cursors(&context, &world);
-		// self.draw_tilemap(&world);
-		// self.draw_fluids(...);
-		// self.draw_background(...);
+		self.draw_healthbars(&context, &world);
 	}
 
 	/* create and fill draw pass
