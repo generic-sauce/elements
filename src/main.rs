@@ -85,8 +85,9 @@ fn main() {
 			},
 			win::Event::RedrawRequested {..} => {
 				if let Ok(world) = graphics_receiver.try_recv() { graphics_world = world };
-				graphics.draw(&graphics_world);
-				graphics.flush(&graphics_world);
+				let mut draw = graphics.create_draw();
+				graphics.draw(&mut draw, &graphics_world);
+				graphics.flush(&draw, &graphics_world);
 			},
 			_ => ()
 		}

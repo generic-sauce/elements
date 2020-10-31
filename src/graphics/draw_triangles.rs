@@ -1,14 +1,5 @@
 use crate::prelude::*;
 
-#[derive(Copy, Clone)]
-struct Vertex {
-	position: SurfaceVec,
-	uv: Vec2f,
-	color: wgpu::Color,
-}
-
-type Triangle = [Vertex; 3];
-
 fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 	let floats_per_vertex = 7;
 	let floats_per_triangle = 3 * floats_per_vertex;
@@ -34,18 +25,11 @@ fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 	bytes
 }
 
-fn texture_count() -> usize {
-	TextureId2::iter().count() + AnimationId::iter()
-		.map(|id| AnimationId::frame_count(id))
-		.fold(0, |acc, x| acc + x)
-}
-
 pub struct DrawTriangles {
 	pipeline: wgpu::RenderPipeline,
 	triangles_capacity: u64,
 	vertex_buffer: wgpu::Buffer,
 	#[allow(dead_code)] texture_state: TextureState2,
-	texture_triangles: Vec<Vec<Triangle>>, // one Vec<Triangle> for every texture
 	#[allow(dead_code)] sampler: wgpu::Sampler,
 	#[allow(dead_code)] bind_group_layout: wgpu::BindGroupLayout,
 	bind_groups: Vec<wgpu::BindGroup>,
@@ -76,8 +60,6 @@ impl DrawTriangles {
 		let texture_state = TextureState2::new(device, queue);
 
 		let triangles_capacity = 128 as u64;
-		let mut texture_triangles = Vec::<Vec<Triangle>>::new();
-		texture_triangles.resize_with(texture_state.texture_count(), Default::default);
 		let vertex_buffer = Self::create_vertex_buffer(device, triangles_capacity);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
@@ -194,19 +176,19 @@ impl DrawTriangles {
 			triangles_capacity,
 			vertex_buffer,
 			texture_state,
-			texture_triangles,
 			sampler,
 			bind_group_layout,
 			bind_groups,
 		}
 	}
 
-	fn render(
+	pub fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		load: wgpu::LoadOp::<wgpu::Color>
+		load: wgpu::LoadOp::<wgpu::Color>,
+		draw: &Draw,
 	) {
-		let max_triangles = self.texture_triangles.iter()
+		let max_triangles = draw.triangles.iter()
 			.map(|x| x.len())
 			.fold(0, |acc, x| acc + x);
 		self.enlarge_vertex_buffer(context.device, max_triangles as u64);
@@ -231,7 +213,7 @@ impl DrawTriangles {
 		let mut all_bytes = Vec::new();
 		let mut slice_end = 0;
 		let mut slice_ends = Vec::new();
-		for triangles in self.texture_triangles.iter() {
+		for triangles in draw.triangles.iter() {
 			let bytes = triangles_to_bytes(&triangles[..]);
 			slice_end += bytes.len();
 			slice_ends.push(slice_end as u64);
@@ -240,7 +222,7 @@ impl DrawTriangles {
 		context.queue.write_buffer(&self.vertex_buffer, 0, &all_bytes[..]);
 
 		let mut slice_begin = 0;
-		for (i, triangles) in self.texture_triangles.iter().enumerate() {
+		for (i, triangles) in draw.triangles.iter().enumerate() {
 			if triangles.len() > 0 {
 				let slice_end = slice_ends[i];
 				render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(slice_begin .. slice_end));
@@ -251,76 +233,7 @@ impl DrawTriangles {
 		}
 	}
 
-	pub fn clear(&mut self) {
-		for triangles in &mut self.texture_triangles {
-			// keep capacity
-			triangles.clear();
-		}
-	}
-
-	pub fn flush(
-		&mut self,
-		context: &mut GraphicsContext,
-		load: wgpu::LoadOp::<wgpu::Color>
-	) {
-		self.render(context, load);
-		self.clear();
-	}
-
-	// struct LeftBot<T: IntoCanvasVec> (T)
-	// struct Center<T: IntoCanvasVec> (T)
-	// trait Origin {
-	// 	pub fn left_bot(self) -> impl IntoCanvasVec;
-	// }
-	// impl Origin for LeftBot<T> {
-	// 	pub fn left_bot(self) -> impl IntoCanvasVec {
-	// 		self.0
-	// 	}
-	// }
-  //
-	// let v = GameVec::new(0, 0);
-	// draw_rectangle(Origin::LeftBot(v));
-
-	#[allow(unused)]
-	pub fn draw_texture(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, texture_index: impl IntoTextureIndex, flip: Flip2, color: Option<wgpu::Color>) {
-		let texture_index = texture_index.into_texture_index();
-		let triangles = &mut self.texture_triangles[texture_index];
-		let left_bot = left_bot.to_surface(context.window_size);
-		let right_top = right_top.to_surface(context.window_size);
-		let color = if let Some(color) = color { color } else { wgpu::Color::WHITE };
-		let (left_uv, right_uv) = match flip {
-			Flip2::Normal => (0.0, 1.0),
-			Flip2::Horizontal => (1.0, 0.0),
-		};
-
-		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color: color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(right_uv, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color: color },
-		]);
-
-		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color: color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(left_uv, 1.0), color: color },
-		]);
-	}
-
-	pub fn draw_rectangle(&mut self, context: &DrawContext2, left_bot: impl IntoSurfaceVec, right_top: impl IntoSurfaceVec, color: wgpu::Color) {
-		let triangles = &mut self.texture_triangles[TextureId2::White as usize];
-		let left_bot = left_bot.to_surface(context.window_size);
-		let right_top = right_top.to_surface(context.window_size);
-
-		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(1.0, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
-		]);
-
-		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(0.0, 1.0), color: color },
-		]);
+	pub fn texture_count(&self) -> usize {
+		self.texture_state.texture_count()
 	}
 }

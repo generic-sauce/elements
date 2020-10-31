@@ -10,6 +10,9 @@ pub use texture_state2::*;
 mod context;
 pub use context::*;
 
+mod draw;
+pub use draw::*;
+
 mod draw_triangles;
 mod draw_tilemap;
 mod draw_fluidmap;
@@ -93,22 +96,24 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw(&mut self, world: &GraphicsWorld) {
-		let window_size = Vec2u::new(self.window_size.x as u32, self.window_size.y as u32);
-		let context = DrawContext2 {
-			window_size,
-		};
+	pub fn create_draw(&self) -> Draw {
+		Draw::new(
+			self.window_size,
+			self.triangles.texture_count(),
+		)
+	}
 
-		self.draw_players(&context, &world);
-		self.draw_cursors(&context, &world);
-		self.draw_healthbars(&context, &world);
+	pub fn draw(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
+		self.draw_players(draw, world);
+		self.draw_cursors(draw, world);
+		self.draw_healthbars(draw, world);
 	}
 
 	/* create and fill draw pass
 	 * create and fill command buffer
 	 * submit command buffer to queue
 	 */
-	pub fn flush(&mut self, world: &GraphicsWorld) {
+	pub fn flush(&mut self, draw: &Draw, world: &GraphicsWorld) {
 		let swap_chain_texture = self.swap_chain
 			.get_current_frame()
 			.unwrap()
@@ -145,9 +150,10 @@ impl Graphics {
 			&world.tilemap_data,
 		);
 
-		self.triangles.flush(
+		self.triangles.render(
 			&mut graphics_context,
 			wgpu::LoadOp::Load,
+			draw,
 		);
 
 		self.queue.submit(Some(encoder.finish()));
