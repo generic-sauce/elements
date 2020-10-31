@@ -1,10 +1,17 @@
-pub mod surface_vec;
-pub mod world;
-pub mod texture_state2;
-pub mod animation_state2;
+mod world;
+pub use world::*;
+
+mod surface_vec;
+pub use surface_vec::*;
+
+mod texture_state2;
+pub use texture_state2::*;
+
 mod draw_triangles;
 mod draw_tilemap;
 mod draw_fluidmap;
+
+
 
 use crate::prelude::*;
 use draw_triangles::*;
