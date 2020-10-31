@@ -7,11 +7,12 @@ pub use surface_vec::*;
 mod texture_state2;
 pub use texture_state2::*;
 
+mod context;
+pub use context::*;
+
 mod draw_triangles;
 mod draw_tilemap;
 mod draw_fluidmap;
-
-
 
 use crate::prelude::*;
 use draw_triangles::*;
@@ -19,10 +20,6 @@ use draw_tilemap::*;
 use draw_fluidmap::*;
 
 pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
-
-pub struct DrawContext2 {
-	window_size: Vec2u,
-}
 
 pub struct Graphics {
 	#[allow(unused)] instance: wgpu::Instance,
@@ -126,6 +123,13 @@ impl Graphics {
 			label: Some("command encoder")
 		});
 
+		let mut graphics_context = GraphicsContext {
+			device: &self.device,
+			queue: &self.queue,
+			swap_chain_texture: &swap_chain_texture,
+			encoder: &mut encoder,
+		};
+
 		let clear_color = wgpu::Color {
 			r: 50.0 / 255.0,
 			g: 120.0 / 255.0,
@@ -134,29 +138,20 @@ impl Graphics {
 		};
 
 		self.fluidmap.render(
-			&self.device,
-			&self.queue,
-			&mut encoder,
-			&swap_chain_texture,
+			&mut graphics_context,
 			wgpu::LoadOp::Clear(clear_color),
 			&world,
 		);
 
 		self.tilemap.render(
-			&self.device,
-			&self.queue,
-			&mut encoder,
-			&swap_chain_texture,
+			&mut graphics_context,
 			wgpu::LoadOp::Load,
 			world.tilemap_size,
 			&world.tilemap_data,
 		);
 
 		self.triangles.flush(
-			&self.device,
-			&self.queue,
-			&mut encoder,
-			&swap_chain_texture,
+			&mut graphics_context,
 			wgpu::LoadOp::Load,
 		);
 

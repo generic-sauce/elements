@@ -201,16 +201,20 @@ impl DrawTriangles {
 		}
 	}
 
-	fn render(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
+	fn render(
+		&mut self,
+		context: &mut GraphicsContext,
+		load: wgpu::LoadOp::<wgpu::Color>
+	) {
 		let max_triangles = self.texture_triangles.iter()
 			.map(|x| x.len())
 			.fold(0, |acc, x| acc + x);
-		self.enlarge_vertex_buffer(device, max_triangles as u64);
+		self.enlarge_vertex_buffer(context.device, max_triangles as u64);
 
-		let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
-					attachment: &swap_chain_texture.view,
+					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
 						load: load,
@@ -233,7 +237,7 @@ impl DrawTriangles {
 			slice_ends.push(slice_end as u64);
 			all_bytes.extend(&bytes);
 		}
-		queue.write_buffer(&self.vertex_buffer, 0, &all_bytes[..]);
+		context.queue.write_buffer(&self.vertex_buffer, 0, &all_bytes[..]);
 
 		let mut slice_begin = 0;
 		for (i, triangles) in self.texture_triangles.iter().enumerate() {
@@ -254,8 +258,12 @@ impl DrawTriangles {
 		}
 	}
 
-	pub fn flush(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, encoder: &mut wgpu::CommandEncoder, swap_chain_texture: &wgpu::SwapChainTexture, load: wgpu::LoadOp::<wgpu::Color>) {
-		self.render(device, queue, encoder, swap_chain_texture, load);
+	pub fn flush(
+		&mut self,
+		context: &mut GraphicsContext,
+		load: wgpu::LoadOp::<wgpu::Color>
+	) {
+		self.render(context, load);
 		self.clear();
 	}
 

@@ -210,18 +210,15 @@ impl DrawTilemap {
 
 	pub fn render(
 		&mut self,
-		device: &wgpu::Device,
-		queue: &wgpu::Queue,
-		encoder: &mut wgpu::CommandEncoder,
-		swap_chain_texture: &wgpu::SwapChainTexture,
+		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,
 		tilemap_size: TileVec,
 		tilemap_data: &[u8]
 	) {
 		assert!(tilemap_size != TileVec::new(0, 0));
-		self.resize_tilemap(device, tilemap_size);
+		self.resize_tilemap(context.device, tilemap_size);
 
-		queue.write_texture(
+		context.queue.write_texture(
 			wgpu::TextureCopyView {
 				texture: self.tilemap_texture.as_ref().unwrap(),
 				mip_level: 0,
@@ -240,10 +237,10 @@ impl DrawTilemap {
 			}
 		);
 
-		let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
-					attachment: &swap_chain_texture.view,
+					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
 						load: load,

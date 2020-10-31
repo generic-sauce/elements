@@ -240,17 +240,14 @@ impl DrawFluidmap {
 
 	pub fn render(
 		&mut self,
-		device: &wgpu::Device,
-		queue: &wgpu::Queue,
-		encoder: &mut wgpu::CommandEncoder,
-		swap_chain_texture: &wgpu::SwapChainTexture,
+		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,
 		world: &GraphicsWorld,
 	) {
 		assert!(world.tilemap_size != TileVec::new(0, 0));
-		self.resize_fluidmap(device, world.tilemap_size);
+		self.resize_fluidmap(context.device, world.tilemap_size);
 
-		queue.write_texture(
+		context.queue.write_texture(
 			wgpu::TextureCopyView {
 				texture: self.fluidmap_texture.as_ref().unwrap(),
 				mip_level: 0,
@@ -270,19 +267,19 @@ impl DrawFluidmap {
 		);
 
 		let elapsed_time = world.elapsed_time.as_millis() as f32 / 1009.0;
-		queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
+		context.queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
 		self.bind_group = Some(create_bind_group(
-			device,
+			context.device,
 			&self.bind_group_layout,
 			&self.fluidmap_texture_view.as_ref().unwrap(),
 			&self.fluidmap_sampler,
 			&self.uniform_buffer
 		));
 
-		let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
-					attachment: &swap_chain_texture.view,
+					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
 						load: load,
