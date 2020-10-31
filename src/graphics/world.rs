@@ -70,4 +70,14 @@ impl Graphics {
 			self.triangles.draw_rectangle(context, left_bot, right_top, wgpu::Color::BLACK);
 		}
 	}
+
+	pub fn draw_health(&mut self, context: &DrawContext2, world: &GraphicsWorld) {
+		for p in &world.players {
+			let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 2);
+			let left_bot = p.left_bot + GameVec::new(0, PLAYER_SIZE.y + TILESIZE);
+			self.triangles.draw_rectangle(context, left_bot, left_bot + size, wgpu::Color::BLACK);
+			size.x = (size.x as f32 * (p.health as f32 / MAX_HEALTH as f32)) as i32;
+			self.triangles.draw_rectangle(context, left_bot, left_bot + size, wgpu::Color::GREEN);
+		}
+	}
 }
