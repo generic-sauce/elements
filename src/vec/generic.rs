@@ -61,8 +61,8 @@ impl<T: Primitive, P> Vec2t<T, P> {
 impl<T: Primitive, P> Clone for Vec2t<T, P> {
 	fn clone(&self) -> Self {
 		Vec2t::new(
-			self.x.clone(),
-			self.y.clone(),
+			self.x,
+			self.y,
 		)
 	}
 }

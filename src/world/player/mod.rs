@@ -118,20 +118,19 @@ impl Player {
 			} else {
 				idle
 			}
+		} else if self.velocity.y > 70 {
+			jump
+		} else if self.velocity.y > -70 {
+			fall_slow
 		} else {
-			if self.velocity.y > 70 {
-				jump
-			} else if self.velocity.y > -70 {
-				fall_slow
-			} else {
-				fall
-			}
+			fall
 		};
 
-		self.direction =
-			if self.velocity.x < 0 { PlayerDirection::Left }
-			else if self.velocity.x > 0 { PlayerDirection::Right }
-			else { self.direction };
+		self.direction = match self.velocity.x.cmp(&0) {
+			Ordering::Less => PlayerDirection::Left,
+			Ordering::Equal => self.direction,
+			Ordering::Greater => PlayerDirection::Right,
+		};
 
 		if self.animation.animation_id != animation_id {
 			self.animation = Animation::new(animation_id);
@@ -159,7 +158,7 @@ impl Player {
 				Some(XDir::Left).filter(|_| self.is_left_walled(t) && self.input.right() && self.last_walljump != Some(XDir::Left)),
 				Some(XDir::Right).filter(|_| self.is_right_walled(t) && self.input.left() && self.last_walljump != Some(XDir::Right)),
 			];
-			let mut iter = arr.iter().filter_map(|x| x.clone());
+			let mut iter = arr.iter().filter_map(|x| *x);
 
 			if let Some(dir) = iter.next() {
 				let horizontal_dir = match dir {

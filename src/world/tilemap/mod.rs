@@ -82,9 +82,6 @@ impl TileMap {
 
 impl Tile {
 	pub fn is_solid(self) -> bool {
-		match self {
-			Tile::Void => false,
-			_ => true,
-		}
+		!matches!(self, Tile::Void)
 	}
 }

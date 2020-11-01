@@ -49,7 +49,7 @@ fn create_fluidmap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgp
 }
 
 fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, fluidmap_texture_view: &wgpu::TextureView, fluidmap_sampler: &wgpu::Sampler, uniform_buffer: &wgpu::Buffer) -> wgpu::BindGroup {
-	let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+	device.create_bind_group(&wgpu::BindGroupDescriptor {
 		label: Some("fluidmap bind group"),
 		layout: bind_group_layout,
 		entries: &[
@@ -66,20 +66,16 @@ fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupL
 				resource: wgpu::BindingResource::Buffer(uniform_buffer.slice(..)),
 			},
 		]
-	});
-
-	bind_group
+	})
 }
 
 fn create_uniform_buffer(device: &wgpu::Device) -> wgpu::Buffer {
-	let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+	device.create_buffer(&wgpu::BufferDescriptor {
 		label: Some("uniform buffer"),
 		size: 2 * std::mem::size_of::<f32>() as u64,
 		usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
 		mapped_at_creation: false
-	});
-
-	uniform_buffer
+	})
 }
 
 fn uniform_to_bytes(elapsed_time: f32) -> Vec<u8> {
@@ -88,14 +84,12 @@ fn uniform_to_bytes(elapsed_time: f32) -> Vec<u8> {
 
 fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
 	let vertices_size = vertices_capacity * vertex_to_bytes_len();
-	let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+	device.create_buffer(&wgpu::BufferDescriptor {
 		label: Some("vertex buffer"),
 		size: vertices_size,
 		usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
 		mapped_at_creation: false
-	});
-
-	vertex_buffer
+	})
 }
 
 pub(in crate::graphics) struct DrawFluidmap {
@@ -113,12 +107,12 @@ pub(in crate::graphics) struct DrawFluidmap {
 impl DrawFluidmap {
 	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawFluidmap {
 		let vertex_buffer = create_vertex_buffer(device, 4);
-		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
+		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&[
 			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
 			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
 			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
 			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
-		))[..]);
+		])[..]);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
 			stride: vertex_to_bytes_len(),
@@ -285,7 +279,7 @@ impl DrawFluidmap {
 					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
-						load: load,
+						load,
 						store: true
 					}
 				},

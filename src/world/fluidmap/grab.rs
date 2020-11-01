@@ -12,10 +12,10 @@ impl FluidMap {
 
 		let condition = (cursor - f.position).as_short_as(CURSOR_GRAB_DIST) ||
 			self.neighbours_with_owner(&f)
-				.find(|n|
+				.any(|n|
 					(f.position - n.position).as_short_as(FLUID_GRAB_DIST)
 					&& n.state == FluidState::AtHand
-				).is_some();
+				);
 		if condition {
 			f.state = FluidState::AtHand;
 		}

@@ -33,7 +33,7 @@ impl GraphicsWorld {
 			fluidmap_data[cell_index+3] = 255;
 			fluidmap_data[cell_index+2] = (fluid.owner * 255) as u8;
 			fluidmap_data[cell_index+1] = local_position.1 as u8;
-			fluidmap_data[cell_index+0] = local_position.0 as u8;
+			fluidmap_data[cell_index] = local_position.0 as u8;
 		}
 
 		GraphicsWorld {

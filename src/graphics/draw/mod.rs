@@ -65,15 +65,15 @@ impl Draw {
 		};
 
 		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color: color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(right_uv, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color },
+			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(right_uv, 0.0), color },
+			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color },
 		]);
 
 		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color: color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(left_uv, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(left_uv, 0.0), color },
+			Vertex { position: right_top, uv: Vec2f::new(right_uv, 1.0), color },
+			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(left_uv, 1.0), color },
 		]);
 	}
 
@@ -89,15 +89,15 @@ impl Draw {
 		let right_top = right_top.to_canvas(UNUSED_TILEVEC);
 
 		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(1.0, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color },
+			Vertex { position: v(right_top.x, left_bot.y), uv: Vec2f::new(1.0, 0.0), color },
+			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color },
 		]);
 
 		triangles.push([
-			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color: color },
-			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color: color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(0.0, 1.0), color: color },
+			Vertex { position: left_bot, uv: Vec2f::new(0.0, 0.0), color },
+			Vertex { position: right_top, uv: Vec2f::new(1.0, 1.0), color },
+			Vertex { position: v(left_bot.x, right_top.y), uv: Vec2f::new(0.0, 1.0), color },
 		]);
 	}
 
