@@ -17,10 +17,10 @@ fn main() {
 	}
 
 	let (draw_sender, draw_receiver) = channel::<Draw>();
-	let (input_sender, input_receiver) = channel::<PeripheralsUpdate>();
+	let (peripherals_sender, peripherals_receiver) = channel::<PeripheralsUpdate>();
 
 	thread::spawn(move || {
-		let input_backend = NativeInputBackend::new(input_receiver);
+		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend { draw_sender };
 		match server_arg.as_deref() {
 			Some("menu") => App::<NativeBackend>::new(graphics_backend, input_backend).run_menu_and_game(),
@@ -92,7 +92,7 @@ fn main() {
 		}
 
 		if let Some(update) = peripherals_update {
-			input_sender.send(update).unwrap();
+			peripherals_sender.send(update).unwrap();
 		}
 
 		window.set_cursor_grab(true).unwrap();

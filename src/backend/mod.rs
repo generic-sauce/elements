@@ -14,7 +14,7 @@ pub trait InputBackend {
 
 	fn events(&mut self) -> Self::EventIterator<'_>;
 	fn gamepad(&mut self, gamepad_id: u32) -> RawGamepadState;
-	fn tick(&mut self, peripherals_state: &mut PeripheralsState);
+	fn tick(&mut self);
 }
 
 pub trait GraphicsBackend {

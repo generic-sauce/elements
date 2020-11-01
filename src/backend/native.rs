@@ -9,20 +9,19 @@ impl Backend for NativeBackend {
 
 pub struct NativeInputBackend {
 	pub gilrs: gilrs::Gilrs,
-	pub input_receiver: Receiver<PeripheralsUpdate>,
+	pub peripherals_receiver: Receiver<PeripheralsUpdate>,
 }
 
 impl NativeInputBackend {
-	pub fn new(input_receiver: Receiver<PeripheralsUpdate>) -> NativeInputBackend {
+	pub fn new(peripherals_receiver: Receiver<PeripheralsUpdate>) -> NativeInputBackend {
 		NativeInputBackend {
-			input_receiver,
+			peripherals_receiver,
 			gilrs: gilrs::Gilrs::new().unwrap(),
 		}
 	}
 }
 
 pub struct NativeEventIterator<'a> {
-	pub gilrs: &'a gilrs::Gilrs,
 	pub peripherals_receiver: &'a Receiver<PeripheralsUpdate>,
 }
 
@@ -30,7 +29,11 @@ impl<'a> Iterator for NativeEventIterator<'a> {
 	type Item = PeripheralsUpdate;
 
 	fn next(&mut self) -> Option<Self::Item> {
-		unimplemented!();
+		match self.peripherals_receiver.try_recv() {
+			Err(TryRecvError::Disconnected) => panic!("PeripheralsUpdate Sender disconnected!"),
+			Err(TryRecvError::Empty) => None,
+			Ok(update) => Some(update),
+		}
 	}
 }
 
@@ -39,8 +42,7 @@ impl InputBackend for NativeInputBackend {
 
 	fn events(&mut self) -> NativeEventIterator<'_> {
 		NativeEventIterator {
-			gilrs: &self.gilrs,
-			peripherals_receiver: &self.input_receiver,
+			peripherals_receiver: &self.peripherals_receiver,
 		}
 	}
 
@@ -70,15 +72,8 @@ impl InputBackend for NativeInputBackend {
 		}
 	}
 
-	fn tick(&mut self, peripherals_state: &mut PeripheralsState) {
+	fn tick(&mut self) {
 		while self.gilrs.next_event().is_some() {};
-		let receive = || self.input_receiver.try_recv().map_err(|err| match err {
-			TryRecvError::Disconnected => panic!("PeripheralsUpdate Sender disconnected!"),
-			x => x,
-		});
-		while let Ok(peripherals_update) = receive() {
-			peripherals_state.update(&peripherals_update);
-		}
 	}
 }
 

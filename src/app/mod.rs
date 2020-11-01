@@ -61,6 +61,12 @@ impl<B: Backend> App<B> {
 		}
 	}
 
+	pub fn fetch_peripherals(&mut self) {
+		for ev in self.input_backend.events() {
+			self.peripherals_state.update(&ev);
+		}
+	}
+
 	pub fn run_local(&mut self, best_of_n: u32) {
 		self.run_runnable(Local::new(best_of_n));
 	}
@@ -92,8 +98,8 @@ impl<B: Backend> App<B> {
 		let mut runnable_change = RunnableChange::None;
 
 		for timed_loop_info in TimedLoop::with_fps(60) {
-			// process gilrs events
-			self.input_backend.tick(&mut self.peripherals_state);
+			self.fetch_peripherals();
+			self.input_backend.tick();
 
 			if timed_loop_info.delta_time > timed_loop_info.interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
