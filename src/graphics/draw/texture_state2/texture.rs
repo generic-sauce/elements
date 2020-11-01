@@ -34,7 +34,7 @@ setup!(
 	White: "images/white.png"
 );
 
-pub fn create_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
+pub(super) fn create_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
 	TextureId2::iter()
 		.map(TextureId2::filepath)
 		.map(|filepath| image::open(filepath).unwrap().flipv().into_rgba())

@@ -1,19 +1,16 @@
-mod world;
-pub use world::*;
-
 mod surface_vec;
 pub use surface_vec::*;
 
-mod context;
-pub use context::*;
+mod world;
+pub use world::*;
 
 mod draw;
 pub use draw::*;
 
+mod context;
+use context::*;
+
 use crate::prelude::*;
-use draw_triangles::*;
-use draw_tilemap::*;
-use draw_fluidmap::*;
 
 pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
@@ -87,13 +84,6 @@ impl Graphics {
 			tilemap,
 			fluidmap,
 		}
-	}
-
-	pub fn create_draw(&self) -> Draw {
-		Draw::new(
-			self.window_size,
-			self.triangles.texture_count(),
-		)
 	}
 
 	pub fn draw(&mut self, draw: &mut Draw, world: &GraphicsWorld) {

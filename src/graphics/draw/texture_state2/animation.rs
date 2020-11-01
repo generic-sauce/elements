@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use super::*;
 
-pub fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
+pub(super) fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
 	AnimationId::iter()
 		.map(|id| AnimationId::dir(id))
 		.flat_map(|dir| std::fs::read_dir(res(&dir)).expect(&format!("could not read animation directory {}", dir)))

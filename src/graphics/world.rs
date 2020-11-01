@@ -49,7 +49,7 @@ const IMG_PLAYER_HEIGHT: i32 = 54;
 const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
 
 impl Graphics {
-	pub fn draw_players(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
+	pub(in crate::graphics) fn draw_players(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
 		for p in &world.players {
 			let center = p.center_position();
 			let left_bot = GameVec::new(center.x - RADIUS, p.left_bot.y);
@@ -60,7 +60,7 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw_cursors(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
+	pub(in crate::graphics) fn draw_cursors(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
 		for p in &world.players {
 			let radius = TILESIZE / 2;
 			let radius = GameVec::new(radius, radius);
@@ -71,7 +71,7 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw_healthbars(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
+	pub(in crate::graphics) fn draw_healthbars(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
 		for p in &world.players {
 			let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 2);
 			let left_bot = p.left_bot + GameVec::new(0, PLAYER_SIZE.y + TILESIZE);

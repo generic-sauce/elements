@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::graphics::*;
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -66,7 +67,7 @@ fn create_tilemap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu
 		bind_group
 	}
 
-pub struct DrawTilemap {
+pub(in crate::graphics) struct DrawTilemap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
 	tilemap_size: TileVec,
@@ -90,7 +91,7 @@ impl DrawTilemap {
 		vertex_buffer
 	}
 
-	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
+	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
 		let vertex_buffer = Self::create_vertex_buffer(device, 4);
 		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
 			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
@@ -196,7 +197,7 @@ impl DrawTilemap {
 		}
 	}
 
-	pub fn resize_tilemap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
+	fn resize_tilemap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
 		if tilemap_size != self.tilemap_size {
 			let (tilemap_texture, tilemap_texture_view) = create_tilemap_texture(device, tilemap_size);
 			let bind_group = create_bind_group(device, &self.bind_group_layout, &tilemap_texture_view, &self.tilemap_sampler);
@@ -208,7 +209,7 @@ impl DrawTilemap {
 		}
 	}
 
-	pub fn render(
+	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,

@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub const VIEW_SIZE: GameVec = TileVec::new(128, 72).to_game();
+const VIEW_SIZE: GameVec = TileVec::new(128, 72).to_game();
 
 /* from (-1, -1) to (1, 1)
  * corresponds to the window surface area

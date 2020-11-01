@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::graphics::*;
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -97,7 +98,7 @@ fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::
 	vertex_buffer
 }
 
-pub struct DrawFluidmap {
+pub(in crate::graphics) struct DrawFluidmap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
 	tilemap_size: TileVec,
@@ -110,7 +111,7 @@ pub struct DrawFluidmap {
 }
 
 impl DrawFluidmap {
-	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawFluidmap {
+	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawFluidmap {
 		let vertex_buffer = create_vertex_buffer(device, 4);
 		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
 			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
@@ -228,7 +229,7 @@ impl DrawFluidmap {
 		}
 	}
 
-	pub fn resize_fluidmap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
+	fn resize_fluidmap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
 		if tilemap_size != self.tilemap_size {
 			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, tilemap_size);
 
@@ -238,7 +239,7 @@ impl DrawFluidmap {
 		}
 	}
 
-	pub fn render(
+	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,

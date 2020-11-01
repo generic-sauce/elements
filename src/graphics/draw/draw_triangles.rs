@@ -1,4 +1,6 @@
 use crate::prelude::*;
+use crate::graphics::*;
+use super::*;
 
 fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 	let floats_per_vertex = 7;
@@ -25,7 +27,7 @@ fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 	bytes
 }
 
-pub struct DrawTriangles {
+pub(in crate::graphics) struct DrawTriangles {
 	pipeline: wgpu::RenderPipeline,
 	triangles_capacity: u64,
 	vertex_buffer: wgpu::Buffer,
@@ -56,7 +58,7 @@ impl DrawTriangles {
 		self.vertex_buffer = Self::create_vertex_buffer(device, self.triangles_capacity);
 	}
 
-	pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTriangles {
+	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTriangles {
 		let texture_state = TextureState2::new(device, queue);
 
 		let triangles_capacity = 128 as u64;
@@ -182,7 +184,7 @@ impl DrawTriangles {
 		}
 	}
 
-	pub fn render(
+	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,
@@ -231,9 +233,5 @@ impl DrawTriangles {
 				render_pass.draw(0 .. (3 * triangles.len() as u32), 0 .. 1);
 			}
 		}
-	}
-
-	pub fn texture_count(&self) -> usize {
-		self.texture_state.texture_count()
 	}
 }

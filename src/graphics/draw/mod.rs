@@ -1,32 +1,38 @@
 mod texture_state2;
 pub use texture_state2::*;
 
-pub(super) mod draw_triangles;
-pub(super) mod draw_tilemap;
-pub(super) mod draw_fluidmap;
+mod draw_triangles;
+pub(in crate::graphics) use draw_triangles::*;
+
+mod draw_tilemap;
+pub(in crate::graphics) use draw_tilemap::*;
+
+mod draw_fluidmap;
+pub(in crate::graphics) use draw_fluidmap::*;
 
 use crate::prelude::*;
+use crate::graphics::*;
 
 #[derive(Copy, Clone)]
-pub struct Vertex {
+struct Vertex {
 	pub position: SurfaceVec,
 	pub uv: Vec2f,
 	pub color: wgpu::Color,
 }
 
-pub type Triangle = [Vertex; 3];
-pub type Triangles = Vec<Triangle>;
-pub type TextureTriangles = Vec<Triangles>;
+type Triangle = [Vertex; 3];
+type Triangles = Vec<Triangle>;
+type TextureTriangles = Vec<Triangles>;
 
 pub struct Draw {
 	window_size: Vec2u,
-	pub triangles: TextureTriangles,
+	triangles: TextureTriangles,
 }
 
 impl Draw {
-	pub fn new(window_size: Vec2u, texture_count: usize) -> Draw {
+	pub fn new(window_size: Vec2u) -> Draw {
 		let mut triangles = TextureTriangles::new();
-		triangles.resize_with(texture_count, Default::default);
+		triangles.resize_with(TextureState2::texture_count(), Default::default);
 		Draw {
 			window_size,
 			triangles,

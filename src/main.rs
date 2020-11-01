@@ -85,7 +85,9 @@ fn main() {
 			},
 			win::Event::RedrawRequested {..} => {
 				if let Ok(world) = graphics_receiver.try_recv() { graphics_world = world };
-				let mut draw = graphics.create_draw();
+				let window_size = window.inner_size();
+				let window_size = Vec2u::new(window_size.width, window_size.height);
+				let mut draw = Draw::new(window_size);
 				graphics.draw(&mut draw, &graphics_world);
 				graphics.flush(&draw, &graphics_world);
 			},
