@@ -28,7 +28,6 @@ pub use {
 // native-client
 #[cfg(feature = "native-client")] pub use {
 	gilrs::{GamepadId, Gilrs},
-	winit_input_helper::WinitInputHelper,
 	crate::{
 		client::*,
 		client_world::*,
