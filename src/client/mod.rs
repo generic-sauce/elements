@@ -2,13 +2,13 @@ use crate::prelude::*;
 
 pub struct Client {
 	client_world: ClientWorld,
-	input_device: InputDevice,
+	gamepad_state: RawGamepadState,
 	socket: UdpSocket,
 	player_id: usize,
 }
 
 impl Client {
-	pub fn new(server_ip: &str, gilrs: &Gilrs) -> Client {
+	pub fn new(server_ip: &str) -> Client {
 		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.set_nonblocking(true).unwrap();
 		socket.connect((server_ip, PORT)).expect("Could not connect to server");
@@ -19,11 +19,9 @@ impl Client {
 			recv_packet::<Go>(&mut socket).map(|(go_packet, _)| go_packet.your_player_id)
 		}).next().unwrap();
 
-		let input_device = InputDevice::new(0, gilrs);
-
 		Client {
 			client_world: ClientWorld::new(0),
-			input_device,
+			gamepad_state: RawGamepadState::new(),
 			socket,
 			player_id,
 		}
@@ -38,7 +36,7 @@ impl Runnable for Client {
 		}
 
 		// handle inputs
-		self.client_world.world.players[self.player_id].input.update_gamepad(&self.input_device.get_state(&app.gilrs));
+		self.client_world.world.players[self.player_id].input.update_gamepad(&self.gamepad_state);
 		self.client_world.world.players[self.player_id].input.update_peripherals(&app.peripherals_state);
 
 		// send packets

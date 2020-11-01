@@ -12,7 +12,7 @@ extern {
 	fn input_state_js(i: usize) -> JsValue;
 }
 
-pub fn input_state(i: usize) -> RawInputState {
+pub fn input_state(i: usize) -> RawGamepadState {
 	input_state_js(i).into_serde().unwrap()
 }
 

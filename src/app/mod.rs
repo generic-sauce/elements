@@ -76,11 +76,11 @@ impl App {
 	}
 
 	pub fn run_local(&mut self, best_of_n: u32) {
-		self.run_runnable(Local::new(&self.gilrs, best_of_n));
+		self.run_runnable(Local::new(best_of_n));
 	}
 
 	pub fn run_client(&mut self, ip: &str) {
-		self.run_runnable(Client::new(ip, &self.gilrs));
+		self.run_runnable(Client::new(ip));
 	}
 
 	pub fn run_menu_and_game(&mut self) {

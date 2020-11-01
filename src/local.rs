@@ -1,16 +1,14 @@
 use crate::prelude::*;
 
 pub struct Local {
-	input_devices: [InputDevice; 2],
+	gamepad_states: [RawGamepadState; 2],
 	client_world: ClientWorld,
 }
 
 impl Local {
-	pub fn new(gilrs: &Gilrs, best_of_n: u32) -> Local {
-		let input_devices = [InputDevice::new(0, gilrs), InputDevice::new(1, gilrs)];
-
+	pub fn new(best_of_n: u32) -> Local {
 		Local {
-			input_devices,
+			gamepad_states: [RawGamepadState::new(), RawGamepadState::new()],
 			client_world: ClientWorld::new(best_of_n),
 		}
 	}
@@ -18,8 +16,8 @@ impl Local {
 
 impl Runnable for Local {
 	fn tick(&mut self, app: &mut App) {
-		for (i, input_device) in self.input_devices.iter_mut().enumerate() {
-			self.client_world.world.players[i].input.update_gamepad(&input_device.get_state(&app.gilrs));
+		for (i, gamepad_state) in self.gamepad_states.iter_mut().enumerate() {
+			self.client_world.world.players[i].input.update_gamepad(&gamepad_state);
 		}
 		self.client_world.world.players.last_mut().unwrap().input.update_peripherals(&app.peripherals_state);
 		self.client_world.tick(app);

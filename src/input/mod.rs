@@ -1,15 +1,13 @@
-#[cfg(feature = "native-client")] mod device;
 mod peripherals_update;
 mod peripherals_state;
 
-#[cfg(feature = "native-client")] pub use device::*;
 pub use peripherals_update::*;
 pub use peripherals_state::*;
 
 use crate::prelude::*;
 
 #[derive(Serialize, Deserialize)]
-pub struct RawInputState {
+pub struct RawGamepadState {
 	pub stick_left: Vec2f, // the length should be less or equal to 1.0
 	pub stick_right: Vec2f, // the length should be less or equal to 1.0
 	pub dpad: Vec2f, // x, y coordinates can be -1.0, 0.0 or 1.0
@@ -21,4 +19,22 @@ pub struct RawInputState {
 	pub button_west: bool,
 	pub button_east: bool,
 	pub button_south: bool,
+}
+
+impl RawGamepadState {
+	pub fn new() -> RawGamepadState {
+		RawGamepadState {
+			stick_left: Vec2f::new(0.0, 0.0),
+			stick_right: Vec2f::new(0.0, 0.0),
+			dpad: Vec2f::new(0.0, 0.0),
+			trigger_left: 0.0,
+			trigger_right: 0.0,
+			bumper_left: false,
+			bumper_right: false,
+			button_north: false,
+			button_west: false,
+			button_east: false,
+			button_south: false,
+		}
+	}
 }

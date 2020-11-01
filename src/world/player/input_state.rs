@@ -61,7 +61,7 @@ impl InputState {
 		(1000.0 * cursor_diff).min(1000.0) as u32
 	}
 
-	pub fn update_gamepad(&mut self, current_input: &RawInputState) {
+	pub fn update_gamepad(&mut self, current_input: &RawGamepadState) {
 		let last_frame_up = self.up();
 		let last_frame_down = self.down();
 		let last_frame_attack2 = self.attack2;

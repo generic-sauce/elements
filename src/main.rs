@@ -1,5 +1,6 @@
 #![feature(drain_filter)]
 #![feature(const_fn)]
+#![feature(generic_associated_types)]
 
 include!("base.rs");
 

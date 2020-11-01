@@ -27,6 +27,7 @@ pub use crate::vec::*;
 pub use crate::animation::*;
 pub use crate::input::*;
 pub use crate::window_vec::*;
+pub use crate::backend::*;
 
 #[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
 #[cfg(feature = "server")] pub use tungstenite::Message;
