@@ -64,17 +64,14 @@ impl Iterator for TimedLoop {
 		};
 
 		let next_second = self.prev_second + Duration::from_secs(1);
-		match now.duration_since(next_second) {
-			Ok(_) => {
-				self.fps = self.frames_since_prev_second;
-				self.frames_since_prev_second = 0;
+		if now.duration_since(next_second).is_ok() {
+			self.fps = self.frames_since_prev_second;
+			self.frames_since_prev_second = 0;
 
-				self.load = self.duration_since_prev_second.as_secs_f32();
-				self.duration_since_prev_second = Duration::from_secs(0);
+			self.load = self.duration_since_prev_second.as_secs_f32();
+			self.duration_since_prev_second = Duration::from_secs(0);
 
-				self.prev_second = next_second;
-			},
-			_ => {},
+			self.prev_second = next_second;
 		}
 
 		self.duration_since_prev_second += delta_time;

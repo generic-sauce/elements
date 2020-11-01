@@ -3,13 +3,12 @@ use super::*;
 
 pub(super) fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
 	AnimationId::iter()
-		.map(|id| AnimationId::dir(id))
-		.flat_map(|dir| std::fs::read_dir(res(&dir)).expect(&format!("could not read animation directory {}", dir)))
+		.map(AnimationId::dir)
+		.flat_map(|dir| std::fs::read_dir(res(&dir)).unwrap_or_else(|_| panic!("could not read animation directory {}", dir)))
 		.map(|filepath| {
 			let filepath = filepath.expect("could not find file");
 			let filepath = filepath.path();
-			let filepath = filepath.into_os_string().into_string().expect("could not get filepath");
-			filepath
+			filepath.into_os_string().into_string().expect("could not get filepath")
 		})
 		.filter(|filepath| filepath.ends_with(".png"))
 		.map(|filepath| image::open(&filepath).unwrap().flipv().into_rgba())

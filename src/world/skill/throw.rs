@@ -18,7 +18,7 @@ impl World {
 			.filter(|x| x.owner == p && x.state == FluidState::AtHand)
 			.collect();
 		v.sort_by_cached_key(|f| throw_priority(f, player));
-		if v.len() == 0 { return; }
+		if v.is_empty() { return; }
 		let best = v.pop().unwrap();
 		v.sort_by_cached_key(|f| (f.position - best.position).length());
 		v.truncate(2);

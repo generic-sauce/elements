@@ -81,24 +81,22 @@ pub(in crate::graphics) struct DrawTilemap {
 impl DrawTilemap {
 	fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
 		let vertices_size = vertices_capacity * vertex_to_bytes_len();
-		let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+		device.create_buffer(&wgpu::BufferDescriptor {
 			label: Some("vertex buffer"),
 			size: vertices_size,
 			usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
 			mapped_at_creation: false
-		});
-
-		vertex_buffer
+		})
 	}
 
 	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
 		let vertex_buffer = Self::create_vertex_buffer(device, 4);
-		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&vec!(
+		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&[
 			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
 			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
 			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
 			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
-		))[..]);
+		])[..]);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
 			stride: vertex_to_bytes_len(),
@@ -244,7 +242,7 @@ impl DrawTilemap {
 					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
-						load: load,
+						load,
 						store: true
 					}
 				},

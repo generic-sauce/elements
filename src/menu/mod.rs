@@ -49,21 +49,19 @@ impl Menu {
 					*selected = false;
 				}
 			}
-		} else {
-			if let Some(element) = self.get_clicked_element() {
-				element.clicked = false;
-				match &mut element.kind {
-					MenuKind::Button { runnable_change, .. } => {
-						*next_runnable_change = runnable_change.clone();
-						if let RunnableChange::Client(ip) = next_runnable_change {
-							if let MenuKind::EditField { text, .. } = &self.get_element_by_name("ip").unwrap().kind {
-								*ip = text.clone();
-							}
+		} else if let Some(element) = self.get_clicked_element() {
+			element.clicked = false;
+			match &mut element.kind {
+				MenuKind::Button { runnable_change, .. } => {
+					*next_runnable_change = runnable_change.clone();
+					if let RunnableChange::Client(ip) = next_runnable_change {
+						if let MenuKind::EditField { text, .. } = &self.get_element_by_name("ip").unwrap().kind {
+							*ip = text.clone();
 						}
 					}
-					MenuKind::EditField { selected, .. } => {
-						*selected = true;
-					}
+				}
+				MenuKind::EditField { selected, .. } => {
+					*selected = true;
 				}
 			}
 		}

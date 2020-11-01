@@ -40,19 +40,17 @@ impl DrawTriangles {
 	fn create_vertex_buffer(device: &wgpu::Device, triangles_capacity: u64) -> wgpu::Buffer {
 		let triangle_size = std::mem::size_of::<Triangle>() as u64;
 		let triangles_size = triangles_capacity * triangle_size;
-		let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+		device.create_buffer(&wgpu::BufferDescriptor {
 			label: Some("vertex buffer"),
 			size: triangles_size,
 			usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
 			mapped_at_creation: false
-		});
-
-		vertex_buffer
+		})
 	}
 
 	fn enlarge_vertex_buffer(&mut self, device: &wgpu::Device, min_triangles_capacity: u64) {
 		while self.triangles_capacity < min_triangles_capacity {
-			self.triangles_capacity = self.triangles_capacity * 2;
+			self.triangles_capacity *= 2;
 		}
 		self.vertex_buffer = Self::create_vertex_buffer(device, self.triangles_capacity);
 	}
@@ -189,9 +187,9 @@ impl DrawTriangles {
 		load: wgpu::LoadOp::<wgpu::Color>,
 		draw: &Draw,
 	) {
-		let max_triangles = draw.triangles.iter()
+		let max_triangles: usize = draw.triangles.iter()
 			.map(|x| x.len())
-			.fold(0, |acc, x| acc + x);
+			.sum();
 		self.enlarge_vertex_buffer(context.device, max_triangles as u64);
 
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -200,7 +198,7 @@ impl DrawTriangles {
 					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
-						load: load,
+						load,
 						store: true
 					}
 				},
@@ -224,7 +222,7 @@ impl DrawTriangles {
 
 		let mut slice_begin = 0;
 		for (i, triangles) in draw.triangles.iter().enumerate() {
-			if triangles.len() > 0 {
+			if !triangles.is_empty() {
 				let slice_end = slice_ends[i];
 				render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(slice_begin .. slice_end));
 				slice_begin = slice_end;
