@@ -243,10 +243,12 @@ impl DrawFluidmap {
 		&mut self,
 		context: &mut GraphicsContext,
 		load: wgpu::LoadOp::<wgpu::Color>,
-		world: &GraphicsWorld,
+		tilemap_size: TileVec,
+		fluidmap_data: &[u8],
+		elapsed_time: Duration
 	) {
-		assert!(world.tilemap_size != TileVec::new(0, 0));
-		self.resize_fluidmap(context.device, world.tilemap_size);
+		assert!(tilemap_size != TileVec::new(0, 0));
+		self.resize_fluidmap(context.device, tilemap_size);
 
 		context.queue.write_texture(
 			wgpu::TextureCopyView {
@@ -254,20 +256,20 @@ impl DrawFluidmap {
 				mip_level: 0,
 				origin: wgpu::Origin3d::ZERO,
 			},
-			&world.fluidmap_data,
+			&fluidmap_data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: 4 * world.tilemap_size.x as u32,
-				rows_per_image: world.tilemap_size.y as u32,
+				bytes_per_row: 4 * tilemap_size.x as u32,
+				rows_per_image: tilemap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: world.tilemap_size.x as u32,
-				height: world.tilemap_size.y as u32,
+				width: tilemap_size.x as u32,
+				height: tilemap_size.y as u32,
 				depth: 1,
 			}
 		);
 
-		let elapsed_time = world.elapsed_time.as_millis() as f32 / 1009.0;
+		let elapsed_time = elapsed_time.as_millis() as f32 / 1009.0;
 		context.queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
 		self.bind_group = Some(create_bind_group(
 			context.device,

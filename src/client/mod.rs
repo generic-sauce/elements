@@ -49,7 +49,9 @@ impl Runnable for Client {
 	}
 
 	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
-		self.client_world.draw(app, timed_loop_info);
+		let mut draw = Draw::new(timed_loop_info.elapsed_time);
+		self.client_world.draw(&mut draw);
+		app.draw_sender.send(draw).unwrap();
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {

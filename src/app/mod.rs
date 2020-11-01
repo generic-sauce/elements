@@ -15,7 +15,7 @@ pub struct App {
 	pub gilrs: gilrs::Gilrs,
 	pub sound_manager: SoundManager,
 	pub cursor_position: CanvasVec,
-	pub graphics_sender: Sender<GraphicsWorld>,
+	pub draw_sender: Sender<Draw>,
 	pub input_receiver: Receiver<PeripheralsUpdate>,
 	pub peripherals_state: PeripheralsState,
 }
@@ -58,7 +58,7 @@ impl RunnableChange {
 }
 
 impl App {
-	pub fn new(graphics_sender: Sender<GraphicsWorld>, input_receiver: Receiver<PeripheralsUpdate>) -> App {
+	pub fn new(draw_sender: Sender<Draw>, input_receiver: Receiver<PeripheralsUpdate>) -> App {
 		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
 
 		App {
@@ -69,7 +69,7 @@ impl App {
 			gilrs,
 			sound_manager: SoundManager::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
-			graphics_sender,
+			draw_sender,
 			input_receiver,
 			peripherals_state: PeripheralsState::new(),
 		}

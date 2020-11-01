@@ -1,6 +1,8 @@
 mod input_state;
 mod physics;
-pub mod sensor;
+
+mod sensor;
+pub use sensor::*;
 
 pub use input_state::*;
 

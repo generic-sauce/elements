@@ -1,4 +1,6 @@
-pub mod player;
+mod player;
+pub use player::*;
+
 pub mod tilemap;
 pub mod fluidmap;
 pub mod skill;

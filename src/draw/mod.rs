@@ -1,4 +1,6 @@
 mod player;
+use player::*;
+
 mod fluidmap;
 mod tilemap;
 mod hud;
@@ -8,10 +10,18 @@ mod hud;
 use crate::prelude::*;
 
 impl ClientWorld {
+	pub fn draw(&mut self, draw: &mut Draw) {
+		draw.world(&self.world.tilemap, &self.world.fluidmap);
+		draw_players(draw, &self.world);
+		draw_cursors(draw, &self.world);
+		draw_healthbars(draw, &self.world);
+	}
+}
+
+/*
 	pub fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
 		// by putting display at the start, the GPU has the whole frame to do graphics until .display() comes again
 		// this offsets the rendering by one frame though!
-		/*
 		app.window.display();
 		app.window.clear(Color::BLACK);
 
@@ -82,12 +92,10 @@ impl ClientWorld {
 							  self.world.fluidmap.iter().filter(|f| f.owner == 0).count(),
 							  self.world.fluidmap.iter().filter(|f| f.owner == 1).count()
 						  ), Origin::LeftTop);
-						  */
 	}
 
 }
 
-/*
 pub fn get_views(app: &App, aspect_ratio: f32) -> (SfBox<View>, SfBox<View>, WindowVec) {
 	let window_size = app.window.size();
 	let window_size = Vector2f::new(window_size.x as f32, window_size.y as f32);
@@ -125,4 +133,4 @@ fn draw_world(w: &World, target: &impl RenderTarget, context: &mut GameDrawConte
 		hud::draw(pl, target, context);
 	}
 }
- */
+*/
