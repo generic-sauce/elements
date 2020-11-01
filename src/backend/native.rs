@@ -89,11 +89,11 @@ fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
 }
 
 pub struct NativeGraphicsBackend {
-	pub graphics_sender: Sender<Draw>,
+	pub draw_sender: Sender<Draw>,
 }
 
 impl GraphicsBackend for NativeGraphicsBackend {
-	fn draw(&mut self, gw: Draw) {
-		self.graphics_sender.send(gw).unwrap();
+	fn draw(&mut self, draw: Draw) {
+		self.draw_sender.send(draw).unwrap();
 	}
 }

@@ -47,7 +47,9 @@ impl<B: Backend> Runnable<B> for Client<B> {
 	}
 
 	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
-		self.client_world.draw(app, timed_loop_info);
+		let mut draw = Draw::new(timed_loop_info.elapsed_time);
+		self.client_world.draw(&mut draw);
+		app.graphics_backend.draw(draw);
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {

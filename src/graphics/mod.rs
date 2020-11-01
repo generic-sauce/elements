@@ -1,9 +1,6 @@
 mod surface_vec;
 pub use surface_vec::*;
 
-mod world;
-pub use world::*;
-
 mod draw;
 pub use draw::*;
 
@@ -86,17 +83,17 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw(&mut self, draw: &mut Draw, world: &GraphicsWorld) {
-		self.draw_players(draw, world);
-		self.draw_cursors(draw, world);
-		self.draw_healthbars(draw, world);
+	pub fn draw(&mut self, draw: &mut Draw) {
+		// self.draw_players(draw, world);
+		// self.draw_cursors(draw, world);
+		// self.draw_healthbars(draw, world);
 	}
 
 	/* create and fill draw pass
 	 * create and fill command buffer
 	 * submit command buffer to queue
 	 */
-	pub fn flush(&mut self, draw: &Draw, world: &GraphicsWorld) {
+	pub fn render(&mut self, draw: &Draw) {
 		let swap_chain_texture = self.swap_chain
 			.get_current_frame()
 			.unwrap()
@@ -113,29 +110,41 @@ impl Graphics {
 			encoder: &mut encoder,
 		};
 
-		let clear_color = wgpu::Color {
-			r: 50.0 / 255.0,
-			g: 120.0 / 255.0,
-			b: 215.0 / 255.0,
-			a: 1.0,
+		let mut cleared = false;
+		let mut clear_color = move || {
+			let load_op = match cleared {
+				true => wgpu::LoadOp::Load,
+				false => wgpu::LoadOp::Clear(wgpu::Color {
+					r: 50.0 / 255.0,
+					g: 120.0 / 255.0,
+					b: 215.0 / 255.0,
+					a: 1.0,
+				})
+			};
+			cleared = true;
+			load_op
 		};
 
-		self.fluidmap.render(
-			&mut graphics_context,
-			wgpu::LoadOp::Clear(clear_color),
-			&world,
-		);
+		if let Some(world) = &draw.world {
+			self.fluidmap.render(
+				&mut graphics_context,
+				clear_color(),
+				world.tilemap_size,
+				&world.fluidmap_data,
+				draw.elapsed_time,
+			);
 
-		self.tilemap.render(
-			&mut graphics_context,
-			wgpu::LoadOp::Load,
-			world.tilemap_size,
-			&world.tilemap_data,
-		);
+			self.tilemap.render(
+				&mut graphics_context,
+				clear_color(),
+				world.tilemap_size,
+				&world.tilemap_data,
+			);
+		}
 
 		self.triangles.render(
 			&mut graphics_context,
-			wgpu::LoadOp::Load,
+			clear_color(),
 			draw,
 		);
 

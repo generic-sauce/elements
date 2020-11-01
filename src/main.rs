@@ -16,15 +16,16 @@ fn main() {
 		return;
 	}
 
-	let (graphics_sender, graphics_receiver) = channel::<Draw>();
+	let (draw_sender, draw_receiver) = channel::<Draw>();
 	let (input_sender, input_receiver) = channel::<PeripheralsUpdate>();
 
 	thread::spawn(move || {
 		let input_backend = NativeInputBackend::new(input_receiver);
+		let graphics_backend = NativeGraphicsBackend { draw_sender };
 		match server_arg.as_deref() {
-			Some("menu") => App::<NativeBackend>::new(graphics_sender, input_backend).run_menu_and_game(),
-			Some(ip) => App::<NativeBackend>::new(graphics_sender, input_backend).run_client(ip),
-			None => App::<NativeBackend>::new(graphics_sender, input_backend).run_local(0),
+			Some("menu") => App::<NativeBackend>::new(graphics_backend, input_backend).run_menu_and_game(),
+			Some(ip) => App::<NativeBackend>::new(graphics_backend, input_backend).run_client(ip),
+			None => App::<NativeBackend>::new(graphics_backend, input_backend).run_local(0),
 		}
 	});
 
@@ -37,7 +38,6 @@ fn main() {
 		.unwrap();
 
 	let mut graphics = Graphics::new(&window);
-	let mut graphics_world = graphics_receiver.recv().unwrap();
 
 	event_loop.run(move |event, _window_target, control_flow| {
 		*control_flow = win::ControlFlow::Poll;
@@ -86,14 +86,7 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
-				if let Ok(world) = graphics_receiver.try_recv() { graphics_world = world };
-				let window_size = window.inner_size();
-				let window_size = Vec2u::new(window_size.width, window_size.height);
-				let mut draw = Draw::new(window_size);
-				/*
-				graphics.draw(&mut draw, &graphics_world);
-				graphics.flush(&draw, &graphics_world);
-				 */
+				graphics.render(&draw_receiver.recv().unwrap());
 			},
 			_ => ()
 		}

@@ -20,3 +20,15 @@ impl IntoSurfaceVec for GameVec {
 		SurfaceVec::new(v.x, v.y)
 	}
 }
+
+impl IntoSurfaceVec for CanvasVec {
+	fn to_surface(self, window_size: Vec2u) -> SurfaceVec {
+		let view_size = VIEW_SIZE.to_f();
+		let aspect = view_size.x / view_size.y;
+		let mut v = self.to_f();
+		v.x /= aspect;
+		v = v * 2.0 - 1.0;
+
+		SurfaceVec::new(v.x, v.y)
+	}
+}

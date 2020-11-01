@@ -24,16 +24,9 @@ impl<B: Backend> Runnable<B> for Local<B> {
 	}
 
 	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
-		// self.client_world.draw(app, timed_loop_info);
-
-		let world = &self.client_world.world;
-		let graphics_world = GraphicsWorld::new(
-			&world.tilemap,
-			&world.fluidmap,
-			world.players.clone(),
-			timed_loop_info.elapsed_time,
-		);
-		app.graphics_sender.send(unimplemented!()).unwrap();
+		let mut draw = Draw::new(timed_loop_info.elapsed_time);
+		self.client_world.draw(&mut draw);
+		app.graphics_backend.draw(draw);
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {

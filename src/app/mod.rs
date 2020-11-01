@@ -7,9 +7,9 @@ pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 
 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
+	pub graphics_backend: B::GraphicsBackend,
 	pub sound_manager: SoundManager,
 	pub cursor_position: CanvasVec,
-	pub graphics_sender: Sender<Draw>,
 	pub peripherals_state: PeripheralsState,
 }
 
@@ -51,12 +51,12 @@ impl RunnableChange {
 }
 
 impl<B: Backend> App<B> {
-	pub fn new(graphics_sender: Sender<Draw>, input_backend: B::InputBackend) -> App<B> {
+	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend) -> App<B> {
 		App {
 			input_backend,
+			graphics_backend,
 			sound_manager: SoundManager::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
-			graphics_sender,
 			peripherals_state: PeripheralsState::new(),
 		}
 	}
