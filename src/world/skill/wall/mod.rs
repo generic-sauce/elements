@@ -10,17 +10,17 @@ impl World {
 		let cursor = player.cursor_position();
 
 		// deadzone
-		if (cursor - player.center_position()).as_short_as(TILESIZE/2) {
-			return;
-		}
+		let too_short = (cursor - player.center_position()).as_short_as(TILESIZE/2);
 
-		let from = match player.wall_mode {
-			WallMode::NoFluids => return,
-			WallMode::NotWalling => cursor,
-			WallMode::InProgress(x) => x,
+		let (from, to) = match (player.wall_mode, too_short) {
+			(WallMode::NoFluids, _) => return,
+			(WallMode::NotWalling, _) => (cursor, cursor),
+			(WallMode::InProgress { absolute, .. }, false) => (absolute, cursor),
+			(WallMode::InProgress { absolute, relative }, true) => (absolute, player.center_position() + relative),
 		};
 
-		player.wall_mode = WallMode::InProgress(cursor);
+		let relative = to - player.center_position();
+		player.wall_mode = WallMode::InProgress { absolute: to, relative };
 
 		self.wall_from_to(p, from, cursor, handler);
 	}
