@@ -18,8 +18,6 @@ pub use bincode::{serialize, deserialize};
 
 pub use crate::rng::*;
 pub use crate::world::*;
-pub use crate::world::tilemap::*;
-pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
 pub use crate::input::*;
