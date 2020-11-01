@@ -23,7 +23,7 @@ pub(super) fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue:
 
 impl IntoTextureIndex for Animation {
 	fn into_texture_index(self) -> usize {
-		let texture_offset = TextureId2::iter().count();
+		let texture_offset = TextureId::iter().count();
 		let animation_offset = AnimationId::iter()
 			.enumerate()
 			.filter(|(index, _)| *index < self.animation_id as usize)

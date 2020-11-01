@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-const BUTTON_TEXT_SIZE: f32 = 0.05;
-const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
+// const BUTTON_TEXT_SIZE: f32 = 0.05;
+// const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 
 pub struct MenuElement {
 	pub name: &'static str,

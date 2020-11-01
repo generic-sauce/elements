@@ -2,21 +2,8 @@ use crate::prelude::*;
 
 const IMG_SIZE: i32 = 64;
 const IMG_PLAYER_HEIGHT: i32 = 54;
-const CURSOR_INDICATOR_RADIUS: i32 = TILESIZE / 2;
 
 // the texture rect has been obtained by reading the .png file
-
-fn texture_center(pl: &Player) -> GameVec {
-	GameVec::new(
-		pl.left_bot.x + PLAYER_SIZE.x / 2,
-		pl.left_bot.y + PLAYER_SIZE.y * IMG_SIZE / 2 / IMG_PLAYER_HEIGHT,
-	)
-}
-
-fn texture_radius() -> GameVec {
-	let r = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
-	GameVec::new(r, r)
-}
 
 const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
 
@@ -25,7 +12,7 @@ pub(in super) fn draw_players(draw: &mut Draw, world: &World) {
 		let center = p.center_position();
 		let left_bot = GameVec::new(center.x - RADIUS, p.left_bot.y);
 		let right_top = GameVec::new(center.x + RADIUS, p.left_bot.y + RADIUS * 2);
-		let flip = if p.direction == PlayerDirection::Right { Flip2::Normal } else { Flip2::Horizontal };
+		let flip = if p.direction == PlayerDirection::Right { Flip::Normal } else { Flip::Horizontal };
 		draw.texture(left_bot, right_top, p.animation, flip, None);
 	}
 }

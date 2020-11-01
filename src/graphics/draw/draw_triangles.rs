@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use crate::graphics::*;
 use super::*;
 
@@ -31,7 +30,7 @@ pub(in crate::graphics) struct DrawTriangles {
 	pipeline: wgpu::RenderPipeline,
 	triangles_capacity: u64,
 	vertex_buffer: wgpu::Buffer,
-	#[allow(dead_code)] texture_state: TextureState2,
+	#[allow(dead_code)] texture_state: TextureState,
 	#[allow(dead_code)] sampler: wgpu::Sampler,
 	#[allow(dead_code)] bind_group_layout: wgpu::BindGroupLayout,
 	bind_groups: Vec<wgpu::BindGroup>,
@@ -59,7 +58,7 @@ impl DrawTriangles {
 	}
 
 	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTriangles {
-		let texture_state = TextureState2::new(device, queue);
+		let texture_state = TextureState::new(device, queue);
 
 		let triangles_capacity = 128 as u64;
 		let vertex_buffer = Self::create_vertex_buffer(device, triangles_capacity);

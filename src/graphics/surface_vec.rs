@@ -13,7 +13,7 @@ pub trait IntoSurfaceVec {
 }
 
 impl IntoSurfaceVec for GameVec {
-	fn to_surface(self, window_size: Vec2u) -> SurfaceVec {
+	fn to_surface(self, _window_size: Vec2u) -> SurfaceVec {
 		let mut v = self.to_f() / VIEW_SIZE.to_f();
 		v = v * 2.0 - 1.0;
 
@@ -22,7 +22,7 @@ impl IntoSurfaceVec for GameVec {
 }
 
 impl IntoSurfaceVec for CanvasVec {
-	fn to_surface(self, window_size: Vec2u) -> SurfaceVec {
+	fn to_surface(self, _window_size: Vec2u) -> SurfaceVec {
 		let view_size = VIEW_SIZE.to_f();
 		let aspect = view_size.x / view_size.y;
 		let mut v = self.to_f();

@@ -1,5 +1,7 @@
-mod texture_state2;
-pub use texture_state2::*;
+use crate::prelude::*;
+
+mod texture_state;
+pub use texture_state::*;
 
 const UNUSED_TILEVEC: TileVec = TileVec::new(0, 0);
 
@@ -14,9 +16,6 @@ pub(in crate::graphics) use draw_fluidmap::*;
 
 mod world;
 pub(in crate::graphics) use world::*;
-
-use crate::prelude::*;
-use crate::graphics::*;
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -38,7 +37,7 @@ pub struct Draw {
 impl Draw {
 	pub fn new(elapsed_time: Duration) -> Draw {
 		let mut triangles = TextureTriangles::new();
-		triangles.resize_with(TextureState2::texture_count(), Default::default);
+		triangles.resize_with(TextureState::texture_count(), Default::default);
 		Draw {
 			triangles,
 			world: None,
@@ -52,7 +51,7 @@ impl Draw {
 		left_bot: impl IntoCanvasVec,
 		right_top: impl IntoCanvasVec,
 		texture_index: impl IntoTextureIndex,
-		flip: Flip2,
+		flip: Flip,
 		color: Option<wgpu::Color>
 	) {
 		let texture_index = texture_index.into_texture_index();
@@ -61,8 +60,8 @@ impl Draw {
 		let right_top = right_top.to_canvas(UNUSED_TILEVEC);
 		let color = color.unwrap_or(wgpu::Color::WHITE);
 		let (left_uv, right_uv) = match flip {
-			Flip2::Normal => (0.0, 1.0),
-			Flip2::Horizontal => (1.0, 0.0),
+			Flip::Normal => (0.0, 1.0),
+			Flip::Horizontal => (1.0, 0.0),
 		};
 
 		triangles.push([
@@ -85,7 +84,7 @@ impl Draw {
 		right_top: impl IntoCanvasVec,
 		color: wgpu::Color
 	) {
-		let triangles = &mut self.triangles[TextureId2::White as usize];
+		let triangles = &mut self.triangles[TextureId::White as usize];
 		let left_bot = left_bot.to_canvas(UNUSED_TILEVEC);
 		let right_top = right_top.to_canvas(UNUSED_TILEVEC);
 

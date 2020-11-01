@@ -1,5 +1,9 @@
 use crate::prelude::*;
 
+// const IMG_SIZE: i32 = 64;
+// const IMG_PLAYER_HEIGHT: i32 = 54;
+// const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
+
 pub(in crate::graphics) struct GraphicsWorld {
 	pub tilemap_size: TileVec,
 	pub tilemap_data: Vec<u8>,
@@ -40,9 +44,6 @@ impl GraphicsWorld {
 	}
 }
 
-const IMG_SIZE: i32 = 64;
-const IMG_PLAYER_HEIGHT: i32 = 54;
-const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
 
 impl Graphics {
 	// pub(in crate::graphics) fn draw_players(&mut self, draw: &mut Draw, world: &World) {

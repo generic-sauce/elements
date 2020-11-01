@@ -3,7 +3,7 @@ mod menu_elements;
 pub use menu_elements::*;
 use crate::prelude::*;
 
-pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
+// pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 pub const ASPECT_RATIO: f32 = 16.0 / 9.0;
 
 pub struct Menu {

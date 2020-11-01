@@ -7,21 +7,21 @@ macro_rules! setup {
 		#[derive(Copy, Clone, Debug)]
 		#[repr(usize)]
 		#[allow(unused)]
-		pub enum TextureId2 {
+		pub enum TextureId {
 			$($id),*
 		}
 
-		impl TextureId2 {
+		impl TextureId {
 			#[allow(unused)]
-			pub fn iter() -> impl Iterator<Item=TextureId2> {
-				[$(TextureId2::$id),*].iter().cloned()
+			pub fn iter() -> impl Iterator<Item=TextureId> {
+				[$(TextureId::$id),*].iter().cloned()
 			}
 
 			#[allow(unused)]
 			pub fn filepath(self) -> String {
 				match self {
 					$(
-						TextureId2::$id => res($resource),
+						TextureId::$id => res($resource),
 					)*
 				}
 			}
@@ -35,8 +35,8 @@ setup!(
 );
 
 pub(super) fn create_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
-	TextureId2::iter()
-		.map(TextureId2::filepath)
+	TextureId::iter()
+		.map(TextureId::filepath)
 		.map(|filepath| image::open(filepath).unwrap().flipv().into_rgba())
 		.map(move |image| {
 			let size = image.dimensions();
@@ -47,7 +47,7 @@ pub(super) fn create_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu:
 		})
 }
 
-impl IntoTextureIndex for TextureId2 {
+impl IntoTextureIndex for TextureId {
 	fn into_texture_index(self) -> usize {
 		self as usize
 	}

@@ -83,12 +83,6 @@ impl Graphics {
 		}
 	}
 
-	pub fn draw(&mut self, draw: &mut Draw) {
-		// self.draw_players(draw, world);
-		// self.draw_cursors(draw, world);
-		// self.draw_healthbars(draw, world);
-	}
-
 	/* create and fill draw pass
 	 * create and fill command buffer
 	 * submit command buffer to queue

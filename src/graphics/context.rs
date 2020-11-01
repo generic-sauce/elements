@@ -1,5 +1,3 @@
-use crate::prelude::*;
-
 pub struct GraphicsContext<'a> {
 	pub device: &'a wgpu::Device,
 	pub queue: &'a wgpu::Queue,

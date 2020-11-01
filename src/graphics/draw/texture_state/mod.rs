@@ -2,10 +2,10 @@ mod texture;
 pub use texture::*;
 
 mod animation;
-pub use animation::*;
+use animation::*;
 
 mod misc;
-pub use misc::*;
+use misc::*;
 
 use crate::prelude::*;
 
@@ -14,18 +14,19 @@ pub trait IntoTextureIndex {
 }
 
 #[derive(PartialEq, Eq)]
-pub enum Flip2 {
+pub enum Flip {
 	Normal,
 	Horizontal,
 }
 
-pub(super) struct TextureState2 {
+#[allow(unused)]
+pub(super) struct TextureState {
 	textures: Vec<wgpu::Texture>,
 	texture_views: Vec<wgpu::TextureView>,
 }
 
-impl TextureState2 {
-	pub(super) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> TextureState2 {
+impl TextureState {
+	pub(super) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> TextureState {
 		let textures: Vec<_> = create_texture_iter(device, queue)
 			.chain(create_animation_texture_iter(device, queue))
 			.collect();
@@ -34,17 +35,19 @@ impl TextureState2 {
 			.map(|texture| create_texture_view(texture))
 			.collect();
 
-		TextureState2 {
+		TextureState {
 			textures,
 			texture_views,
 		}
 	}
 
+	#[allow(unused)]
 	pub(super) fn texture(&self, index: impl IntoTextureIndex) -> &wgpu::Texture {
 		let index = index.into_texture_index();
 		&self.textures[index]
 	}
 
+	#[allow(unused)]
 	pub(super) fn texture_view(&self, index: impl IntoTextureIndex) -> &wgpu::TextureView {
 		let index = index.into_texture_index();
 		&self.texture_views[index]
@@ -55,7 +58,7 @@ impl TextureState2 {
 	}
 
 	pub fn texture_count() -> usize {
-		TextureId2::iter().count()
+		TextureId::iter().count()
 		+
 		AnimationId::iter()
 			.map(AnimationId::frame_count)
