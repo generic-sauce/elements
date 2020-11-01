@@ -3,7 +3,7 @@ use crate::prelude::*;
 mod physics;
 mod grab;
 
-pub mod force;
+mod force;
 mod activity;
 mod update;
 

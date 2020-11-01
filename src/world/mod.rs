@@ -1,9 +1,14 @@
 mod player;
 pub use player::*;
 
-pub mod tilemap;
-pub mod fluidmap;
-pub mod skill;
+mod tilemap;
+pub use tilemap::*;
+
+mod fluidmap;
+pub use fluidmap::*;
+
+mod skill;
+pub use skill::*;
 
 mod event;
 pub use event::*;
