@@ -1,12 +1,5 @@
 use crate::prelude::*;
 
-pub struct NativeBackend;
-
-impl Backend for NativeBackend {
-	type InputBackend = NativeInputBackend;
-	type GraphicsBackend = NativeGraphicsBackend;
-}
-
 pub struct NativeInputBackend {
 	pub gilrs: gilrs::Gilrs,
 	pub peripherals_receiver: Receiver<PeripheralsUpdate>,
@@ -81,14 +74,4 @@ fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
 	gilrs.gamepads()
 		.map(|(gamepad_id, _)| gamepad_id)
 		.find(|gamepad_id| Into::<usize>::into(*gamepad_id) == index as usize)
-}
-
-pub struct NativeGraphicsBackend {
-	pub draw_sender: Sender<Draw>,
-}
-
-impl GraphicsBackend for NativeGraphicsBackend {
-	fn draw(&mut self, draw: Draw) {
-		self.draw_sender.send(draw).unwrap();
-	}
 }
