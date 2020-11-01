@@ -16,21 +16,18 @@ lazy_static! {
 }
 
 fn load_samples() -> Vec<Sound> {
-	let mut parts: Vec<Sound> = Vec::new();
-	for sound_id in SoundId::iter() {
+	SoundId::iter().map(|sound_id| {
 		let file = File::open(res(sound_id.filename())).unwrap();
 		let source = Decoder::new(BufReader::new(file)).unwrap();
 		let channels = source.channels();
 		let sample_rate = source.sample_rate();
 		let data = source.convert_samples().collect();
-		let sample = Sound {
+		Sound {
 			channels,
 			sample_rate,
 			data,
-		};
-		parts.push(sample);
-	}
-	parts
+		}
+	}).collect()
 }
 
 fn get_part_sample_buffer(sound_id: SoundId, part: u8) -> static_buffer::StaticSamplesBuffer<f32> {
