@@ -59,7 +59,7 @@ impl Draw {
 		let triangles = &mut self.triangles[texture_index];
 		let left_bot = left_bot.to_canvas(UNUSED_TILEVEC);
 		let right_top = right_top.to_canvas(UNUSED_TILEVEC);
-		let color = if let Some(color) = color { color } else { wgpu::Color::WHITE };
+		let color = color.unwrap_or(wgpu::Color::WHITE);
 		let (left_uv, right_uv) = match flip {
 			Flip2::Normal => (0.0, 1.0),
 			Flip2::Horizontal => (1.0, 0.0),
