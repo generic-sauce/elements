@@ -105,7 +105,7 @@ impl<B: Backend> Runnable<B> for MenuRunnable {
 		self.menu.tick(app, &mut self.next_runnable_change);
 	}
 
-	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
+	fn draw(&mut self, _app: &mut App<B>, _timed_loop_info: &TimedLoopInfo) {
 		/*
 		app.window.display();
 		app.window.clear(Color::BLACK);

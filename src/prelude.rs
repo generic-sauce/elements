@@ -11,9 +11,6 @@ pub use std::any::Any;
 pub use std::io::ErrorKind;
 pub use std::marker::PhantomData;
 
-#[cfg(feature = "native-client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
-#[cfg(feature = "native-client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};
-// #[cfg(feature = "native-client")] pub use sfml::window::{Style, VideoMode, joystick, ContextSettings};
 #[cfg(feature = "native-client")] pub use gilrs::{GamepadId, Gilrs};
 
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
@@ -26,7 +23,6 @@ pub use crate::world::fluidmap::*;
 pub use crate::vec::*;
 pub use crate::animation::*;
 pub use crate::input::*;
-pub use crate::window_vec::*;
 pub use crate::backend::*;
 
 #[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
@@ -44,14 +40,9 @@ pub use crate::net::*;
 
 #[cfg(feature = "native-client")] pub use crate::client::*;
 #[cfg(feature = "native-client")] pub use crate::client_world::*;
-#[cfg(feature = "native-client")] pub use crate::draw_context::*;
 #[cfg(feature = "native-client")] pub use crate::draw::*;
 #[cfg(feature = "native-client")] pub use crate::local::*;
 #[cfg(feature = "native-client")] pub use crate::app::*;
-#[cfg(feature = "native-client")] pub use crate::texture_state::*;
-#[cfg(feature = "native-client")] pub use crate::shader_state::*;
-#[cfg(feature = "native-client")] pub use crate::font_state::*;
-#[cfg(feature = "native-client")] pub use crate::animation_state::*;
 #[cfg(feature = "native-client")] pub use crate::menu::*;
 #[cfg(feature = "native-client")] pub use crate::graphics::*;
 #[cfg(feature = "native-client")] pub use winit_input_helper::WinitInputHelper;

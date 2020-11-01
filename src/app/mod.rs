@@ -104,7 +104,7 @@ impl<B: Backend> App<B> {
 			runnable_change = runnable.get_runnable_change();
 			match runnable_change {
 				RunnableChange::None => {},
-				_ => { break; },
+				_ => break,
 			}
 			self.sound_manager.tick();
 			self.peripherals_state.reset();

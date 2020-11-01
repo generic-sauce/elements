@@ -52,6 +52,7 @@ impl MenuElement {
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
 	}
 
+	/*
 	pub fn draw(&self, target: &RenderWindow, context: &mut DrawContext, cursor_pos: &CanvasVec) {
 		let color = if self.clicked {
 			Color::rgb(47, 110, 140)
@@ -99,7 +100,6 @@ impl MenuElement {
 		);
 	}
 
-	/*
 	pub fn apply_key_press(&mut self, event: &KeyPressedEvent) {
 		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
 			if let Some(c) = event.to_char() {

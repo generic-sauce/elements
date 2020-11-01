@@ -5,13 +5,8 @@ extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
 
-#[cfg(feature = "native-client")] mod animation_state;
 #[cfg(feature = "native-client")] mod client;
 #[cfg(feature = "native-client")] mod client_world;
-#[cfg(feature = "native-client")] mod texture_state;
-#[cfg(feature = "native-client")] mod shader_state;
-#[cfg(feature = "native-client")] mod font_state;
-#[cfg(feature = "native-client")] mod draw_context;
 #[cfg(feature = "native-client")] mod app;
 #[cfg(feature = "native-client")] mod local;
 #[cfg(feature = "native-client")] mod draw;
@@ -34,5 +29,4 @@ mod vec;
 mod animation;
 mod prelude;
 mod input;
-mod window_vec;
 mod backend;

@@ -1,11 +1,7 @@
 mod player;
 use player::*;
-
-mod fluidmap;
-mod tilemap;
-mod hud;
-// mod render;
-// pub use render::*;
+mod canvas_vec;
+pub use canvas_vec::*;
 
 use crate::prelude::*;
 
