@@ -1,54 +1,69 @@
-pub use std::sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError};
-pub use std::time::{Duration, SystemTime, Instant};
-pub use std::thread::{self, sleep};
-pub use std::rc::Rc;
-pub use std::net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener};
-pub use std::collections::{HashMap, HashSet};
-pub use std::io::BufReader;
-pub use std::fs::File;
-pub use itertools::iproduct;
-pub use std::any::Any;
-pub use std::io::ErrorKind;
-pub use std::marker::PhantomData;
+// generic
+pub use {
+	std::{
+		sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError},
+		time::{Duration, SystemTime, Instant},
+		thread::{self, sleep},
+		rc::Rc,
+		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
+		collections::{HashMap, HashSet},
+		io::{BufReader, ErrorKind},
+		fs::File,
+		any::Any,
+		marker::PhantomData,
+	},
+	itertools::iproduct,
+	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},
+	bincode::{serialize, deserialize},
+	crate::{
+		rng::*,
+		world::*,
+		vec::*,
+		animation::*,
+		input::*,
+		backend::*,
+		net::*,
+	},
+};
 
-#[cfg(feature = "native-client")] pub use gilrs::{GamepadId, Gilrs};
-
-pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
-pub use bincode::{serialize, deserialize};
-
-pub use crate::rng::*;
-pub use crate::world::*;
-pub use crate::vec::*;
-pub use crate::animation::*;
-pub use crate::input::*;
-pub use crate::backend::*;
-
-#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
-#[cfg(feature = "server")] pub use tungstenite::Message;
-
-pub use crate::net::*;
-#[cfg(not(feature = "web-client"))] pub use crate::resource::res;
-#[cfg(not(feature = "web-client"))] pub use crate::timed_loop::*;
-#[cfg(not(feature = "web-client"))] pub use crate::server::*;
-
-#[cfg(feature = "web-client")] pub use crate::web::*;
-#[cfg(feature = "web-client")] pub use wasm_bindgen::{prelude::*, JsCast};
-#[cfg(feature = "web-client")] pub use web_sys::{WebSocket};
-#[cfg(feature = "web-client")] pub use js_sys::{Uint8Array};
-
-#[cfg(feature = "native-client")] pub use crate::client::*;
-#[cfg(feature = "native-client")] pub use crate::client_world::*;
-#[cfg(feature = "native-client")] pub use crate::draw::*;
-#[cfg(feature = "native-client")] pub use crate::local::*;
-#[cfg(feature = "native-client")] pub use crate::app::*;
-#[cfg(feature = "native-client")] pub use crate::menu::*;
-#[cfg(feature = "native-client")] pub use crate::graphics::*;
-#[cfg(feature = "native-client")] pub use winit_input_helper::WinitInputHelper;
+// native-client
+#[cfg(feature = "native-client")] pub use {
+	gilrs::{GamepadId, Gilrs},
+	winit_input_helper::WinitInputHelper,
+	crate::{
+		client::*,
+		client_world::*,
+		draw::*,
+		local::*,
+		app::*,
+		menu::*,
+		graphics::*,
+	},
+};
 #[cfg(feature = "native-client")] pub mod win {
 	pub use winit::{
-			dpi::{ LogicalPosition, LogicalSize, PhysicalSize, PhysicalPosition, },
-			window::{ Window, WindowBuilder, },
-			event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput, ElementState, MouseButton },
-			event_loop::{ EventLoop, ControlFlow, },
+		dpi::{ LogicalPosition, LogicalSize, PhysicalSize, PhysicalPosition, },
+		window::{ Window, WindowBuilder, },
+		event::{ Event, VirtualKeyCode, WindowEvent, ScanCode, KeyboardInput, ElementState, MouseButton },
+		event_loop::{ EventLoop, ControlFlow, },
 	};
 }
+
+// web-client
+#[cfg(feature = "web-client")] pub use {
+	wasm_bindgen::{prelude::*, JsCast},
+	web_sys::{WebSocket},
+	js_sys::{Uint8Array},
+	crate::web::*,
+};
+
+// server (or native-client)
+#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
+#[cfg(feature = "server")] pub use {
+	tungstenite::Message,
+	crate::{
+		resource::res,
+		timed_loop::*,
+		server::*
+	}
+};
