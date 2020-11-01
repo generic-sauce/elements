@@ -21,7 +21,6 @@ pub use {
 		vec::*,
 		animation::*,
 		input::*,
-		backend::*,
 		net::*,
 	},
 };
@@ -38,6 +37,7 @@ pub use {
 		app::*,
 		menu::*,
 		graphics::*,
+		backend::*,
 	},
 };
 #[cfg(feature = "native-client")] pub mod win {
@@ -54,7 +54,10 @@ pub use {
 	wasm_bindgen::{prelude::*, JsCast},
 	web_sys::{WebSocket},
 	js_sys::{Uint8Array},
-	crate::web::*,
+	crate::{
+		web::*,
+		backend::*,
+	},
 };
 
 // server (or native-client)

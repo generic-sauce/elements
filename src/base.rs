@@ -1,9 +1,8 @@
 #[macro_use]
 extern crate serde_derive;
 
-#[cfg(feature = "client")]
-#[macro_use]
-extern crate lazy_static;
+#[cfg(feature = "client")] #[macro_use] extern crate lazy_static;
+#[cfg(feature = "client")] mod backend;
 
 #[cfg(feature = "native-client")] mod client;
 #[cfg(feature = "native-client")] mod client_world;
@@ -30,4 +29,3 @@ mod vec;
 mod animation;
 mod prelude;
 mod input;
-mod backend;
