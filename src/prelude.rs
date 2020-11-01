@@ -9,6 +9,7 @@ pub use std::fs::File;
 pub use itertools::iproduct;
 pub use std::any::Any;
 pub use std::io::ErrorKind;
+pub use std::marker::PhantomData;
 
 #[cfg(feature = "native-client")] pub use sfml::system::{Vector2i, Vector2f, Vector2u, SfBox, Clock, Time};
 #[cfg(feature = "native-client")] pub use sfml::graphics::{RenderWindow, Texture, Color, RenderStates, RenderTarget, Shape, RectangleShape, CircleShape, Transformable, Shader as SfmlShader, Sprite, Rect, IntRect, FloatRect, Image, Text, Font, View, RenderTexture};

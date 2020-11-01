@@ -4,11 +4,21 @@ pub struct NativeBackend;
 
 impl Backend for NativeBackend {
 	type InputBackend = NativeInputBackend;
+	type GraphicsBackend = NativeGraphicsBackend;
 }
 
 pub struct NativeInputBackend {
 	pub gilrs: gilrs::Gilrs,
 	pub input_receiver: Receiver<PeripheralsUpdate>,
+}
+
+impl NativeInputBackend {
+	pub fn new(input_receiver: Receiver<PeripheralsUpdate>) -> NativeInputBackend {
+		NativeInputBackend {
+			input_receiver,
+			gilrs: gilrs::Gilrs::new().unwrap(),
+		}
+	}
 }
 
 pub struct NativeEventIterator<'a> {
@@ -24,7 +34,7 @@ impl<'a> Iterator for NativeEventIterator<'a> {
 	}
 }
 
-impl InputBackendTrait for NativeInputBackend {
+impl InputBackend for NativeInputBackend {
 	type EventIterator<'a> = NativeEventIterator<'a>;
 
 	fn events(&mut self) -> NativeEventIterator<'_> {
@@ -59,10 +69,31 @@ impl InputBackendTrait for NativeInputBackend {
 			RawGamepadState::new()
 		}
 	}
+
+	fn tick(&mut self, peripherals_state: &mut PeripheralsState) {
+		while self.gilrs.next_event().is_some() {};
+		let receive = || self.input_receiver.try_recv().map_err(|err| match err {
+			TryRecvError::Disconnected => panic!("PeripheralsUpdate Sender disconnected!"),
+			x => x,
+		});
+		while let Ok(peripherals_update) = receive() {
+			peripherals_state.update(&peripherals_update);
+		}
+	}
 }
 
 fn get_gamepad(index: u32, gilrs: &gilrs::Gilrs) -> Option<GamepadId> {
 	gilrs.gamepads()
 		.map(|(gamepad_id, _)| gamepad_id)
 		.find(|gamepad_id| Into::<usize>::into(*gamepad_id) == index as usize)
+}
+
+pub struct NativeGraphicsBackend {
+	pub graphics_sender: Sender<Draw>,
+}
+
+impl GraphicsBackend for NativeGraphicsBackend {
+	fn draw(&mut self, gw: Draw) {
+		self.graphics_sender.send(gw).unwrap();
+	}
 }

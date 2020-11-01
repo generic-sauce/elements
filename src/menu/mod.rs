@@ -39,7 +39,7 @@ impl Menu {
 		}
 	}
 
-	pub fn tick(&mut self, app: &App, next_runnable_change: &mut RunnableChange) {
+	pub fn tick<B: Backend>(&mut self, app: &App<B>, next_runnable_change: &mut RunnableChange) {
 		if app.peripherals_state.key_pressed(&Key::LeftMouse) {
 			for element in &mut self.elements {
 				element.clicked = element.is_colliding(&app.cursor_position);
@@ -95,8 +95,8 @@ impl MenuRunnable {
 	}
 }
 
-impl Runnable for MenuRunnable {
-	fn tick(&mut self, app: &mut App) {
+impl<B: Backend> Runnable<B> for MenuRunnable {
+	fn tick(&mut self, app: &mut App<B>) {
 		let mouse_update: WindowVec = app.peripherals_state.cursor_move;
 		app.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
 		app.cursor_position.y = app.cursor_position.y.max(0.0).min(1.0);
@@ -105,7 +105,7 @@ impl Runnable for MenuRunnable {
 		self.menu.tick(app, &mut self.next_runnable_change);
 	}
 
-	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
+	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
 		/*
 		app.window.display();
 		app.window.clear(Color::BLACK);

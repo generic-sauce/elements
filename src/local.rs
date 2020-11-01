@@ -1,12 +1,12 @@
 use crate::prelude::*;
 
-pub struct Local {
+pub struct Local<B: Backend> {
 	gamepad_states: [RawGamepadState; 2],
-	client_world: ClientWorld,
+	client_world: ClientWorld<B>,
 }
 
-impl Local {
-	pub fn new(best_of_n: u32) -> Local {
+impl<B: Backend> Local<B> {
+	pub fn new(best_of_n: u32) -> Local<B> {
 		Local {
 			gamepad_states: [RawGamepadState::new(), RawGamepadState::new()],
 			client_world: ClientWorld::new(best_of_n),
@@ -14,8 +14,8 @@ impl Local {
 	}
 }
 
-impl Runnable for Local {
-	fn tick(&mut self, app: &mut App) {
+impl<B: Backend> Runnable<B> for Local<B> {
+	fn tick(&mut self, app: &mut App<B>) {
 		for (i, gamepad_state) in self.gamepad_states.iter_mut().enumerate() {
 			self.client_world.world.players[i].input.update_gamepad(&gamepad_state);
 		}
@@ -23,7 +23,7 @@ impl Runnable for Local {
 		self.client_world.tick(app);
 	}
 
-	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo) {
+	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
 		// self.client_world.draw(app, timed_loop_info);
 
 		let world = &self.client_world.world;
@@ -33,7 +33,7 @@ impl Runnable for Local {
 			world.players.clone(),
 			timed_loop_info.elapsed_time,
 		);
-		app.graphics_sender.send(graphics_world).unwrap();
+		app.graphics_sender.send(unimplemented!()).unwrap();
 	}
 
 	fn get_runnable_change(&mut self) -> RunnableChange {

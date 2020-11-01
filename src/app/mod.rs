@@ -5,24 +5,17 @@ use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 
-pub struct App {
-	// pub winit_window: Box<winit::Window>,
-	// pub wgpu_instance: wgpu::Instance,
-	pub texture_state: TextureState,
-	pub shader_state: ShaderState,
-	pub font_state: FontState,
-	pub animation_state: AnimationState,
-	pub gilrs: gilrs::Gilrs,
+pub struct App<B: Backend> {
+	pub input_backend: B::InputBackend,
 	pub sound_manager: SoundManager,
 	pub cursor_position: CanvasVec,
-	pub graphics_sender: Sender<GraphicsWorld>,
-	pub input_receiver: Receiver<PeripheralsUpdate>,
+	pub graphics_sender: Sender<Draw>,
 	pub peripherals_state: PeripheralsState,
 }
 
-pub trait Runnable {
-	fn tick(&mut self, app: &mut App);
-	fn draw(&mut self, app: &mut App, timed_loop_info: &TimedLoopInfo);
+pub trait Runnable<B: Backend> {
+	fn tick(&mut self, app: &mut App<B>);
+	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo);
 	fn get_runnable_change(&mut self) -> RunnableChange;
 }
 
@@ -57,20 +50,13 @@ impl RunnableChange {
 	}
 }
 
-impl App {
-	pub fn new(graphics_sender: Sender<GraphicsWorld>, input_receiver: Receiver<PeripheralsUpdate>) -> App {
-		let gilrs = gilrs::Gilrs::new().expect("Failed to create gilrs");
-
+impl<B: Backend> App<B> {
+	pub fn new(graphics_sender: Sender<Draw>, input_backend: B::InputBackend) -> App<B> {
 		App {
-			texture_state: TextureState::new(),
-			shader_state: ShaderState::new(),
-			font_state: FontState::new(),
-			animation_state: AnimationState::new(),
-			gilrs,
+			input_backend,
 			sound_manager: SoundManager::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			graphics_sender,
-			input_receiver,
 			peripherals_state: PeripheralsState::new(),
 		}
 	}
@@ -102,24 +88,12 @@ impl App {
 		}
 	}
 
-	fn fetch_peripherals_update(&mut self) {
-		let receive = |app: &mut App| app.input_receiver.try_recv().map_err(|err| match err {
-			TryRecvError::Disconnected => panic!("PeripheralsUpdate Sender disconnected!"),
-			x => x,
-		});
-		while let Ok(peripherals_update) = receive(self) {
-			self.peripherals_state.update(&peripherals_update);
-		}
-	}
-
-	fn run_runnable(&mut self, mut runnable: impl Runnable) -> RunnableChange {
+	fn run_runnable(&mut self, mut runnable: impl Runnable<B>) -> RunnableChange {
 		let mut runnable_change = RunnableChange::None;
 
 		for timed_loop_info in TimedLoop::with_fps(60) {
 			// process gilrs events
-			while self.gilrs.next_event().is_some() {}
-
-			self.fetch_peripherals_update();
+			self.input_backend.tick(&mut self.peripherals_state);
 
 			if timed_loop_info.delta_time > timed_loop_info.interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());

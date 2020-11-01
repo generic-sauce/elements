@@ -16,14 +16,15 @@ fn main() {
 		return;
 	}
 
-	let (graphics_sender, graphics_receiver) = channel::<GraphicsWorld>();
+	let (graphics_sender, graphics_receiver) = channel::<Draw>();
 	let (input_sender, input_receiver) = channel::<PeripheralsUpdate>();
 
 	thread::spawn(move || {
+		let input_backend = NativeInputBackend::new(input_receiver);
 		match server_arg.as_deref() {
-			Some("menu") => App::new(graphics_sender, input_receiver).run_menu_and_game(),
-			Some(ip) => App::new(graphics_sender, input_receiver).run_client(ip),
-			None => App::new(graphics_sender, input_receiver).run_local(0),
+			Some("menu") => App::<NativeBackend>::new(graphics_sender, input_backend).run_menu_and_game(),
+			Some(ip) => App::<NativeBackend>::new(graphics_sender, input_backend).run_client(ip),
+			None => App::<NativeBackend>::new(graphics_sender, input_backend).run_local(0),
 		}
 	});
 
@@ -89,8 +90,10 @@ fn main() {
 				let window_size = window.inner_size();
 				let window_size = Vec2u::new(window_size.width, window_size.height);
 				let mut draw = Draw::new(window_size);
+				/*
 				graphics.draw(&mut draw, &graphics_world);
 				graphics.flush(&draw, &graphics_world);
+				 */
 			},
 			_ => ()
 		}

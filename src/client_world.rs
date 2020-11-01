@@ -1,21 +1,23 @@
 use crate::prelude::*;
 
-pub struct ClientWorld {
+pub struct ClientWorld<B: Backend> {
 	pub world: World,
 	pub tilemap_texture: SfBox<Texture>,
+	phantom: PhantomData<B>,
 }
 
-impl ClientWorld {
-	pub fn new(best_of_n: u32) -> ClientWorld {
+impl<B: Backend> ClientWorld<B> {
+	pub fn new(best_of_n: u32) -> ClientWorld<B> {
 		let world = World::new_defaultmap(best_of_n);
 		let tilemap_texture = create_tilemap_texture(&world.tilemap.tiles, world.tilemap.size);
 		ClientWorld {
 			world,
 			tilemap_texture,
+			phantom: PhantomData,
 		}
 	}
 
-	pub fn tick(&mut self, app: &mut App) {
+	pub fn tick(&mut self, app: &mut App<B>) {
 		let mut handler = AppEventHandler::new();
 		self.world.tick(&mut handler);
 		self.handle(&handler, &mut app.sound_manager);
