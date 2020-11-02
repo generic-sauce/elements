@@ -148,7 +148,6 @@ impl Graphics {
 
 		self.text.render(
 			&mut graphics_context,
-			clear_color(),
 			draw,
 		);
 

@@ -20,6 +20,7 @@ pub struct Color {
 	pub a: f32,
 }
 
+#[allow(unused)]
 impl Color {
 	pub const fn rgb(r: f32, g: f32, b: f32) -> Color {
 		Color {

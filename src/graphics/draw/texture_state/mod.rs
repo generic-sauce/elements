@@ -1,13 +1,11 @@
 mod texture;
-pub use texture::*;
+use texture::*;
 
 mod animation;
 use animation::*;
 
 mod misc;
 use misc::*;
-
-use crate::prelude::*;
 
 pub trait IntoTextureIndex {
 	fn into_texture_index(self) -> usize;

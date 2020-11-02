@@ -13,10 +13,10 @@ impl DrawText {
 			"../../../res/fonts/dashing_unicorn.ttf"
 		)).unwrap();
 
-		let mut glyph_brush = GlyphBrushBuilder::using_font(font)
+		let glyph_brush = GlyphBrushBuilder::using_font(font)
 			.build(&device, SURFACE_FORMAT);
 
-		let mut staging_belt = wgpu::util::StagingBelt::new(1024);
+		let staging_belt = wgpu::util::StagingBelt::new(1024);
 
 		DrawText {
 			glyph_brush,
@@ -27,10 +27,9 @@ impl DrawText {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		load: wgpu::LoadOp::<wgpu::Color>,
 		draw: &Draw,
 	) {
-		self.staging_belt.recall();
+		futures::executor::block_on(self.staging_belt.recall());
 
 		for text in &draw.texts {
 			let left_bot = text.left_bot.to_f() * context.window_size.to_f();

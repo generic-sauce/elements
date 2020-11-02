@@ -6,17 +6,17 @@ const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
 
 // the texture rect has been obtained by reading the .png file
 
-fn texture_center(pl: &Player) -> GameVec {
-	GameVec::new(
-		pl.left_bot.x + PLAYER_SIZE.x / 2,
-		pl.left_bot.y + PLAYER_SIZE.y * IMG_SIZE / 2 / IMG_PLAYER_HEIGHT,
-	)
-}
-
-fn texture_radius() -> GameVec {
-	let r = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
-	GameVec::new(r, r)
-}
+// fn texture_center(pl: &Player) -> GameVec {
+// 	GameVec::new(
+// 		pl.left_bot.x + PLAYER_SIZE.x / 2,
+// 		pl.left_bot.y + PLAYER_SIZE.y * IMG_SIZE / 2 / IMG_PLAYER_HEIGHT,
+// 	)
+// }
+//
+// fn texture_radius() -> GameVec {
+// 	let r = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
+// 	GameVec::new(r, r)
+// }
 
 pub(in super) fn draw_players(draw: &mut Draw, world: &World) {
 	for p in &world.players {
