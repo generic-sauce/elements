@@ -28,8 +28,7 @@ impl PeripheralsState {
 			PeripheralsUpdate::KeyPress(key) => self.update_press(key),
 			PeripheralsUpdate::KeyRelease(key) => self.update_release(key),
 			PeripheralsUpdate::MouseMove(cursor_move) => {
-				self.cursor_move.x += cursor_move.x;
-				self.cursor_move.y += cursor_move.y;
+				self.cursor_move += cursor_move.cast();
 			},
 			_ => {},
 		};

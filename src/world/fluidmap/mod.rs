@@ -52,7 +52,6 @@ impl World {
 
 impl FluidMap {
 	pub fn new(tilemap_size: TileVec) -> FluidMap {
-		let tilemap_size = TileVec::new(tilemap_size.x as i32, tilemap_size.y as i32); // number of tiles
 		let gamemap_size = tilemap_size.to_game(); // number of game-tiles
 		let size = gamemap_size.to_fluid(); // number of fluid-tiles // TODO this may round down and not cover the full size, right?
 

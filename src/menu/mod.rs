@@ -95,8 +95,8 @@ impl MenuRunnable {
 
 impl<B: Backend> Runnable<B> for MenuRunnable {
 	fn tick(&mut self, app: &mut App<B>) {
-		let mouse_update: WindowVec = app.peripherals_state.cursor_move;
-		app.cursor_position += CanvasVec::new(mouse_update.x, -mouse_update.y) * 0.001;
+		let mouse_update = app.peripherals_state.cursor_move;
+		app.cursor_position += mouse_update.cast() * 0.001 * (1.0, -1.0);
 		app.cursor_position.y = app.cursor_position.y.max(0.0).min(1.0);
 		app.cursor_position.x = app.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 

@@ -12,6 +12,28 @@ impl<T: Primitive, P> Vec2t<T, P> {
 	}
 }
 
+#[allow(unused)]
+impl<T1: Primitive, P1> Vec2t<T1, P1> {
+	// use with care!
+	pub fn cast_with<T2: Primitive, P2>(self, f: impl Fn(T1) -> T2) -> Vec2t<T2, P2> {
+		Vec2t {
+			x: f(self.x),
+			y: f(self.y),
+			_p: PhantomData,
+		}
+	}
+
+	// use with care!
+	pub const fn cast<P2>(self) -> Vec2t<T1, P2> {
+		Vec2t {
+			x: self.x,
+			y: self.y,
+			_p: PhantomData,
+		}
+	}
+}
+
+
 impl<T: Primitive, P> From<T> for Vec2t<T, P> {
 	fn from(t: T) -> Vec2t<T, P> {
 		Vec2t::new(t, t)
