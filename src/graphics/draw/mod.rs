@@ -1,5 +1,5 @@
 mod texture_state;
-pub use texture_state::*;
+use texture_state::*;
 
 mod draw_triangles;
 pub(in crate::graphics) use draw_triangles::*;

@@ -2,7 +2,7 @@ mod surface_vec;
 pub use surface_vec::*;
 
 mod draw;
-pub use draw::*;
+use draw::*;
 
 mod context;
 use context::*;

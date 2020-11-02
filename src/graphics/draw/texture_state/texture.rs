@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use super::*;
 
 pub(super) fn create_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
@@ -12,10 +11,4 @@ pub(super) fn create_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu:
 			write_texture(queue, &texture, size, &image.as_raw()[..]);
 			texture
 		})
-}
-
-impl IntoTextureIndex for TextureId {
-	fn into_texture_index(self) -> usize {
-		self as usize
-	}
 }

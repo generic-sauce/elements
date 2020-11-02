@@ -66,6 +66,10 @@ pub struct Text {
 	pub string: String,
 }
 
+pub trait IntoTextureIndex {
+	fn into_texture_index(self) -> usize;
+}
+
 pub struct Draw {
 	pub triangles: TextureTriangles,
 	pub texts: Vec<Text>,

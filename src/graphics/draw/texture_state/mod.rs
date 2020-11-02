@@ -1,3 +1,5 @@
+use crate::prelude::*;
+
 mod texture;
 use texture::*;
 
@@ -6,10 +8,6 @@ use animation::*;
 
 mod misc;
 use misc::*;
-
-pub trait IntoTextureIndex {
-	fn into_texture_index(self) -> usize;
-}
 
 pub(super) struct TextureState {
 	textures: Vec<wgpu::Texture>,

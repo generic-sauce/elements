@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use super::*;
 
 pub(super) fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue: &'a wgpu::Queue) -> impl Iterator<Item=wgpu::Texture> + 'a {
@@ -18,17 +17,4 @@ pub(super) fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue:
 			write_texture(queue, &texture, size, &image.as_raw()[..]);
 			texture
 		})
-}
-
-impl IntoTextureIndex for Animation {
-	fn into_texture_index(self) -> usize {
-		let texture_offset = TextureId::iter().count();
-		let animation_offset = AnimationId::iter()
-			.enumerate()
-			.filter(|(index, _)| *index < self.animation_id as usize)
-			.map(|(_, id)| id)
-			.fold(0, |acc, id| acc + AnimationId::frame_count(id));
-
-		texture_offset + animation_offset + self.texture_index()
-	}
 }
