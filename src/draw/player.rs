@@ -24,7 +24,7 @@ pub(in super) fn draw_cursors(draw: &mut Draw, world: &World) {
 		let center = p.cursor_position();
 		let left_bot = center - radius;
 		let right_top = center + radius;
-		draw.rectangle(left_bot, right_top, wgpu::Color::BLACK);
+		draw.rectangle(left_bot, right_top, Color::BLACK);
 	}
 }
 
@@ -32,8 +32,8 @@ pub(in super) fn draw_healthbars(draw: &mut Draw, world: &World) {
 	for p in &world.players {
 		let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 2);
 		let left_bot = p.left_bot + GameVec::new(0, PLAYER_SIZE.y + TILESIZE);
-		draw.rectangle(left_bot, left_bot + size, wgpu::Color::BLACK);
+		draw.rectangle(left_bot, left_bot + size, Color::BLACK);
 		size.x = (size.x as f32 * (p.health as f32 / MAX_HEALTH as f32)) as i32;
-		draw.rectangle(left_bot, left_bot + size, wgpu::Color::GREEN);
+		draw.rectangle(left_bot, left_bot + size, Color::GREEN);
 	}
 }

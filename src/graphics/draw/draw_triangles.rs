@@ -15,9 +15,9 @@ fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 				vertex.position.y.to_le_bytes(),
 				vertex.uv.x.to_le_bytes(),
 				vertex.uv.y.to_le_bytes(),
-				(vertex.color.r as f32).to_le_bytes(),
-				(vertex.color.g as f32).to_le_bytes(),
-				(vertex.color.b as f32).to_le_bytes(),
+				vertex.color.r.to_le_bytes(),
+				vertex.color.g.to_le_bytes(),
+				vertex.color.b.to_le_bytes(),
 			];
 			bytes.extend(l.iter().flat_map(|x| x.iter()));
 		}

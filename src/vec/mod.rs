@@ -17,13 +17,6 @@ pub struct Vec2t<T: Primitive, P> {
 	_p: PhantomData<P>,
 }
 
-#[allow(unused)]
-pub struct DefaultParam;
-#[allow(unused)]
-pub type Vec2u = Vec2t::<u32, DefaultParam>;
-#[allow(unused)]
-pub type Vec2f = Vec2t::<f32, DefaultParam>;
-
 pub const fn v<T: Primitive, P>(x: T, y: T) -> Vec2t<T, P> {
 	Vec2t::<T, P>::new(x, y)
 }
