@@ -29,7 +29,7 @@ impl DrawText {
 		context: &mut GraphicsContext,
 		draw: &Draw,
 	) {
-		futures::executor::block_on(self.staging_belt.recall());
+		self.staging_belt.recall();
 
 		for text in &draw.texts {
 			let left_bot = text.left_bot.to_f() * context.window_size.to_f();
