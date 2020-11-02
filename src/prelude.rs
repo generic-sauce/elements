@@ -26,13 +26,19 @@ pub use {
 	},
 };
 
+// *-client
+#[cfg(feature = "client")] pub use {
+	crate::{
+		draw::*,
+	},
+};
+
 // native-client
 #[cfg(feature = "native-client")] pub use {
 	gilrs::{GamepadId, Gilrs},
 	crate::{
 		client::*,
 		client_world::*,
-		draw::*,
 		local::*,
 		app::*,
 		menu::*,
