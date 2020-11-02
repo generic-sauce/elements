@@ -47,8 +47,10 @@ impl World {
 		draw_cursors(draw, self);
 		draw_healthbars(draw, self);
 
-		let text_size = 0.05;
+		let text_size = 0.04;
 		draw.text(v(0.0, 1.0 - 1.0 * text_size), text_size, Color::WHITE,
+			&*format!("best of {}", self.best_of_n));
+		draw.text(v(0.0, 1.0 - 2.0 * text_size), text_size, Color::WHITE,
 			&*format!("score: blue {} / red {}", self.kills[0], self.kills[1]));
 	}
 }
