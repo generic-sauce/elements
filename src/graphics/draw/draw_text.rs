@@ -32,17 +32,23 @@ impl DrawText {
 		self.staging_belt.recall();
 
 		for text in &draw.texts {
-			let left_bot = text.left_bot.to_f() * context.window_size.to_f();
+			let window_size = context.window_size.to_f();
+			let mut left_bot = text.left_bot.to_f();
+			left_bot.y = 1.0 - left_bot.y;
+			left_bot.y -= text.scale;
+			left_bot *= window_size;
 			let left_bot = (left_bot.x, left_bot.y);
-			let color = [text.color.r, text.color.g, text.color.b, text.color.a];
+			let scale = text.scale * window_size.y;
+			let color = text.color;
+			let color = [color.r, color.g, color.b, color.a];
 
 			self.glyph_brush.queue(Section {
 				screen_position: left_bot,
-				bounds: (context.window_size.x as f32, context.window_size.y as f32),
+				bounds: (window_size.x, window_size.y),
 				text: vec![
 					Text::new(&*text.string)
 						.with_color(color)
-						.with_scale(text.scale),
+						.with_scale(scale),
 				],
 				..Section::default()
 			});
