@@ -58,8 +58,16 @@ pub type Triangle = [Vertex; 3];
 pub type Triangles = Vec<Triangle>;
 pub type TextureTriangles = Vec<Triangles>;
 
+pub struct Text {
+	pub left_bot: CanvasVec,
+	pub scale: f32,
+	pub color: Color,
+	pub string: String,
+}
+
 pub struct Draw {
 	pub triangles: TextureTriangles,
+	pub texts: Vec<Text>,
 	pub world: Option<GraphicsWorld>,
 	pub elapsed_time: Duration,
 }
@@ -68,8 +76,10 @@ impl Draw {
 	pub fn new(elapsed_time: Duration) -> Draw {
 		let mut triangles = TextureTriangles::new();
 		triangles.resize_with(TextureId::texture_count(), Default::default);
+		let texts = Vec::new();
 		Draw {
 			triangles,
+			texts,
 			world: None,
 			elapsed_time,
 		}
@@ -133,5 +143,26 @@ impl Draw {
 
 	pub fn world(&mut self, tilemap: &TileMap, fluidmap: &FluidMap) {
 		self.world = Some(GraphicsWorld::new(tilemap, fluidmap));
+	}
+
+	#[allow(unused)]
+	pub fn text(
+		&mut self,
+		left_bot: impl IntoCanvasVec,
+		scale: f32,
+		color: Color,
+		string: &str,
+	) {
+		let left_bot = left_bot.to_canvas();
+		let string = string.to_string();
+
+		let text = Text {
+			left_bot,
+			scale,
+			color,
+			string,
+		};
+
+		self.texts.push(text);
 	}
 }

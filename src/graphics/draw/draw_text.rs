@@ -32,14 +32,22 @@ impl DrawText {
 	) {
 		self.staging_belt.recall();
 
-		self.glyph_brush.queue(Section {
-			screen_position: (30.0, 90.0),
-			bounds: (context.window_size.x as f32, context.window_size.y as f32),
-			text: vec![Text::new("Hello wgpu_glyph!")
-				.with_color([1.0, 1.0, 1.0, 1.0])
-				.with_scale(40.0)],
-			..Section::default()
-		});
+		for text in &draw.texts {
+			let left_bot = text.left_bot.to_f() * context.window_size.to_f();
+			let left_bot = (left_bot.x, left_bot.y);
+			let color = [text.color.r, text.color.g, text.color.b, text.color.a];
+
+			self.glyph_brush.queue(Section {
+				screen_position: left_bot,
+				bounds: (context.window_size.x as f32, context.window_size.y as f32),
+				text: vec![
+					Text::new(&*text.string)
+						.with_color(color)
+						.with_scale(text.scale),
+				],
+				..Section::default()
+			});
+		}
 
 		// Draw the text!
 		self.glyph_brush

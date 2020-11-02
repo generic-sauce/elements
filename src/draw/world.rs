@@ -47,5 +47,6 @@ impl<B: Backend> ClientWorld<B> {
 		draw_players(draw, &self.world);
 		draw_cursors(draw, &self.world);
 		draw_healthbars(draw, &self.world);
+		draw.text(v(0.0, 0.0), 40.0, Color::WHITE, "Hello Text!");
 	}
 }
