@@ -13,12 +13,6 @@ pub trait IntoTextureIndex {
 	fn into_texture_index(self) -> usize;
 }
 
-#[derive(PartialEq, Eq)]
-pub enum Flip {
-	Normal,
-	Horizontal,
-}
-
 pub(super) struct TextureState {
 	textures: Vec<wgpu::Texture>,
 	texture_views: Vec<wgpu::TextureView>,
@@ -54,13 +48,5 @@ impl TextureState {
 
 	pub(super) fn texture_view_iter(&self) -> impl Iterator<Item=&wgpu::TextureView> {
 		self.texture_views.iter()
-	}
-
-	pub fn texture_count() -> usize {
-		TextureId::iter().count()
-		+
-		AnimationId::iter()
-			.map(AnimationId::frame_count)
-			.sum::<usize>()
 	}
 }

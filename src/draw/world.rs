@@ -1,17 +1,14 @@
 use crate::prelude::*;
+use super::*;
 
-// const IMG_SIZE: i32 = 64;
-// const IMG_PLAYER_HEIGHT: i32 = 54;
-// const RADIUS: i32 = PLAYER_SIZE.y * IMG_SIZE / IMG_PLAYER_HEIGHT / 2;
-
-pub(in crate::graphics) struct GraphicsWorld {
+pub struct GraphicsWorld {
 	pub tilemap_size: TileVec,
 	pub tilemap_data: Vec<u8>,
 	pub fluidmap_data: Vec<u8>,
 }
 
 impl GraphicsWorld {
-	pub(in crate::graphics) fn new(tilemap: &TileMap, fluidmap: &FluidMap) -> GraphicsWorld {
+	pub fn new(tilemap: &TileMap, fluidmap: &FluidMap) -> GraphicsWorld {
 
 		let tilemap_data: Vec<u8> = tilemap.iter()
 			.map(|p| tilemap.get(p))
@@ -41,5 +38,14 @@ impl GraphicsWorld {
 			tilemap_data,
 			fluidmap_data,
 		}
+	}
+}
+
+impl<B: Backend> ClientWorld<B> {
+	pub fn draw(&mut self, draw: &mut Draw) {
+		draw.world(&self.world.tilemap, &self.world.fluidmap);
+		draw_players(draw, &self.world);
+		draw_cursors(draw, &self.world);
+		draw_healthbars(draw, &self.world);
 	}
 }

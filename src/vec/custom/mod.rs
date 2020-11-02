@@ -21,6 +21,9 @@ pub type FluidVec = Vec2t<i32, FluidParam>;
 pub struct WindowParam;
 pub type WindowVec = Vec2t<f32, WindowParam>;
 
+pub struct TextureParam;
+pub type TextureVec = Vec2t<f32, TextureParam>;
+
 pub const TILESIZE: i32 = 256;
 
 impl GameVec {
