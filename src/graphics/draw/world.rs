@@ -43,38 +43,3 @@ impl GraphicsWorld {
 		}
 	}
 }
-
-
-impl Graphics {
-	// pub(in crate::graphics) fn draw_players(&mut self, draw: &mut Draw, world: &World) {
-	// 	for p in &world.players {
-	// 		let center = p.center_position();
-	// 		let left_bot = GameVec::new(center.x - RADIUS, p.left_bot.y);
-	// 		let right_top = GameVec::new(center.x + RADIUS, p.left_bot.y + RADIUS * 2);
-	// 		let flip = if p.direction == PlayerDirection::Right { Flip2::Normal } else { Flip2::Horizontal };
-	// 		// self.triangles.draw_sprite(context, left_bot, right_top, TextureId2::BluePlayerIdle1, None);
-	// 		draw.texture(left_bot, right_top, p.animation, flip, None);
-	// 	}
-	// }
-  //
-	// pub(in crate::graphics) fn draw_cursors(&mut self, draw: &mut Draw, world: &World) {
-	// 	for p in &world.players {
-	// 		let radius = TILESIZE / 2;
-	// 		let radius = GameVec::new(radius, radius);
-	// 		let center = p.cursor_position();
-	// 		let left_bot = center - radius;
-	// 		let right_top = center + radius;
-	// 		draw.rectangle(left_bot, right_top, wgpu::Color::BLACK);
-	// 	}
-	// }
-  //
-	// pub(in crate::graphics) fn draw_healthbars(&mut self, draw: &mut Draw, world: &World) {
-	// 	for p in &world.players {
-	// 		let mut size = GameVec::new(PLAYER_SIZE.x, TILESIZE / 2);
-	// 		let left_bot = p.left_bot + GameVec::new(0, PLAYER_SIZE.y + TILESIZE);
-	// 		draw.rectangle(left_bot, left_bot + size, wgpu::Color::BLACK);
-	// 		size.x = (size.x as f32 * (p.health as f32 / MAX_HEALTH as f32)) as i32;
-	// 		draw.rectangle(left_bot, left_bot + size, wgpu::Color::GREEN);
-	// 	}
-	// }
-}

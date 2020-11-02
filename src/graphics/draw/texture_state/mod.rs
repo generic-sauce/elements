@@ -19,7 +19,6 @@ pub enum Flip {
 	Horizontal,
 }
 
-#[allow(unused)]
 pub(super) struct TextureState {
 	textures: Vec<wgpu::Texture>,
 	texture_views: Vec<wgpu::TextureView>,
