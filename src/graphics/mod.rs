@@ -9,7 +9,7 @@ use context::*;
 
 use crate::prelude::*;
 
-pub const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
+const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
 pub struct Graphics {
 	#[allow(unused)] instance: wgpu::Instance,
@@ -21,6 +21,7 @@ pub struct Graphics {
 	triangles: DrawTriangles,
 	tilemap: DrawTilemap,
 	fluidmap: DrawFluidmap,
+	text: DrawText,
 }
 
 fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u) -> wgpu::SwapChain {
@@ -69,6 +70,7 @@ impl Graphics {
 		let triangles = DrawTriangles::new(&device, &queue);
 		let tilemap = DrawTilemap::new(&device, &queue);
 		let fluidmap = DrawFluidmap::new(&device, &queue);
+		let text = DrawText::new(&device);
 
 		Graphics {
 			instance,
@@ -80,6 +82,7 @@ impl Graphics {
 			triangles,
 			tilemap,
 			fluidmap,
+			text,
 		}
 	}
 
@@ -102,6 +105,7 @@ impl Graphics {
 			queue: &self.queue,
 			swap_chain_texture: &swap_chain_texture,
 			encoder: &mut encoder,
+			window_size: self.window_size,
 		};
 
 		let mut cleared = false;
@@ -137,6 +141,12 @@ impl Graphics {
 		}
 
 		self.triangles.render(
+			&mut graphics_context,
+			clear_color(),
+			draw,
+		);
+
+		self.text.render(
 			&mut graphics_context,
 			clear_color(),
 			draw,

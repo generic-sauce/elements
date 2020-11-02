@@ -48,24 +48,24 @@ fn create_tilemap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu
 	(tilemap_texture, tilemap_texture_view)
 }
 
-	fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, tilemap_texture_view: &wgpu::TextureView, tilemap_sampler: &wgpu::Sampler) -> wgpu::BindGroup {
-		let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-			label: Some("tilemap bind group"),
-			layout: bind_group_layout,
-			entries: &[
-				wgpu::BindGroupEntry {
-					binding: 0,
-					resource: wgpu::BindingResource::TextureView(tilemap_texture_view),
-				},
-				wgpu::BindGroupEntry {
-					binding: 1,
-					resource: wgpu::BindingResource::Sampler(tilemap_sampler),
-				},
-			]
-		});
+fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, tilemap_texture_view: &wgpu::TextureView, tilemap_sampler: &wgpu::Sampler) -> wgpu::BindGroup {
+	let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+		label: Some("tilemap bind group"),
+		layout: bind_group_layout,
+		entries: &[
+			wgpu::BindGroupEntry {
+				binding: 0,
+				resource: wgpu::BindingResource::TextureView(tilemap_texture_view),
+			},
+			wgpu::BindGroupEntry {
+				binding: 1,
+				resource: wgpu::BindingResource::Sampler(tilemap_sampler),
+			},
+		]
+	});
 
-		bind_group
-	}
+	bind_group
+}
 
 pub(in crate::graphics) struct DrawTilemap {
 	pipeline: wgpu::RenderPipeline,

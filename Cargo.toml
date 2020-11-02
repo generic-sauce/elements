@@ -10,7 +10,7 @@ edition = "2018"
 default = ["native-client"]
 server = ["tungstenite"]
 client = []
-native-client = ["server", "client", "gilrs", "rodio", "lazy_static", "wgpu", "winit", "bytemuck"]
+native-client = ["server", "client", "gilrs", "rodio", "lazy_static", "wgpu", "winit", "bytemuck", "wgpu_glyph"]
 web-client =    ["client", "wasm-bindgen", "lazy_static", "console_error_panic_hook", "js-sys", "web-sys"]
 
 [dependencies] # TODO not all of those dependencies are always required!
@@ -33,6 +33,7 @@ winit = { version = "0.22.0", optional = true }
 gilrs = { version = "0.7.2", optional = true }
 rodio = { version = "0.11", optional = true }
 bytemuck = { version = "1.4.1", optional = true }
+wgpu_glyph = { version = "0.10.0", optional = true }
 
 # web-client
 wasm-bindgen = { features = ["serde-serialize"], version = "0.2", optional = true }

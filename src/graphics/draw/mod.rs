@@ -9,3 +9,6 @@ pub(in crate::graphics) use draw_tilemap::*;
 
 mod draw_fluidmap;
 pub(in crate::graphics) use draw_fluidmap::*;
+
+mod draw_text;
+pub(in crate::graphics) use draw_text::*;
