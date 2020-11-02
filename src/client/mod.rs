@@ -1,10 +1,11 @@
 use crate::prelude::*;
 
 pub struct Client<B: Backend> {
-	client_world: ClientWorld<B>,
+	world: World,
 	gamepad_state: RawGamepadState,
 	socket: UdpSocket,
 	player_id: usize,
+	phantom: PhantomData<B>,
 }
 
 impl<B: Backend> Client<B> {
@@ -20,10 +21,11 @@ impl<B: Backend> Client<B> {
 		}).next().unwrap();
 
 		Client {
-			client_world: ClientWorld::new(0),
+			world: World::new(0),
 			gamepad_state: RawGamepadState::new(),
 			socket,
 			player_id,
+			phantom: PhantomData,
 		}
 	}
 }
@@ -32,23 +34,23 @@ impl<B: Backend> Runnable<B> for Client<B> {
 	fn tick(&mut self, app: &mut App<B>) {
 		// receive packets
 		if let Some((update, _)) = recv_packet::<WorldUpdate>(&mut self.socket) {
-			self.client_world.apply_update(update, &mut app.sound_manager);
+			self.world.apply_update_within_app(update, app);
 		}
 
 		// handle inputs
-		self.client_world.world.players[self.player_id].input.update_gamepad(&self.gamepad_state);
-		self.client_world.world.players[self.player_id].input.update_peripherals(&app.peripherals_state);
+		self.world.players[self.player_id].input.update_gamepad(&self.gamepad_state);
+		self.world.players[self.player_id].input.update_peripherals(&app.peripherals_state);
 
 		// send packets
-		send_packet(&mut self.socket, &self.client_world.world.players[self.player_id].input);
+		send_packet(&mut self.socket, &self.world.players[self.player_id].input);
 
 		// tick world
-		self.client_world.tick(app);
+		self.world.tick_within_app(app);
 	}
 
 	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
 		let mut draw = Draw::new(timed_loop_info.elapsed_time);
-		self.client_world.world.draw(&mut draw);
+		self.world.draw(&mut draw);
 		app.graphics_backend.draw(draw);
 	}
 

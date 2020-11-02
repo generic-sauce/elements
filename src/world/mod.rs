@@ -64,7 +64,7 @@ impl World {
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new(best_of_n: u32, mapsrc: impl MapSrc) -> World {
+	pub fn new_by_source(best_of_n: u32, mapsrc: impl MapSrc) -> World {
 		let tilemap = TileMap::new(mapsrc);
 
 		World {
@@ -79,8 +79,8 @@ impl World {
 	}
 
 	#[cfg(not(feature = "web-client"))]
-	pub fn new_defaultmap(best_of_n: u32) -> World {
-		Self::new(best_of_n, "map/map04.png")
+	pub fn new(best_of_n: u32) -> World {
+		Self::new_by_source(best_of_n, "map/map04.png")
 	}
 
 

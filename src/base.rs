@@ -6,7 +6,6 @@ extern crate serde_derive;
 #[cfg(feature = "client")] mod draw;
 
 #[cfg(feature = "native-client")] mod client;
-#[cfg(feature = "native-client")] mod client_world;
 #[cfg(feature = "native-client")] mod app;
 #[cfg(feature = "native-client")] mod local;
 #[cfg(feature = "native-client")] mod menu;

@@ -78,7 +78,7 @@ pub fn client_main() {
 
 	let cb = Closure::<dyn Fn(JsValue)>::wrap(Box::new(|map_src| {
 			let map_src: TileMapImage = map_src.into_serde().unwrap();
-			let world = World::new(0,  map_src);
+			let world = World::new_by_source(0,  map_src);
 			Webapp {
 				data: WebappData {
 					tick_counter: 0,

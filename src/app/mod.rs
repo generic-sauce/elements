@@ -1,6 +1,3 @@
-mod sound;
-
-pub use sound::*;
 use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
@@ -8,7 +5,7 @@ pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
 	pub graphics_backend: B::GraphicsBackend,
-	pub sound_manager: SoundManager,
+	pub audio_backend: B::AudioBackend,
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
 }
@@ -55,7 +52,7 @@ impl<B: Backend> App<B> {
 		App {
 			input_backend,
 			graphics_backend,
-			sound_manager: SoundManager::new(),
+			audio_backend: B::AudioBackend::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
 		}
@@ -112,9 +109,48 @@ impl<B: Backend> App<B> {
 				RunnableChange::None => {},
 				_ => break,
 			}
-			self.sound_manager.tick();
+			self.audio_backend.tick();
 			self.peripherals_state.reset();
 		};
 		runnable_change
 	}
+
+	fn handle(&mut self, handler: &AppEventHandler) {
+		if let Some(dmg) = (0..2).map(|p| handler.damages[p]).max() {
+			if dmg > 0 {
+				let volume = (dmg as f32 / 100.0).max(0.5).min(2.0);
+				self.audio_backend.play_sound(SoundId::Whiz, volume);
+			}
+		}
+	}
+}
+
+impl World {
+	pub fn tick_within_app<B: Backend>(&mut self, app: &mut App<B>) {
+		let mut handler = AppEventHandler::new();
+		self.tick(&mut handler);
+		app.handle(&handler);
+
+		self.update_music_within_app(app);
+	}
+
+	fn update_music_within_app<B: Backend>(&mut self, app: &mut App<B>) {
+		let mut critical_level = 0;
+		for player in &self.players {
+			if player.health < MAX_HEALTH / 2 {
+				critical_level += 1;
+			}
+		}
+		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
+		if app.audio_backend.current_music_id().map_or(true, |music_id| music_id != sound_id) {
+			app.audio_backend.queue_music(sound_id);
+		}
+	}
+
+	pub fn apply_update_within_app<B: Backend>(&mut self, update: WorldUpdate, app: &mut App<B>) {
+		let mut handler = AppEventHandler::new();
+		self.apply_update(update, &mut handler);
+		app.handle(&handler);
+	}
+
 }

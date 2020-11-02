@@ -38,7 +38,6 @@ pub use {
 	gilrs::{GamepadId, Gilrs},
 	crate::{
 		client::*,
-		client_world::*,
 		local::*,
 		app::*,
 		menu::*,

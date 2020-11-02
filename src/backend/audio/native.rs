@@ -15,6 +15,40 @@ lazy_static! {
 	static ref SOUNDS: Vec<Sound> = load_samples();
 }
 
+impl AudioBackend for NativeAudioBackend {
+	fn new() -> Self {
+		let device = get_device();
+		let music_sink = Sink::new(&device);
+
+		Self {
+			device,
+			music_sink,
+			current_music_id: None,
+			next_music_id: None,
+			next_part: 0,
+			next_music_refresh_time: Instant::now(),
+		}
+	}
+
+	fn tick(&mut self) {
+		self.check_start_music();
+		self.check_restart_music();
+	}
+
+
+	fn queue_music(&mut self, music_id: SoundId) {
+		self.next_music_id = Some(music_id);
+	}
+
+	fn play_sound(&mut self, sound_id: SoundId, volume: f32) {
+		play_raw(&self.device, get_sample_buffer(sound_id).amplify(WHIZ_VOLUME * volume));
+	}
+
+	fn current_music_id(&self) -> Option<SoundId> {
+		self.current_music_id.clone()
+	}
+}
+
 fn load_samples() -> Vec<Sound> {
 	SoundId::iter().map(|sound_id| {
 		let file = File::open(res(sound_id.filename())).unwrap();
@@ -51,7 +85,7 @@ fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f3
 	)
 }
 
-pub struct SoundManager {
+pub struct NativeAudioBackend {
 	device: Device,
 	music_sink: Sink,
 	pub current_music_id: Option<SoundId>,
@@ -60,27 +94,7 @@ pub struct SoundManager {
 	next_music_refresh_time: Instant,
 }
 
-
-impl SoundManager {
-	pub fn new() -> SoundManager {
-		let device = get_device();
-		let music_sink = Sink::new(&device);
-
-		SoundManager {
-			device,
-			music_sink,
-			current_music_id: None,
-			next_music_id: None,
-			next_part: 0,
-			next_music_refresh_time: Instant::now(),
-		}
-	}
-
-	pub fn tick(&mut self) {
-		self.check_start_music();
-		self.check_restart_music();
-	}
-
+impl NativeAudioBackend {
 	fn start_music_sample(&mut self, music_id: SoundId) {
 		let sample = get_part_sample_buffer(music_id, self.next_part);
 		let sample_duration = sample.total_duration().unwrap();
@@ -108,51 +122,6 @@ impl SoundManager {
 			}
 		}
 	}
-
-	pub fn play_music(&mut self, music_id: SoundId) {
-		self.next_music_id = Some(music_id);
-	}
-
-	pub fn play_sound(&mut self, sound_id: SoundId, volume: f32) {
-		play_raw(&self.device, get_sample_buffer(sound_id).amplify(WHIZ_VOLUME * volume));
-	}
-}
-
-macro_rules! setup {
-	($($id:ident : $file:expr),*$(,)?) => {
-		#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-		#[repr(usize)]
-		pub enum SoundId {
-			$($id),*
-		}
-
-		impl SoundId {
-			#[allow(unused)]
-			pub fn iter() -> impl Iterator<Item=SoundId> {
-				[$(SoundId::$id),*].iter().cloned()
-			}
-
-			#[allow(unused)]
-			pub fn filename(self) -> &'static str {
-				match self {
-					$(
-						SoundId::$id => $file,
-					)*
-				}
-			}
-		}
-
-		use std::fmt::{Display, Formatter, Error};
-
-		impl Display for SoundId {
-			fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-				let string = match *self {
-					$( SoundId::$id => std::stringify!($id), )*
-				};
-				write!(f, "{}", string)
-			}
-		}
-	};
 }
 
 // this is a fallback for the case that default_output_device().default_output_format() is Err
@@ -162,11 +131,3 @@ fn get_device() -> Device {
 		.find(|d| d.default_output_format().is_ok())
 		.expect("no output device found!")
 }
-
-setup!(
-	APart: "audio/a_part.wav",
-	BPart: "audio/b_part.wav",
-	CPart: "audio/c_part.wav",
-	DPart: "audio/d_part.wav",
-	Whiz: "audio/whiz.wav",
-);

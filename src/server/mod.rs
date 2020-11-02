@@ -15,7 +15,7 @@ pub struct Server {
 impl Server {
 	pub fn new() -> Server {
 		Server {
-			world: World::new_defaultmap(0),
+			world: World::new(0),
 			update_desire: [0, 0],
 			peer_manager: PeerManager::wait_for_players(),
 		}
