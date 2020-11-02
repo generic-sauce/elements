@@ -64,8 +64,6 @@ pub struct Draw {
 	pub elapsed_time: Duration,
 }
 
-const UNUSED_TILEVEC: TileVec = TileVec::new(0, 0);
-
 impl Draw {
 	pub fn new(elapsed_time: Duration) -> Draw {
 		let mut triangles = TextureTriangles::new();
@@ -88,8 +86,8 @@ impl Draw {
 	) {
 		let texture_index = texture_index.into_texture_index();
 		let triangles = &mut self.triangles[texture_index];
-		let left_bot = left_bot.to_canvas(UNUSED_TILEVEC);
-		let right_top = right_top.to_canvas(UNUSED_TILEVEC);
+		let left_bot = left_bot.to_canvas();
+		let right_top = right_top.to_canvas();
 		let color = color.unwrap_or(Color::WHITE);
 		let (left_uv, right_uv) = match flip {
 			Flip::Normal => (0.0, 1.0),
@@ -117,8 +115,8 @@ impl Draw {
 		color: Color,
 	) {
 		let triangles = &mut self.triangles[TextureId::White as usize];
-		let left_bot = left_bot.to_canvas(UNUSED_TILEVEC);
-		let right_top = right_top.to_canvas(UNUSED_TILEVEC);
+		let left_bot = left_bot.to_canvas();
+		let right_top = right_top.to_canvas();
 
 		triangles.push([
 			Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },

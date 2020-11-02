@@ -10,11 +10,11 @@ impl CanvasVec {
 }
 
 pub trait IntoCanvasVec {
-	fn to_canvas(self, _: TileVec) -> CanvasVec;
+	fn to_canvas(self) -> CanvasVec;
 }
 
 impl IntoCanvasVec for GameVec {
-	fn to_canvas(self, _: TileVec) -> CanvasVec {
+	fn to_canvas(self) -> CanvasVec {
 		let factor = (TILESIZE * VIEW_SIZE.y) as f32;
 		let x = self.x as f32 / factor;
 		let y = self.y as f32 / factor;
@@ -23,11 +23,11 @@ impl IntoCanvasVec for GameVec {
 }
 
 impl IntoCanvasVec for TileVec {
-	fn to_canvas(self, v: TileVec) -> CanvasVec {
-		self.to_game().to_canvas(v)
+	fn to_canvas(self) -> CanvasVec {
+		self.to_game().to_canvas()
 	}
 }
 
 impl IntoCanvasVec for CanvasVec {
-	fn to_canvas(self, _: TileVec) -> CanvasVec { self }
+	fn to_canvas(self) -> CanvasVec { self }
 }
