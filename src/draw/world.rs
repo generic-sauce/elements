@@ -40,12 +40,12 @@ impl GraphicsWorld {
 	}
 }
 
-impl<B: Backend> ClientWorld<B> {
+impl World {
 	pub fn draw(&mut self, draw: &mut Draw) {
-		draw.world(&self.world.tilemap, &self.world.fluidmap);
-		draw_players(draw, &self.world);
-		draw_cursors(draw, &self.world);
-		draw_healthbars(draw, &self.world);
+		draw.world(&self.tilemap, &self.fluidmap);
+		draw_players(draw, self);
+		draw_cursors(draw, self);
+		draw_healthbars(draw, self);
 		draw.text(v(0.0, 0.0), 40.0, Color::WHITE, "Hello Text!");
 	}
 }

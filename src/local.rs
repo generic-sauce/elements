@@ -23,7 +23,7 @@ impl<B: Backend> Runnable<B> for Local<B> {
 
 	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
 		let mut draw = Draw::new(timed_loop_info.elapsed_time);
-		self.client_world.draw(&mut draw);
+		self.client_world.world.draw(&mut draw);
 		app.graphics_backend.draw(draw);
 	}
 
