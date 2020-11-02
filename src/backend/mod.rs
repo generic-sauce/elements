@@ -9,9 +9,14 @@ pub trait Backend {
 	type GraphicsBackend: GraphicsBackend;
 }
 
-pub struct NativeBackend;
+#[cfg(feature = "native-client")] mod native {
+	use super::*;
 
-impl Backend for NativeBackend {
-	 type InputBackend = NativeInputBackend;
-	 type GraphicsBackend = NativeGraphicsBackend;
+	pub struct NativeBackend;
+
+	impl Backend for NativeBackend {
+		 type InputBackend = NativeInputBackend;
+		 type GraphicsBackend = NativeGraphicsBackend;
+	}
 }
+#[cfg(feature = "native-client")] pub use native::*;
