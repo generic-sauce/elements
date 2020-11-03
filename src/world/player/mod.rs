@@ -53,7 +53,7 @@ pub enum XDir {
 #[derive(PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
 pub enum WallMode {
 	NoFluids, // when you are InProgress, and then the fluids run out.
-	InProgress { relative: GameVec, absolute: GameVec }, // while you are drawing the wall.
+	InProgress { last_drawn_tile: TileVec }, // while you are drawing the wall.
 	NotWalling, // when you are not drawing the wall.
 }
 

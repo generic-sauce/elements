@@ -10,17 +10,11 @@ impl World {
 		let cursor = player.cursor_position();
 
 		// deadzone
-		let too_short = (cursor - player.center_position()).as_short_as(TILESIZE/2);
-
-		let (from, to) = match (player.wall_mode, too_short) {
-			(WallMode::NoFluids, _) => return,
-			(WallMode::NotWalling, _) => (cursor, cursor),
-			(WallMode::InProgress { absolute, .. }, false) => (absolute, cursor),
-			(WallMode::InProgress { absolute, relative }, true) => (absolute, player.center_position() + relative),
+		let from = match player.wall_mode {
+			WallMode::NoFluids => return,
+			WallMode::NotWalling => cursor,
+			WallMode::InProgress { last_drawn_tile } => last_drawn_tile.to_game(),
 		};
-
-		let relative = to - player.center_position();
-		player.wall_mode = WallMode::InProgress { absolute: to, relative };
 
 		self.wall_from_to(p, from, cursor, handler);
 	}
@@ -49,13 +43,18 @@ impl World {
 			Tile::Wall { owner, remaining_lifetime } if owner == p => {
 				WALL_LIFETIME - remaining_lifetime
 			},
-			_ => return Some(()),
+			_ => {
+				self.players[p].wall_mode = WallMode::InProgress { last_drawn_tile: pos_tile };
+				return Some(())
+			},
 		};
 
 		self.alloc_wall_lifetime(p, refill_amount)?;
 
 		self.tilemap.set(pos_tile, Tile::Wall { owner: p, remaining_lifetime: WALL_LIFETIME });
+
 		handler.tilemap_changed();
+		self.players[p].wall_mode = WallMode::InProgress { last_drawn_tile: pos_tile };
 
 		Some(())
 	}
@@ -82,16 +81,17 @@ impl World {
 		Some(())
 	}
 
-	// return a position close to pos, not colliding with the player p
+	// yields what we expect the player meant by `start`
+	// not guaranteed to be outside of any player position
 	fn unglitch(&self, p: usize, start: GameVec) -> GameVec {
 		let pl = &self.players[p];
 		let center = pl.center_position();
 
-		let mut diff = start - center;
+		let diff = start - center;
 
-		// in order to prevent division by zero
-		if diff == v(0, 0) {
-			diff = v(1, 0);
+		// we don't unglitch if its too close the center of the player
+		if diff.as_short_as(TILESIZE/2) {
+			return start;
 		}
 
 		const STEP: i32 = 4;
