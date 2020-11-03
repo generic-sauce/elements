@@ -1,7 +1,7 @@
 use crate::graphics::*;
 use super::*;
 
-fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
+fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle]) -> Vec<u8> {
 	let floats_per_vertex = 7;
 	let floats_per_triangle = 3 * floats_per_vertex;
 	let floats_in_triangles = triangles.len() * floats_per_triangle;
@@ -10,9 +10,10 @@ fn triangles_to_bytes(triangles: &[Triangle]) -> Vec<u8> {
 
 	for triangle in triangles {
 		for vertex in triangle {
+			let position = vertex.position.to_surface(window_size);
 			let l = [
-				vertex.position.x.to_le_bytes(),
-				vertex.position.y.to_le_bytes(),
+				position.x.to_le_bytes(),
+				position.y.to_le_bytes(),
 				vertex.uv.x.to_le_bytes(),
 				vertex.uv.y.to_le_bytes(),
 				vertex.color.r.to_le_bytes(),
@@ -212,8 +213,9 @@ impl DrawTriangles {
 		let mut all_bytes = Vec::new();
 		let mut slice_end = 0;
 		let mut slice_ends = Vec::new();
+		let window_size = context.window_size.to_subpixel();
 		for triangles in draw.triangles.iter() {
-			let bytes = triangles_to_bytes(&triangles[..]);
+			let bytes = triangles_to_bytes(window_size, &triangles[..]);
 			slice_end += bytes.len();
 			slice_ends.push(slice_end as u64);
 			all_bytes.extend(&bytes);

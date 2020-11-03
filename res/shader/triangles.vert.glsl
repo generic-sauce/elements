@@ -15,6 +15,5 @@ void main() {
 	uv = vertex_uv;
 	color = vertex_color;
 	float aspect = 128. / 72.;
-	vec2 position_screen_space = vertex_position * 2. - 1.;
-	gl_Position = vec4(position_screen_space, 0, 1);
+	gl_Position = vec4(vertex_position, 0, 1);
 }

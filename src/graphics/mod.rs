@@ -65,7 +65,7 @@ impl Graphics {
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
 		let triangles = DrawTriangles::new(&device, &queue);
-		let tilemap = DrawTilemap::new(&device, &queue);
+		let tilemap = DrawTilemap::new(&device);
 		let fluidmap = DrawFluidmap::new(&device);
 		let text = DrawText::new(&device);
 

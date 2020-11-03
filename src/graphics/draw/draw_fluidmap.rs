@@ -238,11 +238,13 @@ impl DrawFluidmap {
 		assert!(tilemap_size != TileVec::new(0, 0));
 		self.resize_fluidmap(context.device, tilemap_size);
 
+		let window_size = context.window_size.to_subpixel();
+		let s = |v: ViewVec| v.to_surface(window_size);
 		context.queue.write_buffer(&self.vertex_buffer, 0, &vertices_to_bytes(&[
-			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
-			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
-			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
-			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
+			Vertex { position: s(v(0.0, 0.0)), uv: v(0.0, 0.0) },
+			Vertex { position: s(v(1.0, 0.0)), uv: v(1.0, 0.0) },
+			Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
+			Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
 		])[..]);
 
 		context.queue.write_texture(

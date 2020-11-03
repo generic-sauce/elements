@@ -72,18 +72,25 @@ impl IntoViewVec for ViewVec {
 }
 
 pub trait IntoSurfaceVec {
-	fn to_surface(self, window_size: WindowVec) -> SurfaceVec;
+	fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec;
 }
 
 impl IntoSurfaceVec for ViewVec {
-	fn to_surface(self, _window_size: WindowVec) -> SurfaceVec {
-		let v = self * 2.0 - 1.0;
+	fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
+		let mut v = self * 2.0 - 1.0;
+		let aspect = window_size.x / window_size.y;
+		let ratio = aspect / VIEW_ASPECT;
+		if ratio > 1.0 {
+			v.x /= ratio;
+		} else {
+			v.y *= ratio;
+		}
 		SurfaceVec::new(v.x, v.y)
 	}
 }
 
 impl IntoSurfaceVec for CanvasVec {
-	fn to_surface(self, window_size: WindowVec) -> SurfaceVec {
+	fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
 		self.to_view().to_surface(window_size)
 	}
 }

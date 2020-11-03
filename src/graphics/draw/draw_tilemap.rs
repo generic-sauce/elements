@@ -89,14 +89,8 @@ impl DrawTilemap {
 		})
 	}
 
-	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTilemap {
+	pub(in crate::graphics) fn new(device: &wgpu::Device) -> DrawTilemap {
 		let vertex_buffer = Self::create_vertex_buffer(device, 4);
-		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&[
-			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
-			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
-			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
-			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
-		])[..]);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
 			stride: vertex_to_bytes_len(),
@@ -216,6 +210,15 @@ impl DrawTilemap {
 	) {
 		assert!(tilemap_size != TileVec::new(0, 0));
 		self.resize_tilemap(context.device, tilemap_size);
+
+		let window_size = context.window_size.to_subpixel();
+		let s = |v: ViewVec| v.to_surface(window_size);
+		context.queue.write_buffer(&self.vertex_buffer, 0, &vertices_to_bytes(&[
+			Vertex { position: s(v(0.0, 0.0)), uv: v(0.0, 0.0) },
+			Vertex { position: s(v(1.0, 0.0)), uv: v(1.0, 0.0) },
+			Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
+			Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
+		])[..]);
 
 		context.queue.write_texture(
 			wgpu::TextureCopyView {
