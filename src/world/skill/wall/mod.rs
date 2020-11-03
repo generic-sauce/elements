@@ -6,17 +6,18 @@ const WALLS_PER_FLUID: u32 = 6;
 
 impl World {
 	pub(in super) fn handle_wall(&mut self, p: usize, handler: &mut impl EventHandler) {
-		let player = &mut self.players[p];
-		let cursor = player.cursor_position();
+		let cursor = self.players[p].cursor_position();
+
+		let interpreted_cursor = self.interpret_wallpos(p, cursor);
 
 		// deadzone
-		let from = match player.wall_mode {
+		let from = match self.players[p].wall_mode {
 			WallMode::NoFluids => return,
-			WallMode::NotWalling => cursor,
+			WallMode::NotWalling => interpreted_cursor,
 			WallMode::InProgress { last_drawn_tile } => last_drawn_tile.to_game(),
 		};
 
-		self.wall_from_to(p, from, cursor, handler);
+		self.wall_from_to(p, from, interpreted_cursor, handler);
 	}
 
 	pub(in super) fn stop_wall(&mut self, p: usize) {
@@ -24,7 +25,7 @@ impl World {
 	}
 
 	fn wall_from_to(&mut self, p: usize, from: GameVec, to: GameVec, handler: &mut impl EventHandler) {
-		let path = self.generate_wall_path(p, from, to);
+		let path = self.generate_wall_path(from, to);
 		for t in path {
 			if self.wall(p, t, handler).is_none() {
 				self.players[p].wall_mode = WallMode::NoFluids;

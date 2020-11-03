@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
 impl World {
-	pub(super) fn generate_wall_path(&self, p: usize, from: GameVec, to: GameVec) -> Vec<TileVec> {
-		let mut path = self.direct_path(p, from, to);
+	pub(super) fn generate_wall_path(&self, from: GameVec, to: GameVec) -> Vec<TileVec> {
+		let mut path = self.direct_path(from, to);
 
 		self.assert_path(&path[..]);
 
@@ -38,10 +38,7 @@ impl World {
 		path
 	}
 
-	fn direct_path(&self, p: usize, from: GameVec, to: GameVec) -> Vec<TileVec> {
-		let from = self.interpret_wallpos(p, from);
-		let to = self.interpret_wallpos(p, to);
-
+	fn direct_path(&self, from: GameVec, to: GameVec) -> Vec<TileVec> {
 		let mut direct_path = vec![from.to_tile()];
 
 		let n = (from - to).length() * 8 / TILESIZE; // is this well?
