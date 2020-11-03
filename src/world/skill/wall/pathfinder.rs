@@ -39,8 +39,8 @@ impl World {
 	}
 
 	fn direct_path(&self, p: usize, from: GameVec, to: GameVec) -> Vec<TileVec> {
-		let from = self.unglitch(p, from);
-		let to = self.unglitch(p, to);
+		let from = self.interpret_wallpos(p, from);
+		let to = self.interpret_wallpos(p, to);
 
 		let mut direct_path = vec![from.to_tile()];
 
