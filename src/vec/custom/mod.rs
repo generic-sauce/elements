@@ -6,21 +6,42 @@ pub struct DefaultParam;
 pub type Vec2u = Vec2t<u32, DefaultParam>;
 pub type Vec2f = Vec2t<f32, DefaultParam>;
 
+/* from (0, 0) to tilemap size
+ * corresponds to world coordinates
+ * 256 units per tile
+ */
 pub struct GameParam;
 pub type GameVec = Vec2t<i32, GameParam>;
 
+/* from (0, 0) to tilemap size
+ * corresponds to world coordinates
+ * 1 unit per tile
+ */
 pub struct TileParam;
 pub type TileVec = Vec2t<i32, TileParam>;
 
+/* from (0, 0) to fluidmap size
+ * corresponds to world coordinates
+ * 1 unit per fluid grid cell
+ */
 pub struct FluidParam;
 pub type FluidVec = Vec2t<i32, FluidParam>;
 
+/* from (0, 0) to window size
+ * corresponds to window coordinates
+ */
 pub struct WindowParam;
 pub type WindowVec = Vec2t<u32, WindowParam>;
 
+/* from (0, 0) to window size
+ * corresponds to window coordinates
+ */
 pub struct SubPixelParam;
 pub type SubPixelVec = Vec2t<f32, SubPixelParam>;
 
+/* from (0, 0) to (1, 1)
+ * corresponds to texture coordinates
+ */
 pub struct TextureParam;
 pub type TextureVec = Vec2t<f32, TextureParam>;
 

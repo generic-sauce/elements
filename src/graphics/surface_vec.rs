@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const VIEW_SIZE: GameVec = TileVec::new(128, 72).to_game();
+const VIEW_SIZE: TileVec = TileVec::new(128, 72);
 const VIEW_ASPECT: f32 = VIEW_SIZE.x as f32 / VIEW_SIZE.y as f32;
 
 /* from (-1, -1) to (1, 1)
