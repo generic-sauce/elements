@@ -7,6 +7,7 @@ pub type CanvasVec = Vec2t<f32, CanvasParam>;
 
 impl CanvasVec {
 	pub const fn to_f(self) -> Vec2f { Vec2f::new(self.x as f32, self.y as f32) }
+	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec { SubPixelVec::new(self.x, self.y) * window_size.y }
 }
 
 pub trait IntoCanvasVec {

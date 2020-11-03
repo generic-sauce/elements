@@ -93,7 +93,7 @@ impl InputState {
 
 	pub fn update_peripherals(&mut self, peripherals_state: &PeripheralsState) {
 		self.update_keyboard(peripherals_state);
-		self.update_cursor(&peripherals_state.cursor_move);
+		self.update_cursor(&peripherals_state.cursor_move.cast());
 	}
 
 	pub fn update_keyboard(&mut self, peripherals_state: &PeripheralsState) {
@@ -136,7 +136,7 @@ impl InputState {
 		}
 	}
 
-	pub fn update_cursor(&mut self, cursor_move: &WindowVec) {
+	pub fn update_cursor(&mut self, cursor_move: &SubPixelVec) {
 		self.cursor.x += cursor_move.x * CURSOR_MOUSE_SPEED;
 		self.cursor.y -= cursor_move.y * CURSOR_MOUSE_SPEED;
 		self.cursor = self.cursor.length_clamped(1.0);

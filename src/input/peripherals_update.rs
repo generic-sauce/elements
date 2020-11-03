@@ -4,7 +4,7 @@ pub enum PeripheralsUpdate {
 	KeyPress(Key),
 	KeyRelease(Key),
 	Text(char),
-	MouseMove(WindowVec),
+	MouseMove(SubPixelVec),
 }
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]

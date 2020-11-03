@@ -16,7 +16,7 @@ pub struct Graphics {
 	surface: wgpu::Surface,
 	device: wgpu::Device,
 	queue: wgpu::Queue,
-	window_size: Vec2u,
+	window_size: WindowVec,
 	swap_chain: wgpu::SwapChain,
 	triangles: DrawTriangles,
 	tilemap: DrawTilemap,
@@ -24,12 +24,12 @@ pub struct Graphics {
 	text: DrawText,
 }
 
-fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, size: Vec2u) -> wgpu::SwapChain {
+fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, window_size: WindowVec) -> wgpu::SwapChain {
 	let swap_chain_desc = wgpu::SwapChainDescriptor {
 		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
 		format: SURFACE_FORMAT,
-		width: size.x,
-		height: size.y,
+		width: window_size.x,
+		height: window_size.y,
 		present_mode: wgpu::PresentMode::Immediate,
 	};
 
@@ -63,13 +63,13 @@ impl Graphics {
 			.unwrap();
 
 		let window_size = window.inner_size();
-		let window_size = Vec2u::new(window_size.width, window_size.height);
+		let window_size = WindowVec::new(window_size.width, window_size.height);
 
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
 		let triangles = DrawTriangles::new(&device, &queue);
 		let tilemap = DrawTilemap::new(&device, &queue);
-		let fluidmap = DrawFluidmap::new(&device, &queue);
+		let fluidmap = DrawFluidmap::new(&device);
 		let text = DrawText::new(&device);
 
 		Graphics {
@@ -154,7 +154,7 @@ impl Graphics {
 		self.queue.submit(Some(encoder.finish()));
 	}
 
-	pub fn resize(&mut self, size: Vec2u) {
+	pub fn resize(&mut self, size: WindowVec) {
 		self.window_size = size;
 		self.swap_chain = create_swap_chain(&self.device, &self.surface, size);
 	}

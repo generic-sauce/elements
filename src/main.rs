@@ -7,7 +7,7 @@ include!("base.rs");
 
 use crate::prelude::*;
 
-const DEFAULT_CURSOR_POSITION: WindowVec = WindowVec::new(300.0, 300.0);
+const DEFAULT_CURSOR_POSITION: SubPixelVec = SubPixelVec::new(300.0, 300.0);
 
 #[cfg(feature = "native-client")]
 fn main() {
@@ -50,7 +50,7 @@ fn main() {
 				*control_flow = win::ControlFlow::Exit;
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::CursorMoved { position, .. }, .. } => {
-				let cursor_position = WindowVec::new(position.x as f32, position.y as f32);
+				let cursor_position = SubPixelVec::new(position.x as f32, position.y as f32);
 				let cursor_move = cursor_position - DEFAULT_CURSOR_POSITION;
 				if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
 					peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
@@ -58,7 +58,7 @@ fn main() {
 				}
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::Resized(size), .. } => {
-				graphics.resize(Vec2u::new(size.width, size.height));
+				graphics.resize(WindowVec::new(size.width, size.height));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::ReceivedCharacter(c), .. } => {
 				peripherals_update = Some(PeripheralsUpdate::Text(c));

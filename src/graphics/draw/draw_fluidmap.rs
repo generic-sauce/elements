@@ -4,7 +4,7 @@ use crate::graphics::*;
 #[derive(Copy, Clone)]
 struct Vertex {
 	position: SurfaceVec,
-	uv: Vec2f,
+	uv: TextureVec,
 }
 
 fn vertex_to_bytes_len() -> u64 {
@@ -105,14 +105,8 @@ pub(in crate::graphics) struct DrawFluidmap {
 }
 
 impl DrawFluidmap {
-	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawFluidmap {
+	pub(in crate::graphics) fn new(device: &wgpu::Device) -> DrawFluidmap {
 		let vertex_buffer = create_vertex_buffer(device, 4);
-		queue.write_buffer(&vertex_buffer, 0, &vertices_to_bytes(&[
-			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
-			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
-			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
-			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
-		])[..]);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
 			stride: vertex_to_bytes_len(),
@@ -243,6 +237,13 @@ impl DrawFluidmap {
 	) {
 		assert!(tilemap_size != TileVec::new(0, 0));
 		self.resize_fluidmap(context.device, tilemap_size);
+
+		context.queue.write_buffer(&self.vertex_buffer, 0, &vertices_to_bytes(&[
+			Vertex { position: v(-1.0, -1.0), uv: v(0.0, 0.0) },
+			Vertex { position: v( 1.0, -1.0), uv: v(1.0, 0.0) },
+			Vertex { position: v(-1.0,  1.0), uv: v(0.0, 1.0) },
+			Vertex { position: v( 1.0,  1.0), uv: v(1.0, 1.0) },
+		])[..]);
 
 		context.queue.write_texture(
 			wgpu::TextureCopyView {

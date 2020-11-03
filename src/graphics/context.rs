@@ -5,5 +5,5 @@ pub struct GraphicsContext<'a> {
 	pub queue: &'a wgpu::Queue,
 	pub swap_chain_texture: &'a wgpu::SwapChainTexture,
 	pub encoder: &'a mut wgpu::CommandEncoder,
-	pub window_size: Vec2u,
+	pub window_size: WindowVec,
 }

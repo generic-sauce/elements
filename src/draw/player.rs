@@ -46,6 +46,7 @@ pub(in super) fn draw_healthbars(draw: &mut Draw, world: &World) {
 		left_bot.x -= PLAYER_SIZE.x / 2;
 		left_bot.y += PLAYER_SIZE.y + TILESIZE;
 		draw.rectangle(left_bot, left_bot + size, Color::BLACK);
+
 		size.x = (size.x as f32 * (p.health as f32 / MAX_HEALTH as f32)) as i32;
 		draw.rectangle(left_bot, left_bot + size, Color::GREEN);
 	}

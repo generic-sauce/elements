@@ -32,13 +32,12 @@ impl DrawText {
 		self.staging_belt.recall();
 
 		for text in &draw.texts {
-			let window_size = context.window_size.to_f();
-			let mut left_bot = text.left_bot.to_f();
-			left_bot.y = 1.0 - left_bot.y;
-			left_bot.y -= text.scale;
-			left_bot *= window_size;
-			let left_bot = (left_bot.x, left_bot.y);
+			let window_size = context.window_size.to_subpixel();
 			let scale = text.scale * window_size.y;
+			let mut left_bot = text.left_bot.to_subpixel(window_size);
+			left_bot.y = window_size.y - left_bot.y;
+			left_bot.y -= scale;
+			let left_bot = (left_bot.x, left_bot.y);
 			let color = text.color;
 			let color = [color.r, color.g, color.b, color.a];
 
@@ -61,8 +60,8 @@ impl DrawText {
 				&mut self.staging_belt,
 				context.encoder,
 				&context.swap_chain_texture.view,
-				context.window_size.x,
-				context.window_size.y,
+				context.window_size.x as u32,
+				context.window_size.y as u32,
 			)
 			.expect("Draw queued");
 

@@ -3,7 +3,7 @@ use crate::prelude::*;
 pub struct PeripheralsState {
 	pub pressed_keys: HashSet<Key>,
 	pub just_pressed_keys: HashSet<Key>,
-	pub cursor_move: WindowVec,
+	pub cursor_move: SubPixelVec,
 }
 
 impl PeripheralsState {
@@ -11,7 +11,7 @@ impl PeripheralsState {
 		PeripheralsState {
 			pressed_keys: HashSet::new(),
 			just_pressed_keys: HashSet::new(),
-			cursor_move: WindowVec::new(0.0, 0.0),
+			cursor_move: SubPixelVec::new(0.0, 0.0),
 		}
 	}
 
@@ -28,7 +28,7 @@ impl PeripheralsState {
 			PeripheralsUpdate::KeyPress(key) => self.update_press(key),
 			PeripheralsUpdate::KeyRelease(key) => self.update_release(key),
 			PeripheralsUpdate::MouseMove(cursor_move) => {
-				self.cursor_move += cursor_move.cast();
+				self.cursor_move += *cursor_move;
 			},
 			_ => {},
 		};
@@ -48,6 +48,6 @@ impl PeripheralsState {
 
 	pub fn reset(&mut self) {
 		self.just_pressed_keys.clear();
-		self.cursor_move = WindowVec::new(0.0, 0.0);
+		self.cursor_move = SubPixelVec::new(0.0, 0.0);
 	}
 }
