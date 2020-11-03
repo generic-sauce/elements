@@ -6,6 +6,16 @@ impl World {
 
 		self.assert_path(&path[..]);
 
+		// remove glitched start- and end-segments
+		while path.first().map(|x| self.coll(*x)).unwrap_or(false) {
+			path.remove(0);
+		}
+
+		while path.last().map(|x| self.coll(*x)).unwrap_or(false) {
+			path.pop();
+		}
+
+		// remove glitched inner segments
 		while let Some(i) = path.iter().position(|tile| self.coll(*tile)) {
 			let before_gap = i - 1;
 			let after_gap = path.iter().enumerate().position(|(j, tile)| j > i && !self.coll(*tile)).unwrap();
@@ -115,8 +125,8 @@ impl World {
 	}
 
 	fn assert_path(&self, path: &[TileVec]) {
-		for i in 0..path.len() - 1 {
-			let diff = path[i] - path[i + 1];
+		for i in 1..path.len() {
+			let diff = path[i-1] - path[i];
 			assert_eq!(diff.x.abs() + diff.y.abs(), 1);
 		}
 	}
