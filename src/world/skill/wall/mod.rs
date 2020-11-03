@@ -82,7 +82,7 @@ impl World {
 	}
 
 	// yields what we expect the player meant by `start`
-	// not guaranteed to be outside of any player position
+	// not guaranteed to be outside of any player
 	fn unglitch(&self, p: usize, start: GameVec) -> GameVec {
 		let pl = &self.players[p];
 		let center = pl.center_position();
