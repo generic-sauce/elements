@@ -9,8 +9,8 @@ use world::*;
 mod texture;
 pub use texture::*;
 
-mod canvas_vec;
-pub use canvas_vec::*;
+mod vec;
+pub use vec::*;
 
 #[derive(Copy, Clone)]
 pub struct Color {

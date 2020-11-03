@@ -15,12 +15,27 @@ pub type CanvasVec = Vec2t<f32, CanvasParam>;
 pub struct ViewParam;
 pub type ViewVec = Vec2t<f32, ViewParam>;
 
+/* from (-1, -1) to (1, 1)
+ * corresponds to the window surface area
+ */
+pub struct SurfaceParam;
+pub type SurfaceVec = Vec2t<f32, SurfaceParam>;
+
+#[allow(unused)]
 impl ViewVec {
+	pub fn left_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x, y + 1.0) }
+	pub fn right_bot(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y) }
+	pub fn right_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y + 1.0) }
+	pub fn center(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT * 0.5, y + 0.5) }
 	pub fn to_canvas(self) -> CanvasVec { CanvasVec::new(self.x * VIEW_ASPECT, self.y) }
 }
 
+#[allow(unused)]
 impl CanvasVec {
-	pub const fn to_f(self) -> Vec2f { Vec2f::new(self.x as f32, self.y as f32) }
+	pub fn left_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x, y + 1.0) }
+	pub fn right_bot(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y) }
+	pub fn right_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y + 1.0) }
+	pub fn center(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 0.5, y + 0.5) }
 	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec { SubPixelVec::new(self.x, self.y) * window_size.y }
 	pub fn to_view(self) -> ViewVec { ViewVec::new(self.x / VIEW_ASPECT, self.y) }
 }
@@ -50,4 +65,21 @@ impl IntoCanvasVec for ViewVec {
 
 impl IntoCanvasVec for CanvasVec {
 	fn to_canvas(self) -> CanvasVec { self }
+}
+
+pub trait IntoSurfaceVec {
+	fn to_surface(self, window_size: WindowVec) -> SurfaceVec;
+}
+
+impl IntoSurfaceVec for ViewVec {
+	fn to_surface(self, _window_size: WindowVec) -> SurfaceVec {
+		let v = self * 2.0 - 1.0;
+		SurfaceVec::new(v.x, v.y)
+	}
+}
+
+impl IntoSurfaceVec for CanvasVec {
+	fn to_surface(self, window_size: WindowVec) -> SurfaceVec {
+		self.to_view().to_surface(window_size)
+	}
 }
