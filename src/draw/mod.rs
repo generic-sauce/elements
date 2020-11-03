@@ -50,7 +50,7 @@ pub enum Flip {
 
 #[derive(Copy, Clone)]
 pub struct Vertex {
-	pub position: CanvasVec,
+	pub position: ViewVec,
 	pub uv: TextureVec,
 	pub color: Color,
 }
@@ -60,7 +60,7 @@ pub type Triangles = Vec<Triangle>;
 pub type TextureTriangles = Vec<Triangles>;
 
 pub struct Text {
-	pub left_bot: CanvasVec,
+	pub left_bot: ViewVec,
 	pub scale: f32,
 	pub color: Color,
 	pub string: String,
@@ -93,16 +93,16 @@ impl Draw {
 	#[allow(unused)]
 	pub fn texture(
 		&mut self,
-		left_bot: impl IntoCanvasVec,
-		right_top: impl IntoCanvasVec,
+		left_bot: impl IntoViewVec,
+		right_top: impl IntoViewVec,
 		texture_index: impl IntoTextureIndex,
 		flip: Flip,
 		color: Option<Color>,
 	) {
 		let texture_index = texture_index.into_texture_index();
 		let triangles = &mut self.triangles[texture_index];
-		let left_bot = left_bot.to_canvas();
-		let right_top = right_top.to_canvas();
+		let left_bot = left_bot.to_view();
+		let right_top = right_top.to_view();
 		let color = color.unwrap_or(Color::WHITE);
 		let (left_uv, right_uv) = match flip {
 			Flip::Normal => (0.0, 1.0),
@@ -125,13 +125,13 @@ impl Draw {
 	#[allow(unused)]
 	pub fn rectangle(
 		&mut self,
-		left_bot: impl IntoCanvasVec,
-		right_top: impl IntoCanvasVec,
+		left_bot: impl IntoViewVec,
+		right_top: impl IntoViewVec,
 		color: Color,
 	) {
 		let triangles = &mut self.triangles[TextureId::White as usize];
-		let left_bot = left_bot.to_canvas();
-		let right_top = right_top.to_canvas();
+		let left_bot = left_bot.to_view();
+		let right_top = right_top.to_view();
 
 		triangles.push([
 			Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
@@ -153,12 +153,12 @@ impl Draw {
 	#[allow(unused)]
 	pub fn text(
 		&mut self,
-		left_bot: impl IntoCanvasVec,
+		left_bot: impl IntoViewVec,
 		scale: f32,
 		color: Color,
 		string: &str,
 	) {
-		let left_bot = left_bot.to_canvas();
+		let left_bot = left_bot.to_view();
 		let string = string.to_string();
 
 		let text = Text {
