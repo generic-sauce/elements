@@ -33,11 +33,16 @@ impl DrawText {
 
 		for text in &draw.texts {
 			let window_size = context.window_size.to_subpixel();
-			let scale = text.scale * window_size.y;
-			let mut left_bot = text.left_bot.to_subpixel(window_size);
-			left_bot.y = window_size.y - left_bot.y;
-			left_bot.y -= scale;
+
+			let mut left_bot = text.left_bot;
+			left_bot.y = 1.0 - left_bot.y;
+			left_bot.y -= text.scale;
+			let left_bot = left_bot.to_subpixel(window_size);
 			let left_bot = (left_bot.x, left_bot.y);
+
+			let scale = window_size.y * f32::min(1.0, window_view_ratio(window_size));
+			let scale = text.scale * scale;
+
 			let color = text.color;
 			let color = [color.r, color.g, color.b, color.a];
 

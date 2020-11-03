@@ -4,7 +4,6 @@ const VIEW_SIZE_TILE: TileVec = TileVec::new(128, 72);
 const VIEW_SIZE_GAME: GameVec = VIEW_SIZE_TILE.to_game();
 const VIEW_ASPECT: f32 = VIEW_SIZE_TILE.x as f32 / VIEW_SIZE_TILE.y as f32;
 
-
 /* from (0, 0) to (1, 1)
  * corresponds to the draw area
  */
@@ -30,10 +29,24 @@ impl ViewVec {
 	pub fn right_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y + 1.0) }
 	pub fn center(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT * 0.5, y + 0.5) }
 	pub fn to_canvas(self) -> CanvasVec { CanvasVec::new(self.x * VIEW_ASPECT, self.y) }
-	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec { SubPixelVec::new(
-		self.x * window_size.x,
-		self.y * window_size.y
-	)}
+	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec {
+		let mut v = self.to_surface(window_size);
+		v = v * 0.5 + 0.5;
+		v.x *= window_size.x;
+		v.y *= window_size.y;
+		println!("{}", v);
+		SubPixelVec::new(v.x, v.y)
+	}
+	pub fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
+		let mut v = self * 2.0 - 1.0;
+		let ratio = window_view_ratio(window_size);
+		if ratio > 1.0 {
+			v.x /= ratio;
+		} else {
+			v.y *= ratio;
+		}
+		SurfaceVec::new(v.x, v.y)
+	}
 }
 
 #[allow(unused)]
@@ -43,6 +56,8 @@ impl CanvasVec {
 	pub fn right_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y + 1.0) }
 	pub fn center(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 0.5, y + 0.5) }
 	pub fn to_view(self) -> ViewVec { ViewVec::new(self.x / VIEW_ASPECT, self.y) }
+	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec { self.to_view().to_subpixel(window_size) }
+	pub fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec { self.to_view().to_surface(window_size) }
 }
 
 pub trait IntoViewVec {
@@ -71,26 +86,8 @@ impl IntoViewVec for ViewVec {
 	fn to_view(self) -> ViewVec { self }
 }
 
-pub trait IntoSurfaceVec {
-	fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec;
-}
-
-impl IntoSurfaceVec for ViewVec {
-	fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
-		let mut v = self * 2.0 - 1.0;
-		let aspect = window_size.x / window_size.y;
-		let ratio = aspect / VIEW_ASPECT;
-		if ratio > 1.0 {
-			v.x /= ratio;
-		} else {
-			v.y *= ratio;
-		}
-		SurfaceVec::new(v.x, v.y)
-	}
-}
-
-impl IntoSurfaceVec for CanvasVec {
-	fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
-		self.to_view().to_surface(window_size)
-	}
+pub fn window_view_ratio(window_size: SubPixelVec) -> f32 {
+	let aspect = window_size.x / window_size.y;
+	let ratio = aspect / VIEW_ASPECT;
+	ratio
 }
