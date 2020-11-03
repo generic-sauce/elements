@@ -34,7 +34,6 @@ impl ViewVec {
 		v = v * 0.5 + 0.5;
 		v.x *= window_size.x;
 		v.y *= window_size.y;
-		println!("{}", v);
 		SubPixelVec::new(v.x, v.y)
 	}
 	pub fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
