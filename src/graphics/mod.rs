@@ -91,13 +91,18 @@ impl Graphics {
 		let swap_chain_frame = self.swap_chain
 			.get_current_frame();
 
-		let swap_chain_texture;
-		if let Ok(swap_chain_frame) = swap_chain_frame {
-			swap_chain_texture = swap_chain_frame.output;
-		} else {
-			println!("failed to swap_chain.get_current_frame(). skipping frame");
-			return;
+		if let Err(err) = &swap_chain_frame {
+			println!("swap chain error: {}", match err {
+				wgpu::SwapChainError::Timeout => "timeout",
+				wgpu::SwapChainError::Outdated => "outdated",
+				wgpu::SwapChainError::Lost => "lost",
+				wgpu::SwapChainError::OutOfMemory => "out of memory",
+			});
 		}
+
+		let swap_chain_texture = swap_chain_frame
+			.unwrap()
+			.output;
 
 		let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
 			label: Some("command encoder")
