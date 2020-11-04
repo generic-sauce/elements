@@ -23,8 +23,8 @@ impl<B: Backend> Runnable<B> for Local<B> {
 		self.world.tick_within_app(app);
 	}
 
-	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
-		let mut draw = Draw::new(timed_loop_info.elapsed_time);
+	fn draw(&mut self, app: &mut App<B>, elapsed_time: Duration) {
+		let mut draw = Draw::new(elapsed_time);
 		self.world.draw(&mut draw);
 		app.graphics_backend.draw(draw);
 	}

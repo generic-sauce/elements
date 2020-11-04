@@ -107,8 +107,8 @@ impl<B: Backend> Runnable<B> for MenuRunnable {
 		self.menu.tick(app, &mut self.next_runnable_change);
 	}
 
-	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo) {
-		let mut draw = Draw::new(timed_loop_info.elapsed_time);
+	fn draw(&mut self, app: &mut App<B>, elapsed_time: Duration) {
+		let mut draw = Draw::new(elapsed_time);
 
 		draw.rectangle(CanvasVec::new(0.0, 0.0), CanvasVec::new(ASPECT_RATIO, 1.0), Color::BLACK);
 

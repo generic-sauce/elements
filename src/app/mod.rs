@@ -12,7 +12,7 @@ pub struct App<B: Backend> {
 
 pub trait Runnable<B: Backend> {
 	fn tick(&mut self, app: &mut App<B>);
-	fn draw(&mut self, app: &mut App<B>, timed_loop_info: &TimedLoopInfo);
+	fn draw(&mut self, app: &mut App<B>, elapsed_time: Duration);
 	fn get_runnable_change(&mut self) -> RunnableChange;
 }
 
@@ -103,7 +103,7 @@ impl<B: Backend> App<B> {
 			}
 
 			runnable.tick(self);
-			runnable.draw(self, &timed_loop_info);
+			runnable.draw(self, timed_loop_info.elapsed_time);
 			runnable_change = runnable.get_runnable_change();
 			match runnable_change {
 				RunnableChange::None => {},
