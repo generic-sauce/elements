@@ -88,21 +88,20 @@ impl Graphics {
 	 * submit command buffer to queue
 	 */
 	pub fn render(&mut self, draw: &Draw) {
-		let swap_chain_frame = self.swap_chain
-			.get_current_frame();
+		let swap_chain_texture = match self.swap_chain.get_current_frame() {
+			Ok(frame) => frame.output,
+			Err(err) => {
+				println!("swap chain error: {}. recreate and try again...", match err {
+					wgpu::SwapChainError::Timeout => "timeout",
+					wgpu::SwapChainError::Outdated => "outdated",
+					wgpu::SwapChainError::Lost => "lost",
+					wgpu::SwapChainError::OutOfMemory => "out of memory",
+				});
 
-		if let Err(err) = &swap_chain_frame {
-			println!("swap chain error: {}", match err {
-				wgpu::SwapChainError::Timeout => "timeout",
-				wgpu::SwapChainError::Outdated => "outdated",
-				wgpu::SwapChainError::Lost => "lost",
-				wgpu::SwapChainError::OutOfMemory => "out of memory",
-			});
-		}
-
-		let swap_chain_texture = swap_chain_frame
-			.unwrap()
-			.output;
+				self.swap_chain = create_swap_chain(&self.device, &self.surface, self.window_size);
+				self.swap_chain.get_current_frame().unwrap().output
+			},
+		};
 
 		let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
 			label: Some("command encoder")
