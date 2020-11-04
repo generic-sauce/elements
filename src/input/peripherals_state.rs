@@ -4,6 +4,7 @@ pub struct PeripheralsState {
 	pub pressed_keys: HashSet<Key>,
 	pub just_pressed_keys: HashSet<Key>,
 	pub cursor_move: SubPixelVec,
+	pub text: Vec<char>,
 }
 
 impl PeripheralsState {
@@ -12,6 +13,7 @@ impl PeripheralsState {
 			pressed_keys: HashSet::new(),
 			just_pressed_keys: HashSet::new(),
 			cursor_move: SubPixelVec::new(0.0, 0.0),
+			text: Vec::new(),
 		}
 	}
 
@@ -30,7 +32,7 @@ impl PeripheralsState {
 			PeripheralsUpdate::MouseMove(cursor_move) => {
 				self.cursor_move += *cursor_move;
 			},
-			_ => {},
+			PeripheralsUpdate::Text(c) => self.text.push(*c),
 		};
 	}
 
@@ -49,5 +51,6 @@ impl PeripheralsState {
 	pub fn reset(&mut self) {
 		self.just_pressed_keys.clear();
 		self.cursor_move = SubPixelVec::new(0.0, 0.0);
+		self.text.clear();
 	}
 }
