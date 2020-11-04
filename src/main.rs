@@ -41,7 +41,8 @@ fn main() {
 	let mut graphics = Graphics::new(&window);
 
 	event_loop.run(move |event, _window_target, control_flow| {
-		*control_flow = win::ControlFlow::Poll;
+		let next_frame_instant = Instant::now() + Duration::from_millis(1);
+		*control_flow = win::ControlFlow::WaitUntil(next_frame_instant);
 
 		let mut peripherals_update: Option<PeripheralsUpdate> = None;
 
@@ -87,7 +88,9 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
-				graphics.render(&draw_receiver.recv().unwrap());
+				if let Ok(draw) = draw_receiver.try_recv() {
+					graphics.render(&draw);
+				}
 			},
 			_ => ()
 		}
