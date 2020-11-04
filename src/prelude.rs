@@ -30,6 +30,11 @@ pub use {
 #[cfg(feature = "client")] pub use {
 	crate::{
 		draw::*,
+		client::*,
+		local::*,
+		app::*,
+		menu::*,
+		backend::*,
 	},
 };
 
@@ -37,12 +42,7 @@ pub use {
 #[cfg(feature = "native-client")] pub use {
 	gilrs::{GamepadId, Gilrs},
 	crate::{
-		client::*,
-		local::*,
-		app::*,
-		menu::*,
 		graphics::*,
-		backend::*,
 	},
 };
 #[cfg(feature = "native-client")] pub mod win {
