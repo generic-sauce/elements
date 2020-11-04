@@ -14,7 +14,7 @@ impl World {
 		let from = match self.players[p].wall_mode {
 			WallMode::NoFluids => return,
 			WallMode::NotWalling => interpreted_cursor,
-			WallMode::InProgress { last_drawn_tile } => last_drawn_tile.to_game(),
+			WallMode::InProgress { last_drawn_tile } => last_drawn_tile.to_game_center(),
 		};
 
 		self.wall_from_to(p, from, interpreted_cursor, handler);

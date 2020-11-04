@@ -54,6 +54,7 @@ impl GameVec {
 
 impl TileVec {
 	pub const fn to_game(self) -> GameVec { GameVec::new(self.x * TILESIZE, self.y * TILESIZE) }
+	pub const fn to_game_center(self) -> GameVec { GameVec::new(self.x * TILESIZE + TILESIZE/2, self.y * TILESIZE + TILESIZE/2) }
 }
 
 impl FluidVec {
