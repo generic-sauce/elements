@@ -1,2 +1,2 @@
-# elements2
+# Elements
 Nice game with elements :3
