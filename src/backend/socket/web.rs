@@ -22,11 +22,6 @@ impl SocketBackend for WebSocketBackend {
 		let leaked_cb = Box::leak(Box::new(cb)); // TODO
 		socket.set_onmessage(Some(leaked_cb.as_ref().dyn_ref().unwrap()));
 
-		// TODO: fix busy waiting!
-		while socket.ready_state() != WebSocket::OPEN {
-			log("WebSocket not yet open!");
-		}
-
 		WebSocketBackend {
 			socket,
 			receiver,
