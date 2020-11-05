@@ -10,14 +10,14 @@ pub struct Menu<B: Backend> {
 	pub elements: Vec<MenuElement<B>>,
 }
 
-fn create_local<B: Backend>(best_of_n: u32) -> Box<dyn OnEvent<B>> {
+fn create_local<B: Backend>(best_of_n: u32) -> OnEvent<B> {
 	Box::new(move |app, runnable| {
 		app.menu.elements.clear();
 		*runnable = Runnable::Local(Local::new(best_of_n));
 	})
 }
 
-fn create_client<B: Backend>() -> Box<dyn OnEvent<B>> {
+fn create_client<B: Backend>() -> OnEvent<B> {
 	Box::new(|app, runnable| {
 		if let MenuKind::EditField { text, .. } = &app.menu.get_element_by_name("ip").unwrap().kind {
 			let text = text.clone();
