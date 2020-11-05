@@ -119,12 +119,6 @@ impl<B: Backend> MenuElement<B> {
 							text.drain((*cursor) as usize..(*cursor + 1) as usize);
 						}
 					},
-					Character::Right => {
-						*cursor = (*cursor + 1).min(text.len() as u32);
-					},
-					Character::Left => {
-						*cursor = cursor.checked_sub(1).unwrap_or(0);
-					},
 					_ => {},
 				}
 			}
@@ -132,11 +126,12 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
-        if let MenuKind::EditField { cursor, text, .. } = &mut self.kind {
+        if let MenuKind::EditField { cursor, .. } = &mut self.kind {
 			if peripherals_state.key_just_pressed(&Key::Left) {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
 			}
 			if peripherals_state.key_just_pressed(&Key::Right) {
+				*cursor = (*cursor + 1).min(text.len() as u32);
 			}
 		}
 
@@ -152,7 +147,5 @@ impl<B: Backend, F: Fn(&mut App<B>, &mut Runnable<B>) + Clone + 'static> OnEvent
 }
 
 impl<B: Backend> Clone for Box<dyn OnEventImpl<B>> {
-	fn clone(&self) -> Self {
-		(**self).clone_box()
-	}
+	fn clone(&self) -> Self { (**self).clone_box() }
 }
