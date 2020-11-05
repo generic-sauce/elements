@@ -16,7 +16,9 @@ export function load(filename) {
 	img.src = "res/" + filename;
 
 	// TODO don't do busy waiting.
-	while (!loaded) {};
+	while (!loaded) {
+		alert("loading tilemap");
+	};
 
 	let canvas = document.createElement('canvas');
 	let context = canvas.getContext('2d');

@@ -84,8 +84,6 @@ pub fn client_main() {
 
 	let input_backend = WebInputBackend;
 	let graphics_backend = WebGraphicsBackend;
-	prompt("pre howdy!");
 	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, runnable.build_menu());
-	prompt("howdy!");
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }

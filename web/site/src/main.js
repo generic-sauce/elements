@@ -17,7 +17,7 @@ window.input_state = function(i) {
 	return inputmod.calc_input_state(i);
 };
 window.load_tilemap = function(src) {
-	tilemapmod.load(src);
+	return tilemapmod.load(src);
 };
 
 import("../node_modules/elements2/elements2.js");
