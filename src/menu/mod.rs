@@ -10,15 +10,15 @@ pub struct Menu<B: Backend> {
 	pub elements: Vec<MenuElement<B>>,
 }
 
-fn create_local<B: Backend>() -> OnEvent<B> {
-	|app, runnable| {
+fn create_local<B: Backend>(best_of_n: u32) -> Box<dyn OnEvent<B>> {
+	Box::new(move |app, runnable| {
 		app.menu.elements.clear();
-		*runnable = Runnable::Local(Local::new(0));
-	}
+		*runnable = Runnable::Local(Local::new(best_of_n));
+	})
 }
 
-fn create_client<B: Backend>() -> OnEvent<B> {
-	|app, runnable| {
+fn create_client<B: Backend>() -> Box<dyn OnEvent<B>> {
+	Box::new(|app, runnable| {
 		if let MenuKind::EditField { text, .. } = &app.menu.get_element_by_name("ip").unwrap().kind {
 			let text = text.clone();
 			app.menu.elements.clear();
@@ -26,7 +26,7 @@ fn create_client<B: Backend>() -> OnEvent<B> {
 		} else {
 			panic!("Could not read ip from edit field!");
 		}
-	}
+	})
 }
 
 fn create_join_server<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
@@ -48,11 +48,11 @@ impl<B: Backend> Menu<B> {
 	pub fn main_menu() -> Menu<B> {
 		Menu {
 			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", create_local()),
-				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", create_local()),
-				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", create_local()),
-				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Join Server", create_join_server),
-				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", |_, _| std::process::exit(0)),
+				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", create_local(9)),
+				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", create_local(5)),
+				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", create_local(0)),
+				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Join Server", Box::new(create_join_server)),
+				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", Box::new(|_, _| std::process::exit(0))),
 			),
 		}
 	}
@@ -61,8 +61,8 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements: vec!(
 				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect", create_client()),
-				MenuElement::new_button(CanvasVec::new(0.15 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Back", create_main_menu),
-				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", |_, _| std::process::exit(0)),
+				MenuElement::new_button(CanvasVec::new(0.15 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Back", Box::new(create_main_menu)),
+				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", Box::new(|_, _| std::process::exit(0))),
 				MenuElement::new_edit_field("ip", CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), ""),
 			)
 		}

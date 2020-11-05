@@ -3,7 +3,9 @@ use crate::prelude::*;
 const BUTTON_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 
-pub type OnEvent<B: Backend> = fn(&mut App<B>, &mut Runnable<B>);
+pub trait OnEvent<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
+	fn clone_box(&self) -> Box<dyn OnEvent<B>>;
+}
 
 pub struct MenuElement<B: Backend> {
 	pub name: &'static str,
@@ -17,7 +19,7 @@ pub struct MenuElement<B: Backend> {
 pub enum MenuKind<B: Backend> {
 	Button {
 		text: &'static str,
-		on_click: OnEvent<B>,
+		on_click: Box<dyn OnEvent<B>>,
 	},
 	EditField {
 		text: String,
@@ -27,7 +29,7 @@ pub enum MenuKind<B: Backend> {
 }
 
 impl<B: Backend> MenuElement<B> {
-	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, on_click: OnEvent<B>) -> MenuElement<B> {
+	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, on_click: Box<dyn OnEvent<B>>) -> MenuElement<B> {
 		MenuElement {
 			name: "",
 			kind: MenuKind::Button { text, on_click },
@@ -123,5 +125,19 @@ impl<B: Backend> MenuElement<B> {
 			}
 		}
 
+	}
+}
+
+// OnEvent impl
+
+impl<B: Backend, F: Fn(&mut App<B>, &mut Runnable<B>) + Clone + 'static> OnEvent<B> for F {
+	fn clone_box(&self) -> Box<dyn OnEvent<B>> {
+		Box::new(self.clone())
+	}
+}
+
+impl<B: Backend> Clone for Box<dyn OnEvent<B>> {
+	fn clone(&self) -> Self {
+		(**self).clone_box()
 	}
 }
