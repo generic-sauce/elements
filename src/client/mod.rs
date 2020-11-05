@@ -14,7 +14,7 @@ pub struct Client<B: Backend> {
 
 impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
-		let mut socket = B::SocketBackend::new(server_ip);
+		let socket = B::SocketBackend::new(server_ip);
 
 		Client {
 			world: World::new(0),
