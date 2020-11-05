@@ -25,3 +25,16 @@ pub trait Backend: 'static {
 	}
 }
 #[cfg(feature = "native-client")] pub use native::*;
+
+#[cfg(feature = "web-client")] mod web {
+	use super::*;
+
+	pub struct WebBackend;
+
+	impl Backend for WebBackend {
+		type InputBackend = WebInputBackend;
+		type GraphicsBackend = WebGraphicsBackend;
+		type AudioBackend = WebAudioBackend;
+	}
+}
+#[cfg(feature = "web-client")] pub use web::*;

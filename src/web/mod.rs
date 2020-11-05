@@ -76,18 +76,16 @@ pub fn client_main() {
 
 	init_js();
 
-	let cb = Closure::<dyn Fn(JsValue)>::wrap(Box::new(|map_src| {
-			let map_src: TileMapImage = map_src.into_serde().unwrap();
-			let world = World::new_by_source(0,  map_src);
-			Webapp {
-				data: WebappData {
-					tick_counter: 0,
-					start_time: now(),
-					world,
-				},
-				mode: WebappMode::Menu,
-			}.schedule();
-	}));
-	let leaked_cb = Box::leak(Box::new(cb)); // TODO
-	load_tilemap("map/map02.png", leaked_cb);
+	let mut runnable = match &*prompt("menu / local / ip") {
+		"menu" => Runnable::Menu,
+		"" | "local" => Runnable::Local(Local::<WebBackend>::new(0)),
+		ip => Runnable::Client(Client::<WebBackend>::new(ip)),
+	};
+
+	let input_backend = WebInputBackend;
+	let graphics_backend = WebGraphicsBackend;
+	prompt("pre howdy!");
+	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, runnable.build_menu());
+	prompt("howdy!");
+	main_loop(move || app.tick_draw(&mut runnable), 60);
 }

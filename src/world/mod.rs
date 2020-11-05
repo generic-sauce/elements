@@ -78,7 +78,6 @@ impl World {
 		}
 	}
 
-	#[cfg(not(feature = "web-client"))]
 	pub fn new(best_of_n: u32) -> World {
 		Self::new_by_source(best_of_n, "map/map04.png")
 	}

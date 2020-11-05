@@ -6,7 +6,7 @@ use crate::prelude::*;
 extern {
 	pub fn init_js();
 	pub fn draw_render_world(rw: JsValue, tilemap_data: Uint8Array, fluidmap_data: Uint8Array);
-	pub fn load_tilemap(name: &str, callback: &Closure<dyn Fn(JsValue)>);
+	pub fn load_tilemap(name: &str) -> JsValue;
 
 	#[wasm_bindgen(js_name = "input_state")]
 	fn input_state_js(i: usize) -> JsValue;
