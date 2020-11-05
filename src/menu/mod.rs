@@ -87,7 +87,7 @@ impl<B: Backend> App<B> {
 		let mut opt_on_click = None;
 		if self.peripherals_state.key_pressed(&Key::LeftMouse) {
 			for element in &mut self.menu.elements {
-				element.clicked = element.is_colliding(&self.cursor_position);
+				element.clicked = element.is_colliding(self.cursor_position);
 			}
 			if let Some(elem) = self.menu.get_selected_element() {
 				if let MenuKind::EditField { selected, .. } = &mut elem.kind {
@@ -123,7 +123,7 @@ impl<B: Backend> App<B> {
 
 		// draw elements
 		for element in &self.menu.elements {
-			element.draw(&mut draw, &self.cursor_position)
+			element.draw(&mut draw, self.cursor_position)
 		}
 
 		// draw cursor

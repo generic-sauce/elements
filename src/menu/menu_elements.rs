@@ -53,12 +53,12 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn is_colliding(&self, pos: &CanvasVec) -> bool {
+	pub fn is_colliding(&self, pos: CanvasVec) -> bool {
 		pos.x >= self.position.x - self.size.x && pos.x <= self.position.x + self.size.x &&
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
 	}
 
-	pub fn draw(&self, draw: &mut Draw, cursor_pos: &CanvasVec) {
+	pub fn draw(&self, draw: &mut Draw, cursor_pos: CanvasVec) {
 		let color = if self.clicked {
 			Color::rgb(0.18, 0.43, 0.54)
 		} else if self.is_colliding(cursor_pos) {
@@ -100,7 +100,7 @@ impl<B: Backend> MenuElement<B> {
 		 */
 	}
 
-	pub fn apply_text(&mut self, event_text: &Vec<char>) {
+	pub fn apply_text(&mut self, event_text: &[char]) {
 		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
 			for c in event_text {
 				text.insert(*cursor as usize, *c);
