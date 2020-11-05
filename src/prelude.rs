@@ -35,6 +35,7 @@ pub use {
 		app::*,
 		menu::*,
 		backend::*,
+		main_loop::*,
 	},
 };
 

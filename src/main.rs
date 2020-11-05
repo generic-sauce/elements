@@ -3,11 +3,6 @@
 #![allow(incomplete_features)]
 #![feature(generic_associated_types)]
 
-fn main_loop(mut f: impl FnMut()) {
-	TimedLoop::with_fps(60)
-		.for_each(move |_| f());
-}
-
 include!("base.rs");
 
 use crate::prelude::*;
@@ -34,7 +29,7 @@ fn main() {
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend { draw_sender };
 		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, runnable.build_menu());
-		main_loop(move || app.tick_draw(&mut runnable));
+		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});
 
 	let event_loop = win::EventLoop::new();
