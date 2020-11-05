@@ -20,4 +20,4 @@ window.load_tilemap = function(src) {
 	return tilemapmod.load(src);
 };
 
-import("../node_modules/elements2/elements2.js");
+import("../node_modules/elements/elements.js");
