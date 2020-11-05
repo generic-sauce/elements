@@ -62,7 +62,7 @@ impl<B: Backend> Client<B> {
 			ClientMode::InGame { .. } => {
 				let mut draw = Draw::new();
 				self.world.draw(&mut draw);
-				app.graphics_backend.draw(draw);
+				app.graphics_backend.draw(draw, Some(&self.world));
 			}
 		}
 	}

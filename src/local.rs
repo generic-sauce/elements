@@ -24,6 +24,6 @@ impl<B: Backend> Local<B> {
 	pub fn draw(&mut self, app: &mut App<B>) {
 		let mut draw = Draw::new();
 		self.world.draw(&mut draw);
-		app.graphics_backend.draw(draw);
+		app.graphics_backend.draw(draw, Some(&self.world));
 	}
 }

@@ -5,7 +5,7 @@ pub struct NativeGraphicsBackend {
 }
 
 impl GraphicsBackend for NativeGraphicsBackend {
-	fn draw(&mut self, draw: Draw) {
+	fn draw(&mut self, draw: Draw, _: Option<&World>) {
 		self.draw_sender.send(draw).unwrap();
 	}
 }

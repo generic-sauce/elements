@@ -7,5 +7,5 @@ use crate::prelude::*;
 #[cfg(feature = "native-client")] pub use native::*;
 
 pub trait GraphicsBackend {
-	fn draw(&mut self, draw: Draw);
+	fn draw(&mut self, draw: Draw, tmp_world: Option<&World> /* this is only temporary */);
 }
