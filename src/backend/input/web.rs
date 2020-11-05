@@ -22,10 +22,8 @@ impl InputBackend for WebInputBackend {
 	}
 
 	fn gamepad(&mut self, gamepad_id: u32) -> RawGamepadState {
-		RawGamepadState::new() // TODO
+		input_state(gamepad_id as usize)
 	}
 
-	fn tick(&mut self) {
-		// TODO
-	}
+	fn tick(&mut self) {}
 }
