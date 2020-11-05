@@ -8,24 +8,20 @@ pub enum ClientMode {
 pub struct Client<B: Backend> {
 	world: World,
 	gamepad_state: RawGamepadState,
-	socket: UdpSocket,
-	phantom: PhantomData<B>,
+	socket: B::SocketBackend,
 	mode: ClientMode,
 }
 
 impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
-		let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
-		socket.set_nonblocking(true).unwrap();
-		socket.connect((server_ip, PORT)).expect("Could not connect to server");
+		let mut socket = B::SocketBackend::new(server_ip);
 
-		send_packet(&mut socket, &Init::Init);
+		socket.send(&Init::Init);
 
 		Client {
 			world: World::new(0),
 			gamepad_state: RawGamepadState::new(),
 			socket,
-			phantom: PhantomData,
 			mode: ClientMode::Lobby,
 		}
 	}
@@ -33,13 +29,13 @@ impl<B: Backend> Client<B> {
 	pub fn tick(&mut self, app: &mut App<B>) {
 		match self.mode {
 			ClientMode::Lobby => {
-				if let Some((Go { your_player_id }, _)) = recv_packet(&mut self.socket) {
+				if let Some(Go { your_player_id }) = self.socket.try_recv() {
 					self.mode = ClientMode::InGame { player_id: your_player_id };
 				}
 			},
 			ClientMode::InGame { player_id } => {
 				// receive packets
-				if let Some((update, _)) = recv_packet::<WorldUpdate>(&mut self.socket) {
+				if let Some(update) = self.socket.try_recv::<WorldUpdate>() {
 					self.world.apply_update_within_app(update, app);
 				}
 
@@ -48,7 +44,7 @@ impl<B: Backend> Client<B> {
 				self.world.players[player_id].input.update_peripherals(&app.peripherals_state);
 
 				// send packets
-				send_packet(&mut self.socket, &self.world.players[player_id].input);
+				self.socket.send(&self.world.players[player_id].input);
 
 				// tick world
 				self.world.tick_within_app(app);

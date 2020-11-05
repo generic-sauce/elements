@@ -8,7 +8,7 @@ pub const PORT: u16 = 7575;
 pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
-// this is an enum as every network object needs a size > 0
+// this is an enum as every socket object needs a size > 0
 pub enum Init { Init }
 
 impl Packet for Init {}
