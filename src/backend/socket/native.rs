@@ -8,7 +8,12 @@ impl SocketBackend for NativeSocketBackend {
 		socket.set_nonblocking(true).unwrap();
 		socket.connect((server_ip, PORT)).expect("Could not connect to server");
 
-		NativeSocketBackend(socket)
+		let mut socket = NativeSocketBackend(socket);
+
+		// this only happens on native!
+		socket.send(&Init::Init);
+
+		socket
 	}
 
 	fn send(&mut self, packet: &impl Packet) {

@@ -16,8 +16,6 @@ impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
 		let mut socket = B::SocketBackend::new(server_ip);
 
-		socket.send(&Init::Init);
-
 		Client {
 			world: World::new(0),
 			gamepad_state: RawGamepadState::new(),

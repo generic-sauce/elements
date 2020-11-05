@@ -22,6 +22,11 @@ impl SocketBackend for WebSocketBackend {
 		let leaked_cb = Box::leak(Box::new(cb)); // TODO
 		socket.set_onmessage(Some(leaked_cb.as_ref().dyn_ref().unwrap()));
 
+		// TODO: fix busy waiting!
+		while socket.ready_state() != WebSocket::OPEN {
+			log("WebSocket not yet open!");
+		}
+
 		WebSocketBackend {
 			socket,
 			receiver,
@@ -29,11 +34,15 @@ impl SocketBackend for WebSocketBackend {
 	}
 
 	fn send(&mut self, packet: &impl Packet) {
+		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
+
 		let input_bytes = ser(packet);
 		self.socket.send_with_u8_array(&input_bytes[..]).unwrap();
 	}
 
 	fn try_recv<P: Packet>(&mut self) -> Option<P> {
+		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
+
 		let bytes = match self.receiver.try_recv() {
 			Err(TryRecvError::Empty) => return None,
 			x => x.unwrap(),

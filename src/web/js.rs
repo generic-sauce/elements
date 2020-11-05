@@ -23,6 +23,7 @@ pub fn input_state(i: usize) -> RawGamepadState {
 extern {
 	pub fn setInterval(closure: &Closure<dyn FnMut()>, time_ms: f64);
 	pub fn prompt(txt: &str) -> String;
+	pub fn alert(txt: &str);
 
 	#[wasm_bindgen(js_namespace = console)]
 	pub fn log(txt: &str);
