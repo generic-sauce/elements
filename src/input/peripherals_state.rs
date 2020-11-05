@@ -4,7 +4,7 @@ pub struct PeripheralsState {
 	pub pressed_keys: HashSet<Key>,
 	pub just_pressed_keys: HashSet<Key>,
 	pub cursor_move: SubPixelVec,
-	pub text: Vec<char>,
+	pub text: Vec<Character>,
 }
 
 impl PeripheralsState {

@@ -3,8 +3,20 @@ use crate::prelude::*;
 pub enum PeripheralsUpdate {
 	KeyPress(Key),
 	KeyRelease(Key),
-	Text(char),
+	Text(Character),
 	MouseMove(SubPixelVec),
+}
+
+#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+pub enum Character {
+	Char(char),
+	Backspace,
+	Delete,
+	Right,
+	Left,
+	Up,
+	Down,
+	Unknown,
 }
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
@@ -168,6 +180,21 @@ pub enum Key {
 	Paste,
 	Cut,
 	Unknown,
+}
+
+impl From<char> for Character {
+	fn from(c: char) -> Self {
+		if !c.is_ascii_control() {
+			Character::Char(c)
+		} else if c as u8 == 8 {
+			Character::Backspace
+		} else if c as u8 == 127 {
+			Character::Delete
+		} else {
+			println!("unknown char: {}", c as u32);
+			Character::Unknown
+		}
+	}
 }
 
 #[cfg(feature = "native-client")]
