@@ -74,7 +74,7 @@ impl<B: Backend> MenuElement<B> {
 
 	fn draw_button(&self, draw: &mut Draw, text: &str, color: Color) {
 		draw.rectangle(self.position - self.size, self.position + self.size, color);
-        draw.text(self.position - self.size, 0.1, Color::WHITE, text);
+        draw.text(self.position - self.size, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
 	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: u32) {
@@ -85,7 +85,7 @@ impl<B: Backend> MenuElement<B> {
 			Color::rgb(0.0, 0.03, 0.15),
 		);
 
-		draw.text(self.position - self.size, 0.1, Color::WHITE, text);
+		draw.text(self.position - self.size, BUTTON_TEXT_SIZE, Color::WHITE, text);
 		/*
 		if selected {
 			let text_width = context.get_text_width(BUTTON_TEXT_SIZE, &text[..cursor as usize]);
