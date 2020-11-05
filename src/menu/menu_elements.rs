@@ -100,33 +100,43 @@ impl<B: Backend> MenuElement<B> {
 		 */
 	}
 
-	pub fn apply_text(&mut self, event_text: &[char]) {
+	pub fn apply_text(&mut self, event_text: &[Character]) {
 		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
-			for c in event_text {
-				text.insert(*cursor as usize, *c);
-				*cursor += 1;
+			for character in event_text {
+				match character {
+					Character::Char(c) => {
+						text.insert(*cursor as usize, *c);
+						*cursor += 1;
+					},
+					Character::Backspace => {
+						if *cursor != 0 {
+							text.drain((*cursor - 1) as usize..(*cursor) as usize);
+							*cursor = (*cursor - 1).max(0);
+						}
+					},
+					Character::Delete => {
+						if *cursor < text.len() as u32 {
+							text.drain((*cursor) as usize..(*cursor + 1) as usize);
+						}
+					},
+					Character::Right => {
+						*cursor = (*cursor + 1).min(text.len() as u32);
+					},
+					Character::Left => {
+						*cursor = cursor.checked_sub(1).unwrap_or(0);
+					},
+					_ => {},
+				}
 			}
 		}
 	}
 
 	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
         if let MenuKind::EditField { cursor, text, .. } = &mut self.kind {
-			if peripherals_state.key_just_pressed(&Key::Back) {
-				if *cursor != 0 {
-					text.drain((*cursor - 1) as usize..(*cursor) as usize);
-					*cursor = (*cursor - 1).max(0);
-				}
-			}
-			if peripherals_state.key_just_pressed(&Key::Delete) {
-				if *cursor < text.len() as u32 {
-					text.drain((*cursor) as usize..(*cursor + 1) as usize);
-				}
-			}
 			if peripherals_state.key_just_pressed(&Key::Left) {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
 			}
 			if peripherals_state.key_just_pressed(&Key::Right) {
-				*cursor = (*cursor + 1).min(text.len() as u32);
 			}
 		}
 
