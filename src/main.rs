@@ -64,7 +64,9 @@ fn main() {
 				graphics.resize(WindowVec::new(size.width, size.height));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::ReceivedCharacter(c), .. } => {
-				peripherals_update = Some(PeripheralsUpdate::Text(c));
+				if !c.is_ascii_control() {
+					peripherals_update = Some(PeripheralsUpdate::Text(c));
+				}
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::KeyboardInput { input: win::KeyboardInput { virtual_keycode: Some(virtual_keycode), state, .. }, .. }, .. } => {
 				match state {

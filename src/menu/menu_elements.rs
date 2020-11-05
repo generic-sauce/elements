@@ -101,8 +101,11 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_text(&mut self, event_text: &Vec<char>) {
-		if let MenuKind::EditField { text, .. } = &mut self.kind {
-			text.extend(event_text);
+		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
+			for c in event_text {
+				text.insert(*cursor as usize, *c);
+				*cursor += 1;
+			}
 		}
 	}
 
