@@ -7,7 +7,7 @@ pub use input::*;
 mod audio;
 pub use audio::*;
 
-pub trait Backend {
+pub trait Backend: 'static {
 	type InputBackend: InputBackend;
 	type GraphicsBackend: GraphicsBackend;
 	type AudioBackend: AudioBackend;

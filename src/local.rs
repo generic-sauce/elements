@@ -12,10 +12,8 @@ impl<B: Backend> Local<B> {
 			phantom: PhantomData,
 		}
 	}
-}
 
-impl<B: Backend> Runnable<B> for Local<B> {
-	fn tick(&mut self, app: &mut App<B>) {
+	pub fn tick(&mut self, app: &mut App<B>) {
 		for (i, player) in self.world.players.iter_mut().enumerate() {
 			player.input.update_gamepad(&app.input_backend.gamepad(i as u32));
 		}
@@ -23,13 +21,9 @@ impl<B: Backend> Runnable<B> for Local<B> {
 		self.world.tick_within_app(app);
 	}
 
-	fn draw(&mut self, app: &mut App<B>, elapsed_time: Duration) {
-		let mut draw = Draw::new(elapsed_time);
+	pub fn draw(&mut self, app: &mut App<B>) {
+		let mut draw = Draw::new();
 		self.world.draw(&mut draw);
 		app.graphics_backend.draw(draw);
-	}
-
-	fn get_runnable_change(&mut self) -> RunnableChange {
-		RunnableChange::from_world(&self.world)
 	}
 }

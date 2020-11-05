@@ -1,3 +1,6 @@
+mod runnable;
+pub use runnable::*;
+
 use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
@@ -8,53 +11,18 @@ pub struct App<B: Backend> {
 	pub audio_backend: B::AudioBackend,
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
-}
-
-pub trait Runnable<B: Backend> {
-	fn tick(&mut self, app: &mut App<B>);
-	fn draw(&mut self, app: &mut App<B>, elapsed_time: Duration);
-	fn get_runnable_change(&mut self) -> RunnableChange;
-}
-
-#[derive(Copy, Clone, PartialEq)]
-pub enum MenuChoice {
-	Main,
-	ConnectServer,
-}
-
-#[derive(Clone, PartialEq)]
-pub enum RunnableChange {
-	None,
-	Quit,
-	Local(u32),
-	Menu(MenuChoice),
-	Client(String),
-}
-
-impl RunnableChange {
-	pub fn from_world(world: &World) -> RunnableChange {
-		if world.best_of_n == 0 {
-			return RunnableChange::None;
-		}
-		if world.restart_state == RestartState::Game {
-			for kill in &world.kills {
-				if kill >= &(world.best_of_n / 2 + 1) {
-					return RunnableChange::Menu(MenuChoice::Main);
-				}
-			}
-		}
-		RunnableChange::None
-	}
+	pub menu: Menu<B>,
 }
 
 impl<B: Backend> App<B> {
-	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend) -> App<B> {
+	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, menu: Menu<B>) -> App<B> {
 		App {
 			input_backend,
 			graphics_backend,
 			audio_backend: B::AudioBackend::new(),
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
+			menu,
 		}
 	}
 
@@ -64,55 +32,29 @@ impl<B: Backend> App<B> {
 		}
 	}
 
-	pub fn run_local(&mut self, best_of_n: u32) {
-		self.run_runnable(Local::new(best_of_n));
+	fn update_cursor(&mut self) {
+		let mouse_update = self.peripherals_state.cursor_move;
+		self.cursor_position += mouse_update.cast() * 0.001 * (1.0, -1.0);
+		self.cursor_position.y = self.cursor_position.y.max(0.0).min(1.0);
+		self.cursor_position.x = self.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 	}
 
-	pub fn run_client(&mut self, ip: &str) {
-		self.run_runnable(Client::new(ip));
-	}
+	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
+		self.fetch_peripherals();
+		self.input_backend.tick();
+		self.update_cursor();
 
-	pub fn run_menu_and_game(&mut self) {
-		let mut runnable_change = RunnableChange::Menu(MenuChoice::Main);
-		loop {
-			runnable_change = match runnable_change {
-				RunnableChange::None => panic!("should not receive RunnableChange::None from run_runnable"),
-				RunnableChange::Local(best_of_n) => {
-					self.run_local(best_of_n);
-					RunnableChange::Menu(MenuChoice::Main)
-				},
-				RunnableChange::Quit => break,
-				RunnableChange::Menu(choice) => self.run_runnable(MenuRunnable::new(choice)),
-				RunnableChange::Client(ip) => {
-					self.run_client(&ip);
-					RunnableChange::Menu(MenuChoice::Main)
-				},
-			}
+		runnable.tick(self);
+		runnable.draw(self);
+
+		// TODO: improve
+		if let Runnable::Menu = runnable {
+			self.tick_menu(runnable);
+			self.draw_menu();
 		}
-	}
 
-	fn run_runnable(&mut self, mut runnable: impl Runnable<B>) -> RunnableChange {
-		let mut runnable_change = RunnableChange::None;
-
-		for timed_loop_info in TimedLoop::with_fps(60) {
-			self.fetch_peripherals();
-			self.input_backend.tick();
-
-			if timed_loop_info.delta_time > timed_loop_info.interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
-			}
-
-			runnable.tick(self);
-			runnable.draw(self, timed_loop_info.elapsed_time);
-			runnable_change = runnable.get_runnable_change();
-			match runnable_change {
-				RunnableChange::None => {},
-				_ => break,
-			}
-			self.audio_backend.tick();
-			self.peripherals_state.reset();
-		};
-		runnable_change
+		self.audio_backend.tick();
+		self.peripherals_state.reset();
 	}
 
 	fn handle(&mut self, handler: &AppEventHandler) {
@@ -152,5 +94,4 @@ impl World {
 		self.apply_update(update, &mut handler);
 		app.handle(&handler);
 	}
-
 }

@@ -3,19 +3,21 @@ use crate::prelude::*;
 const BUTTON_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 
-pub struct MenuElement {
+pub type OnEvent<B: Backend> = fn(&mut App<B>, &mut Runnable<B>);
+
+pub struct MenuElement<B: Backend> {
 	pub name: &'static str,
-	pub kind: MenuKind,
+	pub kind: MenuKind<B>,
 	pub position: CanvasVec,
 	pub size: CanvasVec,
 	pub hovered: bool,
 	pub clicked: bool,
 }
 
-pub enum MenuKind {
+pub enum MenuKind<B: Backend> {
 	Button {
 		text: &'static str,
-		runnable_change: RunnableChange,
+		on_click: OnEvent<B>,
 	},
 	EditField {
 		text: String,
@@ -24,11 +26,11 @@ pub enum MenuKind {
 	}
 }
 
-impl MenuElement {
-	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, runnable_change: RunnableChange) -> MenuElement {
+impl<B: Backend> MenuElement<B> {
+	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
 			name: "",
-			kind: MenuKind::Button { runnable_change, text },
+			kind: MenuKind::Button { text, on_click },
 			position,
 			size,
 			hovered: false,
@@ -36,7 +38,7 @@ impl MenuElement {
 		}
 	}
 
-	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement {
+	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
 			kind: MenuKind::EditField { text: String::from(text), selected: false, cursor: 0 },
@@ -61,7 +63,7 @@ impl MenuElement {
 			Color::rgb(0.08, 0.26, 0.42)
 		};
 		match &self.kind {
-			MenuKind::Button { text, runnable_change: _runnable_change } => { self.draw_button(draw, text, color) },
+			MenuKind::Button { text, .. } => { self.draw_button(draw, text, color) },
 			MenuKind::EditField { text, selected, cursor } => { self.draw_edit_field(draw, text, color, *selected, *cursor) },
 		}
 	}

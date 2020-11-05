@@ -3,6 +3,11 @@
 #![allow(incomplete_features)]
 #![feature(generic_associated_types)]
 
+fn main_loop(mut f: impl FnMut()) {
+	TimedLoop::with_fps(60)
+		.for_each(move |_| f());
+}
+
 include!("base.rs");
 
 use crate::prelude::*;
@@ -21,13 +26,15 @@ fn main() {
 	let (peripherals_sender, peripherals_receiver) = channel::<PeripheralsUpdate>();
 
 	thread::spawn(move || {
+		let mut runnable = match server_arg.as_deref() {
+			Some("menu") => Runnable::Menu,
+			Some(ip) => Runnable::Client(Client::new(ip)),
+			None => Runnable::Local(Local::new(0)),
+		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend { draw_sender };
-		match server_arg.as_deref() {
-			Some("menu") => App::<NativeBackend>::new(graphics_backend, input_backend).run_menu_and_game(),
-			Some(ip) => App::<NativeBackend>::new(graphics_backend, input_backend).run_client(ip),
-			None => App::<NativeBackend>::new(graphics_backend, input_backend).run_local(0),
-		}
+		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, runnable.build_menu());
+		main_loop(move || app.tick_draw(&mut runnable));
 	});
 
 	let event_loop = win::EventLoop::new();

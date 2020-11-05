@@ -29,10 +29,8 @@ impl<B: Backend> Client<B> {
 			mode: ClientMode::Lobby,
 		}
 	}
-}
 
-impl<B: Backend> Runnable<B> for Client<B> {
-	fn tick(&mut self, app: &mut App<B>) {
+	pub fn tick(&mut self, app: &mut App<B>) {
 		match self.mode {
 			ClientMode::Lobby => {
 				if let Some((Go { your_player_id }, _)) = recv_packet(&mut self.socket) {
@@ -58,18 +56,14 @@ impl<B: Backend> Runnable<B> for Client<B> {
 		}
 	}
 
-	fn draw(&mut self, app: &mut App<B>, elapsed_time: Duration) {
+	pub fn draw(&mut self, app: &mut App<B>) {
 		match self.mode {
 			ClientMode::Lobby => (), // TODO: drawing in lobby phase
 			ClientMode::InGame { .. } => {
-				let mut draw = Draw::new(elapsed_time);
+				let mut draw = Draw::new();
 				self.world.draw(&mut draw);
 				app.graphics_backend.draw(draw);
 			}
 		}
-	}
-
-	fn get_runnable_change(&mut self) -> RunnableChange {
-		RunnableChange::None
 	}
 }

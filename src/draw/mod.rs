@@ -74,11 +74,10 @@ pub struct Draw {
 	pub triangles: TextureTriangles,
 	pub texts: Vec<Text>,
 	pub world: Option<GraphicsWorld>,
-	pub elapsed_time: Duration,
 }
 
 impl Draw {
-	pub fn new(elapsed_time: Duration) -> Draw {
+	pub fn new() -> Draw {
 		let mut triangles = TextureTriangles::new();
 		triangles.resize_with(TextureId::texture_count(), Default::default);
 		let texts = Vec::new();
@@ -86,7 +85,6 @@ impl Draw {
 			triangles,
 			texts,
 			world: None,
-			elapsed_time,
 		}
 	}
 
