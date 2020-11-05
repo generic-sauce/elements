@@ -126,7 +126,7 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
-        if let MenuKind::EditField { cursor, .. } = &mut self.kind {
+        if let MenuKind::EditField { cursor, text, .. } = &mut self.kind {
 			if peripherals_state.key_just_pressed(&Key::Left) {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
 			}
