@@ -8,6 +8,17 @@ use crate::prelude::*;
 
 const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
+impl Color {
+	fn to_wgpu(self) -> wgpu::Color {
+		wgpu::Color {
+			r: self.r as f64,
+			g: self.g as f64,
+			b: self.b as f64,
+			a: self.a as f64,
+		}
+	}
+}
+
 pub struct Graphics {
 	#[allow(unused)] instance: wgpu::Instance,
 	surface: wgpu::Surface,
@@ -115,16 +126,14 @@ impl Graphics {
 			window_size: self.window_size,
 		};
 
+		let color = draw.clear_color
+			.unwrap_or(Color::BLACK)
+			.to_wgpu();
 		let mut cleared = false;
 		let mut clear_color = move || {
 			let load_op = match cleared {
 				true => wgpu::LoadOp::Load,
-				false => wgpu::LoadOp::Clear(wgpu::Color {
-					r: 50.0 / 255.0,
-					g: 120.0 / 255.0,
-					b: 215.0 / 255.0,
-					a: 1.0,
-				})
+				false => wgpu::LoadOp::Clear(color),
 			};
 			cleared = true;
 			load_op
