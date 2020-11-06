@@ -93,7 +93,7 @@ impl<B: Backend> MenuElement<B> {
 
 		if selected {
 			let text_width = graphics_backend.get_text_width(&text[..cursor as usize]);
-			let left_bot = text_pos + CanvasVec::new(text_width * BUTTON_TEXT_SIZE * 0.0625 + 0.002, 0.017);
+			let left_bot = text_pos + CanvasVec::new(text_width * BUTTON_TEXT_SIZE * 0.0625 + -0.001, 0.017);
 			draw.rectangle(
 				left_bot,
 				left_bot + CanvasVec::new(0.002, BUTTON_TEXT_SIZE*0.6),
