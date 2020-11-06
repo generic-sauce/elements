@@ -67,24 +67,10 @@ fn main() {
 				peripherals_update = Some(PeripheralsUpdate::Text(Character::from(c)));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::KeyboardInput { input: win::KeyboardInput { virtual_keycode: Some(virtual_keycode), state, .. }, .. }, .. } => {
-				match state {
-					win::ElementState::Pressed => {
-						peripherals_update = Some(PeripheralsUpdate::KeyPress(Key::from(virtual_keycode)));
-					}
-					win::ElementState::Released => {
-						peripherals_update = Some(PeripheralsUpdate::KeyRelease(Key::from(virtual_keycode)));
-					}
-				}
+				peripherals_update = Some(update_from_keyboard_input(virtual_keycode, state));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::MouseInput { state, button, .. }, .. } => {
-				match state {
-					win::ElementState::Pressed => {
-						peripherals_update = Some(PeripheralsUpdate::KeyPress(Key::from(button)));
-					}
-					win::ElementState::Released => {
-						peripherals_update = Some(PeripheralsUpdate::KeyRelease(Key::from(button)));
-					}
-				}
+				peripherals_update = Some(update_from_keyboard_input(button, state));
 			},
 			win::Event::MainEventsCleared => {
 				window.request_redraw();
@@ -106,6 +92,13 @@ fn main() {
 		window.set_cursor_grab(true).unwrap();
 		window.set_cursor_visible(false);
 	});
+}
+
+fn update_from_keyboard_input(key_source: impl Into<Key>, state: win::ElementState) -> PeripheralsUpdate {
+	match state {
+		win::ElementState::Pressed => PeripheralsUpdate::KeyPress(key_source.into()),
+		win::ElementState::Released => PeripheralsUpdate::KeyRelease(key_source.into()),
+	}
 }
 
 #[cfg(feature = "web-client")]

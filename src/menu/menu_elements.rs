@@ -7,7 +7,7 @@ pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
 	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
 }
 
-pub type OnEvent<B: Backend> = Box<dyn OnEventImpl<B>>;
+pub type OnEvent<B> = Box<dyn OnEventImpl<B>>;
 
 pub struct MenuElement<B: Backend> {
 	pub name: &'static str,
@@ -77,7 +77,7 @@ impl<B: Backend> MenuElement<B> {
         draw.text(self.position - self.size, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
-	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: u32) {
+	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, _selected: bool, _cursor: u32) {
         draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + CanvasVec::new(EDIT_FIELD_BORDER_WIDTH, EDIT_FIELD_BORDER_WIDTH),
