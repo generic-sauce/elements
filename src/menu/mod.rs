@@ -118,8 +118,7 @@ impl<B: Backend> App<B> {
 
 	pub fn draw_menu(&mut self) {
 		let mut draw = Draw::new();
-
-		draw.rectangle(CanvasVec::new(0.0, 0.0), CanvasVec::new(ASPECT_RATIO, 1.0), Color::BLACK);
+		draw.set_clear_color(Color::BLACK);
 
 		// draw elements
 		for element in &self.menu.elements {

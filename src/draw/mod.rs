@@ -71,6 +71,7 @@ pub trait IntoTextureIndex {
 }
 
 pub struct Draw {
+	pub clear_color: Option<Color>,
 	pub triangles: TextureTriangles,
 	pub texts: Vec<Text>,
 	pub world: Option<GraphicsWorld>,
@@ -78,14 +79,23 @@ pub struct Draw {
 
 impl Draw {
 	pub fn new() -> Draw {
+		let clear_color = None;
 		let mut triangles = TextureTriangles::new();
 		triangles.resize_with(TextureId::texture_count(), Default::default);
 		let texts = Vec::new();
 		Draw {
+			clear_color,
 			triangles,
 			texts,
 			world: None,
 		}
+	}
+
+	pub fn set_clear_color(&mut self, clear_color: Color) {
+		if let Some(_) = self.clear_color {
+			panic!("clear color was set already");
+		}
+		self.clear_color = Some(clear_color);
 	}
 
 	#[allow(unused)]

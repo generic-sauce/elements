@@ -90,8 +90,10 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested {..} => {
-				if let Ok(draw) = draw_receiver.try_recv() {
-					graphics.render(&draw);
+				match draw_receiver.try_recv() {
+					Ok(draw) => graphics.render(&draw),
+					Err(TryRecvError::Disconnected) => panic!("draw channel disconnected"),
+					_ => ()
 				}
 			},
 			_ => ()

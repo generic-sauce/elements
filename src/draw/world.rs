@@ -42,6 +42,12 @@ impl GraphicsWorld {
 
 impl World {
 	pub fn draw(&mut self, draw: &mut Draw) {
+		draw.set_clear_color(Color::rgb(
+			50.0 / 255.0,
+			120.0 / 255.0,
+			215.0 / 255.0,
+		));
+
 		draw.world(&self.tilemap, &self.fluidmap);
 		draw_players(draw, self);
 		draw_cursors(draw, self);
