@@ -19,7 +19,7 @@ pub enum Character {
 	Unknown,
 }
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum Key {
 	LeftMouse,
 	RightMouse,

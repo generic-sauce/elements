@@ -89,7 +89,7 @@ fn main() {
 			win::Event::MainEventsCleared => {
 				window.request_redraw();
 			},
-			win::Event::RedrawRequested {..} => {
+			win::Event::RedrawRequested { .. } => {
 				if let Ok(draw) = draw_receiver.try_recv() {
 					graphics.render(&draw);
 				}

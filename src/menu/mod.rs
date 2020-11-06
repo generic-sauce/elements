@@ -85,7 +85,7 @@ impl<B: Backend> Menu<B> {
 impl<B: Backend> App<B> {
 	pub fn tick_menu(&mut self, runnable: &mut Runnable<B>) {
 		let mut opt_on_click = None;
-		if self.peripherals_state.key_pressed(&Key::LeftMouse) {
+		if self.peripherals_state.key_pressed(Key::LeftMouse) {
 			for element in &mut self.menu.elements {
 				element.clicked = element.is_colliding(self.cursor_position);
 			}
