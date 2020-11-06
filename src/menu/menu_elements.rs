@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-const BUTTON_TEXT_SIZE: f32 = 0.05;
+const BUTTON_TEXT_SIZE: f32 = 0.08;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
@@ -58,7 +58,7 @@ impl<B: Backend> MenuElement<B> {
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
 	}
 
-	pub fn draw(&self, draw: &mut Draw, cursor_pos: CanvasVec) {
+	pub fn draw(&self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend) {
 		let color = if self.clicked {
 			Color::rgb(0.18, 0.43, 0.54)
 		} else if self.is_colliding(cursor_pos) {
@@ -68,7 +68,9 @@ impl<B: Backend> MenuElement<B> {
 		};
 		match &self.kind {
 			MenuKind::Button { text, .. } => { self.draw_button(draw, text, color) },
-			MenuKind::EditField { text, selected, cursor } => { self.draw_edit_field(draw, text, color, *selected, *cursor) },
+			MenuKind::EditField { text, selected, cursor } => {
+				self.draw_edit_field(draw, text, color, *selected, *cursor, graphics_backend)
+			},
 		}
 	}
 
@@ -77,7 +79,7 @@ impl<B: Backend> MenuElement<B> {
         draw.text(self.position - self.size, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
-	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, _selected: bool, _cursor: u32) {
+	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: u32, graphics_backend: &impl GraphicsBackend) {
         draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + CanvasVec::new(EDIT_FIELD_BORDER_WIDTH, EDIT_FIELD_BORDER_WIDTH),
@@ -85,19 +87,19 @@ impl<B: Backend> MenuElement<B> {
 			Color::rgb(0.0, 0.03, 0.15),
 		);
 
-		draw.text(self.position - self.size, BUTTON_TEXT_SIZE, Color::WHITE, text);
-		/*
+		let text_pos = self.position - self.size + CanvasVec::new(0.008, -0.012);
+
+		draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
+
 		if selected {
-			let text_width = context.get_text_width(BUTTON_TEXT_SIZE, &text[..cursor as usize]);
+			let text_width = graphics_backend.get_text_width(&text[..cursor as usize]);
+			let left_bot = text_pos + CanvasVec::new(text_width * BUTTON_TEXT_SIZE * 0.0625 + 0.002, 0.017);
+			draw.rectangle(
+				left_bot,
+				left_bot + CanvasVec::new(0.002, BUTTON_TEXT_SIZE*0.6),
+				Color::WHITE,
+			);
 		}
-		context.draw_text(
-			target,
-			self.position - CanvasVec::new(self.size.x - 0.01, 0.45 * BUTTON_TEXT_SIZE),
-			BUTTON_TEXT_SIZE,
-			&text,
-			Origin::LeftBottom
-		);
-		 */
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character]) {

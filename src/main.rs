@@ -27,7 +27,7 @@ fn main() {
 			None => Runnable::Local(Local::new(0)),
 		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
-		let graphics_backend = NativeGraphicsBackend { draw_sender };
+		let graphics_backend = NativeGraphicsBackend::new(draw_sender);
 		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, runnable.build_menu());
 		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});

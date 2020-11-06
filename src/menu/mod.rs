@@ -122,7 +122,7 @@ impl<B: Backend> App<B> {
 
 		// draw elements
 		for element in &self.menu.elements {
-			element.draw(&mut draw, self.cursor_position)
+			element.draw(&mut draw, self.cursor_position, &self.graphics_backend);
 		}
 
 		// draw cursor
