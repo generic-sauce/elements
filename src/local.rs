@@ -8,7 +8,7 @@ pub struct Local<B: Backend> {
 impl<B: Backend> Local<B> {
 	pub fn new(best_of_n: u32) -> Local<B> {
 		Local {
-			world: World::new(best_of_n),
+			world: World::new(best_of_n, DEFAULT_TILEMAP),
 			phantom: PhantomData,
 		}
 	}

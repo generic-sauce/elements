@@ -2,11 +2,13 @@ use crate::prelude::*;
 
 pub enum ClientMode {
 	Lobby,
-	InGame { player_id: usize },
+	InGame {
+		player_id: usize,
+		world: World
+	},
 }
 
 pub struct Client<B: Backend> {
-	world: World,
 	gamepad_state: RawGamepadState,
 	socket: B::SocketBackend,
 	mode: ClientMode,
@@ -15,7 +17,6 @@ pub struct Client<B: Backend> {
 impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
 		Client {
-			world: World::new(0),
 			gamepad_state: RawGamepadState::new(),
 			socket: B::SocketBackend::new(server_ip),
 			mode: ClientMode::Lobby,
@@ -23,38 +24,41 @@ impl<B: Backend> Client<B> {
 	}
 
 	pub fn tick(&mut self, app: &mut App<B>) {
-		match self.mode {
+		match &mut self.mode {
 			ClientMode::Lobby => {
-				if let Some(Go { your_player_id }) = self.socket.try_recv() {
-					self.mode = ClientMode::InGame { player_id: your_player_id };
+				if let Some(Go { your_player_id, tilemap_image }) = self.socket.try_recv() {
+					self.mode = ClientMode::InGame {
+						player_id: your_player_id,
+						world: World::new(0, tilemap_image),
+					};
 				}
 			},
-			ClientMode::InGame { player_id } => {
+			ClientMode::InGame { player_id, world } => {
 				// receive packets
 				if let Some(update) = self.socket.try_recv::<WorldUpdate>() {
-					self.world.apply_update_within_app(update, app);
+					world.apply_update_within_app(update, app);
 				}
 
 				// handle inputs
-				self.world.players[player_id].input.update_gamepad(&self.gamepad_state);
-				self.world.players[player_id].input.update_peripherals(&app.peripherals_state);
+				world.players[*player_id].input.update_gamepad(&self.gamepad_state);
+				world.players[*player_id].input.update_peripherals(&app.peripherals_state);
 
 				// send packets
-				self.socket.send(&self.world.players[player_id].input);
+				self.socket.send(&world.players[*player_id].input);
 
 				// tick world
-				self.world.tick_within_app(app);
+				world.tick_within_app(app);
 			}
 		}
 	}
 
 	pub fn draw(&mut self, app: &mut App<B>) {
-		match self.mode {
+		match &self.mode {
 			ClientMode::Lobby => (), // TODO: drawing in lobby phase
-			ClientMode::InGame { .. } => {
+			ClientMode::InGame { world, .. } => {
 				let mut draw = Draw::new();
-				self.world.draw(&mut draw);
-				app.graphics_backend.draw(draw, Some(&self.world));
+				world.draw(&mut draw);
+				app.graphics_backend.draw(draw, Some(&world));
 			}
 		}
 	}

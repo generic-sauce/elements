@@ -41,7 +41,7 @@ impl GraphicsWorld {
 }
 
 impl World {
-	pub fn draw(&mut self, draw: &mut Draw) {
+	pub fn draw(&self, draw: &mut Draw) {
 		draw.world(&self.tilemap, &self.fluidmap);
 		draw_players(draw, self);
 		draw_cursors(draw, self);

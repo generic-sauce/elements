@@ -64,7 +64,7 @@ impl World {
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new_by_source(best_of_n: u32, mapsrc: impl MapSrc) -> World {
+	pub fn new(best_of_n: u32, mapsrc: impl MapSrc) -> World {
 		let tilemap = TileMap::new(mapsrc);
 
 		World {
@@ -77,11 +77,6 @@ impl World {
 			best_of_n
 		}
 	}
-
-	pub fn new(best_of_n: u32) -> World {
-		Self::new_by_source(best_of_n, "map/map04.png")
-	}
-
 
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
 		let mut should_tick = false;
