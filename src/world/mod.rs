@@ -18,7 +18,7 @@ pub use update::*;
 
 use crate::prelude::*;
 
-const RESTART_DELAY_COUNT: u32 = 120;
+pub const RESTART_DELAY_COUNT: u32 = 120;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]

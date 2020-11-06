@@ -42,6 +42,32 @@ impl Color {
 	pub const BLUE: Color = Color::rgb(0.0, 0.0, 1.0);
 }
 
+impl Mul for Color {
+	type Output = Self;
+
+	fn mul(self, rhs: Self) -> Self::Output {
+		Color {
+			r: self.r * rhs.r,
+			g: self.g * rhs.g,
+			b: self.b * rhs.b,
+			a: self.a * rhs.a,
+		}
+	}
+}
+
+impl Mul<f32> for Color {
+	type Output = Color;
+
+	fn mul(self, rhs: f32) -> Self::Output {
+		Color {
+			r: self.r * rhs,
+			g: self.g * rhs,
+			b: self.b * rhs,
+			a: self.a * rhs,
+		}
+	}
+}
+
 #[derive(PartialEq, Eq)]
 pub enum Flip {
 	Normal,
