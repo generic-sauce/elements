@@ -182,6 +182,17 @@ pub enum Key {
 	Unknown,
 }
 
+#[cfg(feature = "native-client")]
+impl PeripheralsUpdate {
+	pub fn from_winit_input(key_source: impl Into<Key>, state: win::ElementState) -> PeripheralsUpdate {
+		match state {
+			win::ElementState::Pressed => PeripheralsUpdate::KeyPress(key_source.into()),
+			win::ElementState::Released => PeripheralsUpdate::KeyRelease(key_source.into()),
+		}
+	}
+
+}
+
 impl From<char> for Character {
 	fn from(c: char) -> Self {
 		if !c.is_ascii_control() {
