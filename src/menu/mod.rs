@@ -85,7 +85,7 @@ impl<B: Backend> Menu<B> {
 impl<B: Backend> App<B> {
 	pub fn tick_menu(&mut self, runnable: &mut Runnable<B>) {
 		let mut opt_on_click = None;
-		if self.peripherals_state.key_pressed(&Key::LeftMouse) {
+		if self.peripherals_state.key_pressed(Key::LeftMouse) {
 			for element in &mut self.menu.elements {
 				element.clicked = element.is_colliding(self.cursor_position);
 			}
@@ -118,12 +118,11 @@ impl<B: Backend> App<B> {
 
 	pub fn draw_menu(&mut self) {
 		let mut draw = Draw::new();
-
-		draw.rectangle(CanvasVec::new(0.0, 0.0), CanvasVec::new(ASPECT_RATIO, 1.0), Color::BLACK);
+		draw.set_clear_color(Color::BLACK);
 
 		// draw elements
 		for element in &self.menu.elements {
-			element.draw(&mut draw, self.cursor_position)
+			element.draw(&mut draw, self.cursor_position, &self.graphics_backend);
 		}
 
 		// draw cursor

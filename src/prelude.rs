@@ -12,6 +12,7 @@ pub use {
 		any::Any,
 		marker::PhantomData,
 		cmp::Ordering,
+		ops::Mul,
 	},
 	itertools::iproduct,
 	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},

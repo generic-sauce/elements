@@ -97,41 +97,41 @@ impl InputState {
 	}
 
 	pub fn update_keyboard(&mut self, peripherals_state: &PeripheralsState) {
-		if peripherals_state.key_pressed(&Key::A) {
+		if peripherals_state.key_pressed(Key::A) {
 			self.direction.x -= 1.0;
 		}
-		if peripherals_state.key_pressed(&Key::D) {
+		if peripherals_state.key_pressed(Key::D) {
 			self.direction.x += 1.0;
 		}
 
-		if peripherals_state.key_pressed(&Key::W) {
-			if peripherals_state.key_just_pressed(&Key::W) {
+		if peripherals_state.key_pressed(Key::W) {
+			if peripherals_state.key_just_pressed(Key::W) {
 				self.just_up = true;
 			}
 			self.direction.y += 1.0;
 		}
-		if peripherals_state.key_pressed(&Key::S) {
-			if peripherals_state.key_just_pressed(&Key::S) {
+		if peripherals_state.key_pressed(Key::S) {
+			if peripherals_state.key_just_pressed(Key::S) {
 				self.just_down = true;
 			}
 			self.direction.y -= 1.0;
 		}
 		self.direction = self.direction.clamped(-1.0, 1.0);
 
-		if peripherals_state.key_pressed(&Key::Q) || peripherals_state.key_pressed(&Key::LeftMouse) {
+		if peripherals_state.key_pressed(Key::Q) || peripherals_state.key_pressed(Key::LeftMouse) {
 			self.attack1 = true;
 		}
-		if peripherals_state.key_pressed(&Key::E) || peripherals_state.key_pressed(&Key::RightMouse) {
+		if peripherals_state.key_pressed(Key::E) || peripherals_state.key_pressed(Key::RightMouse) {
 			self.attack2 = true;
-			if peripherals_state.key_just_pressed(&Key::E) || peripherals_state.key_just_pressed(&Key::RightMouse) {
+			if peripherals_state.key_just_pressed(Key::E) || peripherals_state.key_just_pressed(Key::RightMouse) {
 				self.just_attack2 = true;
 			}
 		}
 
-		if peripherals_state.key_pressed(&Key::F) {
+		if peripherals_state.key_pressed(Key::F) {
 			self.special1 = true;
 		}
-		if peripherals_state.key_pressed(&Key::R) {
+		if peripherals_state.key_pressed(Key::R) {
 			self.special2 = true;
 		}
 	}

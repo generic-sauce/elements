@@ -27,7 +27,7 @@ fn main() {
 			None => Runnable::Local(Local::new(0)),
 		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
-		let graphics_backend = NativeGraphicsBackend { draw_sender };
+		let graphics_backend = NativeGraphicsBackend::new(draw_sender);
 		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, runnable.build_menu());
 		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});
@@ -67,31 +67,19 @@ fn main() {
 				peripherals_update = Some(PeripheralsUpdate::Text(Character::from(c)));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::KeyboardInput { input: win::KeyboardInput { virtual_keycode: Some(virtual_keycode), state, .. }, .. }, .. } => {
-				match state {
-					win::ElementState::Pressed => {
-						peripherals_update = Some(PeripheralsUpdate::KeyPress(Key::from(virtual_keycode)));
-					}
-					win::ElementState::Released => {
-						peripherals_update = Some(PeripheralsUpdate::KeyRelease(Key::from(virtual_keycode)));
-					}
-				}
+				peripherals_update = Some(PeripheralsUpdate::from_winit_input(virtual_keycode, state));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::MouseInput { state, button, .. }, .. } => {
-				match state {
-					win::ElementState::Pressed => {
-						peripherals_update = Some(PeripheralsUpdate::KeyPress(Key::from(button)));
-					}
-					win::ElementState::Released => {
-						peripherals_update = Some(PeripheralsUpdate::KeyRelease(Key::from(button)));
-					}
-				}
+				peripherals_update = Some(PeripheralsUpdate::from_winit_input(button, state));
 			},
 			win::Event::MainEventsCleared => {
 				window.request_redraw();
 			},
-			win::Event::RedrawRequested {..} => {
-				if let Ok(draw) = draw_receiver.try_recv() {
-					graphics.render(&draw);
+			win::Event::RedrawRequested { .. } => {
+				match draw_receiver.try_recv() {
+					Ok(draw) => graphics.render(&draw),
+					Err(TryRecvError::Empty) => {},
+					e @ Err(TryRecvError::Disconnected) => { e.unwrap(); },
 				}
 			},
 			_ => ()

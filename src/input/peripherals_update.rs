@@ -19,7 +19,7 @@ pub enum Character {
 	Unknown,
 }
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum Key {
 	LeftMouse,
 	RightMouse,
@@ -180,6 +180,17 @@ pub enum Key {
 	Paste,
 	Cut,
 	Unknown,
+}
+
+#[cfg(feature = "native-client")]
+impl PeripheralsUpdate {
+	pub fn from_winit_input(key_source: impl Into<Key>, state: win::ElementState) -> PeripheralsUpdate {
+		match state {
+			win::ElementState::Pressed => PeripheralsUpdate::KeyPress(key_source.into()),
+			win::ElementState::Released => PeripheralsUpdate::KeyRelease(key_source.into()),
+		}
+	}
+
 }
 
 impl From<char> for Character {

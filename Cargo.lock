@@ -599,6 +599,7 @@ dependencies = [
  "console_error_panic_hook",
  "futures",
  "gilrs",
+ "glyph_brush",
  "image",
  "itertools",
  "js-sys",

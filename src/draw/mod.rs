@@ -42,6 +42,32 @@ impl Color {
 	pub const BLUE: Color = Color::rgb(0.0, 0.0, 1.0);
 }
 
+impl Mul for Color {
+	type Output = Self;
+
+	fn mul(self, rhs: Self) -> Self::Output {
+		Color {
+			r: self.r * rhs.r,
+			g: self.g * rhs.g,
+			b: self.b * rhs.b,
+			a: self.a * rhs.a,
+		}
+	}
+}
+
+impl Mul<f32> for Color {
+	type Output = Color;
+
+	fn mul(self, rhs: f32) -> Self::Output {
+		Color {
+			r: self.r * rhs,
+			g: self.g * rhs,
+			b: self.b * rhs,
+			a: self.a * rhs,
+		}
+	}
+}
+
 #[derive(PartialEq, Eq)]
 pub enum Flip {
 	Normal,
@@ -71,6 +97,7 @@ pub trait IntoTextureIndex {
 }
 
 pub struct Draw {
+	pub clear_color: Option<Color>,
 	pub triangles: TextureTriangles,
 	pub texts: Vec<Text>,
 	pub world: Option<GraphicsWorld>,
@@ -78,14 +105,23 @@ pub struct Draw {
 
 impl Draw {
 	pub fn new() -> Draw {
+		let clear_color = None;
 		let mut triangles = TextureTriangles::new();
 		triangles.resize_with(TextureId::texture_count(), Default::default);
 		let texts = Vec::new();
 		Draw {
+			clear_color,
 			triangles,
 			texts,
 			world: None,
 		}
+	}
+
+	pub fn set_clear_color(&mut self, clear_color: Color) {
+		if let Some(_) = self.clear_color {
+			panic!("clear color was set already");
+		}
+		self.clear_color = Some(clear_color);
 	}
 
 	#[allow(unused)]
