@@ -14,6 +14,5 @@ out gl_PerVertex {
 void main() {
 	uv = vertex_uv;
 	color = vertex_color;
-	float aspect = 128. / 72.;
 	gl_Position = vec4(vertex_position, 0, 1);
 }
