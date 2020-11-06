@@ -8,4 +8,8 @@ impl GraphicsBackend for WebGraphicsBackend {
 			RenderWorld::draw(w);
 		}
 	}
+
+	fn get_text_width(&self, _text: &str) -> f32 {
+		unimplemented!()
+	}
 }
