@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 macro_rules! setup {
-	($($id:ident : $resource:expr),*) => {
+	($($id:ident : $resource:expr),*$(,)?) => {
 
 		#[derive(Copy, Clone, Debug)]
 		#[repr(usize)]
@@ -37,7 +37,8 @@ macro_rules! setup {
 
 setup!(
 	Unknown: "images/checkerboard.png",
-	White: "images/white.png"
+	White: "images/white.png",
+	White2: "images/white.png",
 );
 
 impl TextureId {
