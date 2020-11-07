@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub(super) fn create_texture(device: &wgpu::Device, size: Vec2u) -> wgpu::Texture {
+pub(in crate::graphics) fn create_texture(device: &wgpu::Device, size: Vec2u) -> wgpu::Texture {
 	device.create_texture(&wgpu::TextureDescriptor {
 		label: None,
 		size: wgpu::Extent3d {
@@ -16,7 +16,7 @@ pub(super) fn create_texture(device: &wgpu::Device, size: Vec2u) -> wgpu::Textur
 	})
 }
 
-pub(super) fn write_texture(queue: &wgpu::Queue, texture: &wgpu::Texture, size: Vec2u, image: &[u8]) {
+pub(in crate::graphics) fn write_texture(queue: &wgpu::Queue, texture: &wgpu::Texture, size: Vec2u, image: &[u8]) {
 	queue.write_texture(
 		wgpu::TextureCopyView {
 			texture: &texture,
@@ -37,6 +37,22 @@ pub(super) fn write_texture(queue: &wgpu::Queue, texture: &wgpu::Texture, size: 
 	);
 }
 
-pub(super) fn create_texture_view(texture: &wgpu::Texture) -> wgpu::TextureView {
+pub(in crate::graphics) fn create_texture_view(texture: &wgpu::Texture) -> wgpu::TextureView {
 	texture.create_view(&wgpu::TextureViewDescriptor::default())
+}
+
+pub(in crate::graphics) fn create_depth_texture(device: &wgpu::Device, size: WindowVec) -> wgpu::Texture {
+	device.create_texture(&wgpu::TextureDescriptor {
+		label: None,
+		size: wgpu::Extent3d {
+			width: size.x,
+			height: size.y,
+			depth: 1
+		},
+		mip_level_count: 1,
+		sample_count: 1,
+		dimension: wgpu::TextureDimension::D2,
+		format: wgpu::TextureFormat::Depth32Float,
+		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
+	})
 }

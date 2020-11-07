@@ -81,7 +81,13 @@ pub struct Vertex {
 	pub color: Color,
 }
 
-pub type Triangle = [Vertex; 3];
+pub type DepthIndex = f32;
+
+pub struct Triangle {
+	pub vertices: [Vertex; 3],
+	pub depth: DepthIndex,
+}
+
 pub type Triangles = Vec<Triangle>;
 pub type TextureTriangles = Vec<Triangles>;
 
@@ -98,6 +104,7 @@ pub trait IntoTextureIndex {
 
 pub struct Draw {
 	pub clear_color: Option<Color>,
+	pub depth: DepthIndex,
 	pub triangles: TextureTriangles,
 	pub texts: Vec<Text>,
 	pub world: Option<GraphicsWorld>,
@@ -106,11 +113,13 @@ pub struct Draw {
 impl Draw {
 	pub fn new() -> Draw {
 		let clear_color = None;
+		let depth = 0.0;
 		let mut triangles = TextureTriangles::new();
 		triangles.resize_with(TextureId::texture_count(), Default::default);
 		let texts = Vec::new();
 		Draw {
 			clear_color,
+			depth,
 			triangles,
 			texts,
 			world: None,
@@ -143,17 +152,25 @@ impl Draw {
 			Flip::Horizontal => (1.0, 0.0),
 		};
 
-		triangles.push([
-			Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(right_uv, 0.0), color },
-			Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
-		]);
+		triangles.push(Triangle {
+			vertices: [
+				Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
+				Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(right_uv, 0.0), color },
+				Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
+			],
+			depth: self.depth,
+		});
 
-		triangles.push([
-			Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
-			Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(left_uv, 1.0),  color },
-		]);
+		triangles.push(Triangle {
+			vertices: [
+				Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
+				Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
+				Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(left_uv, 1.0),  color },
+			],
+			depth: self.depth,
+		});
+
+		self.depth += 1.0;
 	}
 
 	#[allow(unused)]
@@ -167,17 +184,25 @@ impl Draw {
 		let left_bot = left_bot.to_view();
 		let right_top = right_top.to_view();
 
-		triangles.push([
-			Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
-			Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(1.0, 0.0), color },
-			Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
-		]);
+		triangles.push(Triangle {
+			vertices: [
+				Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
+				Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(1.0, 0.0), color },
+				Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
+			],
+			depth: self.depth,
+		});
 
-		triangles.push([
-			Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
-			Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
-			Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(0.0, 1.0), color },
-		]);
+		triangles.push(Triangle {
+			vertices: [
+				Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
+				Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
+				Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(0.0, 1.0), color },
+			],
+			depth: self.depth,
+		});
+
+		self.depth += 1.0;
 	}
 
 	pub fn world(&mut self, tilemap: &TileMap, fluidmap: &FluidMap) {

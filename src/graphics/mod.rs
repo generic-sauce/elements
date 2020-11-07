@@ -4,6 +4,9 @@ use draw::*;
 mod context;
 use context::*;
 
+mod misc;
+use misc::*;
+
 use crate::prelude::*;
 
 const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
@@ -26,6 +29,8 @@ pub struct Graphics {
 	queue: wgpu::Queue,
 	window_size: WindowVec,
 	swap_chain: wgpu::SwapChain,
+	depth_texture: wgpu::Texture,
+	depth_texture_view: wgpu::TextureView,
 	triangles: DrawTriangles,
 	tilemap: DrawTilemap,
 	fluidmap: DrawFluidmap,
@@ -75,6 +80,9 @@ impl Graphics {
 
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
+		let depth_texture = create_depth_texture(&device, window_size);
+		let depth_texture_view = create_texture_view(&depth_texture);
+
 		let triangles = DrawTriangles::new(&device, &queue);
 		let tilemap = DrawTilemap::new(&device);
 		let fluidmap = DrawFluidmap::new(&device);
@@ -87,6 +95,8 @@ impl Graphics {
 			queue,
 			window_size,
 			swap_chain,
+			depth_texture,
+			depth_texture_view,
 			triangles,
 			tilemap,
 			fluidmap,
@@ -124,13 +134,25 @@ impl Graphics {
 			swap_chain_texture: &swap_chain_texture,
 			encoder: &mut encoder,
 			window_size: self.window_size,
+			depth_texture_view: &self.depth_texture_view,
 		};
 
 		let color = draw.clear_color
 			.unwrap_or(Color::BLACK)
 			.to_wgpu();
 		let mut cleared = false;
-		let mut clear_color = move || {
+		let mut color_load_op = move || {
+			let load_op = match cleared {
+				true => wgpu::LoadOp::Load,
+				false => wgpu::LoadOp::Clear(color),
+			};
+			cleared = true;
+			load_op
+		};
+
+		let color = f32::MAX;
+		let mut cleared = false;
+		let mut depth_load_op = move || {
 			let load_op = match cleared {
 				true => wgpu::LoadOp::Load,
 				false => wgpu::LoadOp::Clear(color),
@@ -142,7 +164,7 @@ impl Graphics {
 		if let Some(world) = &draw.world {
 			self.fluidmap.render(
 				&mut graphics_context,
-				clear_color(),
+				color_load_op(),
 				world.tilemap_size,
 				&world.fluidmap_data,
 				Duration::from_millis(0), // TODO: make for web
@@ -150,7 +172,7 @@ impl Graphics {
 
 			self.tilemap.render(
 				&mut graphics_context,
-				clear_color(),
+				color_load_op(),
 				world.tilemap_size,
 				&world.tilemap_data,
 			);
@@ -158,7 +180,8 @@ impl Graphics {
 
 		self.triangles.render(
 			&mut graphics_context,
-			clear_color(),
+			color_load_op(),
+			depth_load_op(),
 			draw,
 		);
 
@@ -173,5 +196,8 @@ impl Graphics {
 	pub fn resize(&mut self, size: WindowVec) {
 		self.window_size = size;
 		self.swap_chain = create_swap_chain(&self.device, &self.surface, size);
+
+		self.depth_texture = create_depth_texture(&self.device, self.window_size);
+		self.depth_texture_view = create_texture_view(&self.depth_texture);
 	}
 }

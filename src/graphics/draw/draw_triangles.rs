@@ -1,7 +1,7 @@
 use crate::graphics::*;
 use super::*;
 
-fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle]) -> Vec<u8> {
+fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle], max_depth: DepthIndex) -> Vec<u8> {
 	let floats_per_vertex = 7;
 	let floats_per_triangle = 3 * floats_per_vertex;
 	let floats_in_triangles = triangles.len() * floats_per_triangle;
@@ -9,11 +9,13 @@ fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle]) -> Vec<u
 	let mut bytes = Vec::<u8>::with_capacity(bytes_in_triangles);
 
 	for triangle in triangles {
-		for vertex in triangle {
+		let depth = (max_depth - triangle.depth) / max_depth;
+		for vertex in &triangle.vertices {
 			let position = vertex.position.to_surface(window_size);
 			let l = [
 				position.x.to_le_bytes(),
 				position.y.to_le_bytes(),
+				depth.to_le_bytes(),
 				vertex.uv.x.to_le_bytes(),
 				vertex.uv.y.to_le_bytes(),
 				vertex.color.r.to_le_bytes(),
@@ -63,21 +65,21 @@ impl DrawTriangles {
 		let vertex_buffer = Self::create_vertex_buffer(device, triangles_capacity);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
-			stride: 7 * std::mem::size_of::<f32>() as u64,
+			stride: 8 * std::mem::size_of::<f32>() as u64,
 			step_mode: wgpu::InputStepMode::Vertex,
 			attributes: &[
 				wgpu::VertexAttributeDescriptor {
 					offset: 0,
-					format: wgpu::VertexFormat::Float2,
+					format: wgpu::VertexFormat::Float3,
 					shader_location: 0
 				},
 				wgpu::VertexAttributeDescriptor {
-					offset: 2 * std::mem::size_of::<f32>() as u64,
+					offset: 3 * std::mem::size_of::<f32>() as u64,
 					format: wgpu::VertexFormat::Float2,
 					shader_location: 1
 				},
 				wgpu::VertexAttributeDescriptor {
-					offset: 4 * std::mem::size_of::<f32>() as u64,
+					offset: 5 * std::mem::size_of::<f32>() as u64,
 					format: wgpu::VertexFormat::Float3,
 					shader_location: 2
 				},
@@ -137,7 +139,12 @@ impl DrawTriangles {
 			}),
 			primitive_topology: wgpu::PrimitiveTopology::TriangleList,
 			color_states: &[SURFACE_FORMAT.into()],
-			depth_stencil_state: None,
+			depth_stencil_state: Some(wgpu::DepthStencilStateDescriptor {
+				format: wgpu::TextureFormat::Depth32Float,
+				depth_write_enabled: true,
+				depth_compare: wgpu::CompareFunction::Less,
+				stencil: Default::default(),
+			}),
 			vertex_state: wgpu::VertexStateDescriptor {
 				index_format: Default::default(),
 				vertex_buffers: &[vertex_buffer_desc],
@@ -185,7 +192,8 @@ impl DrawTriangles {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		load: wgpu::LoadOp::<wgpu::Color>,
+		color_load_op: wgpu::LoadOp::<wgpu::Color>,
+		depth_load_op: wgpu::LoadOp::<f32>,
 		draw: &Draw,
 	) {
 		let max_triangles: usize = draw.triangles.iter()
@@ -199,12 +207,19 @@ impl DrawTriangles {
 					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
-						load,
+						load: color_load_op,
 						store: true
 					}
 				},
 			],
-			depth_stencil_attachment: None
+			depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachmentDescriptor {
+				attachment: context.depth_texture_view,
+				depth_ops: Some(wgpu::Operations {
+					load: depth_load_op,
+					store: true,
+				}),
+				stencil_ops: None,
+			}),
 		});
 
 		render_pass.set_pipeline(&self.pipeline);
@@ -215,7 +230,7 @@ impl DrawTriangles {
 		let mut slice_ends = Vec::new();
 		let window_size = context.window_size.to_subpixel();
 		for triangles in draw.triangles.iter() {
-			let bytes = triangles_to_bytes(window_size, &triangles[..]);
+			let bytes = triangles_to_bytes(window_size, &triangles[..], draw.depth);
 			slice_end += bytes.len();
 			slice_ends.push(slice_end as u64);
 			all_bytes.extend(&bytes);
