@@ -24,6 +24,7 @@ impl<B: Backend> Client<B> {
 	pub fn tick(&mut self, app: &mut App<B>) {
 		match &mut self.mode {
 			ClientMode::Lobby => {
+				if !self.socket.is_open() { return; }
 				if let Some(Go { your_player_id, tilemap_image }) = self.socket.try_recv() {
 					self.mode = ClientMode::InGame {
 						player_id: your_player_id,
