@@ -30,6 +30,10 @@ impl SocketBackend for WebSocketBackend {
 		}
 	}
 
+	fn is_ready(&self) -> bool {
+		self.socket.ready_state() == WebSocket::OPEN
+	}
+
 	fn send(&mut self, packet: &impl Packet) {
 		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
 

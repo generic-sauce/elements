@@ -16,6 +16,8 @@ impl SocketBackend for NativeSocketBackend {
 		socket
 	}
 
+	fn is_open(&self) -> bool { true }
+
 	fn send(&mut self, packet: &impl Packet) {
 		send_packet(&mut self.0, packet);
 	}
