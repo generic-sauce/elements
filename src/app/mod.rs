@@ -50,7 +50,11 @@ impl<B: Backend> App<B> {
 	}
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
-		let repeat_opt = (0..10).find(|_| {
+		let framedrop = (0..10).all(|_| {
+			if self.tick_fps() >= TICK_FPS {
+				return false;
+			}
+
 			self.fetch_peripherals();
 			self.input_backend.tick();
 			self.update_cursor();
@@ -58,10 +62,10 @@ impl<B: Backend> App<B> {
 			runnable.tick(self);
 			self.tick_counter += 1;
 
-			self.tick_fps() >= TICK_FPS
+			true
 		});
 
-		if repeat_opt.is_none() {
+		if framedrop {
 			println!("App::tick_draw experienced a framedrop.");
 		}
 
