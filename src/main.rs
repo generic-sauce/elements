@@ -89,8 +89,8 @@ fn main() {
 			peripherals_sender.send(update).unwrap();
 		}
 
-		// window.set_cursor_grab(true).unwrap();
-		// window.set_cursor_visible(false);
+		window.set_cursor_grab(true).unwrap();
+		window.set_cursor_visible(false);
 	});
 }
 

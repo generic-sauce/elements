@@ -29,7 +29,7 @@ impl<B: Backend> Client<B> {
 				if let Some(Go { your_player_id, tilemap_image }) = self.socket.try_recv() {
 					self.mode = ClientMode::InGame {
 						player_id: your_player_id,
-						world: World::new(0, tilemap_image),
+						world: World::new(0, &tilemap_image),
 					};
 				}
 			},

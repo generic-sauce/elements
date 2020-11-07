@@ -16,8 +16,8 @@ window.draw_render_world = function(rw, tilemap_data, fluidmap_data) {
 window.input_state = function(i) {
 	return inputmod.calc_input_state(i);
 };
-window.load_tilemap = function(src) {
-	return tilemapmod.load(src);
+window.load_tilemap = function(src, cb) {
+	tilemapmod.load(src, cb);
 };
 
 import("../node_modules/elements/elements.js");

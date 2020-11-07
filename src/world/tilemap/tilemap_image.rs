@@ -10,27 +10,12 @@ pub struct TileMapImage {
 
 pub const DEFAULT_TILEMAP: &'static str = "map/map04.png";
 
-pub trait MapSrc {
-	fn image(self) -> TileMapImage;
-}
-
-impl MapSrc for TileMapImage {
-	fn image(self) -> TileMapImage { self }
-}
-
-#[cfg(feature = "web-client")]
-impl MapSrc for &'static str {
-	fn image(self) -> TileMapImage {
-		load_tilemap(self).into_serde().unwrap()
-	}
-}
-
-#[cfg(not(feature = "web-client"))]
-impl MapSrc for &'static str {
-	fn image(self) -> TileMapImage {
+#[cfg(feature = "server")]
+impl TileMapImage {
+	pub fn new(src: &str) -> Self {
 		use image::GenericImageView;
 
-		let filename = res(self);
+		let filename = res(src);
 
 		let image = image::open(filename).unwrap();
 		let (width, height) = image.dimensions();
@@ -49,6 +34,7 @@ impl MapSrc for &'static str {
 		}
 
 		let size = TileVec::new(width as i32, height as i32);
+
 		TileMapImage {
 			pixels,
 			size,

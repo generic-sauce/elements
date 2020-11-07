@@ -15,9 +15,9 @@ pub struct Server {
 
 impl Server {
 	pub fn new() -> Server {
-		let tilemap_image = DEFAULT_TILEMAP.image();
+		let tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
 		Server {
-			world: World::new(0, tilemap_image.clone()),
+			world: World::new(0, &tilemap_image),
 			tilemap_image,
 			update_desire: [0, 0],
 			peer_manager: PeerManager::wait_for_players(),
