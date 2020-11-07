@@ -7,7 +7,6 @@ pub use peer::*;
 const UPDATE_DESIRE_PER_FRAME: u32 = 350;
 
 pub struct Server {
-	tilemap_image: TileMapImage,
 	world: World,
 	update_desire: [u32; 2],
 	peer_manager: PeerManager,
@@ -15,24 +14,29 @@ pub struct Server {
 
 impl Server {
 	pub fn new() -> Server {
-		let tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
-		Server {
+		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
+
+		let mut server = Server {
 			world: World::new(0, &tilemap_image),
-			tilemap_image,
 			update_desire: [0, 0],
 			peer_manager: PeerManager::wait_for_players(),
-		}
-	}
+		};
 
-	pub fn run(&mut self) {
 		for i in 0..2 {
 			let go = Go {
 				your_player_id: i,
-				tilemap_image: self.tilemap_image.clone(),
+				tilemap_image,
 			};
-			self.peer_manager.send_to(i, &go);
+			server.peer_manager.send_to(i, &go);
+
+			tilemap_image = go.tilemap_image;
 		}
 
+		server
+
+	}
+
+	pub fn run(&mut self) {
 		println!("server has started!");
 
 		for timed_loop_info in TimedLoop::with_fps(60) {
