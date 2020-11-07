@@ -51,13 +51,13 @@ impl<B: Backend> App<B> {
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
 		let framedrop = (0..10).all(|_| {
-			if self.tick_fps() >= TICK_FPS {
-				return false;
-			}
-
 			self.fetch_peripherals();
 			self.input_backend.tick();
 			self.update_cursor();
+
+			if self.tick_fps() >= TICK_FPS {
+				return false;
+			}
 
 			runnable.tick(self);
 			self.tick_counter += 1;
