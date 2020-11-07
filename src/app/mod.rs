@@ -5,7 +5,7 @@ use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 
-pub const TICK_FPS: f32 = 60.0;
+pub const TICK_FPS: f64 = 60.0;
 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
@@ -45,8 +45,8 @@ impl<B: Backend> App<B> {
 		self.cursor_position.x = self.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 	}
 
-	fn tick_fps(&self) -> f32 {
-		1000.0 * self.tick_counter as f32 / self.timer.elapsed_ms() as f32
+	fn tick_fps(&self) -> f64 {
+		1000.0 * self.tick_counter as f64 / self.timer.elapsed_ms()
 	}
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {

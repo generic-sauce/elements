@@ -13,8 +13,8 @@
 			Self(std::time::Instant::now())
 		}
 
-		pub fn elapsed_ms(&self) -> u64 {
-			self.0.elapsed().as_millis() as u64
+		pub fn elapsed_ms(&self) -> f64 {
+			self.0.elapsed().as_micros() as f64 / 1000.0
 		}
 	}
 }
@@ -29,12 +29,12 @@
 		setInterval(leaked_cb, 1000 as f64 / fps as f64);
 	}
 
-	pub struct Timer { start: u64 }
+	pub struct Timer { start: f64 }
 
-	fn now() -> u64 {
+	fn now() -> f64 {
 		web_sys::window().unwrap()
 			.performance().unwrap()
-			.now() as u64
+			.now()
 	}
 
 	impl Timer {
@@ -42,7 +42,7 @@
 			Self { start: now() }
 		}
 
-		pub fn elapsed_ms(&self) -> u64 {
+		pub fn elapsed_ms(&self) -> f64 {
 			now() - self.start
 		}
 	}
