@@ -64,8 +64,8 @@ impl World {
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new(best_of_n: u32, mapsrc: impl MapSrc) -> World {
-		let tilemap = TileMap::new(mapsrc);
+	pub fn new(best_of_n: u32, tilemap_image: &TileMapImage) -> World {
+		let tilemap = TileMap::new(tilemap_image);
 
 		World {
 			players: new_players(),

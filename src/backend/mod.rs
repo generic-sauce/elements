@@ -10,11 +10,15 @@ pub use audio::*;
 mod socket;
 pub use socket::*;
 
+mod tilemap_loader;
+pub use tilemap_loader::*;
+
 pub trait Backend: 'static {
 	type InputBackend: InputBackend;
 	type GraphicsBackend: GraphicsBackend;
 	type AudioBackend: AudioBackend;
 	type SocketBackend: SocketBackend;
+	type TileMapLoaderBackend: TileMapLoaderBackend;
 }
 
 #[cfg(feature = "native-client")] mod native {
@@ -27,6 +31,7 @@ pub trait Backend: 'static {
 		type GraphicsBackend = NativeGraphicsBackend;
 		type AudioBackend = NativeAudioBackend;
 		type SocketBackend = NativeSocketBackend;
+		type TileMapLoaderBackend = NativeTileMapLoaderBackend;
 	}
 }
 #[cfg(feature = "native-client")] pub use native::*;
@@ -41,6 +46,7 @@ pub trait Backend: 'static {
 		type GraphicsBackend = WebGraphicsBackend;
 		type AudioBackend = WebAudioBackend;
 		type SocketBackend = WebSocketBackend;
+		type TileMapLoaderBackend = WebTileMapLoaderBackend;
 	}
 }
 #[cfg(feature = "web-client")] pub use web::*;

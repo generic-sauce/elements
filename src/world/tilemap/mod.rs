@@ -1,8 +1,8 @@
 mod update;
 pub use update::*;
 
-mod src;
-pub use src::*;
+mod tilemap_image;
+pub use tilemap_image::*;
 
 use crate::prelude::*;
 
@@ -22,8 +22,8 @@ pub struct TileMap {
 }
 
 impl TileMap {
-	pub fn new(src: impl MapSrc) -> TileMap {
-		let TileMapImage { pixels, size } = src.image();
+	pub fn new(src: &TileMapImage) -> TileMap {
+		let TileMapImage { pixels, size } = src;
 		let mut tiles = Vec::with_capacity((size.x * size.y) as usize);
 
 		for y in 0..size.y {
@@ -39,7 +39,7 @@ impl TileMap {
 
 		TileMap {
 			tiles,
-			size,
+			size: *size,
 		}
 	}
 
