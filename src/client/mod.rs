@@ -9,7 +9,6 @@ pub enum ClientMode {
 }
 
 pub struct Client<B: Backend> {
-	gamepad_state: RawGamepadState,
 	socket: B::SocketBackend,
 	mode: ClientMode,
 }
@@ -17,7 +16,6 @@ pub struct Client<B: Backend> {
 impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
 		Client {
-			gamepad_state: RawGamepadState::new(),
 			socket: B::SocketBackend::new(server_ip),
 			mode: ClientMode::Lobby,
 		}
@@ -40,7 +38,7 @@ impl<B: Backend> Client<B> {
 				}
 
 				// handle inputs
-				world.players[*player_id].input.update_gamepad(&self.gamepad_state);
+				world.players[*player_id].input.update_gamepad(&app.input_backend.gamepad(0));
 				world.players[*player_id].input.update_peripherals(&app.peripherals_state);
 
 				// send packets
