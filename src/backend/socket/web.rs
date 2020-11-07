@@ -30,7 +30,7 @@ impl SocketBackend for WebSocketBackend {
 		}
 	}
 
-	fn is_ready(&self) -> bool {
+	fn is_open(&self) -> bool {
 		self.socket.ready_state() == WebSocket::OPEN
 	}
 
