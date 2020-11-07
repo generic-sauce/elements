@@ -68,10 +68,6 @@ impl World {
 		draw_cursors(draw, self);
 		draw_healthbars(draw, self);
 
-		draw.texture(CanvasVec::new(0.1, 0.1), CanvasVec::new(0.3, 0.3), TextureId::White2, Flip::Normal, Some(Color::RED));
-		draw.texture(CanvasVec::new(0.22, 0.22), CanvasVec::new(0.44, 0.44), TextureId::White, Flip::Normal, Some(Color::BLUE));
-		draw.texture(CanvasVec::new(0.34, 0.34), CanvasVec::new(0.58, 0.58), TextureId::White2, Flip::Normal, Some(Color::GREEN));
-
 		let text_size = 0.04;
 		draw.text(ViewVec::new(0.0, 1.0 - 1.0 * text_size), text_size, Color::WHITE,
 			&*format!("best of {}", self.best_of_n));
