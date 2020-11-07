@@ -9,7 +9,7 @@ impl GraphicsBackend for WebGraphicsBackend {
 		}
 	}
 
-	fn get_text_width(&self, _text: &str) -> f32 {
+	fn get_text_width(&self, _text: &str) -> CanvasVec {
 		unimplemented!()
 	}
 }

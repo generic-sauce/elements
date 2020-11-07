@@ -2,6 +2,8 @@ use crate::prelude::*;
 use wgpu_glyph::{ab_glyph, Section, Text, GlyphCruncher};
 use glyph_brush::{GlyphCalculatorBuilder, GlyphCalculator};
 
+const TEXT_WIDTH_SCALE: f32 = 0.0625;
+
 pub struct NativeGraphicsBackend {
 	pub draw_sender: Sender<Draw>,
 	glyphs: GlyphCalculator,
@@ -26,9 +28,9 @@ impl GraphicsBackend for NativeGraphicsBackend {
 		self.draw_sender.send(draw).unwrap();
 	}
 
-	fn get_text_width(&self, text: &str) -> f32 {
+	fn get_text_width(&self, text: &str) -> CanvasVec {
 		if text.is_empty() {
-			return 0.0;
+			return CanvasVec::new(0.0, 0.0);
 		}
 
 		let section = Section::default()
@@ -40,6 +42,6 @@ impl GraphicsBackend for NativeGraphicsBackend {
 
 		let bounds = scope.glyph_bounds(section).unwrap();
 
-		bounds.width()
+		CanvasVec::new(bounds.width() * TEXT_WIDTH_SCALE, bounds.height() * TEXT_WIDTH_SCALE)
 	}
 }

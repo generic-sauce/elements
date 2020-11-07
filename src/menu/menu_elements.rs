@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use std::ops::{Add, Sub, Mul};
 
 const BUTTON_TEXT_SIZE: f32 = 0.08;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
@@ -26,7 +27,7 @@ pub enum MenuKind<B: Backend> {
 	EditField {
 		text: String,
 		selected: bool,
-		cursor: u32,
+		cursor: usize,
 	}
 }
 
@@ -67,19 +68,24 @@ impl<B: Backend> MenuElement<B> {
 			Color::rgb(0.08, 0.26, 0.42)
 		};
 		match &self.kind {
-			MenuKind::Button { text, .. } => { self.draw_button(draw, text, color) },
+			MenuKind::Button { text, .. } => {
+				self.draw_button(draw, text, color, graphics_backend)
+			},
 			MenuKind::EditField { text, selected, cursor } => {
 				self.draw_edit_field(draw, text, color, *selected, *cursor, graphics_backend)
 			},
 		}
 	}
 
-	fn draw_button(&self, draw: &mut Draw, text: &str, color: Color) {
-		draw.rectangle(self.position - self.size, self.position + self.size, color);
-        draw.text(self.position - self.size, BUTTON_TEXT_SIZE, Color::WHITE, text);
+	fn draw_button(&self, draw: &mut Draw, text: &str, color: Color, graphics_backend: &impl GraphicsBackend) {
+		let left_bot = self.position - self.size;
+		let right_top = self.position + self.size;
+		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_width(text) * BUTTON_TEXT_SIZE);
+		draw.rectangle(left_bot, right_top, color);
+        draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
-	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: u32, graphics_backend: &impl GraphicsBackend) {
+	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: usize, graphics_backend: &impl GraphicsBackend) {
         draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + CanvasVec::new(EDIT_FIELD_BORDER_WIDTH, EDIT_FIELD_BORDER_WIDTH),
@@ -92,8 +98,9 @@ impl<B: Backend> MenuElement<B> {
 		draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 
 		if selected {
-			let text_width = graphics_backend.get_text_width(&text[..cursor as usize]);
-			let left_bot = text_pos + CanvasVec::new(text_width * BUTTON_TEXT_SIZE * 0.0625 + -0.001, 0.017);
+			let subtext = &text[0..get_byte_pos(text, cursor)];
+			let text_width = graphics_backend.get_text_width(subtext).x;
+			let left_bot = text_pos + CanvasVec::new(text_width * BUTTON_TEXT_SIZE + -0.001, 0.017);
 			draw.rectangle(
 				left_bot,
 				left_bot + CanvasVec::new(0.002, BUTTON_TEXT_SIZE*0.6),
@@ -107,18 +114,18 @@ impl<B: Backend> MenuElement<B> {
 			for character in event_text {
 				match character {
 					Character::Char(c) => {
-						text.insert(*cursor as usize, *c);
+						text.insert(get_byte_pos(text, *cursor), *c);
 						*cursor += 1;
 					},
 					Character::Backspace => {
 						if *cursor != 0 {
-							text.drain((*cursor - 1) as usize..(*cursor) as usize);
+							text.drain(get_byte_pos(text, *cursor - 1)..get_byte_pos(text, *cursor));
 							*cursor = (*cursor - 1).max(0);
 						}
 					},
 					Character::Delete => {
-						if *cursor < text.len() as u32 {
-							text.drain((*cursor) as usize..(*cursor + 1) as usize);
+						if *cursor < text.chars().count() {
+							text.drain(get_byte_pos(text, *cursor)..get_byte_pos(text, *cursor + 1));
 						}
 					},
 					_ => {},
@@ -133,15 +140,29 @@ impl<B: Backend> MenuElement<B> {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
 			}
 			if peripherals_state.key_firing(Key::Right) {
-				*cursor = (*cursor + 1).min(text.len() as u32);
+				*cursor = (*cursor + 1).min(text.len());
 			}
 		}
 
 	}
 }
 
-// OnEvent impl
+fn center_position<T>(outer_left: T, outer_right: T, inner_size: T) -> T
+	where T: Add<Output=T> + Sub<Output=T> + Mul<f32, Output=T> + Copy
+{
+	let outer_size = outer_right - outer_left;
+	let space = (outer_size - inner_size) * 0.5;
+	outer_left + space
+}
 
+fn get_byte_pos(text: &str, char_pos: usize) -> usize {
+	text.char_indices()
+		.nth(char_pos)
+		.map(|(i, _)| i)
+		.unwrap_or(text.len())
+}
+
+// OnEvent impl
 impl<B: Backend, F: Fn(&mut App<B>, &mut Runnable<B>) + Clone + 'static> OnEventImpl<B> for F {
 	fn clone_box(&self) -> Box<dyn OnEventImpl<B>> {
 		Box::new(self.clone())

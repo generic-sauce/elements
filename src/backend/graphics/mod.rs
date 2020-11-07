@@ -8,5 +8,5 @@ use crate::prelude::*;
 
 pub trait GraphicsBackend {
 	fn draw(&mut self, draw: Draw, tmp_world: Option<&World> /* this is only temporary */);
-	fn get_text_width(&self, text: &str) -> f32;
+	fn get_text_width(&self, text: &str) -> CanvasVec;
 }
