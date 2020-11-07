@@ -28,10 +28,3 @@ extern {
 	#[wasm_bindgen(js_namespace = console)]
 	pub fn log(txt: &str);
 }
-
-pub fn now() -> f64 {
-	web_sys::window().unwrap()
-		.performance().unwrap()
-		.now()
-}
-

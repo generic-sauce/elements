@@ -5,6 +5,8 @@ use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 
+pub const TICK_FPS: f32 = 60.0;
+
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
 	pub graphics_backend: B::GraphicsBackend,
@@ -12,6 +14,8 @@ pub struct App<B: Backend> {
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
 	pub menu: Menu<B>,
+	pub timer: Timer,
+	pub tick_counter: u32,
 }
 
 impl<B: Backend> App<B> {
@@ -23,6 +27,8 @@ impl<B: Backend> App<B> {
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
 			menu,
+			timer: Timer::new(),
+			tick_counter: 0,
 		}
 	}
 
@@ -39,12 +45,23 @@ impl<B: Backend> App<B> {
 		self.cursor_position.x = self.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 	}
 
-	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
-		self.fetch_peripherals();
-		self.input_backend.tick();
-		self.update_cursor();
+	fn tick_fps(&self) -> f32 {
+		1000.0 * self.tick_counter as f32 / self.timer.elapsed_ms() as f32
+	}
 
-		runnable.tick(self);
+	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
+		for _ in 0..10 {
+			self.fetch_peripherals();
+			self.input_backend.tick();
+			self.update_cursor();
+
+			runnable.tick(self);
+			self.tick_counter += 1;
+
+			if self.tick_fps() >= TICK_FPS {
+				break;
+			}
+		}
 		runnable.draw(self);
 
 		// TODO: improve
