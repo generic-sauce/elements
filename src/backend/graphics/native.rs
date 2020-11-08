@@ -24,7 +24,7 @@ impl NativeGraphicsBackend {
 }
 
 impl GraphicsBackend for NativeGraphicsBackend {
-	fn draw(&mut self, draw: Draw, _: Option<&World>) {
+	fn submit(&mut self, draw: Draw) {
 		self.draw_sender.send(draw).unwrap();
 	}
 

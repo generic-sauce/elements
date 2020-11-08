@@ -1,23 +1,29 @@
-import * as drawmod from "./draw/mod.js";
-import * as inputmod from "./input.js";
-import * as tilemapmod from "./tilemap.js";
+import * as render_mod from "./render/mod.js"
+import * as inputmod from "./input.js"
+import * as tilemapmod from "./tilemap.js"
 
-window.e2 = {};
+window.e2 = {}
+
 window.init_js = function(f) {
-	drawmod.init();
-};
-window.draw_render_world = function(rw, tilemap_data, fluidmap_data) {
-	e2.render_world = rw;
-	e2.render_world.tilemap_data = tilemap_data;
-	e2.render_world.fluidmap_data = fluidmap_data;
+	render_mod.init()
+}
 
-	drawmod.draw();
-};
+// draw_render_world = function(rw, tilemap_data, fluidmap_data) {
+// 	e2.render_world = rw
+// 	e2.render_world.tilemap_data = tilemap_data
+// 	e2.render_world.fluidmap_data = fluidmap_data
+//
+// 	drawmod.draw()
+// }
+
+window.js_render = render_mod.render
+
 window.input_state = function(i) {
-	return inputmod.calc_input_state(i);
-};
-window.load_tilemap = function(src, cb) {
-	tilemapmod.load(src, cb);
-};
+	return inputmod.calc_input_state(i)
+}
 
-import("../node_modules/elements/elements.js");
+window.load_tilemap = function(src, cb) {
+	tilemapmod.load(src, cb)
+}
+
+import("../node_modules/elements/elements.js")

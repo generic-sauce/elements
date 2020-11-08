@@ -7,6 +7,6 @@ use crate::prelude::*;
 #[cfg(feature = "native-client")] pub use native::*;
 
 pub trait GraphicsBackend {
-	fn draw(&mut self, draw: Draw, tmp_world: Option<&World> /* this is only temporary */);
+	fn submit(&mut self, draw: Draw);
 	fn get_text_size(&self, text: &str, scale: f32) -> CanvasVec;
 }
