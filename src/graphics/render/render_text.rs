@@ -1,13 +1,13 @@
 use crate::graphics::*;
 use wgpu_glyph::{ab_glyph, GlyphBrush, GlyphBrushBuilder, Section, Text};
 
-pub(in crate::graphics) struct DrawText {
+pub(in crate::graphics) struct RenderText {
 	glyph_brush: GlyphBrush<(), ab_glyph::FontArc>,
 	staging_belt: wgpu::util::StagingBelt,
 }
 
-impl DrawText {
-	pub(in crate::graphics) fn new(device: &wgpu::Device) -> DrawText {
+impl RenderText {
+	pub(in crate::graphics) fn new(device: &wgpu::Device) -> RenderText {
 		let font = ab_glyph::FontArc::try_from_slice(include_bytes!(
 			"../../../res/fonts/elementsfont.ttf"
 		)).unwrap();
@@ -17,7 +17,7 @@ impl DrawText {
 
 		let staging_belt = wgpu::util::StagingBelt::new(1024);
 
-		DrawText {
+		RenderText {
 			glyph_brush,
 			staging_belt,
 		}

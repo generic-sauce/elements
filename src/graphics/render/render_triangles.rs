@@ -29,7 +29,7 @@ fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle], max_dept
 	bytes
 }
 
-pub(in crate::graphics) struct DrawTriangles {
+pub(in crate::graphics) struct RenderTriangles {
 	pipeline: wgpu::RenderPipeline,
 	triangles_capacity: u64,
 	vertex_buffer: wgpu::Buffer,
@@ -39,7 +39,7 @@ pub(in crate::graphics) struct DrawTriangles {
 	bind_groups: Vec<wgpu::BindGroup>,
 }
 
-impl DrawTriangles {
+impl RenderTriangles {
 	fn create_vertex_buffer(device: &wgpu::Device, triangles_capacity: u64) -> wgpu::Buffer {
 		let triangle_size = std::mem::size_of::<Triangle>() as u64;
 		let triangles_size = triangles_capacity * triangle_size;
@@ -58,7 +58,7 @@ impl DrawTriangles {
 		self.vertex_buffer = Self::create_vertex_buffer(device, self.triangles_capacity);
 	}
 
-	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> DrawTriangles {
+	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> RenderTriangles {
 		let texture_state = TextureState::new(device, queue);
 
 		let triangles_capacity = 128 as u64;
@@ -178,7 +178,7 @@ impl DrawTriangles {
 			)
 			.collect();
 
-		DrawTriangles {
+		RenderTriangles {
 			pipeline,
 			triangles_capacity,
 			vertex_buffer,
