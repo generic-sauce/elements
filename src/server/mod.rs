@@ -50,6 +50,7 @@ impl Server {
 				self.update_desire[0] += diff;
 				self.update_desire[1] += diff;
 				self.world.players[i].input = input_state;
+				self.world.players[i].input.clamp();
 			}
 
 			self.world.tick(&mut ());
