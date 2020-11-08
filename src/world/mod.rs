@@ -48,6 +48,12 @@ pub struct World {
 	pub best_of_n: u32,
 }
 
+pub enum GameResult {
+	None,
+	Winner(u8),
+	Tie,
+}
+
 fn new_players() -> [Player; 2] {
 	[
 		Player::new(TileVec::new(37, 39).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
@@ -79,13 +85,11 @@ impl World {
 	}
 
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
-		let mut should_tick = false;
 		// sub-tick
 		match &mut self.restart_state {
 			RestartState::Game => {
 				self.tick_impl(handler);
-				if let Some(p) = self.player_dead() {
-					self.kills[1-p] += 1;
+				if self.player_dead().is_some() {
 					self.restart_state = RestartState::new_restart();
 				}
 				self.frame_id += 1;
@@ -93,21 +97,24 @@ impl World {
 			RestartState::Restart { counter, tick_value } => {
 				*counter += 1;
 				*tick_value += get_frame_tick_probability(*counter);
-				if *counter >= RESTART_DELAY_COUNT {
+				if *counter == RESTART_DELAY_COUNT {
+					for i in 0..self.players.len() {
+						if self.players[i].health == 0 {
+							self.kills[1-i] += 1;
+						}
+					}
+				} else if *counter > RESTART_DELAY_COUNT {
 					if self.players.iter().any(|p| p.input.restart()) {
 						self.reset(handler);
 						self.restart_state = RestartState::Game;
 					}
 				} else if *tick_value >= 1.0 {
 					*tick_value -= 1.0;
-					should_tick = true;
+					self.tick_impl(handler);
 				}
 			}
 		}
 
-		if should_tick {
-			self.tick_impl(handler);
-		}
 	}
 
 	fn tick_impl(&mut self, handler: &mut impl EventHandler) {
@@ -201,16 +208,24 @@ impl World {
 		(0..2).find(|&p| self.players[p].health == 0)
 	}
 
-	pub fn is_game_over(&self) -> Option<usize> {
+	pub fn is_game_over(&self) -> GameResult {
 		if self.best_of_n == 0 {
-			return None;
+			return GameResult::None;
 		};
 
 		match self.restart_state {
 			RestartState::Game => {
-				return self.kills.iter().position(|kill| *kill >= (self.best_of_n+1) / 2);
+				let mut game_result = GameResult::None;
+				for winner in self.kills.iter().enumerate().filter(|(_, kill)| **kill >= (self.best_of_n+1) / 2).map(|(index, _)| index) {
+					match game_result {
+						GameResult::None => { game_result = GameResult::Winner(winner as u8)},
+						GameResult::Winner(_) => { game_result = GameResult::Tie },
+						GameResult::Tie => {},
+					}
+				}
+				game_result
 			},
-			_ => None,
+			_ => GameResult::None,
 		}
 	}
 }

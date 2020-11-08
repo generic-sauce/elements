@@ -69,6 +69,8 @@ impl<B: Backend> App<B> {
 			println!("App::tick_draw experienced a framedrop.");
 		}
 
+		self.check_game_over(runnable);
+
 		runnable.draw(self);
 
 		// TODO: improve
@@ -76,8 +78,6 @@ impl<B: Backend> App<B> {
 			self.tick_menu(runnable);
 			self.draw_menu();
 		}
-
-		self.check_game_over(runnable);
 
 		self.audio_backend.tick();
 		self.peripherals_state.reset();
@@ -87,8 +87,18 @@ impl<B: Backend> App<B> {
 		let opt_world = runnable.get_world();
 
 		if let Some(world) = opt_world {
-			if let Some(winner_id) = world.is_game_over() {
-				println!("player {} won the match", winner_id);
+			let winner_found = match world.is_game_over() {
+				GameResult::None => false,
+				GameResult::Winner(winner) => {
+					println!("player {} won the match", winner);
+					true
+				}
+				GameResult::Tie => {
+					println!("match ended in a tie");
+					true
+				}
+			};
+			if winner_found {
 				*runnable = Runnable::Menu;
 				self.menu = Menu::main_menu();
 			}
