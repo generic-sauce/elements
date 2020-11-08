@@ -200,4 +200,17 @@ impl World {
 	pub fn player_dead(&self) -> Option<usize> {
 		(0..2).find(|&p| self.players[p].health == 0)
 	}
+
+	pub fn is_game_over(&self) -> Option<usize> {
+		if self.best_of_n == 0 {
+			return None;
+		};
+
+		match self.restart_state {
+			RestartState::Game => {
+				return self.kills.iter().position(|kill| *kill >= (self.best_of_n+1) / 2);
+			},
+			_ => None,
+		}
+	}
 }

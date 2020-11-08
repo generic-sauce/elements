@@ -77,8 +77,22 @@ impl<B: Backend> App<B> {
 			self.draw_menu();
 		}
 
+		self.check_game_over(runnable);
+
 		self.audio_backend.tick();
 		self.peripherals_state.reset();
+	}
+
+	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {
+		let opt_world = runnable.get_world();
+
+		if let Some(world) = opt_world {
+			if let Some(winner_id) = world.is_game_over() {
+				println!("player {} won the match", winner_id);
+				*runnable = Runnable::Menu;
+				self.menu = Menu::main_menu();
+			}
+		}
 	}
 
 	fn handle(&mut self, handler: &AppEventHandler) {

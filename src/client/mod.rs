@@ -9,8 +9,8 @@ pub enum ClientMode {
 }
 
 pub struct Client<B: Backend> {
-	socket: B::SocketBackend,
-	mode: ClientMode,
+	pub socket: B::SocketBackend,
+	pub mode: ClientMode,
 }
 
 impl<B: Backend> Client<B> {
