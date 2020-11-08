@@ -7,16 +7,17 @@ struct Vertex {
 }
 
 fn vertex_to_bytes_len() -> u64 {
-	2 * 2 * std::mem::size_of::<f32>() as u64
+	(3 + 2) * std::mem::size_of::<f32>() as u64
 }
 
-fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
+fn vertices_to_bytes(vertices: &[Vertex], depth: DepthValue) -> Vec<u8> {
 	let vertices_size = vertices.len() * vertex_to_bytes_len() as usize;
 	let mut bytes = Vec::<u8>::with_capacity(vertices_size);
 
 	for vertex in vertices {
 		bytes.extend(vertex.position.x.to_le_bytes().iter());
 		bytes.extend(vertex.position.y.to_le_bytes().iter());
+		bytes.extend(depth.to_le_bytes().iter());
 		bytes.extend(vertex.uv.x.to_le_bytes().iter());
 		bytes.extend(vertex.uv.y.to_le_bytes().iter());
 	}
@@ -97,11 +98,11 @@ impl DrawTilemap {
 			attributes: &[
 				wgpu::VertexAttributeDescriptor {
 					offset: 0,
-					format: wgpu::VertexFormat::Float2,
+					format: wgpu::VertexFormat::Float3,
 					shader_location: 0
 				},
 				wgpu::VertexAttributeDescriptor {
-					offset: 2 * std::mem::size_of::<f32>() as u64,
+					offset: 3 * std::mem::size_of::<f32>() as u64,
 					format: wgpu::VertexFormat::Float2,
 					shader_location: 1
 				},
@@ -161,7 +162,12 @@ impl DrawTilemap {
 			}),
 			primitive_topology: wgpu::PrimitiveTopology::TriangleStrip,
 			color_states: &[SURFACE_FORMAT.into()],
-			depth_stencil_state: None,
+			depth_stencil_state: Some(wgpu::DepthStencilStateDescriptor {
+				format: wgpu::TextureFormat::Depth32Float,
+				depth_write_enabled: true,
+				depth_compare: wgpu::CompareFunction::Less,
+				stencil: Default::default(),
+			}),
 			vertex_state: wgpu::VertexStateDescriptor {
 				index_format: Default::default(),
 				vertex_buffers: &[vertex_buffer_desc],
@@ -203,19 +209,29 @@ impl DrawTilemap {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		world: &GraphicsWorld,
+		draw: &Draw,
 	) {
+		let world = match &draw.world {
+			Some(world) => world,
+			None => return,
+		};
+
 		assert!(world.tilemap_size != TileVec::new(0, 0));
 		self.resize_tilemap(context.device, world.tilemap_size);
 
 		let window_size = context.window_size.to_subpixel();
 		let s = |v: ViewVec| v.to_surface(window_size);
-		context.queue.write_buffer(&self.vertex_buffer, 0, &vertices_to_bytes(&[
-			Vertex { position: s(v(0.0, 0.0)), uv: v(0.0, 0.0) },
-			Vertex { position: s(v(1.0, 0.0)), uv: v(1.0, 0.0) },
-			Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
-			Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
-		])[..]);
+		context.queue.write_buffer(&self.vertex_buffer, 0,
+			&vertices_to_bytes(
+				&[
+					Vertex { position: s(v(0.0, 0.0)), uv: v(0.0, 0.0) },
+					Vertex { position: s(v(1.0, 0.0)), uv: v(1.0, 0.0) },
+					Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
+					Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
+				],
+				depth_index_to_value(world.tilemap_depth_index, draw.depth_index)
+			)[..]
+		);
 
 		context.queue.write_texture(
 			wgpu::TextureCopyView {
@@ -237,6 +253,7 @@ impl DrawTilemap {
 		);
 
 		let color_load_op = context.color_load_op();
+		let depth_load_op = context.depth_load_op();
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
@@ -248,7 +265,14 @@ impl DrawTilemap {
 					}
 				},
 			],
-			depth_stencil_attachment: None
+			depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachmentDescriptor {
+				attachment: context.depth_texture_view,
+				depth_ops: Some(wgpu::Operations {
+					load: depth_load_op,
+					store: true,
+				}),
+				stencil_ops: None,
+			}),
 		});
 
 		render_pass.set_pipeline(&self.pipeline);

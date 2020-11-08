@@ -4,11 +4,12 @@ pub struct GraphicsWorld {
 	pub tilemap_size: TileVec,
 	pub tilemap_data: Vec<u8>,
 	pub fluidmap_data: Vec<u8>,
-	pub depth_index: DepthIndex,
+	pub tilemap_depth_index: DepthIndex,
+	pub fluidmap_depth_index: DepthIndex,
 }
 
 impl GraphicsWorld {
-	pub fn new(tilemap: &TileMap, fluidmap: &FluidMap, depth_index: DepthIndex) -> GraphicsWorld {
+	pub fn new(tilemap: &TileMap, fluidmap: &FluidMap, tilemap_depth_index: DepthIndex, fluidmap_depth_index: DepthIndex) -> GraphicsWorld {
 
 		let tilemap_data: Vec<u8> = tilemap.iter()
 			.map(|p| tilemap.get(p))
@@ -37,7 +38,8 @@ impl GraphicsWorld {
 			tilemap_size: tilemap.size,
 			tilemap_data,
 			fluidmap_data,
-			depth_index,
+			tilemap_depth_index,
+			fluidmap_depth_index,
 		}
 	}
 }

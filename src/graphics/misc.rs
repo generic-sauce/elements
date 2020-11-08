@@ -56,3 +56,9 @@ pub(in crate::graphics) fn create_depth_texture(device: &wgpu::Device, size: Pix
 		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
 	})
 }
+
+pub(in crate::graphics) type DepthValue = f32;
+
+pub(in crate::graphics) fn depth_index_to_value(index: DepthIndex, max_index: DepthIndex) -> DepthValue {
+	(max_index - index + 0.001) / (max_index + 0.002)
+}

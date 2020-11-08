@@ -138,19 +138,17 @@ impl Graphics {
 			draw.clear_color.unwrap_or(Color::BLACK).to_wgpu()
 		);
 
-		if let Some(world) = &draw.world {
-			self.fluidmap.render(
-				&mut graphics_context,
-				&world,
-			);
-
-			self.tilemap.render(
-				&mut graphics_context,
-				&world,
-			);
-		}
-
 		self.triangles.render(
+			&mut graphics_context,
+			draw,
+		);
+
+		self.fluidmap.render(
+			&mut graphics_context,
+			draw,
+		);
+
+		self.tilemap.render(
 			&mut graphics_context,
 			draw,
 		);

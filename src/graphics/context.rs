@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::graphics::*;
 
 pub(in crate::graphics) struct GraphicsContext<'a> {
 	pub device: &'a wgpu::Device,
@@ -12,8 +12,6 @@ pub(in crate::graphics) struct GraphicsContext<'a> {
 	color_cleared: bool,
 	depth_cleared: bool,
 }
-
-pub(in crate::graphics) type DepthValue = f32;
 
 impl<'a> GraphicsContext<'a> {
 	pub(in crate::graphics) fn new(

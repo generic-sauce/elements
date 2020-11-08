@@ -206,8 +206,8 @@ impl Draw {
 	}
 
 	pub fn world(&mut self, tilemap: &TileMap, fluidmap: &FluidMap) {
-		self.world = Some(GraphicsWorld::new(tilemap, fluidmap, self.depth_index));
-		self.depth_index += 1.0;
+		self.world = Some(GraphicsWorld::new(tilemap, fluidmap, self.depth_index + 1.0, self.depth_index));
+		self.depth_index += 2.0;
 	}
 
 	#[allow(unused)]
