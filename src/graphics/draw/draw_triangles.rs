@@ -192,8 +192,6 @@ impl DrawTriangles {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		color_load_op: wgpu::LoadOp::<wgpu::Color>,
-		depth_load_op: wgpu::LoadOp::<f32>,
 		draw: &Draw,
 	) {
 		let max_triangles: usize = draw.triangles.iter()
@@ -201,6 +199,8 @@ impl DrawTriangles {
 			.sum();
 		self.enlarge_vertex_buffer(context.device, max_triangles as u64);
 
+		let color_load_op = context.color_load_op();
+		let depth_load_op = context.depth_load_op();
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {

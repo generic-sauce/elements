@@ -230,7 +230,6 @@ impl DrawFluidmap {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		load: wgpu::LoadOp::<wgpu::Color>,
 		tilemap_size: TileVec,
 		fluidmap_data: &[u8],
 		elapsed_time: Duration
@@ -276,13 +275,14 @@ impl DrawFluidmap {
 			&self.uniform_buffer
 		));
 
+		let color_load_op = context.color_load_op();
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
 					attachment: &context.swap_chain_texture.view,
 					resolve_target: None,
 					ops: wgpu::Operations {
-						load,
+						load: color_load_op,
 						store: true
 					}
 				},

@@ -128,43 +128,19 @@ impl Graphics {
 			label: Some("command encoder")
 		});
 
-		let mut graphics_context = GraphicsContext {
-			device: &self.device,
-			queue: &self.queue,
-			swap_chain_texture: &swap_chain_texture,
-			encoder: &mut encoder,
-			window_size: self.window_size,
-			depth_texture_view: &self.depth_texture_view,
-		};
-
-		let color = draw.clear_color
-			.unwrap_or(Color::BLACK)
-			.to_wgpu();
-		let mut cleared = false;
-		let mut color_load_op = move || {
-			let load_op = match cleared {
-				true => wgpu::LoadOp::Load,
-				false => wgpu::LoadOp::Clear(color),
-			};
-			cleared = true;
-			load_op
-		};
-
-		let color = f32::MAX;
-		let mut cleared = false;
-		let mut depth_load_op = move || {
-			let load_op = match cleared {
-				true => wgpu::LoadOp::Load,
-				false => wgpu::LoadOp::Clear(color),
-			};
-			cleared = true;
-			load_op
-		};
+		let mut graphics_context = GraphicsContext::new(
+			&self.device,
+			&self.queue,
+			&swap_chain_texture,
+			&mut encoder,
+			self.window_size,
+			&self.depth_texture_view,
+			draw.clear_color.unwrap_or(Color::BLACK).to_wgpu()
+		);
 
 		if let Some(world) = &draw.world {
 			self.fluidmap.render(
 				&mut graphics_context,
-				color_load_op(),
 				world.tilemap_size,
 				&world.fluidmap_data,
 				Duration::from_millis(0), // TODO: make for web
@@ -172,7 +148,6 @@ impl Graphics {
 
 			self.tilemap.render(
 				&mut graphics_context,
-				color_load_op(),
 				world.tilemap_size,
 				&world.tilemap_data,
 			);
@@ -180,8 +155,6 @@ impl Graphics {
 
 		self.triangles.render(
 			&mut graphics_context,
-			color_load_op(),
-			depth_load_op(),
 			draw,
 		);
 
