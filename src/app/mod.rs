@@ -51,6 +51,8 @@ impl<B: Backend> App<B> {
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
 		let framedrop = (0..10).all(|_| {
+			self.peripherals_state.reset();
+			
 			self.fetch_peripherals();
 			self.input_backend.tick();
 			self.update_cursor();
@@ -61,6 +63,11 @@ impl<B: Backend> App<B> {
 
 			runnable.tick(self);
 			self.tick_counter += 1;
+			if let Runnable::Menu = runnable {
+				self.tick_menu(runnable);
+			}
+
+			self.audio_backend.tick();
 
 			true
 		});
@@ -75,12 +82,9 @@ impl<B: Backend> App<B> {
 
 		// TODO: improve
 		if let Runnable::Menu = runnable {
-			self.tick_menu(runnable);
 			self.draw_menu();
 		}
 
-		self.audio_backend.tick();
-		self.peripherals_state.reset();
 	}
 
 	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {
