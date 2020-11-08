@@ -132,9 +132,7 @@ impl World {
 			}
 		}
 		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
-		if app.audio_backend.current_music_id().map_or(true, |music_id| music_id != sound_id) {
-			app.audio_backend.queue_music(sound_id);
-		}
+		app.audio_backend.queue_music(sound_id);
 	}
 
 	pub fn apply_update_within_app<B: Backend>(&mut self, update: WorldUpdate, app: &mut App<B>) {
