@@ -9,8 +9,8 @@ fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle], max_dept
 	let mut bytes = Vec::<u8>::with_capacity(bytes_in_triangles);
 
 	for triangle in triangles {
-		let depth = (max_depth - triangle.depth) / max_depth;
-		for vertex in &triangle.vertices {
+		let depth = (max_depth - triangle.depth_index + 0.01) / (max_depth + 0.02);
+		for vertex in triangle.vertices.iter() {
 			let position = vertex.position.to_surface(window_size);
 			let l = [
 				position.x.to_le_bytes(),
@@ -230,7 +230,7 @@ impl DrawTriangles {
 		let mut slice_ends = Vec::new();
 		let window_size = context.window_size.to_subpixel();
 		for triangles in draw.triangles.iter() {
-			let bytes = triangles_to_bytes(window_size, &triangles[..], draw.depth);
+			let bytes = triangles_to_bytes(window_size, &triangles[..], draw.depth_index);
 			slice_end += bytes.len();
 			slice_ends.push(slice_end as u64);
 			all_bytes.extend(&bytes);
