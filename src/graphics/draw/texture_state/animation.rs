@@ -12,7 +12,7 @@ pub(super) fn create_animation_texture_iter<'a>(device: &'a wgpu::Device, queue:
 		.filter(|filepath| filepath.ends_with(".png"))
 		.map(|filepath| image::open(&filepath).unwrap().flipv().into_rgba())
 		.map(move |image| {
-			let size: Vec2u = image.dimensions().into();
+			let size: PixelVec = image.dimensions().into();
 			let texture = create_texture(device, size);
 			write_texture(queue, &texture, size, &image.as_raw()[..]);
 			texture

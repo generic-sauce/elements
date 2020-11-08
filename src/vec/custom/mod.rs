@@ -3,7 +3,6 @@ use crate::prelude::*;
 mod serde;
 
 pub struct DefaultParam;
-pub type Vec2u = Vec2t<u32, DefaultParam>;
 pub type Vec2f = Vec2t<f32, DefaultParam>;
 
 /* from (0, 0) to tilemap size
@@ -30,8 +29,8 @@ pub type FluidVec = Vec2t<i32, FluidParam>;
 /* from (0, 0) to window size
  * corresponds to window coordinates
  */
-pub struct WindowParam;
-pub type WindowVec = Vec2t<u32, WindowParam>;
+pub struct PixelParam;
+pub type PixelVec = Vec2t<u32, PixelParam>;
 
 /* from (0, 0) to window size
  * corresponds to window coordinates
@@ -62,10 +61,10 @@ impl FluidVec {
 }
 
 impl SubPixelVec {
-	pub const fn to_window(self) -> WindowVec { WindowVec::new(self.x as u32, self.y as u32) }
+	pub const fn to_window(self) -> PixelVec { PixelVec::new(self.x as u32, self.y as u32) }
 }
 
-impl WindowVec {
+impl PixelVec {
 	pub const fn to_subpixel(self) -> SubPixelVec { SubPixelVec::new(self.x as f32, self.y as f32) }
 }
 
@@ -93,8 +92,8 @@ impl From<GameVec> for FluidVec {
 	}
 }
 
-impl From<SubPixelVec> for WindowVec {
-	fn from(t: SubPixelVec) -> WindowVec {
+impl From<SubPixelVec> for PixelVec {
+	fn from(t: SubPixelVec) -> PixelVec {
 		t.to_window()
 	}
 }

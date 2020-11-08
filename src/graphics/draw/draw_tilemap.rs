@@ -3,7 +3,7 @@ use crate::graphics::*;
 #[derive(Copy, Clone)]
 struct Vertex {
 	position: SurfaceVec,
-	uv: Vec2f,
+	uv: TextureVec,
 }
 
 fn vertex_to_bytes_len() -> u64 {

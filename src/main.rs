@@ -61,7 +61,7 @@ fn main() {
 				}
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::Resized(size), .. } => {
-				graphics.resize(WindowVec::new(size.width, size.height));
+				graphics.resize(PixelVec::new(size.width, size.height));
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::ReceivedCharacter(c), .. } => {
 				peripherals_update = Some(PeripheralsUpdate::Text(Character::from(c)));

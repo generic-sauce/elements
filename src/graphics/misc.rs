@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub(in crate::graphics) fn create_texture(device: &wgpu::Device, size: Vec2u) -> wgpu::Texture {
+pub(in crate::graphics) fn create_texture(device: &wgpu::Device, size: PixelVec) -> wgpu::Texture {
 	device.create_texture(&wgpu::TextureDescriptor {
 		label: None,
 		size: wgpu::Extent3d {
@@ -16,7 +16,7 @@ pub(in crate::graphics) fn create_texture(device: &wgpu::Device, size: Vec2u) ->
 	})
 }
 
-pub(in crate::graphics) fn write_texture(queue: &wgpu::Queue, texture: &wgpu::Texture, size: Vec2u, image: &[u8]) {
+pub(in crate::graphics) fn write_texture(queue: &wgpu::Queue, texture: &wgpu::Texture, size: PixelVec, image: &[u8]) {
 	queue.write_texture(
 		wgpu::TextureCopyView {
 			texture: &texture,
@@ -41,7 +41,7 @@ pub(in crate::graphics) fn create_texture_view(texture: &wgpu::Texture) -> wgpu:
 	texture.create_view(&wgpu::TextureViewDescriptor::default())
 }
 
-pub(in crate::graphics) fn create_depth_texture(device: &wgpu::Device, size: WindowVec) -> wgpu::Texture {
+pub(in crate::graphics) fn create_depth_texture(device: &wgpu::Device, size: PixelVec) -> wgpu::Texture {
 	device.create_texture(&wgpu::TextureDescriptor {
 		label: None,
 		size: wgpu::Extent3d {

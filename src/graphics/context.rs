@@ -5,7 +5,7 @@ pub(in crate::graphics) struct GraphicsContext<'a> {
 	pub queue: &'a wgpu::Queue,
 	pub swap_chain_texture: &'a wgpu::SwapChainTexture,
 	pub encoder: &'a mut wgpu::CommandEncoder,
-	pub window_size: WindowVec,
+	pub window_size: PixelVec,
 	pub depth_texture_view: &'a wgpu::TextureView,
 	pub elapsed_time: Duration,
 	pub clear_color: wgpu::Color,
@@ -21,7 +21,7 @@ impl<'a> GraphicsContext<'a> {
 		queue: &'a wgpu::Queue,
 		swap_chain_texture: &'a wgpu::SwapChainTexture,
 		encoder: &'a mut wgpu::CommandEncoder,
-		window_size: WindowVec,
+		window_size: PixelVec,
 		depth_texture_view: &'a wgpu::TextureView,
 		clear_color: wgpu::Color,
 	) -> GraphicsContext<'a> {

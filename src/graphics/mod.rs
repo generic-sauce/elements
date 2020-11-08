@@ -27,7 +27,7 @@ pub struct Graphics {
 	surface: wgpu::Surface,
 	device: wgpu::Device,
 	queue: wgpu::Queue,
-	window_size: WindowVec,
+	window_size: PixelVec,
 	swap_chain: wgpu::SwapChain,
 	depth_texture: wgpu::Texture,
 	depth_texture_view: wgpu::TextureView,
@@ -37,7 +37,7 @@ pub struct Graphics {
 	text: DrawText,
 }
 
-fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, window_size: WindowVec) -> wgpu::SwapChain {
+fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, window_size: PixelVec) -> wgpu::SwapChain {
 	let swap_chain_desc = wgpu::SwapChainDescriptor {
 		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
 		format: SURFACE_FORMAT,
@@ -76,7 +76,7 @@ impl Graphics {
 			.unwrap();
 
 		let window_size = window.inner_size();
-		let window_size = WindowVec::new(window_size.width, window_size.height);
+		let window_size = PixelVec::new(window_size.width, window_size.height);
 
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
@@ -163,7 +163,7 @@ impl Graphics {
 		self.queue.submit(Some(encoder.finish()));
 	}
 
-	pub fn resize(&mut self, size: WindowVec) {
+	pub fn resize(&mut self, size: PixelVec) {
 		self.window_size = size;
 		self.swap_chain = create_swap_chain(&self.device, &self.surface, size);
 
