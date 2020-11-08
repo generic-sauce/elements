@@ -1,3 +1,5 @@
+use crate::prelude::*;
+
 mod draw;
 use draw::*;
 
@@ -6,8 +8,6 @@ use context::*;
 
 mod misc;
 use misc::*;
-
-use crate::prelude::*;
 
 const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
@@ -141,15 +141,12 @@ impl Graphics {
 		if let Some(world) = &draw.world {
 			self.fluidmap.render(
 				&mut graphics_context,
-				world.tilemap_size,
-				&world.fluidmap_data,
-				Duration::from_millis(0), // TODO: make for web
+				&world,
 			);
 
 			self.tilemap.render(
 				&mut graphics_context,
-				world.tilemap_size,
-				&world.tilemap_data,
+				&world,
 			);
 		}
 

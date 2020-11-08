@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use crate::graphics::*;
 
 #[derive(Copy, Clone)]
@@ -204,11 +203,10 @@ impl DrawTilemap {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		tilemap_size: TileVec,
-		tilemap_data: &[u8]
+		world: &GraphicsWorld,
 	) {
-		assert!(tilemap_size != TileVec::new(0, 0));
-		self.resize_tilemap(context.device, tilemap_size);
+		assert!(world.tilemap_size != TileVec::new(0, 0));
+		self.resize_tilemap(context.device, world.tilemap_size);
 
 		let window_size = context.window_size.to_subpixel();
 		let s = |v: ViewVec| v.to_surface(window_size);
@@ -225,15 +223,15 @@ impl DrawTilemap {
 				mip_level: 0,
 				origin: wgpu::Origin3d::ZERO,
 			},
-			tilemap_data,
+			&world.tilemap_data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: tilemap_size.x as u32,
-				rows_per_image: tilemap_size.y as u32,
+				bytes_per_row: world.tilemap_size.x as u32,
+				rows_per_image: world.tilemap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: tilemap_size.x as u32,
-				height: tilemap_size.y as u32,
+				width: world.tilemap_size.x as u32,
+				height: world.tilemap_size.y as u32,
 				depth: 1,
 			}
 		);

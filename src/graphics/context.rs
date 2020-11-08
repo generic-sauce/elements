@@ -7,6 +7,7 @@ pub(in crate::graphics) struct GraphicsContext<'a> {
 	pub encoder: &'a mut wgpu::CommandEncoder,
 	pub window_size: WindowVec,
 	pub depth_texture_view: &'a wgpu::TextureView,
+	pub elapsed_time: Duration,
 	pub clear_color: wgpu::Color,
 	color_cleared: bool,
 	depth_cleared: bool,
@@ -31,6 +32,7 @@ impl<'a> GraphicsContext<'a> {
 			encoder,
 			window_size,
 			depth_texture_view,
+			elapsed_time: Duration::from_millis(0), // TODO
 			clear_color,
 			color_cleared: false,
 			depth_cleared: false,

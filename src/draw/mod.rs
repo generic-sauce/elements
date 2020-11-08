@@ -4,7 +4,7 @@ mod player;
 use player::*;
 
 mod world;
-use world::*;
+pub use world::*;
 
 mod texture;
 pub use texture::*;
