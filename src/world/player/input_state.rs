@@ -123,14 +123,14 @@ impl InputState {
 		if peripherals_state.key_pressed(Key::Q) || peripherals_state.key_pressed(Key::LeftMouse) {
 			self.attack1 = true;
 		}
-		if peripherals_state.key_pressed(Key::E) || peripherals_state.key_pressed(Key::RightMouse) {
+		if peripherals_state.key_pressed(Key::E) || peripherals_state.key_pressed(Key::MiddleMouse) {
 			self.attack2 = true;
-			if peripherals_state.key_just_pressed(Key::E) || peripherals_state.key_just_pressed(Key::RightMouse) {
+			if peripherals_state.key_just_pressed(Key::E) || peripherals_state.key_just_pressed(Key::MiddleMouse) {
 				self.just_attack2 = true;
 			}
 		}
 
-		if peripherals_state.key_pressed(Key::F) {
+		if peripherals_state.key_pressed(Key::F) || peripherals_state.key_pressed(Key::RightMouse) {
 			self.special1 = true;
 		}
 		if peripherals_state.key_pressed(Key::R) {
