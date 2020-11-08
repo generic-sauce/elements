@@ -10,7 +10,7 @@ fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle], max_dept
 
 	for triangle in triangles {
 		let depth = (max_depth - triangle.depth_index + 0.01) / (max_depth + 0.02);
-		for vertex in triangle.vertices.iter() {
+		for vertex in triangle.vertices.iter().rev() {
 			let position = vertex.position.to_surface(window_size);
 			let l = [
 				position.x.to_le_bytes(),
