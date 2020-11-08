@@ -29,4 +29,12 @@ impl<B: Backend> Runnable<B> {
 			Runnable::Client(client) => client.draw(app),
 		}
 	}
+
+	pub fn get_world(&self) -> Option<&World> {
+		match self {
+			Runnable::Local(Local { mode: LocalMode::InGame(world) }) => Some(world),
+			Runnable::Client( Client { mode: ClientMode::InGame { world, .. }, .. }) => Some(world),
+			_ => None,
+		}
+	}
 }

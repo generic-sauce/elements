@@ -50,7 +50,9 @@ impl AudioBackend for NativeAudioBackend {
 	}
 
 	fn queue_music(&mut self, music_id: SoundId) {
-		self.next_music_id = Some(music_id);
+		if self.current_music_id.map_or(true, |x| x != music_id) {
+			self.next_music_id = Some(music_id);
+		}
 	}
 
 	fn play_sound(&mut self, sound_id: SoundId, volume: f32) {

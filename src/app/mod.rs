@@ -51,6 +51,8 @@ impl<B: Backend> App<B> {
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
 		let framedrop = (0..10).all(|_| {
+			self.peripherals_state.reset();
+			
 			self.fetch_peripherals();
 			self.input_backend.tick();
 			self.update_cursor();
@@ -61,6 +63,11 @@ impl<B: Backend> App<B> {
 
 			runnable.tick(self);
 			self.tick_counter += 1;
+			if let Runnable::Menu = runnable {
+				self.tick_menu(runnable);
+			}
+
+			self.audio_backend.tick();
 
 			true
 		});
@@ -69,16 +76,37 @@ impl<B: Backend> App<B> {
 			println!("App::tick_draw experienced a framedrop.");
 		}
 
+		self.check_game_over(runnable);
+
 		runnable.draw(self);
 
 		// TODO: improve
 		if let Runnable::Menu = runnable {
-			self.tick_menu(runnable);
 			self.draw_menu();
 		}
 
-		self.audio_backend.tick();
-		self.peripherals_state.reset();
+	}
+
+	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {
+		let opt_world = runnable.get_world();
+
+		if let Some(world) = opt_world {
+			let winner_found = match world.is_game_over() {
+				GameResult::None => false,
+				GameResult::Winner(winner) => {
+					println!("player {} won the match", winner);
+					true
+				}
+				GameResult::Tie => {
+					println!("match ended in a tie");
+					true
+				}
+			};
+			if winner_found {
+				*runnable = Runnable::Menu;
+				self.menu = Menu::main_menu();
+			}
+		}
 	}
 
 	fn handle(&mut self, handler: &AppEventHandler) {
@@ -108,9 +136,7 @@ impl World {
 			}
 		}
 		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
-		if app.audio_backend.current_music_id().map_or(true, |music_id| music_id != sound_id) {
-			app.audio_backend.queue_music(sound_id);
-		}
+		app.audio_backend.queue_music(sound_id);
 	}
 
 	pub fn apply_update_within_app<B: Backend>(&mut self, update: WorldUpdate, app: &mut App<B>) {

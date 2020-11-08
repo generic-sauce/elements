@@ -5,21 +5,27 @@ pub use peer::*;
 
 // update_desire is within 0..=1000
 const UPDATE_DESIRE_PER_FRAME: u32 = 350;
+const GAME_FPS: u32 = 60;
+const MAX_SILENT_GAME_SECONDS: u32 = 3;
 
 pub struct Server {
 	world: World,
 	update_desire: [u32; 2],
 	peer_manager: PeerManager,
+	silent_frames: u32,
 }
 
 impl Server {
 	pub fn new() -> Server {
 		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
 
+		println!("Server started. Waiting for players.");
+
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
 			update_desire: [0, 0],
 			peer_manager: PeerManager::wait_for_players(),
+			silent_frames: 0,
 		};
 
 		for i in 0..2 {
@@ -37,9 +43,9 @@ impl Server {
 	}
 
 	pub fn run(&mut self) {
-		println!("server has started!");
+		println!("Game has started!");
 
-		for timed_loop_info in TimedLoop::with_fps(60) {
+		for timed_loop_info in TimedLoop::with_fps(GAME_FPS) {
 			if timed_loop_info.delta_time > timed_loop_info.interval {
 				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
 			}
@@ -50,6 +56,8 @@ impl Server {
 				self.update_desire[0] += diff;
 				self.update_desire[1] += diff;
 				self.world.players[i].input = input_state;
+				self.world.players[i].input.clamp();
+				self.silent_frames = 0;
 			}
 
 			self.world.tick(&mut ());
@@ -62,6 +70,12 @@ impl Server {
 					let update = self.world.update();
 					self.peer_manager.send_to(i, &update);
 				}
+			}
+
+			self.silent_frames += 1;
+
+			if self.silent_frames > MAX_SILENT_GAME_SECONDS*GAME_FPS {
+				panic!("No game packets received for {} seconds! Shutting down...", MAX_SILENT_GAME_SECONDS);
 			}
 		}
 	}

@@ -89,6 +89,8 @@ impl InputState {
 		self.just_down = !last_frame_down && self.down();
 		self.just_attack2 = !last_frame_attack2 && self.attack2;
 		self.last_gamepad_cursor = gamepad_cursor;
+
+		self.clamp();
 	}
 
 	pub fn update_peripherals(&mut self, peripherals_state: &PeripheralsState) {
@@ -121,25 +123,31 @@ impl InputState {
 		if peripherals_state.key_pressed(Key::Q) || peripherals_state.key_pressed(Key::LeftMouse) {
 			self.attack1 = true;
 		}
-		if peripherals_state.key_pressed(Key::E) || peripherals_state.key_pressed(Key::RightMouse) {
+		if peripherals_state.key_pressed(Key::E) || peripherals_state.key_pressed(Key::MiddleMouse) {
 			self.attack2 = true;
-			if peripherals_state.key_just_pressed(Key::E) || peripherals_state.key_just_pressed(Key::RightMouse) {
+			if peripherals_state.key_just_pressed(Key::E) || peripherals_state.key_just_pressed(Key::MiddleMouse) {
 				self.just_attack2 = true;
 			}
 		}
 
-		if peripherals_state.key_pressed(Key::F) {
+		if peripherals_state.key_pressed(Key::F) || peripherals_state.key_pressed(Key::RightMouse) {
 			self.special1 = true;
 		}
 		if peripherals_state.key_pressed(Key::R) {
 			self.special2 = true;
 		}
+		self.clamp()
 	}
 
 	pub fn update_cursor(&mut self, cursor_move: &SubPixelVec) {
 		self.cursor.x += cursor_move.x * CURSOR_MOUSE_SPEED;
 		self.cursor.y -= cursor_move.y * CURSOR_MOUSE_SPEED;
+		self.clamp()
+	}
+
+	pub fn clamp(&mut self) {
 		self.cursor = self.cursor.length_clamped(1.0);
+		self.direction = self.direction.clamped(-1.0, 1.0);
 	}
 }
 

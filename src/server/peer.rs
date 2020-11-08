@@ -1,5 +1,8 @@
 use crate::prelude::*;
 
+const JOIN_FPS: u32 = 10;
+const MAX_SILENT_JOIN_SECONDS: u32 = 2*60;
+
 enum Peer {
 	Web(TungSocket),
 	Native(SocketAddr),
@@ -20,13 +23,16 @@ impl PeerManager {
 
 		// web
 		let listener = TcpListener::bind(("0.0.0.0", PORT)).expect("Could not create server tcp-listener");
-		listener .set_nonblocking(true).unwrap();
+		listener.set_nonblocking(true).unwrap();
 
-		for _ in TimedLoop::with_fps(10) {
+		let mut silent_frames = 0;
+
+		for _ in TimedLoop::with_fps(JOIN_FPS) {
 			// native
 			if let Some((Init::Init, recv_addr)) = recv_packet(&mut udp_socket) {
 				peers.push(Peer::Native(recv_addr));
 				println!("new player joined {}", recv_addr);
+				silent_frames = 0;
 				if peers.len() == 2 {
 					break;
 				}
@@ -40,12 +46,21 @@ impl PeerManager {
 					peers.push(Peer::Web(tung));
 
 					println!("new player joined {}", recv_addr);
+					silent_frames = 0;
 					if peers.len() == 2 {
 						break;
 					}
 				},
 				Err(ErrorKind::WouldBlock) => {},
 				Err(_) => panic!("listener.accept() failed"),
+			}
+
+			if !peers.is_empty() {
+				silent_frames += 1;
+			}
+
+			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
+				panic!("No more players joined! Shutting down...");
 			}
 		}
 

@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-enum LocalMode<B: Backend> {
+pub enum LocalMode<B: Backend> {
 	LoadingTileMap {
 		loader: B::TileMapLoaderBackend,
 		best_of_n: u32,
@@ -9,7 +9,7 @@ enum LocalMode<B: Backend> {
 }
 
 pub struct Local<B: Backend> {
-	mode: LocalMode<B>,
+	pub mode: LocalMode<B>,
 }
 
 impl<B: Backend> Local<B> {
