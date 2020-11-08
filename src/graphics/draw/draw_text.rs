@@ -9,7 +9,7 @@ pub(in crate::graphics) struct DrawText {
 impl DrawText {
 	pub(in crate::graphics) fn new(device: &wgpu::Device) -> DrawText {
 		let font = ab_glyph::FontArc::try_from_slice(include_bytes!(
-			"../../../res/fonts/dashing_unicorn.ttf"
+			"../../../res/fonts/elementsfont.ttf"
 		)).unwrap();
 
 		let glyph_brush = GlyphBrushBuilder::using_font(font)

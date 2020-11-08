@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use std::ops::{Add, Sub, Mul};
 
-const BUTTON_TEXT_SIZE: f32 = 0.08;
+const BUTTON_TEXT_SIZE: f32 = 0.06;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {

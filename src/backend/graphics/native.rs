@@ -12,7 +12,7 @@ pub struct NativeGraphicsBackend {
 impl NativeGraphicsBackend {
 	pub fn new(draw_sender: Sender<Draw>) -> NativeGraphicsBackend {
 		let font = ab_glyph::FontArc::try_from_slice(include_bytes!(
-			"../../../res/fonts/dashing_unicorn.ttf"
+			"../../../res/fonts/elementsfont.ttf"
 		)).unwrap();
 		let glyphs = GlyphCalculatorBuilder::using_font(font).build();
 
