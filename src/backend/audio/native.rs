@@ -1,9 +1,13 @@
 use crate::prelude::*;
+
 use rodio::*;
+use once_cell::sync::OnceCell;
 
 const START_MUSIC_OFFSET: Duration = Duration::from_micros(1000);
 const NUM_PARTS: usize = 4;
 const WHIZ_VOLUME: f32 = 0.1;
+
+static SOUNDS: OnceCell<Vec<Sound>> = OnceCell::new();
 
 struct Sound {
 	channels: u16,
@@ -11,14 +15,24 @@ struct Sound {
 	data: Vec<f32>,
 }
 
-lazy_static! {
-	static ref SOUNDS: Vec<Sound> = load_samples();
+pub struct NativeAudioBackend {
+	device: Device,
+	music_sink: Sink,
+	pub current_music_id: Option<SoundId>,
+	pub next_music_id: Option<SoundId>,
+	pub next_part: u8,
+	next_music_refresh_time: Instant,
 }
 
 impl AudioBackend for NativeAudioBackend {
 	fn new() -> Self {
 		let device = get_device();
 		let music_sink = Sink::new(&device);
+
+		thread::spawn(|| {
+			let samples = load_samples();
+			SOUNDS.set(samples).unwrap_or_else(|_| panic!("SOUNDS is already defined?!"));
+		});
 
 		Self {
 			device,
@@ -35,13 +49,14 @@ impl AudioBackend for NativeAudioBackend {
 		self.check_restart_music();
 	}
 
-
 	fn queue_music(&mut self, music_id: SoundId) {
 		self.next_music_id = Some(music_id);
 	}
 
 	fn play_sound(&mut self, sound_id: SoundId, volume: f32) {
-		play_raw(&self.device, get_sample_buffer(sound_id).amplify(WHIZ_VOLUME * volume));
+		if let Some(buf) = get_sample_buffer(sound_id) {
+			play_raw(&self.device, buf.amplify(WHIZ_VOLUME * volume));
+		}
 	}
 
 	fn current_music_id(&self) -> Option<SoundId> {
@@ -64,44 +79,40 @@ fn load_samples() -> Vec<Sound> {
 	}).collect()
 }
 
-fn get_part_sample_buffer(sound_id: SoundId, part: u8) -> static_buffer::StaticSamplesBuffer<f32> {
+fn get_part_sample_buffer(sound_id: SoundId, part: u8) -> Option<static_buffer::StaticSamplesBuffer<f32>> {
 	let part = part as usize;
-	let sample = &SOUNDS[sound_id as usize];
+	let sample = get_sound(sound_id)?;
 	let part_size = sample.data.len() / NUM_PARTS;
 
-	static_buffer::StaticSamplesBuffer::new(
+	Some(static_buffer::StaticSamplesBuffer::new(
 		sample.channels,
 		sample.sample_rate,
 		&sample.data[part*part_size..(part+1)*part_size]
-	)
+	))
 }
 
-fn get_sample_buffer(sound_id: SoundId) -> static_buffer::StaticSamplesBuffer<f32> {
-	let sample = &SOUNDS[sound_id as usize];
-	static_buffer::StaticSamplesBuffer::new(
+fn get_sound(sound_id: SoundId) -> Option<&'static Sound> {
+	SOUNDS.get().map(|v| &v[sound_id as usize])
+}
+
+fn get_sample_buffer(sound_id: SoundId) -> Option<static_buffer::StaticSamplesBuffer<f32>> {
+	let sample = get_sound(sound_id)?;
+	Some(static_buffer::StaticSamplesBuffer::new(
 		sample.channels,
 		sample.sample_rate,
 		&sample.data[..],
-	)
-}
-
-pub struct NativeAudioBackend {
-	device: Device,
-	music_sink: Sink,
-	pub current_music_id: Option<SoundId>,
-	pub next_music_id: Option<SoundId>,
-	pub next_part: u8,
-	next_music_refresh_time: Instant,
+	))
 }
 
 impl NativeAudioBackend {
 	fn start_music_sample(&mut self, music_id: SoundId) {
-		let sample = get_part_sample_buffer(music_id, self.next_part);
-		let sample_duration = sample.total_duration().unwrap();
-		self.music_sink.append(sample);
-		self.current_music_id = Some(music_id);
-		self.next_music_refresh_time += sample_duration;
-		self.next_part = (self.next_part + 1) % NUM_PARTS as u8;
+		if let Some(sample) = get_part_sample_buffer(music_id, self.next_part) {
+			let sample_duration = sample.total_duration().unwrap();
+			self.music_sink.append(sample);
+			self.current_music_id = Some(music_id);
+			self.next_music_refresh_time += sample_duration;
+			self.next_part = (self.next_part + 1) % NUM_PARTS as u8;
+		}
 	}
 
 	fn check_start_music(&mut self) {

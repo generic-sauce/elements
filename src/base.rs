@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
 
-#[cfg(feature = "client")] #[macro_use] extern crate lazy_static;
 #[cfg(feature = "client")] mod backend;
 #[cfg(feature = "client")] mod draw;
 #[cfg(feature = "client")] mod client;
