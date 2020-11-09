@@ -92,7 +92,7 @@ fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::
 	})
 }
 
-pub(in crate::graphics) struct DrawFluidmap {
+pub(in crate::graphics) struct RenderFluidmap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
 	tilemap_size: TileVec,
@@ -104,8 +104,8 @@ pub(in crate::graphics) struct DrawFluidmap {
 	bind_group: Option<wgpu::BindGroup>,
 }
 
-impl DrawFluidmap {
-	pub(in crate::graphics) fn new(device: &wgpu::Device) -> DrawFluidmap {
+impl RenderFluidmap {
+	pub(in crate::graphics) fn new(device: &wgpu::Device) -> RenderFluidmap {
 		let vertex_buffer = create_vertex_buffer(device, 4);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
@@ -209,7 +209,7 @@ impl DrawFluidmap {
 
 		let uniform_buffer = create_uniform_buffer(device);
 
-		DrawFluidmap {
+		RenderFluidmap {
 			pipeline,
 			vertex_buffer,
 			tilemap_size: TileVec::new(0, 0),

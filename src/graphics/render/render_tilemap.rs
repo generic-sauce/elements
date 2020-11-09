@@ -67,7 +67,7 @@ fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupL
 	bind_group
 }
 
-pub(in crate::graphics) struct DrawTilemap {
+pub(in crate::graphics) struct RenderTilemap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
 	tilemap_size: TileVec,
@@ -78,7 +78,7 @@ pub(in crate::graphics) struct DrawTilemap {
 	bind_group: Option<wgpu::BindGroup>,
 }
 
-impl DrawTilemap {
+impl RenderTilemap {
 	fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
 		let vertices_size = vertices_capacity * vertex_to_bytes_len();
 		device.create_buffer(&wgpu::BufferDescriptor {
@@ -89,7 +89,7 @@ impl DrawTilemap {
 		})
 	}
 
-	pub(in crate::graphics) fn new(device: &wgpu::Device) -> DrawTilemap {
+	pub(in crate::graphics) fn new(device: &wgpu::Device) -> RenderTilemap {
 		let vertex_buffer = Self::create_vertex_buffer(device, 4);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
@@ -182,7 +182,7 @@ impl DrawTilemap {
 			..Default::default()
 		});
 
-		DrawTilemap {
+		RenderTilemap {
 			pipeline,
 			vertex_buffer,
 			tilemap_size: TileVec::new(0, 0),

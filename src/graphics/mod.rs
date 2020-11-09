@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-mod draw;
-use draw::*;
+mod render;
+use render::*;
 
 mod context;
 use context::*;
@@ -31,10 +31,10 @@ pub struct Graphics {
 	swap_chain: wgpu::SwapChain,
 	depth_texture: wgpu::Texture,
 	depth_texture_view: wgpu::TextureView,
-	triangles: DrawTriangles,
-	tilemap: DrawTilemap,
-	fluidmap: DrawFluidmap,
-	text: DrawText,
+	triangles: RenderTriangles,
+	tilemap: RenderTilemap,
+	fluidmap: RenderFluidmap,
+	text: RenderText,
 }
 
 fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, window_size: PixelVec) -> wgpu::SwapChain {
@@ -83,10 +83,10 @@ impl Graphics {
 		let depth_texture = create_depth_texture(&device, window_size);
 		let depth_texture_view = create_texture_view(&depth_texture);
 
-		let triangles = DrawTriangles::new(&device, &queue);
-		let tilemap = DrawTilemap::new(&device);
-		let fluidmap = DrawFluidmap::new(&device);
-		let text = DrawText::new(&device);
+		let triangles = RenderTriangles::new(&device, &queue);
+		let tilemap = RenderTilemap::new(&device);
+		let fluidmap = RenderFluidmap::new(&device);
+		let text = RenderText::new(&device);
 
 		Graphics {
 			instance,
@@ -104,7 +104,7 @@ impl Graphics {
 		}
 	}
 
-	/* create and fill draw pass
+	/* create and fill render pass
 	 * create and fill command buffer
 	 * submit command buffer to queue
 	 */
