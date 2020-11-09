@@ -4,7 +4,7 @@ use std::ops::{Add, Sub, Mul};
 const BUTTON_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
-const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 40;
+const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 60;
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
 	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
