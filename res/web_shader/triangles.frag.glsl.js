@@ -8,10 +8,10 @@ varying vec3 color;
 
 void main() {
 	vec4 t = texture2D(tex, uv);
-	if (t.a < .5)
-		discard;
+	// if (t.a < .5)
+	// 	discard;
 
 	vec3 c = color * t.rgb;
-	gl_FragColor = vec4(c, 1);
+	gl_FragColor = vec4(t.rgb, 1);
 }
 `

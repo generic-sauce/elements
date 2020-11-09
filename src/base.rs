@@ -15,8 +15,8 @@ extern crate serde_derive;
 
 // server (or native-client)
 #[cfg(feature = "server")] mod server;
-#[cfg(feature = "server")] mod resource;
 #[cfg(feature = "server")] mod timed_loop;
+mod resource;
 
 #[macro_use]
 mod fps_timer;

@@ -13,7 +13,7 @@ impl GraphicsBackend for WebGraphicsBackend {
 		)
 	}
 
-	fn get_text_size(&self, _text: &str, scale: f32) -> CanvasVec {
+	fn get_text_size(&self, _text: &str, _scale: f32) -> CanvasVec {
 		unimplemented!()
 	}
 }

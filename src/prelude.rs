@@ -24,6 +24,7 @@ pub use {
 		animation::*,
 		input::*,
 		net::*,
+		resource::res,
 	},
 };
 
@@ -72,7 +73,6 @@ pub use {
 #[cfg(feature = "server")] pub use {
 	tungstenite::Message,
 	crate::{
-		resource::res,
 		timed_loop::*,
 		server::*
 	}

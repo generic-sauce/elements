@@ -10,7 +10,9 @@ pub use js::*;
 pub fn client_main() {
 	std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-	js_init();
+	let texture_filenames: Vec<_> = texture_filenames_iter().collect();
+	let texture_filenames = JsValue::from_serde(&texture_filenames).unwrap();
+	js_init(texture_filenames);
 
 	let mut runnable = match &*prompt("menu / local / ip") {
 		"menu" => Runnable::Menu,

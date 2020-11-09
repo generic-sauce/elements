@@ -1,9 +1,6 @@
 import { state } from "./init.js"
 
 export function render(draw) {
-	if (!state.ready)
-		return
-
 	gl.useProgram(state.program)
 
 	let counts = update_vertices(draw)
@@ -42,7 +39,7 @@ export function render(draw) {
 		gl.enableVertexAttribArray(state.locations.vertex_uv);
 	}
 
-	{ // vertex_uv
+	{ // vertex_color
 		const count = 3;
 		const type = gl.FLOAT;
 		const normalize = false;
@@ -60,20 +57,29 @@ export function render(draw) {
 	}
 
 	let offset = 0
-	for (let i = 0; i < counts; ++i) {
-		gl.bindTexture(gl.TEXTURE_2D, state.triangles_texture)
+	for (let i = 0; i < counts.length; ++i) {
 		const count = counts[i]
-		gl.drawArrays(gl.TRIANGLE_STRIP, offset, count)
+		gl.bindTexture(gl.TEXTURE_2D, state.textures[i])
+		gl.drawArrays(gl.TRIANGLES, offset, count)
 		offset += count
 	}
 }
 
 function update_vertices(draw) {
-	// let vertices = // TODO
+	const counts = [3, 3]
 
-	console.log(draw.triangles)
-	alert()
+	const vertices = [
+		0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+		0.5, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
+		0.0, 0.5, 0.0, 1.0, 1.0, 1.0, 1.0,
+
+		1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+		1.0, 0.5, 1.0, 0.0, 1.0, 1.0, 1.0,
+		0.5, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+	]
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
+
+	return counts
 }

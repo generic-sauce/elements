@@ -2,7 +2,7 @@ import * as fluidmap_mod from "./fluidmap/mod.js"
 import * as tilemap_mod from "./tilemap/mod.js"
 import * as triangles_mod from "./triangles/mod.js"
 
-export function init() {
+export function init(texture_filenames) {
 	window.canvas = document.getElementById("canvas");
 	window.gl = canvas.getContext("webgl");
 
@@ -13,9 +13,7 @@ export function init() {
 
 	fluidmap_mod.init()
 	tilemap_mod.init()
-
-	let texture_filepaths = [] // TODO replace with texture filepaths
-	triangles_mod.init(texture_filepaths)
+	triangles_mod.init(texture_filenames)
 }
 
 export function render(draw) {

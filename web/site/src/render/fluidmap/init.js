@@ -1,10 +1,11 @@
 import vert_src from '../../../res/web_shader/fluidmap.vert.glsl'
 import frag_src from '../../../res/web_shader/fluidmap.frag.glsl'
+import { create_program } from '../misc'
 
 export let state = {}
 
 export function init() {
-	state.program = create_program(gl, vert_src, frag_src)
+	state.program = create_program("fluidmap", vert_src, frag_src)
 	state.locations = {}
 	state.locations.vertex_position = gl.getAttribLocation(state.program, 'vertex_position')
 	state.locations.vertex_uv = gl.getAttribLocation(state.program, 'vertex_uv')
@@ -29,37 +30,4 @@ export function init() {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-}
-
-function create_program(gl, vert_src, frag_src) {
-	const vert = create_shader('fluidmap_vert', gl.VERTEX_SHADER, vert_src)
-	const frag = create_shader('fluidmap_frag', gl.FRAGMENT_SHADER, frag_src)
-
-	const program = gl.createProgram()
-	gl.attachShader(program, vert)
-	gl.attachShader(program, frag)
-	gl.linkProgram(program)
-	// gl.deleteShader(vert)
-	// gl.deleteShader(frag)
-
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(program))
-		return null
-	}
-
-	return program
-}
-
-function create_shader(name, type, src) {
-	const shader = gl.createShader(type)
-	gl.shaderSource(shader, src)
-	gl.compileShader(shader)
-
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		alert('An error occurred compiling the shader (' + name + '): ' + gl.getShaderInfoLog(shader))
-		gl.deleteShader(shader)
-		return null
-	}
-
-	return shader
 }

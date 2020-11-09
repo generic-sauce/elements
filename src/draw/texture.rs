@@ -27,7 +27,6 @@ macro_rules! setup {
 			}
 
 			#[allow(unused)]
-			#[cfg(feature = "server")] /* or native-client */
 			pub fn filepath(self) -> String {
 				res(self.filepath_relative())
 			}
@@ -38,7 +37,6 @@ macro_rules! setup {
 setup!(
 	Unknown: "images/checkerboard.png",
 	White: "images/white.png",
-	White2: "images/white.png",
 );
 
 impl TextureId {
@@ -68,4 +66,19 @@ impl IntoTextureIndex for Animation {
 
 		texture_offset + animation_offset + self.texture_index()
 	}
+}
+
+pub fn texture_filenames_iter() -> impl Iterator<Item=String> {
+	TextureId::iter()
+		.map(TextureId::filepath)
+		// .chain(
+		// 	AnimationId::iter()
+		// 		.map(AnimationId::dir)
+		// 		.flat_map(|dir| std::fs::read_dir(res(&dir)).unwrap())
+		// 		.map(|filepath| {
+		// 			let filepath = filepath.expect("could not find file");
+		// 			let filepath = filepath.path();
+		// 			filepath.into_os_string().into_string().expect("could not get filepath")
+		// 		})
+		// )
 }
