@@ -21,17 +21,19 @@ pub struct MenuElement<B: Backend> {
 	pub clicked: bool,
 }
 
+pub struct EditField {
+	pub text: String,
+	pub selected: bool,
+	pub cursor: usize,
+	pub cursor_blink_counter: u32,
+}
+
 pub enum MenuKind<B: Backend> {
 	Button {
 		text: &'static str,
 		on_click: OnEvent<B>,
 	},
-	EditField {
-		text: String,
-		selected: bool,
-		cursor: usize,
-		cursor_blink_counter: u32,
-	}
+	EditField(EditField)
 }
 
 impl<B: Backend> MenuElement<B> {
@@ -49,7 +51,7 @@ impl<B: Backend> MenuElement<B> {
 	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
-			kind: MenuKind::EditField { text: String::from(text), selected: false, cursor: 0, cursor_blink_counter: 0 },
+			kind: MenuKind::EditField( EditField { text: String::from(text), selected: false, cursor: 0, cursor_blink_counter: 0 } ),
 			position,
 			size,
 			hovered: false,
@@ -63,11 +65,8 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn tick(&mut self) {
-		match &mut self.kind {
-			MenuKind::EditField { cursor_blink_counter, .. } => {
-				*cursor_blink_counter = (*cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
-			}
-			_ => {}
+		if let MenuKind::EditField ( EditField { cursor_blink_counter, .. } ) = &mut self.kind {
+			*cursor_blink_counter = (*cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
 		}
 	}
 
@@ -83,8 +82,8 @@ impl<B: Backend> MenuElement<B> {
 			MenuKind::Button { text, .. } => {
 				self.draw_button(draw, text, color, graphics_backend)
 			},
-			MenuKind::EditField { text, selected, cursor, cursor_blink_counter } => {
-				self.draw_edit_field(draw, text, color, *selected, *cursor, cursor_blink_counter, graphics_backend)
+			MenuKind::EditField (edit_field) => {
+				self.draw_edit_field(draw, edit_field, color, graphics_backend)
 			},
 		}
 	}
@@ -98,11 +97,9 @@ impl<B: Backend> MenuElement<B> {
         draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
-	fn draw_edit_field(
-		&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: usize,
-		cursor_blink_counter: &u32, graphics_backend: &impl GraphicsBackend
-	) {
-        draw.rectangle(self.position - self.size, self.position + self.size, color);
+	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {
+		let EditField { text, cursor_blink_counter, cursor, selected } = edit_field;
+		draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
 			self.position + self.size - EDIT_FIELD_BORDER_WIDTH,
@@ -119,8 +116,8 @@ impl<B: Backend> MenuElement<B> {
 		draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 
 		// draw cursor
-		if selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
-			let subtext = &text[0..get_byte_pos(text, cursor)];
+		if *selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
+			let subtext = &text[0..get_byte_pos(text, *cursor)];
 			let text_width = graphics_backend.get_text_width(subtext).x;
 			let left_bot = CanvasVec::new(
 				self.position.x - self.size.x + text_width * BUTTON_TEXT_SIZE + EDIT_FIELD_BORDER_WIDTH * 2.0,
@@ -136,7 +133,7 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character]) {
-		if let MenuKind::EditField { text, cursor, .. } = &mut self.kind {
+		if let MenuKind::EditField ( EditField { text, cursor, .. } ) = &mut self.kind {
 			for character in event_text {
 				match character {
 					Character::Char(c) => {
@@ -161,7 +158,7 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
-        if let MenuKind::EditField { cursor, text, .. } = &mut self.kind {
+        if let MenuKind::EditField( EditField{ cursor, text, .. } ) = &mut self.kind {
 			if peripherals_state.key_firing(Key::Left) {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
 			}

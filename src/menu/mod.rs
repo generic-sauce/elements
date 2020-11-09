@@ -19,7 +19,7 @@ fn create_local<B: Backend>(best_of_n: u32) -> OnEvent<B> {
 
 fn create_client<B: Backend>() -> OnEvent<B> {
 	Box::new(|app, runnable| {
-		if let MenuKind::EditField { text, .. } = &app.menu.get_element_by_name("ip").unwrap().kind {
+		if let MenuKind::EditField( EditField { text, .. } ) = &app.menu.get_element_by_name("ip").unwrap().kind {
 			let text = text.clone();
 			app.menu.elements.clear();
 			*runnable = Runnable::Client(Client::new(&text));
@@ -73,7 +73,7 @@ impl<B: Backend> Menu<B> {
 	}
 
 	pub fn get_selected_element(&mut self) -> Option<&mut MenuElement<B>> {
-		self.elements.iter_mut().find(|e| if let MenuKind::EditField { selected, .. } = e.kind { selected } else { false })
+		self.elements.iter_mut().find(|e| if let MenuKind::EditField(EditField { selected, .. } ) = e.kind { selected } else { false })
 	}
 
 	pub fn get_element_by_name(&mut self, name: &'static str) -> Option<&mut MenuElement<B>> {
@@ -90,7 +90,7 @@ impl<B: Backend> App<B> {
 				element.clicked = element.is_colliding(self.cursor_position);
 			}
 			if let Some(elem) = self.menu.get_selected_element() {
-				if let MenuKind::EditField { selected, .. } = &mut elem.kind {
+				if let MenuKind::EditField( EditField { selected, .. } ) = &mut elem.kind {
 					*selected = false;
 				}
 			}
@@ -100,7 +100,7 @@ impl<B: Backend> App<B> {
 				MenuKind::Button { on_click, .. } => {
 					opt_on_click = Some(on_click.clone());
 				}
-				MenuKind::EditField { selected, .. } => {
+				MenuKind::EditField( EditField { selected, .. } ) => {
 					*selected = true;
 				}
 			}
