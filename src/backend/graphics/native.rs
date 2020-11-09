@@ -28,7 +28,7 @@ impl GraphicsBackend for NativeGraphicsBackend {
 		self.draw_sender.send(draw).unwrap();
 	}
 
-	fn get_text_width(&self, text: &str) -> CanvasVec {
+	fn get_text_size(&self, text: &str, scale: f32) -> CanvasVec {
 		if text.is_empty() {
 			return CanvasVec::new(0.0, 0.0);
 		}
@@ -42,6 +42,6 @@ impl GraphicsBackend for NativeGraphicsBackend {
 
 		let bounds = scope.glyph_bounds(section).unwrap();
 
-		CanvasVec::new(bounds.width() * TEXT_WIDTH_SCALE, bounds.height() * TEXT_WIDTH_SCALE)
+		CanvasVec::new(bounds.width() * TEXT_WIDTH_SCALE, bounds.height() * TEXT_WIDTH_SCALE) * scale
 	}
 }

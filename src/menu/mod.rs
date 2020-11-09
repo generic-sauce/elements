@@ -117,7 +117,7 @@ impl<B: Backend> App<B> {
 
 		// draw elements
 		for element in &mut self.menu.elements {
-			element.tick();
+			element.tick(&self.graphics_backend);
 		}
 	}
 

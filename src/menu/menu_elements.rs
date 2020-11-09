@@ -2,6 +2,7 @@ use crate::prelude::*;
 use std::ops::{Add, Sub, Mul};
 
 const BUTTON_TEXT_SIZE: f32 = 0.05;
+const EDIT_FIELD_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
 const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 60;
@@ -26,6 +27,8 @@ pub struct EditField {
 	pub selected: bool,
 	pub cursor: usize,
 	pub cursor_blink_counter: u32,
+	pub view_offset: usize,
+	pub view_limit: usize,
 }
 
 pub enum MenuKind<B: Backend> {
@@ -51,7 +54,7 @@ impl<B: Backend> MenuElement<B> {
 	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
-			kind: MenuKind::EditField( EditField { text: String::from(text), selected: false, cursor: 0, cursor_blink_counter: 0 } ),
+			kind: MenuKind::EditField( EditField::new(text) ),
 			position,
 			size,
 			hovered: false,
@@ -64,9 +67,12 @@ impl<B: Backend> MenuElement<B> {
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
 	}
 
-	pub fn tick(&mut self) {
-		if let MenuKind::EditField ( EditField { cursor_blink_counter, .. } ) = &mut self.kind {
-			*cursor_blink_counter = (*cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
+	pub fn tick(&mut self, graphics_backend: &impl GraphicsBackend) {
+		if let MenuKind::EditField (edit_field) = &mut self.kind {
+			edit_field.cursor_blink_counter = (edit_field.cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
+
+			// view offset
+			edit_field.adapt_view(graphics_backend, self.size);
 		}
 	}
 
@@ -93,12 +99,12 @@ impl<B: Backend> MenuElement<B> {
 		let right_top = self.position + self.size;
 		draw.rectangle(left_bot, right_top, color);
 
-		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_width(text) * BUTTON_TEXT_SIZE);
+		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_size(text, BUTTON_TEXT_SIZE));
         draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
 	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {
-		let EditField { text, cursor_blink_counter, cursor, selected } = edit_field;
+		let EditField { cursor_blink_counter, cursor, selected, view_offset, .. } = edit_field;
 		draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
@@ -106,7 +112,9 @@ impl<B: Backend> MenuElement<B> {
 			Color::rgb(0.0, 0.03, 0.15),
 		);
 
-		let text_width = graphics_backend.get_text_width(text) * BUTTON_TEXT_SIZE;
+		let text = edit_field.get_render_text();
+
+		let text_width = graphics_backend.get_text_size(text, EDIT_FIELD_TEXT_SIZE);
 
 		let text_pos = CanvasVec::new(
 			self.position.x - self.size.x + EDIT_FIELD_BORDER_WIDTH * 2.0,
@@ -117,10 +125,10 @@ impl<B: Backend> MenuElement<B> {
 
 		// draw cursor
 		if *selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
-			let subtext = &text[0..get_byte_pos(text, *cursor)];
-			let text_width = graphics_backend.get_text_width(subtext).x;
+			let subtext = &text[0..get_byte_pos(text, *cursor - view_offset)];
+			let text_width = graphics_backend.get_text_size(subtext, EDIT_FIELD_TEXT_SIZE).x;
 			let left_bot = CanvasVec::new(
-				self.position.x - self.size.x + text_width * BUTTON_TEXT_SIZE + EDIT_FIELD_BORDER_WIDTH * 2.0,
+				self.position.x - self.size.x + text_width + EDIT_FIELD_BORDER_WIDTH * 2.0,
 				self.position.y - self.size.y + EDIT_FIELD_BORDER_WIDTH * 2.0
 			);
 			let right_top = CanvasVec::new(
@@ -167,6 +175,76 @@ impl<B: Backend> MenuElement<B> {
 			}
 		}
 
+	}
+}
+
+impl EditField {
+	fn new(text: &str) -> EditField {
+		EditField {
+			text: String::from(text),
+			selected: false,
+			cursor: 0,
+			cursor_blink_counter: 0,
+			view_offset: 0,
+			view_limit: 0
+		}
+	}
+
+	fn adapt_view(&mut self, graphics_backend: &impl GraphicsBackend, size: CanvasVec) {
+		let allowed_width = size.x * 2.0 - EDIT_FIELD_BORDER_WIDTH * 2.0;
+
+		// if text is not right aligned -> decrease view offset
+		while graphics_backend.get_text_size(self.get_text_post_view_offset(), EDIT_FIELD_TEXT_SIZE).x <= allowed_width - 0.03 {
+			if self.view_offset == 0 {
+				break;
+			}
+			self.view_offset -= 1;
+		}
+
+		// test if cursor is left out of view range
+		// -> decrease view offset
+		if self.cursor < self.view_offset {
+			self.view_offset = self.cursor;
+		} else {
+			// test if cursor is right out of view range
+			// -> increase view offset
+			while self.get_cursor_render_offset(graphics_backend) > allowed_width {
+				self.view_offset += 1;
+			}
+		}
+
+
+		// view limit
+		self.view_limit = self.view_limit.min(self.text.len());
+		while graphics_backend.get_text_size(self.get_render_text(), EDIT_FIELD_TEXT_SIZE).x <= allowed_width {
+			if self.view_limit == self.text.len() {
+				break;
+			}
+			self.view_limit += 1;
+		}
+		while graphics_backend.get_text_size(self.get_render_text(), EDIT_FIELD_TEXT_SIZE).x > allowed_width {
+			if self.view_limit == 0 {
+				break;
+			}
+			self.view_limit -= 1;
+		}
+	}
+
+	fn get_render_text(&self) -> &str {
+		&self.text[get_byte_pos(&self.text, self.view_offset)..get_byte_pos(&self.text, self.view_limit)]
+	}
+
+	fn get_cursor_render_offset(&self, graphics_backend: &impl GraphicsBackend) -> f32 {
+		graphics_backend.get_text_size(self.get_pre_cursor_text(), EDIT_FIELD_TEXT_SIZE).x
+	}
+
+	// text after view offset but before cursor
+	fn get_pre_cursor_text(&self) -> &str {
+		&self.text[get_byte_pos(&self.text, self.view_offset)..get_byte_pos(&self.text, self.cursor)]
+	}
+
+	fn get_text_post_view_offset(&self) -> &str {
+		&self.text[get_byte_pos(&self.text, self.view_offset)..]
 	}
 }
 
