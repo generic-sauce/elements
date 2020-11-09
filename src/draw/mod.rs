@@ -22,6 +22,7 @@ pub enum Flip {
 }
 
 #[derive(Copy, Clone)]
+#[derive(Serialize, Deserialize)] // TODO web only
 pub struct Vertex {
 	pub position: ViewVec,
 	pub uv: TextureVec,
@@ -30,6 +31,7 @@ pub struct Vertex {
 
 pub type DepthIndex = f32;
 
+#[derive(Serialize, Deserialize)] // TODO web only
 pub struct Triangle {
 	pub vertices: [Vertex; 3],
 	pub depth_index: DepthIndex,

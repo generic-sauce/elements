@@ -53,6 +53,7 @@ function update_tilemap_tex(draw) {
 	const height = draw.tilemap_size[1]
 	const data = draw.tilemap_data
 
+	gl.bindTexture(gl.TEXTURE_2D, state.tilemap_texture)
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, width, height, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, data)
 	gl.uniform2f(state.locations.tilemap_tex_size, width, height)
 }

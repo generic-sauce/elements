@@ -154,6 +154,7 @@ impl RenderTriangles {
 			alpha_to_coverage_enabled: false,
 		});
 
+		// TODO linear or nearest?
 		let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
 			label: Some("fluidmap sampler"),
 			..Default::default()

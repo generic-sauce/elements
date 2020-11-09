@@ -4,6 +4,7 @@ use crate::prelude::*;
 pub struct WebJsonDraw {
 	pub tilemap_size: TileVec,
 	pub fluidmap_size: TileVec,
+	pub triangles: TextureTriangles,
 }
 
 pub struct WebDraw {
@@ -18,10 +19,12 @@ impl WebDraw {
 
 		let tilemap_size = world.tilemap_size;
 		let fluidmap_size = world.tilemap_size;
+		let triangles = draw.triangles;
 
 		let json_draw = WebJsonDraw {
 			tilemap_size,
 			fluidmap_size,
+			triangles,
 		};
 		let json_draw = JsValue::from_serde(&json_draw).unwrap();
 

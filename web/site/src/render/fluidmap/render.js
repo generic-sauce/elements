@@ -4,6 +4,7 @@ export function render(draw) {
 	gl.useProgram(state.program)
 
 	update_fluidmap_tex(draw)
+	gl.uniform1f(state.locations.elapsed_time, 0) // TODO
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 
@@ -53,6 +54,7 @@ function update_fluidmap_tex(draw) {
 	const height = draw.fluidmap_size[1]
 	const data = draw.fluidmap_data
 
+	gl.bindTexture(gl.TEXTURE_2D, state.fluidmap_texture)
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
 	gl.uniform2f(state.locations.fluidmap_tex_size, width, height)
 }

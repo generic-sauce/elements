@@ -4,8 +4,8 @@ export function load(filename, callback) {
 	const height = 72;
 
 	let pixels = range(width).map(_ =>
-					range(height).map(_ => [0, 0, 0, 255])
-				 );
+		range(height).map(_ => [0, 0, 0, 255])
+	);
 
 	let img = new Image();
 
