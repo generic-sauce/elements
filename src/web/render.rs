@@ -3,11 +3,13 @@ use crate::prelude::*;
 #[derive(Serialize, Deserialize)]
 pub struct WebJsonDraw {
 	pub tilemap_size: TileVec,
+	pub fluidmap_size: TileVec,
 }
 
 pub struct WebDraw {
 	pub json_draw: JsValue,
 	pub tilemap_data: Uint8Array,
+	pub fluidmap_data: Uint8Array,
 }
 
 impl WebDraw {
@@ -15,16 +17,21 @@ impl WebDraw {
 		let world = draw.world.unwrap();
 
 		let tilemap_size = world.tilemap_size;
+		let fluidmap_size = world.tilemap_size;
+
 		let json_draw = WebJsonDraw {
 			tilemap_size,
+			fluidmap_size,
 		};
 		let json_draw = JsValue::from_serde(&json_draw).unwrap();
 
 		let tilemap_data: Uint8Array = world.tilemap_data[..].into();
+		let fluidmap_data: Uint8Array = world.fluidmap_data[..].into();
 
 		WebDraw {
 			json_draw,
 			tilemap_data,
+			fluidmap_data,
 		}
 	}
 }

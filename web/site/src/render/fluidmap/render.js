@@ -3,7 +3,7 @@ import { state } from "./init.js"
 export function render(draw) {
 	gl.useProgram(state.program)
 
-	update_tilemap_tex(draw)
+	update_fluidmap_tex(draw)
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 
@@ -48,11 +48,11 @@ export function render(draw) {
 	}
 }
 
-function update_tilemap_tex(draw) {
-	const width = draw.tilemap_size[0]
-	const height = draw.tilemap_size[1]
-	const data = draw.tilemap_data
+function update_fluidmap_tex(draw) {
+	const width = draw.fluidmap_size[0]
+	const height = draw.fluidmap_size[1]
+	const data = draw.fluidmap_data
 
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, width, height, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, data)
-	gl.uniform2f(state.locations.tilemap_tex_size, width, height)
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
+	gl.uniform2f(state.locations.fluidmap_tex_size, width, height)
 }

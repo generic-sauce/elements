@@ -9,6 +9,7 @@ impl GraphicsBackend for WebGraphicsBackend {
 		js_render(
 			draw.json_draw,
 			draw.tilemap_data,
+			draw.fluidmap_data,
 		)
 	}
 

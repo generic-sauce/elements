@@ -11,6 +11,7 @@ out gl_PerVertex {
 
 void main() {
 	uv = vertex_uv;
+
 	// ensure that floor(vertex_position) works on different scales
 	gl_Position = vec4(vertex_position.xy + .001, vertex_position.z, 1);
 }
