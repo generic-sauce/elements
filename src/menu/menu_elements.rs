@@ -1,8 +1,10 @@
 use crate::prelude::*;
 use std::ops::{Add, Sub, Mul};
 
-const BUTTON_TEXT_SIZE: f32 = 0.06;
+const BUTTON_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
+const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
+const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 40;
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
 	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
@@ -28,6 +30,7 @@ pub enum MenuKind<B: Backend> {
 		text: String,
 		selected: bool,
 		cursor: usize,
+		cursor_blink_counter: u32,
 	}
 }
 
@@ -46,7 +49,7 @@ impl<B: Backend> MenuElement<B> {
 	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
-			kind: MenuKind::EditField { text: String::from(text), selected: false, cursor: 0 },
+			kind: MenuKind::EditField { text: String::from(text), selected: false, cursor: 0, cursor_blink_counter: 0 },
 			position,
 			size,
 			hovered: false,
@@ -59,7 +62,16 @@ impl<B: Backend> MenuElement<B> {
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
 	}
 
-	pub fn draw(&self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend) {
+	pub fn tick(&mut self) {
+		match &mut self.kind {
+			MenuKind::EditField { cursor_blink_counter, .. } => {
+				*cursor_blink_counter = (*cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
+			}
+			_ => {}
+		}
+	}
+
+	pub fn draw(&mut self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend) {
 		let color = if self.clicked {
 			Color::rgb(0.18, 0.43, 0.54)
 		} else if self.is_colliding(cursor_pos) {
@@ -71,8 +83,8 @@ impl<B: Backend> MenuElement<B> {
 			MenuKind::Button { text, .. } => {
 				self.draw_button(draw, text, color, graphics_backend)
 			},
-			MenuKind::EditField { text, selected, cursor } => {
-				self.draw_edit_field(draw, text, color, *selected, *cursor, graphics_backend)
+			MenuKind::EditField { text, selected, cursor, cursor_blink_counter } => {
+				self.draw_edit_field(draw, text, color, *selected, *cursor, cursor_blink_counter, graphics_backend)
 			},
 		}
 	}
@@ -80,33 +92,47 @@ impl<B: Backend> MenuElement<B> {
 	fn draw_button(&self, draw: &mut Draw, text: &str, color: Color, graphics_backend: &impl GraphicsBackend) {
 		let left_bot = self.position - self.size;
 		let right_top = self.position + self.size;
-		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_width(text) * BUTTON_TEXT_SIZE);
 		draw.rectangle(left_bot, right_top, color);
+
+		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_width(text) * BUTTON_TEXT_SIZE);
         draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 	}
 
-	fn draw_edit_field(&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: usize, graphics_backend: &impl GraphicsBackend) {
+	fn draw_edit_field(
+		&self, draw: &mut Draw, text: &str, color: Color, selected: bool, cursor: usize,
+		cursor_blink_counter: &u32, graphics_backend: &impl GraphicsBackend
+	) {
         draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
-			self.position - self.size + CanvasVec::new(EDIT_FIELD_BORDER_WIDTH, EDIT_FIELD_BORDER_WIDTH),
-			self.position + self.size - CanvasVec::new(EDIT_FIELD_BORDER_WIDTH, EDIT_FIELD_BORDER_WIDTH),
+			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
+			self.position + self.size - EDIT_FIELD_BORDER_WIDTH,
 			Color::rgb(0.0, 0.03, 0.15),
 		);
 
-		let text_pos = self.position - self.size + CanvasVec::new(0.008, -0.012);
+		let text_width = graphics_backend.get_text_width(text) * BUTTON_TEXT_SIZE;
+
+		let text_pos = CanvasVec::new(
+			self.position.x - self.size.x + EDIT_FIELD_BORDER_WIDTH * 2.0,
+			center_position(self.position.y - self.size.y, self.position.y + self.size.y, text_width.y)
+		);
 
 		draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
 
-		if selected {
+		// draw cursor
+		if selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
 			let subtext = &text[0..get_byte_pos(text, cursor)];
 			let text_width = graphics_backend.get_text_width(subtext).x;
-			let left_bot = text_pos + CanvasVec::new(text_width * BUTTON_TEXT_SIZE + -0.001, 0.017);
-			draw.rectangle(
-				left_bot,
-				left_bot + CanvasVec::new(0.002, BUTTON_TEXT_SIZE*0.6),
-				Color::WHITE,
+			let left_bot = CanvasVec::new(
+				self.position.x - self.size.x + text_width * BUTTON_TEXT_SIZE + EDIT_FIELD_BORDER_WIDTH * 2.0,
+				self.position.y - self.size.y + EDIT_FIELD_BORDER_WIDTH * 2.0
 			);
+			let right_top = CanvasVec::new(
+				left_bot.x + EDIT_FIELD_CURSOR_WIDTH,
+				self.position.y + self.size.y - EDIT_FIELD_BORDER_WIDTH * 2.0
+			);
+			draw.rectangle(left_bot, right_top, Color::WHITE);
 		}
+
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character]) {

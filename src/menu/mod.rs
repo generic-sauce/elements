@@ -114,6 +114,11 @@ impl<B: Backend> App<B> {
 			element.apply_text(&self.peripherals_state.text);
 			element.apply_key_events(&self.peripherals_state);
 		}
+
+		// draw elements
+		for element in &mut self.menu.elements {
+			element.tick();
+		}
 	}
 
 	pub fn draw_menu(&mut self) {
@@ -121,7 +126,7 @@ impl<B: Backend> App<B> {
 		draw.set_clear_color(Color::BLACK);
 
 		// draw elements
-		for element in &self.menu.elements {
+		for element in &mut self.menu.elements {
 			element.draw(&mut draw, self.cursor_position, &self.graphics_backend);
 		}
 
