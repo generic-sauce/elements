@@ -1,11 +1,9 @@
-import { vert_src, frag_src } from "./shader.js"
+import vert_src from '../../../res/web_shader/tilemap.vert.glsl'
+import frag_src from '../../../res/web_shader/tilemap.frag.glsl'
 
 export let state = {}
 
 export function init() {
-	// const vert_src = document.getElementById('tilemap_vert').text
-	// const frag_src = document.getElementById('tilemap_frag').text
-
 	state.program = create_program(gl, vert_src, frag_src)
 	gl.useProgram(state.program)
 	state.locations = {}
@@ -34,8 +32,8 @@ export function init() {
 }
 
 function create_program(gl, vert_src, frag_src) {
-	const vert = create_shader("tilemap_vert", gl.VERTEX_SHADER, vert_src)
-	const frag = create_shader("tilemap_frag", gl.FRAGMENT_SHADER, frag_src)
+	const vert = create_shader('tilemap_vert', gl.VERTEX_SHADER, vert_src)
+	const frag = create_shader('tilemap_frag', gl.FRAGMENT_SHADER, frag_src)
 
 	const program = gl.createProgram()
 	gl.attachShader(program, vert)

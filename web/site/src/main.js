@@ -4,17 +4,10 @@ import * as tilemapmod from "./tilemap.js"
 
 window.e2 = {}
 
-window.init_js = function(f) {
-	render_mod.init()
+window.before_init = function() {
 }
 
-// draw_render_world = function(rw, tilemap_data, fluidmap_data) {
-// 	e2.render_world = rw
-// 	e2.render_world.tilemap_data = tilemap_data
-// 	e2.render_world.fluidmap_data = fluidmap_data
-//
-// 	drawmod.draw()
-// }
+window.js_init = render_mod.init
 
 window.js_render = render_mod.render
 

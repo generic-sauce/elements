@@ -4,8 +4,8 @@ use crate::prelude::*;
 
 #[wasm_bindgen] // TODO put into module!
 extern {
-	pub fn init_js();
 	// pub fn draw_render_world(rw: JsValue, tilemap_data: Uint8Array, fluidmap_data: Uint8Array);
+	pub fn js_init();
 	pub fn js_render(tilemap_size: JsValue, tilemap_data: Uint8Array);
 	pub fn load_tilemap(name: &str, closure: &Closure<dyn FnMut(JsValue)>);
 

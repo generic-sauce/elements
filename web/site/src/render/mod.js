@@ -3,7 +3,7 @@ import * as tilemap_mod from "./tilemap/mod.js"
 // import * as playermod from "./player/mod.js"
 
 export function init() {
-	window.canvas = document.getElementById("main-canvas");
+	window.canvas = document.getElementById("canvas");
 	window.gl = canvas.getContext("webgl");
 
 	onresize = update_canvas_size

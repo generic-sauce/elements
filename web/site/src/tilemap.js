@@ -10,7 +10,6 @@ export function load(filename, callback) {
 	let img = new Image();
 
 	img.onload = function() {
-
 		let canvas = document.createElement('canvas');
 		let context = canvas.getContext('2d');
 

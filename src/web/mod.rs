@@ -10,7 +10,7 @@ pub use js::*;
 pub fn client_main() {
 	std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-	init_js();
+	js_init();
 
 	let mut runnable = match &*prompt("menu / local / ip") {
 		"menu" => Runnable::Menu,
