@@ -278,7 +278,7 @@ impl RenderFluidmap {
 			}
 		);
 
-		let elapsed_time = context.elapsed_time.as_millis() as f32 / 1009.0;
+		let elapsed_time = context.elapsed_time_ms / 1000.0;
 		context.queue.write_buffer(&self.uniform_buffer, 0, &uniform_to_bytes(elapsed_time)[..]);
 		self.bind_group = Some(create_bind_group(
 			context.device,
