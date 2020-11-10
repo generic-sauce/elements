@@ -68,12 +68,7 @@ void main() {
 	else if (tile == 3) // wall player 1
 		c = (1. - wall_color) * .5;
 	else // background
-	{
-		discard; // discard until depth test is enabled
-		/* vec3 bright_bg = vec3(133, 178, 215) / 255.; */
-		/* vec3 dark_bg = vec3(37, 78, 205) / 255.; */
-		/* c = mix(dark_bg, bright_bg, vec3(uv.y)); */
-	}
+		discard;
 
 	gl_FragColor = vec4(c, 1);
 }

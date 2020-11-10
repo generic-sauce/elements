@@ -6,6 +6,9 @@ export function init(texture_filenames) {
 	window.canvas = document.getElementById("canvas");
 	window.gl = canvas.getContext("webgl");
 
+	gl.enable(gl.DEPTH_TEST)
+	gl.depthFunc(gl.LESS)
+
 	onresize = update_canvas_size
 	update_canvas_size()
 
@@ -17,11 +20,11 @@ export function init(texture_filenames) {
 export function render(draw) {
 	let clear = draw.clear_color
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
-	gl.clear(gl.COLOR_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	fluidmap_mod.render(draw)
-	tilemap_mod.render(draw)
 	triangles_mod.render(draw)
+	tilemap_mod.render(draw)
+	fluidmap_mod.render(draw)
 }
 
 function update_canvas_size() {

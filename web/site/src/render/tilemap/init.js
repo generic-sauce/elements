@@ -14,16 +14,6 @@ export function init() {
 	state.buffer = gl.createBuffer()
 	state.tilemap_texture = gl.createTexture()
 
-	const vertices = [
-		-1.0, -1.0, 0.0, 0.0,
-		 1.0, -1.0, 1.0, 0.0,
-		-1.0,  1.0, 0.0, 1.0,
-		 1.0,  1.0, 1.0, 1.0,
-	]
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-
 	gl.bindTexture(gl.TEXTURE_2D, state.tilemap_texture)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)

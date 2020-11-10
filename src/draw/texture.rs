@@ -16,19 +16,13 @@ macro_rules! setup {
 				[$(TextureId::$id),*].iter().cloned()
 			}
 
-			// TODO use in the web client
 			#[allow(unused)]
-			pub fn filepath_relative(self) -> &'static str {
-				match self {
+			pub fn filepath(self) -> String {
+				res(match self {
 					$(
 						TextureId::$id => $resource,
 					)*
-				}
-			}
-
-			#[allow(unused)]
-			pub fn filepath(self) -> String {
-				res(self.filepath_relative())
+				})
 			}
 		}
 	}

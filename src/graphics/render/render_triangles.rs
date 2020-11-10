@@ -179,7 +179,6 @@ impl RenderTriangles {
 		render_pass.set_pipeline(&self.pipeline);
 
 		let mut begin = 0;
-		let mut offset = 0;
 		for (i, &count) in draw.vertex_counts.iter().enumerate() {
 			if count > 0 {
 				let end = begin + count as u64 * bytes_per_vertex();
@@ -188,7 +187,6 @@ impl RenderTriangles {
 				render_pass.set_bind_group(0, &self.bind_groups[i], &[]);
 				render_pass.draw(0 .. count, 0 .. 1);
 
-				offset += count;
 				begin = end;
 			}
 		}

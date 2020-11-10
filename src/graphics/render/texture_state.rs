@@ -1,11 +1,5 @@
 use crate::graphics::*;
 
-mod texture;
-use texture::*;
-
-mod animation;
-use animation::*;
-
 pub(super) struct TextureState {
 	textures: Vec<wgpu::Texture>,
 	texture_views: Vec<wgpu::TextureView>,
