@@ -1,48 +1,69 @@
 use crate::prelude::*;
 
 #[derive(Serialize, Deserialize)]
+pub struct JsWebRenderDrawTilemap {
+	pub size: TileVec,
+	pub depth_value: DepthValue,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct JsWebRenderDrawFluidmap {
+	pub size: FluidVec,
+	pub depth_value: DepthValue,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct JsWebRenderDraw {
-	pub tilemap_size: TileVec,
-	pub fluidmap_size: TileVec,
 	pub clear_color: Color,
 	pub vertex_counts: Vec<u32>, // number of vertices per texture
+	pub tilemap: Option<JsWebRenderDrawTilemap>,
+	pub fluidmap: Option<JsWebRenderDrawFluidmap>,
 }
 
 pub struct WebRenderDraw {
 	pub js_web_render_draw: JsValue,
+	pub vertex_data: Uint8Array, // vertices for all textures in bytes
 	pub tilemap_data: Uint8Array,
 	pub fluidmap_data: Uint8Array,
-	pub vertex_data: Uint8Array, // vertices for all textures in bytes
 }
 
 impl WebRenderDraw {
 	pub fn new(draw: Draw) -> WebRenderDraw {
 		// canvas vec cast because we only need aspect. kinda shady
 		let render_draw = RenderDraw::new(draw, CanvasVec::aspect().cast());
-		let RenderDraw { clear_color, world, vertex_data, vertex_counts } = render_draw;
+		let RenderDraw { clear_color, vertex_data, vertex_counts, texts: _, tilemap, fluidmap } = render_draw;
 
-		let world = world.unwrap();
+		let (tilemap, tilemap_data) = match tilemap {
+			Some(RenderDrawTilemap { data, size, depth_value }) => (
+				Some(JsWebRenderDrawTilemap { size, depth_value }),
+				data[..].into()
+			),
+			None => (None, Uint8Array::new_with_length(0))
+		};
 
-		let tilemap_size = world.tilemap_size;
-		let fluidmap_size = world.tilemap_size;
+		let (fluidmap, fluidmap_data) = match fluidmap {
+			Some(RenderDrawFluidmap { data, size, depth_value }) => (
+				Some(JsWebRenderDrawFluidmap { size, depth_value }),
+				data[..].into()
+			),
+			None => (None, Uint8Array::new_with_length(0))
+		};
 
 		let js_web_render_draw = JsWebRenderDraw {
-			tilemap_size,
-			fluidmap_size,
 			clear_color,
 			vertex_counts,
+			tilemap,
+			fluidmap,
 		};
 		let js_web_render_draw = JsValue::from_serde(&js_web_render_draw).unwrap();
 
-		let tilemap_data: Uint8Array = world.tilemap_data[..].into();
-		let fluidmap_data: Uint8Array = world.fluidmap_data[..].into();
 		let vertex_data: Uint8Array = vertex_data[..].into();
 
 		WebRenderDraw {
 			js_web_render_draw,
+			vertex_data,
 			tilemap_data,
 			fluidmap_data,
-			vertex_data,
 		}
 	}
 }

@@ -209,15 +209,15 @@ impl RenderTilemap {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		draw: &Draw,
+		draw: &RenderDraw,
 	) {
-		let world = match &draw.world {
-			Some(world) => world,
+		let tilemap = match &draw.tilemap {
+			Some(tilemap) => tilemap,
 			None => return,
 		};
 
-		assert!(world.tilemap_size != TileVec::new(0, 0));
-		self.resize_tilemap(context.device, world.tilemap_size);
+		assert!(tilemap.size != TileVec::new(0, 0));
+		self.resize_tilemap(context.device, tilemap.size);
 
 		let window_size = context.window_size.to_subpixel();
 		let s = |v: ViewVec| v.to_surface(window_size);
@@ -229,7 +229,7 @@ impl RenderTilemap {
 					Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
 					Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
 				],
-				depth_index_to_value(world.tilemap_depth_index, draw.depth_index)
+				tilemap.depth_value,
 			)[..]
 		);
 
@@ -239,15 +239,15 @@ impl RenderTilemap {
 				mip_level: 0,
 				origin: wgpu::Origin3d::ZERO,
 			},
-			&world.tilemap_data,
+			&tilemap.data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: world.tilemap_size.x as u32,
-				rows_per_image: world.tilemap_size.y as u32,
+				bytes_per_row: self.tilemap_size.x as u32,
+				rows_per_image: self.tilemap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: world.tilemap_size.x as u32,
-				height: world.tilemap_size.y as u32,
+				width: self.tilemap_size.x as u32,
+				height: self.tilemap_size.y as u32,
 				depth: 1,
 			}
 		);

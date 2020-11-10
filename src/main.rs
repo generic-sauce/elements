@@ -77,7 +77,7 @@ fn main() {
 			},
 			win::Event::RedrawRequested { .. } => {
 				match draw_receiver.try_recv() {
-					Ok(draw) => graphics.render(&draw),
+					Ok(draw) => graphics.render(draw),
 					Err(TryRecvError::Empty) => {},
 					e @ Err(TryRecvError::Disconnected) => { e.unwrap(); },
 				}

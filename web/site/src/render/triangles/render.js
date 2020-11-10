@@ -60,9 +60,11 @@ export function render(draw) {
 	let offset = 0
 	for (let i = 0; i < draw.vertex_counts.length; ++i) {
 		const count = draw.vertex_counts[i]
-		gl.bindTexture(gl.TEXTURE_2D, state.textures[i])
-		gl.drawArrays(gl.TRIANGLES, offset, count)
-		offset += count
+		if (count > 0) {
+			gl.bindTexture(gl.TEXTURE_2D, state.textures[i])
+			gl.drawArrays(gl.TRIANGLES, offset, count)
+			offset += count
+		}
 	}
 }
 

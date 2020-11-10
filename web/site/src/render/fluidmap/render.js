@@ -50,8 +50,8 @@ export function render(draw) {
 }
 
 function update_fluidmap_tex(draw) {
-	const width = draw.fluidmap_size[0]
-	const height = draw.fluidmap_size[1]
+	const width = draw.fluidmap.size[0]
+	const height = draw.fluidmap.size[1]
 	const data = draw.fluidmap_data
 
 	gl.bindTexture(gl.TEXTURE_2D, state.fluidmap_texture)

@@ -49,8 +49,8 @@ export function render(draw) {
 }
 
 function update_tilemap_tex(draw) {
-	const width = draw.tilemap_size[0]
-	const height = draw.tilemap_size[1]
+	const width = draw.tilemap.size[0]
+	const height = draw.tilemap.size[1]
 	const data = draw.tilemap_data
 
 	gl.bindTexture(gl.TEXTURE_2D, state.tilemap_texture)

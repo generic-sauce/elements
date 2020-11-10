@@ -112,7 +112,7 @@ impl Graphics {
 	 * create and fill command buffer
 	 * submit command buffer to queue
 	 */
-	pub fn render(&mut self, draw: &Draw) {
+	pub fn render(&mut self, draw: Draw) {
 		let swap_chain_texture = match self.swap_chain.get_current_frame() {
 			Ok(frame) => frame.output,
 			Err(err) => {
@@ -132,6 +132,8 @@ impl Graphics {
 			label: Some("command encoder")
 		});
 
+		let draw = RenderDraw::new(draw, self.window_size.to_subpixel());
+
 		let mut graphics_context = GraphicsContext::new(
 			&self.device,
 			&self.queue,
@@ -139,28 +141,28 @@ impl Graphics {
 			&mut encoder,
 			self.window_size,
 			&self.depth_texture_view,
-			draw.clear_color.unwrap_or(Color::BLACK).to_wgpu(),
+			draw.clear_color.to_wgpu(),
 			self.timer.elapsed_ms() as f32,
 		);
 
 		self.triangles.render(
 			&mut graphics_context,
-			draw,
+			&draw,
 		);
 
 		self.fluidmap.render(
 			&mut graphics_context,
-			draw,
+			&draw,
 		);
 
 		self.tilemap.render(
 			&mut graphics_context,
-			draw,
+			&draw,
 		);
 
 		self.text.render(
 			&mut graphics_context,
-			draw,
+			&draw,
 		);
 
 		self.queue.submit(Some(encoder.finish()));

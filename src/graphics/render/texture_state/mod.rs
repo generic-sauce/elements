@@ -13,8 +13,14 @@ pub(super) struct TextureState {
 
 impl TextureState {
 	pub(super) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> TextureState {
-		let textures: Vec<_> = create_texture_iter(device, queue)
-			.chain(create_animation_texture_iter(device, queue))
+		let textures: Vec<_> = texture_filenames_iter()
+			.map(|filepath| image::open(&filepath).unwrap().flipv().into_rgba())
+			.map(move |image| {
+				let size: PixelVec = image.dimensions().into();
+				let texture = create_texture(device, size);
+				write_texture(queue, &texture, size, &image.as_raw()[..]);
+				texture
+			})
 			.collect();
 
 		let texture_views: Vec<wgpu::TextureView> = textures.iter()

@@ -1,101 +1,9 @@
 use crate::graphics::*;
 
-#[derive(Copy, Clone)]
-struct Vertex {
-	position: SurfaceVec,
-	uv: TextureVec,
-}
-
-fn vertex_to_bytes_len() -> u64 {
-	(3 + 2) * std::mem::size_of::<f32>() as u64
-}
-
-fn vertices_to_bytes(vertices: &[Vertex], depth: DepthValue) -> Vec<u8> {
-	let vertices_size = vertices.len() * vertex_to_bytes_len() as usize;
-	let mut bytes = Vec::<u8>::with_capacity(vertices_size);
-
-	for vertex in vertices {
-		bytes.extend(vertex.position.x.to_le_bytes().iter());
-		bytes.extend(vertex.position.y.to_le_bytes().iter());
-		bytes.extend(depth.to_le_bytes().iter());
-		bytes.extend(vertex.uv.x.to_le_bytes().iter());
-		bytes.extend(vertex.uv.y.to_le_bytes().iter());
-	}
-
-	bytes
-}
-
-fn create_fluidmap_texture(device: &wgpu::Device, tilemap_size: TileVec) -> (wgpu::Texture, wgpu::TextureView) {
-	let fluidmap_texture = device.create_texture(&wgpu::TextureDescriptor {
-		label: Some("fluidmap texture"),
-		size: wgpu::Extent3d {
-			width: tilemap_size.x as u32,
-			height: tilemap_size.y as u32,
-			depth: 1,
-		},
-		mip_level_count: 1,
-		sample_count: 1,
-		dimension: wgpu::TextureDimension::D2,
-		format: wgpu::TextureFormat::Rgba8Unorm,
-		usage: wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
-	});
-
-	let fluidmap_texture_view = fluidmap_texture.create_view(&wgpu::TextureViewDescriptor {
-		label: Some("fluidmap texture view"),
-		..Default::default()
-	});
-
-	(fluidmap_texture, fluidmap_texture_view)
-}
-
-fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, fluidmap_texture_view: &wgpu::TextureView, fluidmap_sampler: &wgpu::Sampler, uniform_buffer: &wgpu::Buffer) -> wgpu::BindGroup {
-	device.create_bind_group(&wgpu::BindGroupDescriptor {
-		label: Some("fluidmap bind group"),
-		layout: bind_group_layout,
-		entries: &[
-			wgpu::BindGroupEntry {
-				binding: 0,
-				resource: wgpu::BindingResource::TextureView(fluidmap_texture_view),
-			},
-			wgpu::BindGroupEntry {
-				binding: 1,
-				resource: wgpu::BindingResource::Sampler(fluidmap_sampler),
-			},
-			wgpu::BindGroupEntry {
-				binding: 2,
-				resource: wgpu::BindingResource::Buffer(uniform_buffer.slice(..)),
-			},
-		]
-	})
-}
-
-fn create_uniform_buffer(device: &wgpu::Device) -> wgpu::Buffer {
-	device.create_buffer(&wgpu::BufferDescriptor {
-		label: Some("uniform buffer"),
-		size: 2 * std::mem::size_of::<f32>() as u64,
-		usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-		mapped_at_creation: false
-	})
-}
-
-fn uniform_to_bytes(elapsed_time: f32) -> Vec<u8> {
-	bytemuck::cast_slice(&[elapsed_time]).to_vec()
-}
-
-fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
-	let vertices_size = vertices_capacity * vertex_to_bytes_len();
-	device.create_buffer(&wgpu::BufferDescriptor {
-		label: Some("vertex buffer"),
-		size: vertices_size,
-		usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
-		mapped_at_creation: false
-	})
-}
-
 pub(in crate::graphics) struct RenderFluidmap {
 	pipeline: wgpu::RenderPipeline,
 	vertex_buffer: wgpu::Buffer,
-	tilemap_size: TileVec,
+	fluidmap_size: FluidVec,
 	fluidmap_texture: Option<wgpu::Texture>,
 	fluidmap_texture_view: Option<wgpu::TextureView>,
 	fluidmap_sampler: wgpu::Sampler,
@@ -212,7 +120,7 @@ impl RenderFluidmap {
 		RenderFluidmap {
 			pipeline,
 			vertex_buffer,
-			tilemap_size: TileVec::new(0, 0),
+			fluidmap_size: FluidVec::new(0, 0),
 			fluidmap_texture: None,
 			fluidmap_texture_view: None,
 			fluidmap_sampler,
@@ -222,28 +130,18 @@ impl RenderFluidmap {
 		}
 	}
 
-	fn resize_fluidmap(&mut self, device: &wgpu::Device, tilemap_size: TileVec) {
-		if tilemap_size != self.tilemap_size {
-			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, tilemap_size);
-
-			self.fluidmap_texture = Some(fluidmap_texture);
-			self.fluidmap_texture_view = Some(fluidmap_texture_view);
-			self.tilemap_size = tilemap_size;
-		}
-	}
-
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		draw: &Draw,
+		draw: &RenderDraw,
 	) {
-		let world = match &draw.world {
-			Some(world) => world,
+		let fluidmap = match &draw.fluidmap {
+			Some(fluidmap) => fluidmap,
 			None => return,
 		};
 
-		assert!(world.tilemap_size != TileVec::new(0, 0));
-		self.resize_fluidmap(context.device, world.tilemap_size);
+		assert!(fluidmap.size != FluidVec::new(0, 0));
+		self.resize_fluidmap(context.device, fluidmap.size);
 
 		let window_size = context.window_size.to_subpixel();
 		let s = |v: ViewVec| v.to_surface(window_size);
@@ -255,7 +153,7 @@ impl RenderFluidmap {
 					Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
 					Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
 				],
-				depth_index_to_value(world.fluidmap_depth_index, draw.depth_index)
+				fluidmap.depth_value,
 			)[..]
 		);
 
@@ -265,15 +163,15 @@ impl RenderFluidmap {
 				mip_level: 0,
 				origin: wgpu::Origin3d::ZERO,
 			},
-			&world.fluidmap_data,
+			&fluidmap.data,
 			wgpu::TextureDataLayout {
 				offset: 0,
-				bytes_per_row: 4 * world.tilemap_size.x as u32,
-				rows_per_image: world.tilemap_size.y as u32,
+				bytes_per_row: 4 * self.fluidmap_size.x as u32,
+				rows_per_image: self.fluidmap_size.y as u32,
 			},
 			wgpu::Extent3d {
-				width: world.tilemap_size.x as u32,
-				height: world.tilemap_size.y as u32,
+				width: self.fluidmap_size.x as u32,
+				height: self.fluidmap_size.y as u32,
 				depth: 1,
 			}
 		);
@@ -320,4 +218,106 @@ impl RenderFluidmap {
 		render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
 		render_pass.draw(0 .. 4, 0 .. 1);
 	}
+
+	fn resize_fluidmap(&mut self, device: &wgpu::Device, fluidmap_size: FluidVec) {
+		if fluidmap_size != self.fluidmap_size {
+			let (fluidmap_texture, fluidmap_texture_view) = create_fluidmap_texture(device, fluidmap_size);
+
+			self.fluidmap_texture = Some(fluidmap_texture);
+			self.fluidmap_texture_view = Some(fluidmap_texture_view);
+			self.fluidmap_size = fluidmap_size;
+		}
+	}
+}
+
+#[derive(Copy, Clone)]
+struct Vertex {
+	position: SurfaceVec,
+	uv: TextureVec,
+}
+
+fn vertex_to_bytes_len() -> u64 {
+	(3 + 2) * std::mem::size_of::<f32>() as u64
+}
+
+fn vertices_to_bytes(vertices: &[Vertex], depth: DepthValue) -> Vec<u8> {
+	let vertices_size = vertices.len() * vertex_to_bytes_len() as usize;
+	let mut bytes = Vec::<u8>::with_capacity(vertices_size);
+
+	for vertex in vertices {
+		bytes.extend(vertex.position.x.to_le_bytes().iter());
+		bytes.extend(vertex.position.y.to_le_bytes().iter());
+		bytes.extend(depth.to_le_bytes().iter());
+		bytes.extend(vertex.uv.x.to_le_bytes().iter());
+		bytes.extend(vertex.uv.y.to_le_bytes().iter());
+	}
+
+	bytes
+}
+
+fn create_fluidmap_texture(device: &wgpu::Device, fluidmap_size: FluidVec) -> (wgpu::Texture, wgpu::TextureView) {
+	let fluidmap_texture = device.create_texture(&wgpu::TextureDescriptor {
+		label: Some("fluidmap texture"),
+		size: wgpu::Extent3d {
+			width: fluidmap_size.x as u32,
+			height: fluidmap_size.y as u32,
+			depth: 1,
+		},
+		mip_level_count: 1,
+		sample_count: 1,
+		dimension: wgpu::TextureDimension::D2,
+		format: wgpu::TextureFormat::Rgba8Unorm,
+		usage: wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
+	});
+
+	let fluidmap_texture_view = fluidmap_texture.create_view(&wgpu::TextureViewDescriptor {
+		label: Some("fluidmap texture view"),
+		..Default::default()
+	});
+
+	(fluidmap_texture, fluidmap_texture_view)
+}
+
+fn create_bind_group(device: &wgpu::Device, bind_group_layout: &wgpu::BindGroupLayout, fluidmap_texture_view: &wgpu::TextureView, fluidmap_sampler: &wgpu::Sampler, uniform_buffer: &wgpu::Buffer) -> wgpu::BindGroup {
+	device.create_bind_group(&wgpu::BindGroupDescriptor {
+		label: Some("fluidmap bind group"),
+		layout: bind_group_layout,
+		entries: &[
+			wgpu::BindGroupEntry {
+				binding: 0,
+				resource: wgpu::BindingResource::TextureView(fluidmap_texture_view),
+			},
+			wgpu::BindGroupEntry {
+				binding: 1,
+				resource: wgpu::BindingResource::Sampler(fluidmap_sampler),
+			},
+			wgpu::BindGroupEntry {
+				binding: 2,
+				resource: wgpu::BindingResource::Buffer(uniform_buffer.slice(..)),
+			},
+		]
+	})
+}
+
+fn create_uniform_buffer(device: &wgpu::Device) -> wgpu::Buffer {
+	device.create_buffer(&wgpu::BufferDescriptor {
+		label: Some("uniform buffer"),
+		size: 2 * std::mem::size_of::<f32>() as u64,
+		usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+		mapped_at_creation: false
+	})
+}
+
+fn uniform_to_bytes(elapsed_time: f32) -> Vec<u8> {
+	bytemuck::cast_slice(&[elapsed_time]).to_vec()
+}
+
+fn create_vertex_buffer(device: &wgpu::Device, vertices_capacity: u64) -> wgpu::Buffer {
+	let vertices_size = vertices_capacity * vertex_to_bytes_len();
+	device.create_buffer(&wgpu::BufferDescriptor {
+		label: Some("vertex buffer"),
+		size: vertices_size,
+		usage: wgpu::BufferUsage::COPY_DST | wgpu::BufferUsage::VERTEX,
+		mapped_at_creation: false
+	})
 }

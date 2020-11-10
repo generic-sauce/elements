@@ -26,7 +26,7 @@ impl RenderText {
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		draw: &Draw,
+		draw: &RenderDraw,
 	) {
 		self.staging_belt.recall();
 

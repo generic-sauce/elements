@@ -18,33 +18,10 @@ pub use color::*;
 mod render;
 pub use render::*;
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Copy, Clone)]
 pub enum Flip {
 	Normal,
 	Horizontal,
-}
-
-pub struct Vertex {
-	pub position: ViewVec,
-	pub uv: TextureVec,
-	pub color: Color,
-}
-
-pub type DepthIndex = f32;
-
-pub struct Triangle {
-	pub vertices: [Vertex; 3],
-	pub depth_index: DepthIndex,
-}
-
-pub type Triangles = Vec<Triangle>;
-pub type TextureTriangles = Vec<Triangles>;
-
-pub struct Text {
-	pub left_bot: ViewVec,
-	pub scale: f32,
-	pub color: Color,
-	pub string: String,
 }
 
 pub trait IntoTextureIndex {
@@ -52,11 +29,12 @@ pub trait IntoTextureIndex {
 }
 
 pub struct Draw {
-	pub clear_color: Option<Color>,
-	pub depth_index: DepthIndex,
-	pub texture_triangles: TextureTriangles,
-	pub texts: Vec<Text>,
-	pub world: Option<GraphicsWorld>,
+	clear_color: Option<Color>,
+	depth_index: DepthIndex,
+	texture_triangles: TextureTriangles,
+	tilemap: Option<DrawTilemap>,
+	fluidmap: Option<DrawFluidmap>,
+	texts: Vec<Text>,
 }
 
 impl Draw {
@@ -66,12 +44,16 @@ impl Draw {
 		let mut texture_triangles = TextureTriangles::new();
 		texture_triangles.resize_with(TextureId::texture_count(), Default::default);
 		let texts = Vec::new();
+		let tilemap = None;
+		let fluidmap = None;
+
 		Draw {
 			clear_color,
 			depth_index,
 			texture_triangles,
 			texts,
-			world: None,
+			tilemap,
+			fluidmap,
 		}
 	}
 
@@ -154,8 +136,11 @@ impl Draw {
 		self.depth_index += 1.0;
 	}
 
-	pub fn world(&mut self, tilemap: &TileMap, fluidmap: &FluidMap) {
-		self.world = Some(GraphicsWorld::new(tilemap, fluidmap, self.depth_index + 1.0, self.depth_index));
+	pub fn map(&mut self, tilemap: &TileMap, fluidmap: &FluidMap) {
+		// draw and render order have to be changed respectively
+		self.tilemap = Some(DrawTilemap::new(tilemap, self.depth_index + 1.0));
+		self.fluidmap = Some(DrawFluidmap::new(fluidmap, self.depth_index));
+
 		self.depth_index += 2.0;
 	}
 
@@ -178,5 +163,90 @@ impl Draw {
 		};
 
 		self.texts.push(text);
+	}
+}
+
+struct Vertex {
+	position: ViewVec,
+	uv: TextureVec,
+	color: Color,
+}
+
+// index of draw command recorded by draw
+type DepthIndex = f32;
+
+// vertex depth used for actual rendering
+pub type DepthValue = f32;
+
+struct Triangle {
+	vertices: [Vertex; 3],
+	depth_index: DepthIndex,
+}
+
+type Triangles = Vec<Triangle>;
+type TextureTriangles = Vec<Triangles>;
+
+pub struct Text {
+	pub left_bot: ViewVec,
+	pub scale: f32,
+	pub color: Color,
+	pub string: String,
+}
+
+struct DrawTilemap {
+	size: TileVec,
+	data: Vec<u8>,
+	depth_index: DepthIndex,
+}
+
+impl DrawTilemap {
+	fn new(tilemap: &TileMap, depth_index: DepthIndex) -> DrawTilemap {
+		let size = tilemap.size;
+		let data: Vec<u8> = tilemap.iter()
+			.map(|p| tilemap.get(p))
+			.map(|t| match t {
+				Tile::Void => 0,
+				Tile::Ground => 1,
+				Tile::Wall { owner, .. } => 2 + owner as u8,
+			})
+			.collect();
+
+		DrawTilemap {
+			size,
+			data,
+			depth_index,
+		}
+	}
+}
+
+struct DrawFluidmap {
+	size: FluidVec,
+	data: Vec<u8>,
+	depth_index: DepthIndex,
+}
+
+impl DrawFluidmap {
+	fn new(fluidmap: &FluidMap, depth_index: DepthIndex) -> DrawFluidmap {
+		let size: FluidVec = TileVec::new(128, 72).cast();
+
+		let mut data: Vec<u8> = Vec::new();
+		data.resize((4 * size.x * size.y) as usize, 0 as u8);
+
+		for fluid in fluidmap.iter() {
+			let cell_id = fluid.position / TILESIZE;
+			let local_position = ((fluid.position.x % TILESIZE) as u8, (fluid.position.y % TILESIZE) as u8);
+
+			let cell_index = 4 * (cell_id.x + cell_id.y * size.x as i32) as usize;
+			data[cell_index+3] = 255;
+			data[cell_index+2] = (fluid.owner * 255) as u8;
+			data[cell_index+1] = local_position.1 as u8;
+			data[cell_index]   = local_position.0 as u8;
+		}
+
+		DrawFluidmap {
+			size,
+			data,
+			depth_index,
+		}
 	}
 }
