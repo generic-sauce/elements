@@ -9,14 +9,14 @@ export function init(texture_filenames) {
 	onresize = update_canvas_size
 	update_canvas_size()
 
-	gl.clearColor(0.8, 0.8, 1.0, 1.0)
-
 	fluidmap_mod.init()
 	tilemap_mod.init()
 	triangles_mod.init(texture_filenames)
 }
 
 export function render(draw) {
+	let clear = draw.clear_color
+	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
 	gl.clear(gl.COLOR_BUFFER_BIT)
 
 	fluidmap_mod.render(draw)

@@ -1,3 +1,4 @@
+#[cfg(feature = "server")]
 use std::path::PathBuf;
 
 #[cfg(feature = "server")]

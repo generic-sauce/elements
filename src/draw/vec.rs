@@ -24,11 +24,13 @@ pub type SurfaceVec = Vec2t<f32, SurfaceParam>;
 
 #[allow(unused)]
 impl ViewVec {
-	pub fn left_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x, y + 1.0) }
-	pub fn right_bot(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y) }
-	pub fn right_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y + 1.0) }
-	pub fn center(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT * 0.5, y + 0.5) }
+	// pub fn left_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x, y + 1.0) }
+	// pub fn right_bot(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y) }
+	// pub fn right_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y + 1.0) }
+	// pub fn center(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 0.5, y + 0.5) }
+
 	pub fn to_canvas(self) -> CanvasVec { CanvasVec::new(self.x * VIEW_ASPECT, self.y) }
+
 	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec {
 		let mut v = self.to_surface(window_size);
 		v = v * 0.5 + 0.5;
@@ -36,6 +38,7 @@ impl ViewVec {
 		v.y *= window_size.y;
 		SubPixelVec::new(v.x, v.y)
 	}
+
 	pub fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec {
 		let mut v = self * 2.0 - 1.0;
 		let ratio = window_view_ratio(window_size);
@@ -50,13 +53,16 @@ impl ViewVec {
 
 #[allow(unused)]
 impl CanvasVec {
-	pub fn left_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x, y + 1.0) }
-	pub fn right_bot(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y) }
-	pub fn right_top(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 1.0, y + 1.0) }
-	pub fn center(x: f32, y: f32) -> ViewVec { ViewVec::new(x + 0.5, y + 0.5) }
+	// pub fn left_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x, y + 1.0) }
+	// pub fn right_bot(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y) }
+	// pub fn right_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y + 1.0) }
+	// pub fn center(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT * 0.5, y + 0.5) }
+
 	pub fn to_view(self) -> ViewVec { ViewVec::new(self.x / VIEW_ASPECT, self.y) }
 	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec { self.to_view().to_subpixel(window_size) }
 	pub fn to_surface(self, window_size: SubPixelVec) -> SurfaceVec { self.to_view().to_surface(window_size) }
+
+	pub fn aspect() -> CanvasVec { CanvasVec::new(VIEW_ASPECT, 1.0) }
 }
 
 pub trait IntoViewVec {

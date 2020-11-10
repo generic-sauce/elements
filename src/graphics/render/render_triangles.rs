@@ -1,34 +1,6 @@
 use crate::graphics::*;
 use super::*;
 
-fn triangles_to_bytes(window_size: SubPixelVec, triangles: &[Triangle], max_depth: DepthIndex) -> Vec<u8> {
-	let floats_per_vertex = 7;
-	let floats_per_triangle = 3 * floats_per_vertex;
-	let floats_in_triangles = triangles.len() * floats_per_triangle;
-	let bytes_in_triangles = floats_in_triangles * std::mem::size_of::<f32>();
-	let mut bytes = Vec::<u8>::with_capacity(bytes_in_triangles);
-
-	for triangle in triangles {
-		let depth = (max_depth - triangle.depth_index + 0.01) / (max_depth + 0.02);
-		for vertex in triangle.vertices.iter().rev() {
-			let position = vertex.position.to_surface(window_size);
-			let l = [
-				position.x.to_le_bytes(),
-				position.y.to_le_bytes(),
-				depth.to_le_bytes(),
-				vertex.uv.x.to_le_bytes(),
-				vertex.uv.y.to_le_bytes(),
-				vertex.color.r.to_le_bytes(),
-				vertex.color.g.to_le_bytes(),
-				vertex.color.b.to_le_bytes(),
-			];
-			bytes.extend(l.iter().flat_map(|x| x.iter()));
-		}
-	}
-
-	bytes
-}
-
 pub(in crate::graphics) struct RenderTriangles {
 	pipeline: wgpu::RenderPipeline,
 	triangles_capacity: u64,

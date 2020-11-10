@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 #[derive(Copy, Clone)]
-#[derive(Serialize, Deserialize)] // TODO web only
+#[derive(Serialize, Deserialize)]
 pub struct Color {
 	pub r: f32,
 	pub g: f32,

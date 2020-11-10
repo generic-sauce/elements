@@ -15,14 +15,15 @@ pub use vec::*;
 mod color;
 pub use color::*;
 
+mod render;
+pub use render::*;
+
 #[derive(PartialEq, Eq)]
 pub enum Flip {
 	Normal,
 	Horizontal,
 }
 
-#[derive(Copy, Clone)]
-#[derive(Serialize, Deserialize)] // TODO web only
 pub struct Vertex {
 	pub position: ViewVec,
 	pub uv: TextureVec,
@@ -31,7 +32,6 @@ pub struct Vertex {
 
 pub type DepthIndex = f32;
 
-#[derive(Serialize, Deserialize)] // TODO web only
 pub struct Triangle {
 	pub vertices: [Vertex; 3],
 	pub depth_index: DepthIndex,
@@ -54,7 +54,7 @@ pub trait IntoTextureIndex {
 pub struct Draw {
 	pub clear_color: Option<Color>,
 	pub depth_index: DepthIndex,
-	pub triangles: TextureTriangles,
+	pub texture_triangles: TextureTriangles,
 	pub texts: Vec<Text>,
 	pub world: Option<GraphicsWorld>,
 }
@@ -63,13 +63,13 @@ impl Draw {
 	pub fn new() -> Draw {
 		let clear_color = None;
 		let depth_index = 0.0;
-		let mut triangles = TextureTriangles::new();
-		triangles.resize_with(TextureId::texture_count(), Default::default);
+		let mut texture_triangles = TextureTriangles::new();
+		texture_triangles.resize_with(TextureId::texture_count(), Default::default);
 		let texts = Vec::new();
 		Draw {
 			clear_color,
 			depth_index,
-			triangles,
+			texture_triangles,
 			texts,
 			world: None,
 		}
@@ -92,7 +92,7 @@ impl Draw {
 		color: Option<Color>,
 	) {
 		let texture_index = texture_index.into_texture_index();
-		let triangles = &mut self.triangles[texture_index];
+		let triangles = &mut self.texture_triangles[texture_index];
 		let left_bot = left_bot.to_view();
 		let right_top = right_top.to_view();
 		let color = color.unwrap_or(Color::WHITE);
@@ -129,7 +129,7 @@ impl Draw {
 		right_top: impl IntoViewVec,
 		color: Color,
 	) {
-		let triangles = &mut self.triangles[TextureId::White as usize];
+		let triangles = &mut self.texture_triangles[TextureId::White as usize];
 		let left_bot = left_bot.to_view();
 		let right_top = right_top.to_view();
 

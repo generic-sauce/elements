@@ -3,13 +3,14 @@ import { state } from "./init.js"
 export function render(draw) {
 	gl.useProgram(state.program)
 
-	let counts = update_vertices(draw)
+	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
+	gl.bufferData(gl.ARRAY_BUFFER, draw.vertex_data, gl.STATIC_DRAW)
 
 	{ // vertex_position
-		const count = 2;
+		const count = 3;
 		const type = gl.FLOAT;
 		const normalize = false;
-		const stride = 7 * 4;
+		const stride = 8 * 4;
 		const offset = 0 * 4;
 		gl.vertexAttribPointer(
 			state.locations.vertex_position,
@@ -26,8 +27,8 @@ export function render(draw) {
 		const count = 2;
 		const type = gl.FLOAT;
 		const normalize = false;
-		const stride = 7 * 4;
-		const offset = 2 * 4;
+		const stride = 8 * 4;
+		const offset = 3 * 4;
 		gl.vertexAttribPointer(
 			state.locations.vertex_uv,
 			count,
@@ -43,8 +44,8 @@ export function render(draw) {
 		const count = 3;
 		const type = gl.FLOAT;
 		const normalize = false;
-		const stride = 7 * 4;
-		const offset = 4 * 4;
+		const stride = 8 * 4;
+		const offset = 5 * 4;
 		gl.vertexAttribPointer(
 			state.locations.vertex_color,
 			count,
@@ -57,8 +58,8 @@ export function render(draw) {
 	}
 
 	let offset = 0
-	for (let i = 0; i < counts.length; ++i) {
-		const count = counts[i]
+	for (let i = 0; i < draw.vertex_counts.length; ++i) {
+		const count = draw.vertex_counts[i]
 		gl.bindTexture(gl.TEXTURE_2D, state.textures[i])
 		gl.drawArrays(gl.TRIANGLES, offset, count)
 		offset += count
@@ -66,20 +67,4 @@ export function render(draw) {
 }
 
 function update_vertices(draw) {
-	const counts = [3, 3]
-
-	const vertices = [
-		0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
-		0.5, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
-		0.0, 0.5, 0.0, 1.0, 1.0, 1.0, 1.0,
-
-		1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-		1.0, 0.5, 1.0, 0.0, 1.0, 1.0, 1.0,
-		0.5, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-	]
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-
-	return counts
 }

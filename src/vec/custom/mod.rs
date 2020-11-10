@@ -61,7 +61,7 @@ impl FluidVec {
 }
 
 impl SubPixelVec {
-	pub const fn to_window(self) -> PixelVec { PixelVec::new(self.x as u32, self.y as u32) }
+	pub const fn to_pixel(self) -> PixelVec { PixelVec::new(self.x as u32, self.y as u32) }
 }
 
 impl PixelVec {
@@ -94,6 +94,6 @@ impl From<GameVec> for FluidVec {
 
 impl From<SubPixelVec> for PixelVec {
 	fn from(t: SubPixelVec) -> PixelVec {
-		t.to_window()
+		t.to_pixel()
 	}
 }

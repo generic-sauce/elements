@@ -1,3 +1,5 @@
+use crate::prelude::*;
+
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct Animation {
 	pub animation_id: AnimationId,
@@ -22,7 +24,7 @@ impl Animation {
 }
 
 macro_rules! setup {
-	($($id:ident : $dir:expr, $frame_count:expr, $interval:expr),*$(,)?) => {
+	($($id:ident : $parent_dir:expr, $name:expr, $extension:expr, $frame_count:expr, $interval:expr),*$(,)?) => {
 		#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 		#[repr(usize)]
 		pub enum AnimationId {
@@ -58,12 +60,43 @@ macro_rules! setup {
 			}
 
 			#[allow(unused)]
-			pub fn dir(self) -> &'static str {
+			pub fn name(self) -> &'static str {
 				match self {
 					$(
-						AnimationId::$id => $dir,
+						AnimationId::$id => $name,
 					)*
 				}
+			}
+
+			#[allow(unused)]
+			pub fn extension(self) -> &'static str {
+				match self {
+					$(
+						AnimationId::$id => $extension,
+					)*
+				}
+			}
+
+			#[allow(unused)]
+			pub fn dir(self) -> String {
+				match self {
+					$(
+						AnimationId::$id => format!("{}/{}", $parent_dir, $name),
+					)*
+				}
+			}
+
+			pub fn filepaths_iter(self) -> impl Iterator<Item=String> {
+				let id = self;
+				let dir = AnimationId::dir(id);
+				let name = AnimationId::name(id);
+				let extension = AnimationId::extension(id);
+				(0..AnimationId::frame_count(id))
+					.map(move |i| {
+						let filepath = format!("{}/{}{}.{}", dir, name, i + 1, extension);
+						let filepath = res(filepath.as_str());
+						filepath
+					})
 			}
 
 			pub fn frame_count(self) -> usize {
@@ -86,14 +119,14 @@ macro_rules! setup {
 }
 
 setup!(
-	BluePlayerIdle: "images/player_blue/player_idle", 5, 9,
-	BluePlayerRun: "images/player_blue/player_run", 6, 6,
-	BluePlayerJump: "images/player_blue/player_jump", 2, 6,
-	BluePlayerFall: "images/player_blue/player_fall", 2, 6,
-	BluePlayerFallSlow: "images/player_blue/player_fall_slow", 2, 6,
-	RedPlayerIdle: "images/player_red/player_idle", 5, 9,
-	RedPlayerRun: "images/player_red/player_run", 4, 6,
-	RedPlayerJump: "images/player_red/player_jump", 2, 6,
-	RedPlayerFall: "images/player_red/player_fall", 2, 6,
-	RedPlayerFallSlow: "images/player_red/player_fall_slow", 2, 6
+	BluePlayerIdle: "images/player_blue", "player_idle", "png", 5, 9,
+	BluePlayerRun: "images/player_blue", "player_run", "png", 6, 6,
+	BluePlayerJump: "images/player_blue", "player_jump", "png", 2, 6,
+	BluePlayerFall: "images/player_blue", "player_fall", "png", 2, 6,
+	BluePlayerFallSlow: "images/player_blue", "player_fall_slow", "png", 2, 6,
+	RedPlayerIdle: "images/player_red", "player_idle", "png", 5, 9,
+	RedPlayerRun: "images/player_red", "player_run", "png", 4, 6,
+	RedPlayerJump: "images/player_red", "player_jump", "png", 2, 6,
+	RedPlayerFall: "images/player_red", "player_fall", "png", 2, 6,
+	RedPlayerFallSlow: "images/player_red", "player_fall_slow", "png", 2, 6
 );

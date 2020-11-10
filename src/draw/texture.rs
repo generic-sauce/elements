@@ -69,16 +69,11 @@ impl IntoTextureIndex for Animation {
 }
 
 pub fn texture_filenames_iter() -> impl Iterator<Item=String> {
-	TextureId::iter()
-		.map(TextureId::filepath)
-		// .chain(
-		// 	AnimationId::iter()
-		// 		.map(AnimationId::dir)
-		// 		.flat_map(|dir| std::fs::read_dir(res(&dir)).unwrap())
-		// 		.map(|filepath| {
-		// 			let filepath = filepath.expect("could not find file");
-		// 			let filepath = filepath.path();
-		// 			filepath.into_os_string().into_string().expect("could not get filepath")
-		// 		})
-		// )
+	let textures = TextureId::iter()
+		.map(TextureId::filepath);
+
+	let animation_textures = AnimationId::iter()
+		.flat_map(AnimationId::filepaths_iter);
+
+	textures.chain(animation_textures)
 }

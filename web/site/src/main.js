@@ -9,9 +9,10 @@ window.before_init = function() {
 
 window.js_init = render_mod.init
 
-window.js_render = function(draw, tilemap_data, fluidmap_data) {
+window.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
 	draw.tilemap_data = tilemap_data
 	draw.fluidmap_data = fluidmap_data
+	draw.vertex_data = vertex_data
 
 	render_mod.render(draw)
 }

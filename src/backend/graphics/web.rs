@@ -4,12 +4,13 @@ pub struct WebGraphicsBackend;
 
 impl GraphicsBackend for WebGraphicsBackend {
 	fn submit(&mut self, draw: Draw) {
-		let draw = WebDraw::new(draw);
+		let draw = WebRenderDraw::new(draw);
 
 		js_render(
-			draw.json_draw,
+			draw.js_web_render_draw,
 			draw.tilemap_data,
 			draw.fluidmap_data,
+			draw.vertex_data,
 		)
 	}
 
