@@ -150,12 +150,12 @@ impl Graphics {
 			&draw,
 		);
 
-		self.fluidmap.render(
+		self.tilemap.render(
 			&mut graphics_context,
 			&draw,
 		);
 
-		self.tilemap.render(
+		self.fluidmap.render(
 			&mut graphics_context,
 			&draw,
 		);
