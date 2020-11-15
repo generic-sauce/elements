@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cargo run
+ROCKET_ENV=production cargo run
