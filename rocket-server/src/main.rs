@@ -3,6 +3,7 @@
 #[macro_use] extern crate rocket;
 
 use std::process::Command;
+use std::str;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::http::Status;
 
@@ -41,7 +42,7 @@ fn deploy(event: Option<GithubPushHook>) {
 	match Command::new("bash").arg("-c").arg("./deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
 		Ok(x) => {
 			println!("Deployed.status: {}", x.status);
-			if let Ok(text) = str::from_utf8(x.stdout) {
+			if let Ok(text) = str::from_utf8(&x.stdout) {
 				println!("Deployed.stdout: {}", text);
 			}
 		}
