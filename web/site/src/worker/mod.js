@@ -1,5 +1,19 @@
 import * as inputmod from "./input.js"
-import * as tilemapmod from "./tilemap.js"
+
+self.tilemap_load_callback = null
+self.onmessage = function(e) {
+	const msg = e.data;
+	if (msg.type == "load_tilemap_response") {
+		if (self.tilemap_load_callback) {
+			self.tilemap_load_callback(msg.tilemap);
+			self.tilemap_load_callback = null;
+		} else {
+			console.log("panic!");
+		}
+	} else {
+		console.log("received invalid message at worker/mod.js", msg);
+	}
+}
 
 self.js_init = function(texture_filenames) {
 	console.log("herewego:",texture_filenames);
@@ -25,7 +39,11 @@ self.input_state = function(i) {
 }
 
 self.load_tilemap = function(src, cb) {
-	tilemapmod.load(src, cb)
+	self.postMessage({
+		type: "load_tilemap_request",
+		filename: src,
+	});
+	self.tilemap_load_callback = cb;
 }
 
 import("../../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
