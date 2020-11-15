@@ -14,7 +14,7 @@ fn index() -> &'static str {
 #[post("/deploy")]
 fn deploy() {
 	match Command::new("bash").arg("-c").arg("deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
-		Ok(_) => {}
+		Ok(x) => { println!("Deployed: {:?}", x) }
 		Err(e) => { println!("Error executing deploy.sh: {}", e) }
 	}
 }
