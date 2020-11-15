@@ -39,7 +39,12 @@ fn index() -> &'static str {
 fn deploy(event: Option<GithubPushHook>) {
 	println!("got event: {:?}", event);
 	match Command::new("bash").arg("-c").arg("./deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
-		Ok(x) => { println!("Deployed.status: {}\nDeployed.stdout: {:?}", x.status, x.stdout) }
+		Ok(x) => {
+			println!("Deployed.status: {}", x.status);
+			if let Ok(text) = str::from_utf8(x.stdout) {
+				println!("Deployed.stdout: {}", text);
+			}
+		}
 		Err(e) => { println!("Error executing deploy.sh: {}", e) }
 	}
 }
