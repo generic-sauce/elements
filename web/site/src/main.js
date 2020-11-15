@@ -23,15 +23,19 @@ window.worker.onmessage = function(e) {
 	}
 }
 
-setInterval(function() {
-	if (window.draw) {
-		render_mod.render(window.draw)
-	}
-}, 1000/60)
-
-setInterval(function() {
+function send_input_update() {
 	window.worker.postMessage({
 		type: "input",
 		states: [inputmod.calc_input_state(0), inputmod.calc_input_state(1)],
 	});
-}, 1000/20)
+}
+
+setInterval(function() {
+	send_input_update()
+	if (window.draw) {
+		render_mod.render(window.draw)
+	}
+	send_input_update()
+}, 1000/60)
+
+setInterval(send_input_update, 1000/120)
