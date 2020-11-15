@@ -51,18 +51,19 @@ fn index() -> &'static str {
 #[post("/deploy", data = "<event>")]
 fn deploy(event: Json<GithubPushHook>) {
 	// parse event
-	for commit in &event.commits {
-		println!("commit: {}", commit.message);
-	}
+	let deploy_commit = &event.commits.iter().any(|c| c.message.contains("#deploy"));
 
-	match Command::new("bash").arg("-c").arg("./deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
-		Ok(x) => {
-			println!("Deployed.status: {}", x.status);
-			if let Ok(text) = str::from_utf8(&x.stdout) {
-				println!("Deployed.stdout: {}", text);
+	// TODO: do not call bash script, but use rust bindings
+	if deploy_commit {
+		match Command::new("bash").arg("-c").arg("./deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
+			Ok(x) => {
+				println!("Deployed.status: {}", x.status);
+				if let Ok(text) = str::from_utf8(&x.stdout) {
+					println!("Deployed.stdout: {}", text);
+				}
 			}
+			Err(e) => { println!("Error executing deploy.sh: {}", e) }
 		}
-		Err(e) => { println!("Error executing deploy.sh: {}", e) }
 	}
 }
 
