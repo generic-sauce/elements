@@ -29,6 +29,7 @@
 		setInterval(leaked_cb, 1000 as f64 / fps as f64);
 	}
 
+	// TODO: this web-timer is unused!
 	pub struct Timer { start: f64 }
 
 	fn now() -> f64 {

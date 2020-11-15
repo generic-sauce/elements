@@ -5,8 +5,6 @@ use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 
-pub const TICK_FPS: f64 = 60.0;
-
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
 	pub graphics_backend: B::GraphicsBackend,
@@ -14,8 +12,6 @@ pub struct App<B: Backend> {
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
 	pub menu: Menu<B>,
-	pub timer: Timer,
-	pub tick_counter: u32,
 }
 
 impl<B: Backend> App<B> {
@@ -27,8 +23,6 @@ impl<B: Backend> App<B> {
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
 			menu,
-			timer: Timer::new(),
-			tick_counter: 0,
 		}
 	}
 
@@ -45,36 +39,20 @@ impl<B: Backend> App<B> {
 		self.cursor_position.x = self.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 	}
 
-	fn tick_fps(&self) -> f64 {
-		1000.0 * self.tick_counter as f64 / self.timer.elapsed_ms()
-	}
-
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
-		let framedrop = (0..10).all(|_| {
-			self.peripherals_state.reset();
-			
-			self.fetch_peripherals();
-			self.input_backend.tick();
-			self.update_cursor();
+		self.peripherals_state.reset();
 
-			if self.tick_fps() >= TICK_FPS {
-				return false;
-			}
+		self.fetch_peripherals();
+		self.input_backend.tick();
+		self.update_cursor();
 
-			runnable.tick(self);
-			self.tick_counter += 1;
-			if let Runnable::Menu = runnable {
-				self.tick_menu(runnable);
-			}
+		runnable.tick(self);
 
-			self.audio_backend.tick();
-
-			true
-		});
-
-		if framedrop {
-			println!("App::tick_draw experienced a framedrop.");
+		if let Runnable::Menu = runnable {
+			self.tick_menu(runnable);
 		}
+
+		self.audio_backend.tick();
 
 		self.check_game_over(runnable);
 

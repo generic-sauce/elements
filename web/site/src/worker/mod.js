@@ -15,8 +15,15 @@ self.onmessage = function(e) {
 	}
 }
 
+self.load_tilemap = function(src, cb) {
+	self.postMessage({
+		type: "load_tilemap_request",
+		filename: src,
+	});
+	self.tilemap_load_callback = cb;
+}
+
 self.js_init = function(texture_filenames) {
-	console.log("herewego:",texture_filenames);
 	self.postMessage({
 		type: "init",
 		texture_filenames,
@@ -36,14 +43,6 @@ self.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
 
 self.input_state = function(i) {
 	return inputmod.calc_input_state(i)
-}
-
-self.load_tilemap = function(src, cb) {
-	self.postMessage({
-		type: "load_tilemap_request",
-		filename: src,
-	});
-	self.tilemap_load_callback = cb;
 }
 
 import("../../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
