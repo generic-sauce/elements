@@ -14,11 +14,11 @@ const browserConfig = {
 }
 
 const workerConfig = {
-  entry: "./src/worker/mod.js",
+  entry: "./src/worker.js",
   target: 'webworker',
   output: {
-    path: path.resolve(__dirname, "dist") + "/src/worker",
-    filename: "mod.js" // maybe full path?
+    path: path.resolve(__dirname, "dist") + "/src",
+    filename: "worker.js" // maybe full path?
   },
   mode: "development",
   devServer: {

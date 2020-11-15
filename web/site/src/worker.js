@@ -1,4 +1,8 @@
-import * as inputmod from "./input.js"
+self.input_states = [default_input_state(), default_input_state()];
+
+self.input_state = function(i) {
+	return self.input_states[i];
+}
 
 self.tilemap_load_callback = null
 self.onmessage = function(e) {
@@ -10,6 +14,8 @@ self.onmessage = function(e) {
 		} else {
 			console.log("panic!");
 		}
+	} else if (msg.type == "input") {
+		self.input_states = msg.states;
 	} else {
 		console.log("received invalid message at worker/mod.js", msg);
 	}
@@ -41,8 +47,22 @@ self.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
 	});
 }
 
-self.input_state = function(i) {
-	return inputmod.calc_input_state(i)
+// TODO make non-redundant
+function default_input_state() {
+	return {
+		stick_left: [0, 0],
+		stick_right: [0, 0],
+		dpad: [0.0, 0.0],
+		trigger_left: 0,
+		trigger_right: 0,
+		bumper_right: false,
+		bumper_left: false,
+		button_north: false,
+		button_west: false,
+		button_east: false,
+		button_south: false,
+	};
 }
 
-import("../../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
+
+import("../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
