@@ -2,18 +2,30 @@
 
 #[macro_use] extern crate rocket;
 
+use serde::{Serialize, Deserialize};
 use std::process::Command;
 use std::str;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::http::Status;
+use rocket_contrib::json::Json;
 
 const ELEMENTS_DEPLOY_DIRECTORY: &str = "/home/sauce/elements_deploy";
 
-#[derive(Debug)]
-pub struct GithubPushHook {
+pub enum GithubEvent {
+	Push
 }
 
-impl<'r, 'a> FromRequest<'r, 'a> for GithubPushHook {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GithubPushCommit {
+	pub message: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GithubPushHook {
+	pub commits: Vec<GithubPushCommit>,
+}
+
+impl<'r, 'a> FromRequest<'r, 'a> for GithubEvent {
 	type Error = ();
 
 	fn from_request(request: &'r Request<'a>) -> Outcome<Self, ()> {
@@ -23,7 +35,7 @@ impl<'r, 'a> FromRequest<'r, 'a> for GithubPushHook {
 		}
 
 		let event = match keys[0] {
-			"push" => GithubPushHook {},
+			"push" => GithubEvent::Push {},
 			_ => { return Outcome::Failure((Status::BadRequest, ())) },
 		};
 
@@ -36,9 +48,13 @@ fn index() -> &'static str {
     "This is the elements frontpage. Have fun :3. Go to /elements/game for the game."
 }
 
-#[post("/deploy")]
-fn deploy(event: Option<GithubPushHook>) {
-	println!("got event: {:?}", event);
+#[post("/deploy", data = "<event>")]
+fn deploy(event: Json<GithubPushHook>) {
+	// parse event
+	for commit in &event.commits {
+		println!("commit: {}", commit.message);
+	}
+
 	match Command::new("bash").arg("-c").arg("./deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
 		Ok(x) => {
 			println!("Deployed.status: {}", x.status);
