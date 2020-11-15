@@ -1,28 +1,21 @@
 import * as render_mod from "./render/mod.js"
-import * as inputmod from "./input.js"
-import * as tilemapmod from "./tilemap.js"
 
-window.e2 = {}
+window.draw = null
+window.worker = new Worker("./src/worker/mod.js")
+window.worker.onmessage = function(e) {
+	const msg = e.data;
 
-window.before_init = function() {
+	if (msg.type == "init") {
+		render_mod.init(msg.texture_filenames);
+	} else if (msg.type == "render") {
+		window.draw = msg.draw;
+	} else {
+		console.log("invalid message received at main.js", msg)
+	}
 }
 
-window.js_init = render_mod.init
-
-window.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
-	draw.tilemap_data = tilemap_data
-	draw.fluidmap_data = fluidmap_data
-	draw.vertex_data = vertex_data
-
-	render_mod.render(draw)
-}
-
-window.input_state = function(i) {
-	return inputmod.calc_input_state(i)
-}
-
-window.load_tilemap = function(src, cb) {
-	tilemapmod.load(src, cb)
-}
-
-import("../node_modules/elements/elements.js")
+setInterval(function() {
+	if (window.draw) {
+		render_mod.render(window.draw)
+	}
+}, 1000/60)
