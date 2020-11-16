@@ -23,6 +23,12 @@ impl Color {
 		}
 	}
 
+	pub const fn gray(c: f32) -> Color {
+		Color {
+			r: c, g: c, b: c, a: 1.0,
+		}
+	}
+
 	pub const WHITE: Color = Color::rgb(1.0, 1.0, 1.0);
 	pub const GRAY: Color = Color::rgb(0.2, 0.2, 0.2);
 	pub const BLACK: Color = Color::rgb(0.0, 0.0, 0.0);
