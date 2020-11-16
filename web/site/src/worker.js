@@ -4,6 +4,8 @@ self.input_state = function(i) {
 	return self.input_states[i];
 }
 
+self.date_now = Date.now
+
 self.tilemap_load_callback = null
 self.onmessage = function(e) {
 	const msg = e.data;

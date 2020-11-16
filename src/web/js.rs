@@ -11,6 +11,8 @@ extern {
 
 	#[wasm_bindgen(js_name = "input_state")]
 	fn input_state_js(i: usize) -> JsValue;
+
+	pub fn date_now() -> f64;
 }
 
 pub fn input_state(i: usize) -> RawGamepadState {
