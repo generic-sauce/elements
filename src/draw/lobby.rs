@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn draw_lobby(draw: &mut Draw, _graphics_backend: &dyn GraphicsBackend, elapsed_ms: f32) {
+pub fn draw_lobby(draw: &mut Draw, graphics_backend: &dyn GraphicsBackend, elapsed_ms: f32) {
 	draw.set_clear_color(Color::gray(0.02));
 
 	let t = elapsed_ms / 1000.0;
@@ -8,5 +8,8 @@ pub fn draw_lobby(draw: &mut Draw, _graphics_backend: &dyn GraphicsBackend, elap
 	draw.arc(ViewVec::new(0.5, 0.5), 0.1, Color::WHITE, 0.5, arc_offset);
 	draw.circle(ViewVec::new(0.5, 0.5), 0.08, Color::gray(0.3));
 
-	draw.text(ViewVec::new(0.5, 0.8), 0.07, Color::WHITE, "Waiting for more players...")
+	let text = "Waiting for more players...";
+	let scale = 0.07;
+	let size = graphics_backend.get_text_size(text, scale);
+	draw.text(CanvasVec::center(0.0, 0.3) - size * 0.5, scale, Color::WHITE, text);
 }
