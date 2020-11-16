@@ -52,13 +52,17 @@ impl<B: Backend> Client<B> {
 	}
 
 	pub fn draw(&mut self, app: &mut App<B>) {
+		let mut draw = Draw::new();
+
 		match &self.mode {
-			ClientMode::Lobby => (), // TODO: drawing in lobby phase
+			ClientMode::Lobby => {
+				draw_lobby(&mut draw, app.timer.elapsed_ms() as f32);
+			},
 			ClientMode::InGame { world, .. } => {
-				let mut draw = Draw::new();
 				world.draw(&mut draw);
-				app.graphics_backend.submit(draw);
 			}
 		}
+
+		app.graphics_backend.submit(draw);
 	}
 }

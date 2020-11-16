@@ -18,6 +18,9 @@ pub use color::*;
 mod render;
 pub use render::*;
 
+mod lobby;
+pub use lobby::*;
+
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum Flip {
 	Normal,
@@ -142,6 +145,66 @@ impl Draw {
 		self.fluidmap = Some(DrawFluidmap::new(fluidmap, self.depth_index));
 
 		self.depth_index += 2.0;
+	}
+
+	fn circle_frac_iter(points: u32) -> impl Iterator<Item=(f32, f32)> {
+		let frac = std::f32::consts::PI * 2.0 / points as f32;
+		let i0 = (0..points)
+			.map(move |i| frac * i as f32);
+		let i1 = (0..points)
+			.map(move |i| frac * (i+1) as f32);
+
+		i0.zip(i1)
+	}
+
+	pub fn circle(
+		&mut self,
+		center: impl IntoViewVec,
+		scale: f32,
+		color: Color,
+	) {
+		self.arc(center, scale, color, 1.0, 0.0);
+	}
+
+	pub fn arc(
+		&mut self,
+		center: impl IntoViewVec,
+		scale: f32,
+		color: Color,
+		arc_size: f32,
+		arc_offset: f32,
+	) {
+		let points = 32;
+		let center = center.to_view();
+		let center_uv = TextureVec::new(0.5, 0.5);
+		let arc_offset = arc_offset * std::f32::consts::PI * 2.0;
+		let triangles = &mut self.texture_triangles[TextureId::White as usize];
+
+		for (frac0, frac1) in Self::circle_frac_iter(points) {
+			let frac0 = frac0 * arc_size + arc_offset;
+			let frac1 = frac1 * arc_size + arc_offset;
+
+			let x0 = f32::cos(frac0);
+			let y0 = f32::sin(frac0);
+			let x1 = f32::cos(frac1);
+			let y1 = f32::sin(frac1);
+
+			let point0 = center + CanvasVec::new(x0, y0).to_view() * scale;
+			let point1 = center + CanvasVec::new(x1, y1).to_view() * scale;
+			let uv0 = TextureVec::new(x0, y0) * 0.5 + 0.5;
+			let uv1 = TextureVec::new(x1, y1) * 0.5 + 0.5;
+
+			triangles.push(Triangle {
+				vertices: [
+					Vertex { position: center, uv: center_uv, color },
+					Vertex { position: point0, uv: uv0,       color },
+					Vertex { position: point1, uv: uv1,       color },
+				],
+				depth_index: self.depth_index,
+			});
+		}
+
+		self.depth_index += 1.0;
 	}
 
 	#[allow(unused)]
