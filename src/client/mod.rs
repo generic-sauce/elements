@@ -56,7 +56,7 @@ impl<B: Backend> Client<B> {
 
 		match &self.mode {
 			ClientMode::Lobby => {
-				draw_lobby(&mut draw, app.timer.elapsed_ms() as f32);
+				draw_lobby(&mut draw, now() as f32);
 			},
 			ClientMode::InGame { world, .. } => {
 				world.draw(&mut draw);

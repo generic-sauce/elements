@@ -6,16 +6,8 @@
 			.for_each(move |_| f());
 	}
 
-	pub struct Timer(std::time::Instant);
-
-	impl Timer {
-		pub fn new() -> Self {
-			Self(std::time::Instant::now())
-		}
-
-		pub fn elapsed_ms(&self) -> f64 {
-			self.0.elapsed().as_micros() as f64 / 1000.0
-		}
+	pub fn now() -> f64 {
+		std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.
 	}
 }
 #[cfg(feature = "native-client")] pub use native::*;
@@ -29,24 +21,8 @@
 		setInterval(leaked_cb, 1000 as f64 / fps as f64);
 	}
 
-	// TODO: this web-timer is unused!
-	pub struct Timer { start: f64 }
-
-	fn now() -> f64 {
-		web_sys::window().unwrap()
-			.performance().unwrap()
-			.now()
+	pub fn now() -> f64 {
+		date_now()
 	}
-
-	impl Timer {
-		pub fn new() -> Self {
-			Self { start: now() }
-		}
-
-		pub fn elapsed_ms(&self) -> f64 {
-			now() - self.start
-		}
-	}
-
 }
 #[cfg(feature = "web-client")] pub use web::*;
