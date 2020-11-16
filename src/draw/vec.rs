@@ -53,10 +53,10 @@ impl ViewVec {
 
 #[allow(unused)]
 impl CanvasVec {
-	// pub fn left_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x, y + 1.0) }
-	// pub fn right_bot(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y) }
-	// pub fn right_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y + 1.0) }
-	// pub fn center(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT * 0.5, y + 0.5) }
+	pub fn left_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x, y + 1.0) }
+	pub fn right_bot(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y) }
+	pub fn right_top(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT, y + 1.0) }
+	pub fn center(x: f32, y: f32) -> CanvasVec { CanvasVec::new(x + VIEW_ASPECT * 0.5, y + 0.5) }
 
 	pub fn to_view(self) -> ViewVec { ViewVec::new(self.x / VIEW_ASPECT, self.y) }
 	pub fn to_subpixel(self, window_size: SubPixelVec) -> SubPixelVec { self.to_view().to_subpixel(window_size) }
