@@ -23,7 +23,7 @@ export function init(texture_filenames) {
 export function render(draw) {
 	let clear = draw.clear_color
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT)
 
 	fluidmap_mod.render(draw)
 	tilemap_mod.render(draw)

@@ -57,7 +57,7 @@ export function render(draw) {
 
 	for (let i = 0; i < draw.texts.length; ++i) {
 		const text = draw.texts[i]
-		update_texture(text.left_bot, text.string)
+		update_texture(text.left_bot, text.scale, text.color, text.string)
 
 		const offset = 0
 		const count = 4
@@ -65,11 +65,11 @@ export function render(draw) {
 	}
 }
 
-function update_texture(left_bot, text) {
+function update_texture(left_bot, scale, color, text) {
 	const text_canvas = document.createElement("canvas")
 	const ctx = text_canvas.getContext("2d")
 
-	const font_size = 72
+	const font_size = scale * canvas.height * 2
 	const font = `${font_size}px elements_font`
 	ctx.font = font
 
@@ -81,9 +81,9 @@ function update_texture(left_bot, text) {
 
 	const x = left_bot[0]
 	const y = left_bot[1]
-	const r = 1.0
-	const g = 1.0
-	const b = 1.0
+	const r = color.r
+	const g = color.g
+	const b = color.b
 	const vertices = [
 		x + right, y + bot, 1.0, 0.0, r, g, b,
 		x + right, y + top, 1.0, 1.0, r, g, b,
