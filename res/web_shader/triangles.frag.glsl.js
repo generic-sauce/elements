@@ -8,7 +8,7 @@ varying vec3 color;
 
 void main() {
 	vec4 t = texture2D(tex, uv);
-	if (t.a < .95)
+	if (t.a < .5)
 		discard;
 
 	vec3 c = color * t.rgb;

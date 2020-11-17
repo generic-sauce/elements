@@ -13,11 +13,20 @@ pub struct JsWebRenderDrawFluidmap {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct WebText {
+	pub left_bot: SurfaceVec,
+	pub scale: f32,
+	pub color: Color,
+	pub string: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct JsWebRenderDraw {
 	pub clear_color: Color,
 	pub vertex_counts: Vec<u32>, // number of vertices per texture
 	pub tilemap: Option<JsWebRenderDrawTilemap>,
 	pub fluidmap: Option<JsWebRenderDrawFluidmap>,
+	pub texts: Vec<WebText>,
 }
 
 pub struct WebRenderDraw {
@@ -31,7 +40,7 @@ impl WebRenderDraw {
 	pub fn new(draw: Draw) -> WebRenderDraw {
 		// canvas vec cast because we only need aspect. kinda shady
 		let render_draw = RenderDraw::new(draw, CanvasVec::aspect().cast());
-		let RenderDraw { clear_color, vertex_data, vertex_counts, texts: _, tilemap, fluidmap } = render_draw;
+		let RenderDraw { clear_color, vertex_data, vertex_counts, texts, tilemap, fluidmap } = render_draw;
 
 		let (tilemap, tilemap_data) = match tilemap {
 			Some(RenderDrawTilemap { data, size, depth_value }) => (
@@ -49,11 +58,23 @@ impl WebRenderDraw {
 			None => (None, Uint8Array::new_with_length(0))
 		};
 
+		let mut web_texts = Vec::new();
+		web_texts.extend(
+			texts.into_iter()
+				.map(move |text| WebText {
+					left_bot: text.left_bot.to_surface_correct_aspect(),
+					scale: text.scale,
+					color: text.color,
+					string: text.string,
+				})
+		);
+
 		let js_web_render_draw = JsWebRenderDraw {
 			clear_color,
 			vertex_counts,
 			tilemap,
 			fluidmap,
+			texts: web_texts,
 		};
 		let js_web_render_draw = JsValue::from_serde(&js_web_render_draw).unwrap();
 
