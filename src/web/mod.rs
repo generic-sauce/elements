@@ -16,14 +16,14 @@ pub fn client_main() {
 
 	// TODO
 	// let mut runnable = match &*prompt("menu / local / ip") {
-	let mut runnable = match "" {
+	let mut runnable = match "menu" {
 		"menu" => Runnable::Menu,
 		"" | "local" => Runnable::Local(Local::<WebBackend>::new(0)),
 		ip => Runnable::Client(Client::<WebBackend>::new(ip)),
 	};
 
 	let input_backend = WebInputBackend;
-	let graphics_backend = WebGraphicsBackend;
+	let graphics_backend = WebGraphicsBackend::new();
 	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, runnable.build_menu());
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }

@@ -49,6 +49,23 @@ self.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
 	});
 }
 
+// self.js_get_text_size(text, scale) {
+// 	const text_canvas = document.createElement("canvas")
+// 	const ctx = text_canvas.getContext("2d")
+//
+// 	const font_size = scale * canvas.height * 2
+// 	const font = `${font_size}px elements_font`
+// 	ctx.font = font
+//
+// 	const box = ctx.measureText(text)
+// 	const left = box.actualBoundingBoxLeft   / -canvas.width
+// 	const right = box.actualBoundingBoxRight / canvas.width
+// 	const top = box.actualBoundingBoxAscent  / canvas.height
+// 	const bot = box.actualBoundingBoxDescent / -canvas.height
+//
+// 	return [right - left, top - bot]
+// }
+
 // TODO make non-redundant
 function default_input_state() {
 	return {
