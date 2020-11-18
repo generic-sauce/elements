@@ -69,15 +69,20 @@ function update_texture(left_bot, scale, color, text) {
 	const text_canvas = document.createElement("canvas")
 	const ctx = text_canvas.getContext("2d")
 
-	const font_size = scale * canvas.height * 2
+	const font_size = scale * canvas.height
 	const font = `${font_size}px elements_font`
 	ctx.font = font
 
 	const box = ctx.measureText(text)
-	const left = box.actualBoundingBoxLeft   / -canvas.width
-	const right = box.actualBoundingBoxRight / canvas.width
-	const top = box.actualBoundingBoxAscent  / canvas.height
-	const bot = box.actualBoundingBoxDescent / -canvas.height
+	const le = box.actualBoundingBoxLeft
+	const ri = box.actualBoundingBoxRight
+	const to = box.actualBoundingBoxAscent
+	const bo = box.actualBoundingBoxDescent
+
+	const left  = le / -canvas.width
+	const right = ri /  canvas.width
+	const top   = to /  canvas.height
+	const bot   = bo / -canvas.height
 
 	const x = left_bot[0]
 	const y = left_bot[1]
@@ -94,23 +99,19 @@ function update_texture(left_bot, scale, color, text) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 
-	const width = (right - left) * canvas.width
-	const height = (top - bot) * canvas.height
-
-	text_canvas.width = width
-	text_canvas.height = height
-	text_canvas.style.width = width + "px"
-	text_canvas.style.height = height + "px"
-
-	ctx.font = font
-	ctx.textAlign = "left"
-	ctx.textBaseline = "bottom"
+	text_canvas.width = (ri - le)
+	text_canvas.height = (to + bo)
+	text_canvas.style.width = text_canvas.width + "px"
+	text_canvas.style.height = text_canvas.height + "px"
 
 	ctx.fillStyle = "transparent"
 	ctx.fillRect(0, 0, text_canvas.width, text_canvas.height)
 
+	ctx.font = font
+	ctx.textAlign = "left"
+	ctx.textBaseline = "alphabetic"
 	ctx.fillStyle = "white"
-	ctx.fillText(text, 0, font_size)
+	ctx.fillText(text, 0, to)
 
 	gl.bindTexture(gl.TEXTURE_2D, state.texture)
 	{
