@@ -16,7 +16,7 @@ pub fn client_main() {
 
 	// TODO
 	// let mut runnable = match &*prompt("menu / local / ip") {
-	let mut runnable = match "menu" {
+	let mut runnable = match "" {
 		"menu" => Runnable::Menu,
 		"" | "local" => Runnable::Local(Local::<WebBackend>::new(0)),
 		ip => Runnable::Client(Client::<WebBackend>::new(ip)),

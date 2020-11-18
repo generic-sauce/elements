@@ -66,10 +66,13 @@ export function render(draw) {
 }
 
 function update_texture(left_bot, scale, color, text) {
+	// text = "#jöÖkp"
 	const text_canvas = document.createElement("canvas")
 	const ctx = text_canvas.getContext("2d")
 
-	const font_size = scale * canvas.height
+	// TODO: this is an educated guess
+	const font_size = scale * canvas.height * 2
+	// console.log(scale); alert()
 	const font = `${font_size}px elements_font`
 	ctx.font = font
 
@@ -89,6 +92,7 @@ function update_texture(left_bot, scale, color, text) {
 	const r = color.r
 	const g = color.g
 	const b = color.b
+	// TODO: vertex positions also incorrect
 	const vertices = [
 		x + right, y + bot, 1.0, 0.0, r, g, b,
 		x + right, y + top, 1.0, 1.0, r, g, b,
@@ -101,8 +105,6 @@ function update_texture(left_bot, scale, color, text) {
 
 	text_canvas.width = (ri - le)
 	text_canvas.height = (to + bo)
-	text_canvas.style.width = text_canvas.width + "px"
-	text_canvas.style.height = text_canvas.height + "px"
 
 	ctx.fillStyle = "transparent"
 	ctx.fillRect(0, 0, text_canvas.width, text_canvas.height)
