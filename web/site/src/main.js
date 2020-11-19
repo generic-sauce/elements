@@ -2,12 +2,14 @@ import * as render_mod from "./render/mod.js"
 import * as tilemapmod from "./tilemap.js"
 import * as inputmod from "./input.js"
 
+const answer = prompt("menu / local / ip")
+
 window.draw = null
 window.worker = new Worker("./src/worker.js")
 window.worker.onmessage = function(e) {
 	const msg = e.data;
 
-	if (msg.type == "init") {
+	if (msg.type == "init-response") {
 		render_mod.init(msg.texture_filenames);
 	} else if (msg.type == "render") {
 		window.draw = msg.draw;
@@ -22,6 +24,10 @@ window.worker.onmessage = function(e) {
 		console.log("invalid message received at main.js", msg)
 	}
 }
+window.worker.postMessage({
+	type: "init-request",
+	answer
+});
 
 function send_input_update() {
 	window.worker.postMessage({
@@ -29,6 +35,7 @@ function send_input_update() {
 		states: [inputmod.calc_input_state(0), inputmod.calc_input_state(1)],
 	});
 }
+
 
 setInterval(function() {
 	send_input_update()
