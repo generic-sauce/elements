@@ -12,7 +12,7 @@ self.tilemap_load_callback = null
 self.onmessage = function(e) {
 	const msg = e.data;
 	if (msg.type == "init-request") {
-		rust.then(rst => rust.client_main(msg.answer))
+		rust.then(rust => rust.client_main(msg.answer))
 	} else if (msg.type == "load_tilemap_response") {
 		if (self.tilemap_load_callback) {
 			self.tilemap_load_callback(msg.tilemap);
