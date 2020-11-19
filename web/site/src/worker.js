@@ -1,3 +1,5 @@
+const rust = import("../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
+
 self.input_states = [default_input_state(), default_input_state()];
 
 self.input_state = function(i) {
@@ -9,7 +11,9 @@ self.date_now = Date.now
 self.tilemap_load_callback = null
 self.onmessage = function(e) {
 	const msg = e.data;
-	if (msg.type == "load_tilemap_response") {
+	if (msg.type == "init-request") {
+		rust.then(rst => rust.client_main(msg.answer))
+	} else if (msg.type == "load_tilemap_response") {
 		if (self.tilemap_load_callback) {
 			self.tilemap_load_callback(msg.tilemap);
 			self.tilemap_load_callback = null;
@@ -33,7 +37,7 @@ self.load_tilemap = function(src, cb) {
 
 self.js_init = function(texture_filenames) {
 	self.postMessage({
-		type: "init",
+		type: "init-response",
 		texture_filenames,
 	});
 }
@@ -65,6 +69,3 @@ function default_input_state() {
 		button_south: false,
 	};
 }
-
-
-import("../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
