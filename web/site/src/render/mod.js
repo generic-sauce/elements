@@ -1,13 +1,14 @@
 import * as fluidmap_mod from "./fluidmap/mod.js"
 import * as tilemap_mod from "./tilemap/mod.js"
 import * as triangles_mod from "./triangles/mod.js"
+import * as text_mod from "./text/mod.js"
 
 export function init(texture_filenames) {
 	window.canvas = document.getElementById("canvas");
 	window.gl = canvas.getContext("webgl");
 
 	// gl.enable(gl.DEPTH_TEST)
-	gl.depthFunc(gl.LESS)
+	// gl.depthFunc(gl.LESS)
 
 	onresize = update_canvas_size
 	update_canvas_size()
@@ -15,16 +16,19 @@ export function init(texture_filenames) {
 	fluidmap_mod.init()
 	tilemap_mod.init()
 	triangles_mod.init(texture_filenames)
+	text_mod.init()
 }
 
+// TODO render might be called to early
 export function render(draw) {
 	let clear = draw.clear_color
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT)
 
 	fluidmap_mod.render(draw)
 	tilemap_mod.render(draw)
 	triangles_mod.render(draw)
+	text_mod.render(draw)
 }
 
 function update_canvas_size() {

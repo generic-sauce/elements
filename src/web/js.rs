@@ -7,6 +7,7 @@ extern {
 	// pub fn draw_render_world(rw: JsValue, tilemap_data: Uint8Array, fluidmap_data: Uint8Array);
 	pub fn js_init(texture_filenames: JsValue);
 	pub fn js_render(draw: JsValue, tilemap_data: Uint8Array, fluidmap_data: Uint8Array, vertex_data: Uint8Array);
+	// pub fn js_get_text_size(text: JsValue, scale: JsValue) -> JsValue;
 	pub fn load_tilemap(name: &str, closure: &Closure<dyn FnMut(JsValue)>);
 
 	#[wasm_bindgen(js_name = "input_state")]
