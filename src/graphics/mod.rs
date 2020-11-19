@@ -35,7 +35,6 @@ pub struct Graphics {
 	tilemap: RenderTilemap,
 	fluidmap: RenderFluidmap,
 	text: RenderText,
-	timer: Timer,
 }
 
 fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, window_size: PixelVec) -> wgpu::SwapChain {
@@ -89,8 +88,6 @@ impl Graphics {
 		let fluidmap = RenderFluidmap::new(&device);
 		let text = RenderText::new(&device);
 
-		let timer = Timer::new();
-
 		Graphics {
 			instance,
 			surface,
@@ -104,7 +101,6 @@ impl Graphics {
 			tilemap,
 			fluidmap,
 			text,
-			timer,
 		}
 	}
 
@@ -142,7 +138,6 @@ impl Graphics {
 			self.window_size,
 			&self.depth_texture_view,
 			draw.clear_color.to_wgpu(),
-			self.timer.elapsed_ms() as f32,
 		);
 
 		self.triangles.render(

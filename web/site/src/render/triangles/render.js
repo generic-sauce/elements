@@ -7,11 +7,11 @@ export function render(draw) {
 	gl.bufferData(gl.ARRAY_BUFFER, draw.vertex_data, gl.STATIC_DRAW)
 
 	{ // vertex_position
-		const count = 3;
-		const type = gl.FLOAT;
-		const normalize = false;
-		const stride = 8 * 4;
-		const offset = 0 * 4;
+		const count = 2
+		const type = gl.FLOAT
+		const normalize = false
+		const stride = 8 * 4
+		const offset = 0 * 4
 		gl.vertexAttribPointer(
 			state.locations.vertex_position,
 			count,
@@ -19,16 +19,16 @@ export function render(draw) {
 			normalize,
 			stride,
 			offset
-		);
-		gl.enableVertexAttribArray(state.locations.vertex_position);
+		)
+		gl.enableVertexAttribArray(state.locations.vertex_position)
 	}
 
 	{ // vertex_uv
-		const count = 2;
-		const type = gl.FLOAT;
-		const normalize = false;
-		const stride = 8 * 4;
-		const offset = 3 * 4;
+		const count = 2
+		const type = gl.FLOAT
+		const normalize = false
+		const stride = 8 * 4
+		const offset = 3 * 4
 		gl.vertexAttribPointer(
 			state.locations.vertex_uv,
 			count,
@@ -36,16 +36,16 @@ export function render(draw) {
 			normalize,
 			stride,
 			offset
-		);
-		gl.enableVertexAttribArray(state.locations.vertex_uv);
+		)
+		gl.enableVertexAttribArray(state.locations.vertex_uv)
 	}
 
 	{ // vertex_color
-		const count = 3;
-		const type = gl.FLOAT;
-		const normalize = false;
-		const stride = 8 * 4;
-		const offset = 5 * 4;
+		const count = 3
+		const type = gl.FLOAT
+		const normalize = false
+		const stride = 8 * 4
+		const offset = 5 * 4
 		gl.vertexAttribPointer(
 			state.locations.vertex_color,
 			count,
@@ -53,8 +53,8 @@ export function render(draw) {
 			normalize,
 			stride,
 			offset
-		);
-		gl.enableVertexAttribArray(state.locations.vertex_color);
+		)
+		gl.enableVertexAttribArray(state.locations.vertex_color)
 	}
 
 	let offset = 0
