@@ -31,6 +31,7 @@ macro_rules! setup {
 setup!(
 	Unknown: "images/checkerboard.png",
 	White: "images/white.png",
+	Trophy: "images/trophy/trophy.png",
 );
 
 impl TextureId {

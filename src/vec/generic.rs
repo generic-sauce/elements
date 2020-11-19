@@ -265,4 +265,8 @@ impl<T: Primitive, P> Vec2t<T, P> {
 		}
 		other * self.dot(other) / other.dot(other)
 	}
+
+	pub fn mix(self, other: Vec2t<T, P>, self_weight: T, other_weight: T) -> Vec2t<T, P> {
+		self * self_weight + other * other_weight / (self_weight + other_weight)
+	}
 }

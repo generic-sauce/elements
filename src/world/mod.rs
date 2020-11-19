@@ -19,17 +19,25 @@ pub use update::*;
 use crate::prelude::*;
 
 pub const RESTART_DELAY_COUNT: u32 = 120;
+pub const TROPHY_END_COUNT: u32 = 180;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub enum Winner {
+	None,
+	Both,
+	One(u32),
+}
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum RestartState {
 	Game,
-	Restart { counter: u32, tick_value: f32 },
+	Restart { counter: u32, tick_value: f32, winner: Winner },
 }
 
 impl RestartState {
 	pub fn new_restart() -> RestartState {
-		RestartState::Restart { counter: 0, tick_value: 1.0 }
+		RestartState::Restart { counter: 0, tick_value: 1.0, winner: Winner::None }
 	}
 }
 
@@ -94,27 +102,34 @@ impl World {
 				}
 				self.frame_id += 1;
 			},
-			RestartState::Restart { counter, tick_value } => {
+			RestartState::Restart { counter, tick_value, winner } => {
 				*counter += 1;
 				*tick_value += get_frame_tick_probability(*counter);
 				if *counter == RESTART_DELAY_COUNT {
 					for i in 0..self.players.len() {
 						if self.players[i].health == 0 {
-							self.kills[1-i] += 1;
+							let winner_id = 1 - i;
+							if matches!(*winner, Winner::One(_)) {
+								*winner = Winner::Both;
+							} else {
+								*winner = Winner::One(winner_id as u32);
+							}
+							self.kills[winner_id] += 1;
 						}
 					}
-				} else if *counter > RESTART_DELAY_COUNT {
+				} else if *counter > TROPHY_END_COUNT {
 					if self.players.iter().any(|p| p.input.restart()) {
 						self.reset(handler);
 						self.restart_state = RestartState::Game;
 					}
+				} else if *counter > RESTART_DELAY_COUNT {
+
 				} else if *tick_value >= 1.0 {
 					*tick_value -= 1.0;
 					self.tick_impl(handler);
 				}
 			}
 		}
-
 	}
 
 	fn tick_impl(&mut self, handler: &mut impl EventHandler) {
