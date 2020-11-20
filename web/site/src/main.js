@@ -36,13 +36,16 @@ function send_input_update() {
 	});
 }
 
-
-setInterval(function() {
+function draw_fn() {
 	send_input_update()
 	if (window.draw) {
 		render_mod.render(window.draw)
 	}
 	send_input_update()
-}, 1000/60)
+
+	requestAnimationFrame(draw_fn)
+}
+
+requestAnimationFrame(draw_fn)
 
 setInterval(send_input_update, 1000/120)
