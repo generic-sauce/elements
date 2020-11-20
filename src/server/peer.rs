@@ -49,9 +49,9 @@ impl PeerManager {
 			// web
 			match listener.accept().map_err(|e| e.kind()) {
 				Ok((stream, recv_addr)) => {
-					let mut tung = acceptor.accept(stream).unwrap();
-					tung.get_mut().set_nonblocking(true).unwrap();
-					let tung = TungSocket::from_raw_socket(tung, Role::Server, None);
+					let mut tls_stream = acceptor.accept(stream).unwrap();
+					tls_stream.get_mut().set_nonblocking(true).unwrap();
+					let tung = tungstenite::server::accept(tls_stream).unwrap();
 					peers.push(Peer::Web(tung));
 
 					println!("new player joined {}", recv_addr);
