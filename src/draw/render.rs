@@ -26,6 +26,7 @@ impl RenderDraw {
 		let Draw { clear_color, depth_index, texture_triangles, texts, tilemap, fluidmap } = draw;
 
 		let clear_color = clear_color.unwrap_or(Color::BLACK);
+
 		let mut vertex_counts = Vec::new();
 		let mut vertex_data = Vec::new();
 

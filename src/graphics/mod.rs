@@ -129,6 +129,12 @@ impl Graphics {
 		});
 
 		let draw = RenderDraw::new(draw, self.window_size.to_subpixel());
+		let clear_color = Color::rgba(
+			f32::powf(draw.clear_color.r, 2.2),
+			f32::powf(draw.clear_color.g, 2.2),
+			f32::powf(draw.clear_color.b, 2.2),
+			draw.clear_color.a,
+		).to_wgpu();
 
 		let mut graphics_context = GraphicsContext::new(
 			&self.device,
@@ -137,7 +143,7 @@ impl Graphics {
 			&mut encoder,
 			self.window_size,
 			&self.depth_texture_view,
-			draw.clear_color.to_wgpu(),
+			clear_color,
 		);
 
 		self.triangles.render(
