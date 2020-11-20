@@ -59,7 +59,7 @@ impl<B: Backend> Client<B> {
 				draw_lobby(&mut draw, &app.graphics_backend);
 			},
 			ClientMode::InGame { world, .. } => {
-				world.draw(&mut draw);
+				world.draw(&mut draw, app);
 			}
 		}
 

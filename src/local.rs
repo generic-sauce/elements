@@ -44,7 +44,7 @@ impl<B: Backend> Local<B> {
 			LocalMode::LoadingTileMap { .. } => {} // TODO
 			LocalMode::InGame(world) => {
 				let mut draw = Draw::new();
-				world.draw(&mut draw);
+				world.draw(&mut draw, app);
 				app.graphics_backend.submit(draw);
 			}
 		}
