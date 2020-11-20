@@ -2,7 +2,9 @@
 
 ../web/build.sh
 (cd ../web/site; npx webpack)
-rm -r static
+if [ -d static ]; then
+	rm -r static
+fi
 mkdir static
 cp -r ../res static
 cp ../web/site/index.html static
