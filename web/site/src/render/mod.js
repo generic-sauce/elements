@@ -7,9 +7,6 @@ export function init(texture_filenames) {
 	window.canvas = document.getElementById("canvas");
 	window.gl = canvas.getContext("webgl");
 
-	// gl.enable(gl.DEPTH_TEST)
-	// gl.depthFunc(gl.LESS)
-
 	onresize = update_canvas_size
 	update_canvas_size()
 
