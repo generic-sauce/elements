@@ -7,7 +7,7 @@ pub use {
 		rc::Rc,
 		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
 		collections::{HashMap, HashSet},
-		io::{BufReader, ErrorKind},
+		io::{Read, BufReader, ErrorKind},
 		fs::File,
 		any::Any,
 		marker::PhantomData,
@@ -69,9 +69,11 @@ pub use {
 };
 
 // server (or native-client)
-#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
+#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
 #[cfg(feature = "server")] pub use {
+	std::sync::Arc,
 	tungstenite::Message,
+	native_tls::{Identity, TlsAcceptor},
 	crate::{
 		timed_loop::*,
 		server::*

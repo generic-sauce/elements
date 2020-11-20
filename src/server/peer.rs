@@ -27,6 +27,14 @@ impl PeerManager {
 
 		let mut silent_frames = 0;
 
+		let mut file = File::open("/root/identity.pfx").unwrap();
+		let mut identity = vec![];
+		file.read_to_end(&mut identity).unwrap();
+		let identity = Identity::from_pkcs12(&identity, "hunter2").unwrap();
+
+		let acceptor = TlsAcceptor::new(identity).unwrap();
+		let acceptor = Arc::new(acceptor);
+
 		for _ in TimedLoop::with_fps(JOIN_FPS) {
 			// native
 			if let Some((Init::Init, recv_addr)) = recv_packet(&mut udp_socket) {
@@ -41,8 +49,9 @@ impl PeerManager {
 			// web
 			match listener.accept().map_err(|e| e.kind()) {
 				Ok((stream, recv_addr)) => {
-					let mut tung = tungstenite::server::accept(stream).unwrap();
+					let mut tung = acceptor.accept(stream).unwrap();
 					tung.get_mut().set_nonblocking(true).unwrap();
+					let tung = tungstenite::server::accept(tung).unwrap();
 					peers.push(Peer::Web(tung));
 
 					println!("new player joined {}", recv_addr);
