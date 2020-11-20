@@ -69,7 +69,8 @@ pub use {
 };
 
 // server (or native-client)
-#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
+#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
+#[cfg(feature = "server")] pub type TungTlsSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
 #[cfg(feature = "server")] pub use {
 	std::sync::Arc,
 	tungstenite::{protocol::Role, Message},
