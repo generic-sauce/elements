@@ -3,7 +3,8 @@ pub use go::*;
 
 use crate::prelude::*;
 
-pub const PORT: u16 = 7575;
+pub const PORT: u16 = 7575; // HTTP / UDP
+pub const HTTPS_PORT: u16 = 7576; // HTTPS
 
 pub trait Packet: Serialize + DeserializeOwned {}
 

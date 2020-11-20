@@ -22,7 +22,7 @@ impl PeerManager {
 		udp_socket.set_nonblocking(true).unwrap();
 
 		// web
-		let listener = TcpListener::bind(("0.0.0.0", PORT)).expect("Could not create server tcp-listener");
+		let listener = TcpListener::bind(("0.0.0.0", HTTPS_PORT)).expect("Could not create server tcp-listener");
 		listener.set_nonblocking(true).unwrap();
 
 		let mut silent_frames = 0;

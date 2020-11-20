@@ -8,7 +8,7 @@ use crate::prelude::*;
 
 pub trait SocketBackend {
 	fn new(server_ip: &str) -> Self;
-	fn is_open(&self) -> bool;
+	fn is_open(&mut self) -> bool;
 	fn send(&mut self, packet: &impl Packet);
 	fn try_recv<P: Packet>(&mut self) -> Option<P>;
 }
