@@ -30,7 +30,7 @@ impl PeerManager {
 		let mut file = File::open("/root/identity.pfx").unwrap();
 		let mut identity = vec![];
 		file.read_to_end(&mut identity).unwrap();
-		let identity = Identity::from_pkcs12(&identity, "hunter2").unwrap();
+		let identity = Identity::from_pkcs12(&identity, "").unwrap();
 
 		let acceptor = TlsAcceptor::new(identity).unwrap();
 		let acceptor = Arc::new(acceptor);
