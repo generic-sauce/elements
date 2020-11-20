@@ -76,10 +76,18 @@ fn main() {
 				window.request_redraw();
 			},
 			win::Event::RedrawRequested { .. } => {
-				match draw_receiver.try_recv() {
-					Ok(draw) => graphics.render(draw),
-					Err(TryRecvError::Empty) => {},
-					e @ Err(TryRecvError::Disconnected) => { e.unwrap(); },
+				let mut opt_draw = None;
+
+				loop {
+					match draw_receiver.try_recv() {
+						Ok(draw) => opt_draw = Some(draw),
+						Err(TryRecvError::Empty) => break,
+						e @ Err(TryRecvError::Disconnected) => { e.unwrap(); },
+					}
+				}
+
+				if let Some(draw) = opt_draw {
+					graphics.render(draw);
 				}
 			},
 			_ => ()
