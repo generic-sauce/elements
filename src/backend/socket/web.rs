@@ -10,7 +10,7 @@ impl SocketBackend for WebSocketBackend {
 	fn new(server_ip: &str) -> Self {
 		let (sender, receiver) = channel();
 
-		let socket = WebSocket::new(&format!("ws://{}:{}", server_ip, PORT)).unwrap();
+		let socket = WebSocket::new(&format!("wss://{}:{}", server_ip, PORT)).unwrap();
 		socket.set_binary_type(web_sys::BinaryType::Arraybuffer);
 
 		let closure = Closure::<dyn Fn(web_sys::MessageEvent)>::wrap(Box::new(move |ev| {
