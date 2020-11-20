@@ -1,14 +1,14 @@
 use super::*;
 
 const TROPHY_SIZE: CanvasVec = CanvasVec::new(0.05, 0.05);
-const TROPHY_SHOW_START: u32 = 100;
+const TROPHY_SHOW_START: u32 = 115;
 const WINNER_POSITIONS: [ViewVec; 2] = [ViewVec::new(0.0, 0.9), ViewVec::new(1.0, 0.9)];
 
 impl World {
 	pub fn draw(&self, draw: &mut Draw) {
 		let sky_color = match self.restart_state {
 			RestartState::Restart { counter, .. } => {
-				let rdc = RESTART_DELAY_COUNT as f32;
+				let rdc = FIGHT_END_COUNT as f32;
 				let counter = counter as f32;
 				let factor = (rdc - counter.min(rdc) * 0.9) / rdc;
 				Color::rgb(
@@ -41,11 +41,17 @@ impl World {
 	}
 }
 
+fn trophy_position_curve(mix: f32) -> f32 {
+	// (f32::sin((mix+1.5) * std::f32::consts::PI) + 1.0) * 0.5
+	f32::sin(0.5*mix*std::f32::consts::PI).powf(3.0)
+}
+
 fn draw_trophy(draw: &mut Draw, world: &World) {
 	let trophy_start_position: ViewVec = world.tilemap.size.to_game().to_view() / 2.0;
 	let trophy_size = TROPHY_SIZE.to_view();
 	if let RestartState::Restart { winner, counter, .. } = world.restart_state {
-		let trophy_position_mix: f32 = ((counter as f32 - RESTART_DELAY_COUNT as f32) / (TROPHY_END_COUNT as f32 - RESTART_DELAY_COUNT as f32)).min(1.0).max(0.0);
+		let trophy_position_mix: f32 = ((counter as f32 - FIGHT_END_COUNT as f32) / (TROPHY_END_COUNT as f32 - FIGHT_END_COUNT as f32)).min(1.0).max(0.0);
+		let trophy_position_mix = trophy_position_curve(trophy_position_mix);
 		match winner {
 			Winner::None => {
 				if counter >= TROPHY_SHOW_START {
@@ -57,9 +63,9 @@ fn draw_trophy(draw: &mut Draw, world: &World) {
 				draw.texture(pos - trophy_size, pos + trophy_size, TextureId::Trophy, Flip::Normal, None);
 			}
 			Winner::Both => {
-				let pos = trophy_start_position.mix(WINNER_POSITIONS[0], 1.0 - trophy_position_mix, trophy_position_mix);;
+				let pos = trophy_start_position.mix(WINNER_POSITIONS[0], 1.0 - trophy_position_mix, trophy_position_mix);
 				draw.texture(pos - trophy_size, pos + trophy_size, TextureId::Trophy, Flip::Normal, None);
-				let pos = trophy_start_position.mix(WINNER_POSITIONS[1], 1.0 - trophy_position_mix, trophy_position_mix);;
+				let pos = trophy_start_position.mix(WINNER_POSITIONS[1], 1.0 - trophy_position_mix, trophy_position_mix);
 				draw.texture(pos - trophy_size, pos + trophy_size, TextureId::Trophy, Flip::Normal, None);
 			}
 		}

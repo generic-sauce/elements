@@ -18,8 +18,8 @@ pub use update::*;
 
 use crate::prelude::*;
 
-pub const RESTART_DELAY_COUNT: u32 = 120;
-pub const TROPHY_END_COUNT: u32 = 180;
+pub const FIGHT_END_COUNT: u32 = 120;
+pub const TROPHY_END_COUNT: u32 = 160;
 const FLUID_DAMAGE_RADIUS: i32 = TILESIZE * 3 / 2;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -42,7 +42,7 @@ impl RestartState {
 }
 
 pub fn get_frame_tick_probability(counter: u32) -> f32 {
-	1.0 - counter as f32 / RESTART_DELAY_COUNT as f32
+	1.0 - counter as f32 / FIGHT_END_COUNT as f32
 }
 
 #[derive(Serialize, Deserialize)]
@@ -105,7 +105,7 @@ impl World {
 			RestartState::Restart { counter, tick_value, winner } => {
 				*counter += 1;
 				*tick_value += get_frame_tick_probability(*counter);
-				if *counter == RESTART_DELAY_COUNT {
+				if *counter == FIGHT_END_COUNT {
 					for i in 0..self.players.len() {
 						if self.players[i].health == 0 {
 							let winner_id = 1 - i;
@@ -122,7 +122,7 @@ impl World {
 						self.reset(handler);
 						self.restart_state = RestartState::Game;
 					}
-				} else if *counter > RESTART_DELAY_COUNT {
+				} else if *counter > FIGHT_END_COUNT {
 
 				} else if *tick_value >= 1.0 {
 					*tick_value -= 1.0;
