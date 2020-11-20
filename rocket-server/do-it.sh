@@ -1,6 +1,6 @@
 #!/bin/bash
 
-../web/build.sh
+(cd ../web/; ./build.sh)
 (cd ../web/site; npx webpack)
 if [ -d static ]; then
 	rm -r static
