@@ -27,7 +27,7 @@ fn index() -> &'static str {
     "This is the elements frontpage. Have fun :3. Go to /elements/game for the game."
 }
 
-#[post("/deploy", data = "<event>")]
+#[post("/", data = "<event>")]
 fn deploy(sender: State<Arc<Mutex<Sender<()>>>>, event: Json<GithubPushHook>) {
 	// parse event
 	let deploy_commit = &event.commits.iter().any(|c| c.message.contains("#deploy"));
@@ -59,5 +59,9 @@ fn main() {
 		}
 	});
 
-    rocket::ignite().manage(Arc::new(Mutex::new(sender))).mount("/elements", routes![index, deploy]).launch();
+    rocket::ignite()
+		.manage(Arc::new(Mutex::new(sender)))
+		.mount("/elements", routes![index])
+		.mount("/deploy", routes![deploy])
+		.launch();
 }
