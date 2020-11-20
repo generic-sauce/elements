@@ -130,7 +130,7 @@ fn tung_recv_packet<P: Packet>(socket: &mut TungSocket) -> Option<P> {
 				}
 				panic!("recv error (1)");
 			}
-			Err(_) => panic!("recv error (2)"),
+			e @ Err(_) => { e.unwrap(); unreachable!(); },
 		};
 		let p = deser::<P>(&bytes[..]);
 		return Some(p);
