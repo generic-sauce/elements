@@ -72,7 +72,7 @@ pub use {
 #[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
 #[cfg(feature = "server")] pub use {
 	std::sync::Arc,
-	tungstenite::Message,
+	tungstenite::{protocol::Role, Message},
 	native_tls::{Identity, TlsAcceptor},
 	crate::{
 		timed_loop::*,
