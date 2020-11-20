@@ -25,3 +25,4 @@
 # rocket-server
 /rocket-server/target
 /rocket-server/Rocket.toml
+/rocket-server/static

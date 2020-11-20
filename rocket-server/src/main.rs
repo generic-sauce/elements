@@ -9,6 +9,7 @@ use rocket_contrib::json::Json;
 use std::sync::mpsc::{channel, Sender};
 use rocket::State;
 use std::sync::{Arc, Mutex};
+use rocket_contrib::serve::StaticFiles;
 
 const ELEMENTS_DEPLOY_DIRECTORY: &str = "/home/sauce/elements_deploy";
 
@@ -61,7 +62,7 @@ fn main() {
 
     rocket::ignite()
 		.manage(Arc::new(Mutex::new(sender)))
-		.mount("/elements", routes![index])
+		.mount("/elements", StaticFiles::from("./static"))
 		.mount("/deploy", routes![deploy])
 		.launch();
 }
