@@ -13,3 +13,4 @@ cargo run --release menu
 # server compilation
 cargo run --release --no-default-features --features=server
 ```
+
