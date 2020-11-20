@@ -23,11 +23,6 @@ pub struct GithubPushHook {
 	pub commits: Vec<GithubPushCommit>,
 }
 
-#[get("/")]
-fn index() -> &'static str {
-    "This is the elements frontpage. Have fun :3. Go to /elements/game for the game."
-}
-
 #[post("/", data = "<event>")]
 fn deploy(sender: State<Arc<Mutex<Sender<()>>>>, event: Json<GithubPushHook>) {
 	// parse event
@@ -62,7 +57,7 @@ fn main() {
 
     rocket::ignite()
 		.manage(Arc::new(Mutex::new(sender)))
-		.mount("/elements", StaticFiles::from("./static"))
 		.mount("/deploy", routes![deploy])
+		.mount("/", StaticFiles::from("./static"))
 		.launch();
 }
