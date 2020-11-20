@@ -62,6 +62,7 @@ impl SocketBackend for WebSocketBackend {
 			Ok(_) => {
 				if self.https {
 					// fallback to http
+					self.socket.close().unwrap();
 					*self = Self::new_by_protocol(&self.server_ip, false);
 				} else {
 					panic!("Could not connect even with http");
