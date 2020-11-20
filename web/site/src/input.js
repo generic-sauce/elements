@@ -5,7 +5,6 @@ export function calc_input_state(i) {
 
 	// fallback!
 	if (!gp) {
-	    console.log("default");
 		return default_input_state();
 	}
 
@@ -36,12 +35,12 @@ export function calc_input_state(i) {
 	{
 		if (chrome) dpad = [gp.buttons[15].value - gp.buttons[14].value, gp.buttons[12].value - gp.buttons[13].value];
 		else dpad = [gp.axes[6], -gp.axes[7]];
+
+		if (!dpad[0]) { dpad[0] = 0; }
+		if (!dpad[1]) { dpad[1] = 0; }
 	}
 
-	if (!dpad[0]) { dpad[0] = 0; }
-	if (!dpad[1]) { dpad[1] = 0; }
-
-	let result = {
+	const result = {
 		stick_left,
         stick_right,
 		trigger_left,
@@ -55,7 +54,6 @@ export function calc_input_state(i) {
 		button_east: false,
 		button_south: false,
 	};
-    console.log(result);
 	return result;
 }
 
