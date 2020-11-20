@@ -4,6 +4,7 @@
 
 use serde::{Serialize, Deserialize};
 use std::process::Command;
+use std::os::unix::process::CommandExt;
 use std::{str, thread};
 use rocket_contrib::json::Json;
 use std::sync::mpsc::{channel, Sender};
@@ -26,10 +27,10 @@ pub struct GithubPushHook {
 #[post("/", data = "<event>")]
 fn deploy(sender: State<Arc<Mutex<Sender<()>>>>, event: Json<GithubPushHook>) {
 	// parse event
-	let deploy_commit = &event.commits.iter().any(|c| c.message.contains("#deploy"));
+	let deploy_commit = event.commits.iter().any(|c| c.message.contains("#deploy"));
 
 	// TODO: do not call bash script, but use rust bindings
-	if *deploy_commit {
+	if deploy_commit {
 		sender.lock()
 			.unwrap()
 			.send(())
@@ -43,7 +44,12 @@ fn main() {
 	thread::spawn(move || {
 		loop {
 			receiver.recv().unwrap();
-			match Command::new("bash").arg("-c").arg("./deploy.sh").current_dir(ELEMENTS_DEPLOY_DIRECTORY).output() {
+			let mut command = Command::new("bash");
+			command.arg("-c").arg("./deploy.sh")
+				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
+				.uid(1000);
+
+			match command.output() {
 				Ok(x) => {
 					println!("Deployed.status: {}", x.status);
 					if let Ok(text) = str::from_utf8(&x.stdout) {
