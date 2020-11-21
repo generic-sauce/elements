@@ -16,7 +16,6 @@ export function init(texture_filenames) {
 	text_mod.init()
 }
 
-// TODO render might be called to early
 export function render(draw) {
 	let clear = draw.clear_color
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)

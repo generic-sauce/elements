@@ -7,7 +7,7 @@ export function render(draw) {
 	gl.useProgram(state.program)
 
 	update_fluidmap_tex(draw)
-	gl.uniform1f(state.locations.elapsed_time, 0) // TODO
+	gl.uniform1f(state.locations.elapsed_time, performance.now() / 1000)
 
 	const depth = draw.fluidmap.depth_value
 	const vertices = [
