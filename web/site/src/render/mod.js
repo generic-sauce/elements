@@ -30,5 +30,14 @@ export function render(draw) {
 function update_canvas_size() {
 	canvas.width = window.innerWidth
 	canvas.height = window.innerHeight
+
+	let ratio = (canvas.width / canvas.height) / (16 / 9)
+	console.log(ratio)
+	if (ratio > 1.0) {
+		canvas.width /= ratio
+	} else {
+		canvas.height *= ratio
+	}
+
 	gl.viewport(0, 0, canvas.width, canvas.height)
 }
