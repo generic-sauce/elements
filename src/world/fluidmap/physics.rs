@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 impl Fluid {
 	pub(in super) fn move_and_slide(&mut self, mut remaining_vel: GameVec, t: &TileMap) {
-		if t.check_solid(self.position) {
+		if check_solid(self.position, self, t) {
 			#[cfg(debug_assertions)]
 			println!("A fluid is glitched.");
 			return;
@@ -27,8 +27,8 @@ impl Fluid {
 				let change = GameVec::new(xroute, ychange);
 
 				let change_ex = change + (remaining_vel.x.signum(), 0);
-				if t.check_solid(self.position + change_ex) {
-					assert!(!t.check_solid(self.position + change));
+				if check_solid(self.position + change_ex, self, t) {
+					assert!(!check_solid(self.position + change, self, t));
 
 					remaining_vel -= change;
 					self.position += change;
@@ -46,8 +46,8 @@ impl Fluid {
 				let change = GameVec::new(xchange, yroute);
 
 				let change_ex = change + (0, remaining_vel.y.signum());
-				if t.check_solid(self.position + change_ex) {
-					assert!(!t.check_solid(self.position + change));
+				if check_solid(self.position + change_ex, self, t) {
+					assert!(!check_solid(self.position + change, self, t));
 
 					remaining_vel -= change;
 					self.position += change;
@@ -69,6 +69,14 @@ fn route(velocity: i32, pos: i32) -> i32 {
 		-(pos % TILESIZE)
 	} else {
 		(TILESIZE-1) - (pos % TILESIZE)
+	}
+}
+
+fn check_solid(position: GameVec, f: &Fluid, t: &TileMap) -> bool {
+	let tile = t.get(position.to_tile());
+	match tile {
+		Tile::Wall { owner, .. } if owner == f.owner && f.state == FluidState::AtHand { friendly_glitched: true } => false,
+		_ => t.check_solid(position),
 	}
 }
 

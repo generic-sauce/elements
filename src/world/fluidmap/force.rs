@@ -13,7 +13,7 @@ impl FluidMap {
 		// gravity
 		let mut velocity = f.velocity - GameVec::new(0, FLUID_GRAVITY);
 
-		if let FluidState::AtHand = f.state {
+		if let FluidState::AtHand { .. } = f.state {
 			let cursor = players[f.owner].cursor_position();
 			apply_cursor_steering(&mut velocity, &f, cursor);
 		}
@@ -22,7 +22,7 @@ impl FluidMap {
 		let velocity = velocity.map(
 			match f.state {
 				FluidState::Free => free_drag,
-				FluidState::AtHand => hand_drag,
+				FluidState::AtHand { .. } => hand_drag,
 			}
 		);
 
