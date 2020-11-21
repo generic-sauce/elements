@@ -32,7 +32,6 @@ function update_canvas_size() {
 	canvas.height = window.innerHeight
 
 	let ratio = (canvas.width / canvas.height) / (16 / 9)
-	console.log(ratio)
 	if (ratio > 1.0) {
 		canvas.width /= ratio
 	} else {
