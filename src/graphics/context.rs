@@ -10,6 +10,7 @@ pub(in crate::graphics) struct GraphicsContext<'a> {
 	pub clear_color: wgpu::Color,
 	color_cleared: bool,
 	depth_cleared: bool,
+	pub elapsed_ms: f32,
 }
 
 impl<'a> GraphicsContext<'a> {
@@ -21,6 +22,7 @@ impl<'a> GraphicsContext<'a> {
 		window_size: PixelVec,
 		depth_texture_view: &'a wgpu::TextureView,
 		clear_color: wgpu::Color,
+		elapsed_ms: f32,
 	) -> GraphicsContext<'a> {
 		GraphicsContext {
 			device,
@@ -32,6 +34,7 @@ impl<'a> GraphicsContext<'a> {
 			clear_color,
 			color_cleared: false,
 			depth_cleared: false,
+			elapsed_ms,
 		}
 	}
 
