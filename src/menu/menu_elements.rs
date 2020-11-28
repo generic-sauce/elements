@@ -117,7 +117,7 @@ impl<B: Backend> MenuElement<B> {
 		let text_width = graphics_backend.get_text_size(text, EDIT_FIELD_TEXT_SIZE);
 
 		let text_pos = CanvasVec::new(
-			self.position.x - self.size.x + EDIT_FIELD_BORDER_WIDTH * 2.0,
+			self.position.x - self.size.x + EDIT_FIELD_BORDER_WIDTH * 2.7,
 			center_position(self.position.y - self.size.y, self.position.y + self.size.y, text_width.y)
 		);
 
@@ -141,23 +141,26 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character]) {
-		if let MenuKind::EditField ( EditField { text, cursor, .. } ) = &mut self.kind {
+		if let MenuKind::EditField ( EditField { text, cursor, cursor_blink_counter, .. } ) = &mut self.kind {
 			for character in event_text {
 				match character {
 					Character::Char(c) => {
 						text.insert(get_byte_pos(text, *cursor), *c);
 						*cursor += 1;
+						*cursor_blink_counter = 0;
 					},
 					Character::Backspace => {
 						if *cursor != 0 {
 							text.drain(get_byte_pos(text, *cursor - 1)..get_byte_pos(text, *cursor));
 							*cursor = (*cursor - 1).max(0);
 						}
+						*cursor_blink_counter = 0;
 					},
 					Character::Delete => {
 						if *cursor < text.chars().count() {
 							text.drain(get_byte_pos(text, *cursor)..get_byte_pos(text, *cursor + 1));
 						}
+						*cursor_blink_counter = 0;
 					},
 					_ => {},
 				}
@@ -166,15 +169,16 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
-        if let MenuKind::EditField( EditField{ cursor, text, .. } ) = &mut self.kind {
+        if let MenuKind::EditField( EditField{ cursor, text, cursor_blink_counter, .. } ) = &mut self.kind {
 			if peripherals_state.key_firing(Key::Left) {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
+				*cursor_blink_counter = 0;
 			}
 			if peripherals_state.key_firing(Key::Right) {
 				*cursor = (*cursor + 1).min(text.len());
+				*cursor_blink_counter = 0;
 			}
 		}
-
 	}
 }
 
