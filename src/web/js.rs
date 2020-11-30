@@ -32,13 +32,15 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 	peripherals_events_js().into_serde::<Vec<Ev>>()
 		.unwrap()
 		.into_iter()
-		.map(|x| {
-			match &*x.peri_type {
-				"keydown" => PeripheralsUpdate::KeyPress(Key::A),
-				"keyup" => PeripheralsUpdate::KeyRelease(Key::A),
-				_ => panic!("unexpected peri_type!")
-			}
-	}).collect()
+		.filter_map(|x|
+			js_to_rust_key(&*x.key)
+				.map(|key|
+					match &*x.peri_type {
+						"keydown" => PeripheralsUpdate::KeyPress(key),
+						"keyup" => PeripheralsUpdate::KeyRelease(key),
+						_ => panic!("unexpected peri_type!")
+					})
+		).collect()
 }
 
 // generic js
@@ -51,4 +53,17 @@ extern {
 
 	#[wasm_bindgen(js_namespace = console)]
 	pub fn log(txt: &str);
+}
+
+fn js_to_rust_key(js_key: &str) -> Option<Key> {
+	Some(match js_key {
+		"a" => Key::A,
+		"d" => Key::D,
+		"w" => Key::W,
+		"e" => Key::E,
+		"r" => Key::R,
+		"f" => Key::F,
+		"Space" => Key::Space,
+		_ => None?, // TODO
+	})
 }

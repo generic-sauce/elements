@@ -1,27 +1,23 @@
 window.onkeydown = function(ev) {
 	if (!worker) { return; }
 
-	if (ev.key == "a") {
-		worker.postMessage({
-			type: "peripherals-event",
-			ev: {
-				peri_type: "keydown",
-				key: "a",
-			},
-		});
-	}
+	worker.postMessage({
+		type: "peripherals-event",
+		ev: {
+			peri_type: "keydown",
+			key: ev.key,
+		},
+	});
 }
 
 window.onkeyup = function(ev) {
 	if (!worker) { return; }
 
-	if (ev.key == "a") {
-		worker.postMessage({
-			type: "peripherals-event",
-			ev: {
-				peri_type: "keyup",
-				key: "a",
-			},
-		});
-	}
+	worker.postMessage({
+		type: "peripherals-event",
+		ev: {
+			peri_type: "keyup",
+			key: ev.key,
+		},
+	});
 }
