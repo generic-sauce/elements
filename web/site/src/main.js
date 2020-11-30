@@ -4,6 +4,10 @@ import * as gamepadmod from "./gamepad.js"
 import * as peripheralsmod from "./peripherals.js"
 
 window.onload = function() {
+	document.addEventListener("click", function () {
+		document.body.requestPointerLock();
+	});
+
 	const answer = prompt("menu / local / ip")
 
 	window.draw = null
