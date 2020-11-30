@@ -25,9 +25,10 @@ pub fn gamepad_state(i: usize) -> RawGamepadState {
 pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 	#[derive(Serialize, Deserialize)]
 	struct Ev {
+		peri_type: String,
 		key: Option<String>,
 		movement: Option<SubPixelVec>,
-		peri_type: String,
+		button: Option<u8>,
 	}
 
 	peripherals_events_js().into_serde::<Vec<Ev>>()
@@ -37,6 +38,8 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 			match &*x.peri_type {
 				"keydown" => js_to_rust_key(&*x.key.unwrap()).map(PeripheralsUpdate::KeyPress),
 				"keyup" => js_to_rust_key(&*x.key.unwrap()).map(PeripheralsUpdate::KeyRelease),
+				"mousedown" => Some(PeripheralsUpdate::KeyPress(js_to_rust_button(x.button.unwrap()))),
+				"mouseup" => Some(PeripheralsUpdate::KeyRelease(js_to_rust_button(x.button.unwrap()))),
 				"mousemove" => Some(PeripheralsUpdate::MouseMove(x.movement.unwrap())),
 				_ => panic!("unexpected peri_type!"),
 			}
@@ -67,4 +70,13 @@ fn js_to_rust_key(js_key: &str) -> Option<Key> {
 		"Space" => Key::Space,
 		_ => None?, // TODO
 	})
+}
+
+fn js_to_rust_button(js_button: u8) -> Key {
+	match js_button {
+		0 => Key::LeftMouse,
+		1 => Key::MiddleMouse,
+		2 => Key::RightMouse,
+		x => Key::OtherMouse(x),
+	}
 }

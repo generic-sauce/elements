@@ -33,3 +33,27 @@ window.onmousemove = function(ev) {
 		},
 	});
 }
+
+window.onmousedown = function(ev) {
+	if (!worker) { return; }
+
+	worker.postMessage({
+		type: "peripherals-event",
+		ev: {
+			peri_type: "mousedown",
+			button: ev.button,
+		},
+	});
+}
+
+window.onmouseup = function(ev) {
+	if (!worker) { return; }
+
+	worker.postMessage({
+		type: "peripherals-event",
+		ev: {
+			peri_type: "mouseup",
+			button: ev.button,
+		},
+	});
+}
