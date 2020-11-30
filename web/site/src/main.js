@@ -7,6 +7,9 @@ window.onload = function() {
 	document.addEventListener("click", function () {
 		document.body.requestPointerLock();
 	});
+	document.addEventListener("dblclick", function () {
+		document.body.requestFullscreen();
+	});
 
 	const answer = prompt("menu / local / ip")
 
