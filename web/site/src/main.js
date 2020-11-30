@@ -8,6 +8,7 @@ window.onload = function() {
 		document.body.requestPointerLock();
 	});
 	document.addEventListener("dblclick", function () {
+		document.body.requestPointerLock();
 		document.body.requestFullscreen();
 	});
 
