@@ -25,7 +25,8 @@ pub fn gamepad_state(i: usize) -> RawGamepadState {
 pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 	#[derive(Serialize, Deserialize)]
 	struct Ev {
-		key: String,
+		key: Option<String>,
+		movement: Option<SubPixelVec>,
 		peri_type: String,
 	}
 
@@ -33,13 +34,12 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 		.unwrap()
 		.into_iter()
 		.filter_map(|x|
-			js_to_rust_key(&*x.key)
-				.map(|key|
-					match &*x.peri_type {
-						"keydown" => PeripheralsUpdate::KeyPress(key),
-						"keyup" => PeripheralsUpdate::KeyRelease(key),
-						_ => panic!("unexpected peri_type!")
-					})
+			match &*x.peri_type {
+				"keydown" => js_to_rust_key(&*x.key.unwrap()).map(PeripheralsUpdate::KeyPress),
+				"keyup" => js_to_rust_key(&*x.key.unwrap()).map(PeripheralsUpdate::KeyRelease),
+				"mousemove" => Some(PeripheralsUpdate::MouseMove(x.movement.unwrap())),
+				_ => panic!("unexpected peri_type!"),
+			}
 		).collect()
 }
 
