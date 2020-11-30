@@ -6,9 +6,6 @@ import * as peripheralsmod from "./peripherals.js"
 window.onload = function() {
 	document.addEventListener("click", function () {
 		document.body.requestPointerLock();
-	});
-	document.addEventListener("dblclick", function () {
-		document.body.requestPointerLock();
 		document.body.requestFullscreen();
 	});
 
