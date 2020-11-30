@@ -1,9 +1,9 @@
 const rust = import("../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
 
-self.input_states = [default_input_state(), default_input_state()];
+self.gamepad_states = [default_gamepad_state(), default_gamepad_state()];
 
-self.input_state = function(i) {
-	return self.input_states[i];
+self.gamepad_state = function(i) {
+	return self.gamepad_states[i];
 }
 
 self.date_now = Date.now
@@ -20,8 +20,8 @@ self.onmessage = function(e) {
 		} else {
 			console.log("panic!");
 		}
-	} else if (msg.type == "input") {
-		self.input_states = msg.states;
+	} else if (msg.type == "gamepad-update") {
+		self.gamepad_states = msg.states;
 	} else {
 		console.log("received invalid message at worker/mod.js", msg);
 	}
@@ -71,7 +71,7 @@ self.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
 // }
 
 // TODO make non-redundant
-function default_input_state() {
+function default_gamepad_state() {
 	return {
 		stick_left: [0, 0],
 		stick_right: [0, 0],

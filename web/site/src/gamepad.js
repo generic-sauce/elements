@@ -1,11 +1,11 @@
-// calculating the input states
+// calculating the gamepad states
 
-export function calc_input_state(i) {
+export function calc_gamepad_state(i) {
 	const gp = navigator.getGamepads()[i];
 
 	// fallback!
 	if (!gp) {
-		return default_input_state();
+		return default_gamepad_state();
 	}
 
 	const chrome = navigator.userAgent.toLowerCase().indexOf("chrom") != -1;
@@ -57,7 +57,7 @@ export function calc_input_state(i) {
 	return result;
 }
 
-function default_input_state() {
+function default_gamepad_state() {
 	return {
 		stick_left: [0, 0],
 		stick_right: [0, 0],

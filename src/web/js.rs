@@ -10,14 +10,14 @@ extern {
 	// pub fn js_get_text_size(text: JsValue, scale: JsValue) -> JsValue;
 	pub fn load_tilemap(name: &str, closure: &Closure<dyn FnMut(JsValue)>);
 
-	#[wasm_bindgen(js_name = "input_state")]
-	fn input_state_js(i: usize) -> JsValue;
+	#[wasm_bindgen(js_name = "gamepad_state")]
+	fn gamepad_state_js(i: usize) -> JsValue;
 
 	pub fn date_now() -> f64;
 }
 
-pub fn input_state(i: usize) -> RawGamepadState {
-	input_state_js(i).into_serde().unwrap()
+pub fn gamepad_state(i: usize) -> RawGamepadState {
+	gamepad_state_js(i).into_serde().unwrap()
 }
 
 

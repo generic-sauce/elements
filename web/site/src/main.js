@@ -1,6 +1,6 @@
 import * as render_mod from "./render/mod.js"
 import * as tilemapmod from "./tilemap.js"
-import * as inputmod from "./input.js"
+import * as gamepadmod from "./gamepad.js"
 
 window.onload = function() {
 	const answer = prompt("menu / local / ip")
@@ -30,24 +30,24 @@ window.onload = function() {
 		answer
 	});
 
-	function send_input_update() {
+	function send_gamepad_update() {
 		window.worker.postMessage({
-			type: "input",
-			states: [inputmod.calc_input_state(0), inputmod.calc_input_state(1)],
+			type: "gamepad-update",
+			states: [gamepadmod.calc_gamepad_state(0), gamepadmod.calc_gamepad_state(1)],
 		});
 	}
 
 	function draw_fn() {
-		send_input_update()
+		send_gamepad_update()
 		if (window.draw) {
 			render_mod.render(window.draw)
 		}
-		send_input_update()
+		send_gamepad_update()
 
 		requestAnimationFrame(draw_fn)
 	}
 
 	requestAnimationFrame(draw_fn)
 
-	setInterval(send_input_update, 1000/120)
+	setInterval(send_gamepad_update, 1000/120)
 }
