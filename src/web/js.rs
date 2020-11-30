@@ -63,6 +63,7 @@ fn js_to_rust_key(js_key: &str) -> Option<Key> {
 		"e" => Key::E,
 		"r" => Key::R,
 		"f" => Key::F,
+		"q" => Key::Q,
 		"Space" => Key::Space,
 		_ => None?, // TODO
 	})
