@@ -29,21 +29,43 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 		key: Option<String>,
 		movement: Option<SubPixelVec>,
 		button: Option<u8>,
+		repeat: Option<bool>,
 	}
 
-	peripherals_events_js().into_serde::<Vec<Ev>>()
-		.unwrap()
-		.into_iter()
-		.filter_map(|x|
-			match &*x.peri_type {
-				"keydown" => js_to_rust_key(&*x.key.unwrap()).map(PeripheralsUpdate::KeyPress),
-				"keyup" => js_to_rust_key(&*x.key.unwrap()).map(PeripheralsUpdate::KeyRelease),
-				"mousedown" => Some(PeripheralsUpdate::KeyPress(js_to_rust_button(x.button.unwrap()))),
-				"mouseup" => Some(PeripheralsUpdate::KeyRelease(js_to_rust_button(x.button.unwrap()))),
-				"mousemove" => Some(PeripheralsUpdate::MouseMove(x.movement.unwrap())),
-				_ => panic!("unexpected peri_type!"),
-			}
-		).collect()
+	let mut out = Vec::new();
+	for x in peripherals_events_js().into_serde::<Vec<Ev>>().unwrap() {
+		match &*x.peri_type {
+			"keydown" => {
+				let k = &*x.key.unwrap();
+				if !x.repeat.unwrap() {
+					if let Some(key) = js_to_rust_key(k) {
+						out.push(PeripheralsUpdate::KeyPress(key));
+					}
+				}
+				out.push(PeripheralsUpdate::Text(
+					match k {
+						"Backspace" => Character::Backspace,
+						"Delete" => Character::Delete,
+						"ArrowRight" => Character::Right,
+						"ArrowLeft" => Character::Left,
+						_ => Character::Char(k.chars().next().unwrap()), // TODO this case is pretty imperfect
+					}
+				));
+			},
+			"keyup" => {
+				let k = &*x.key.unwrap();
+				if let Some(key) = js_to_rust_key(k) {
+					out.push(PeripheralsUpdate::KeyRelease(key));
+				}
+			},
+			"mousedown" => out.push(PeripheralsUpdate::KeyPress(js_to_rust_button(x.button.unwrap()))),
+			"mouseup" => out.push(PeripheralsUpdate::KeyRelease(js_to_rust_button(x.button.unwrap()))),
+			"mousemove" => out.push(PeripheralsUpdate::MouseMove(x.movement.unwrap())),
+			_ => panic!("unexpected peri_type!"),
+		}
+	}
+
+	out
 }
 
 // generic js
