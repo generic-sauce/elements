@@ -1,6 +1,7 @@
 import * as render_mod from "./render/mod.js"
 import * as tilemapmod from "./tilemap.js"
 import * as gamepadmod from "./gamepad.js"
+import * as peripheralsmod from "./peripherals.js"
 
 window.onload = function() {
 	const answer = prompt("menu / local / ip")

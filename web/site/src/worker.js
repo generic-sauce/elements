@@ -6,6 +6,13 @@ self.gamepad_state = function(i) {
 	return self.gamepad_states[i];
 }
 
+self.peripherals_events = []
+self.peripherals_events_js = function() {
+	const ret = self.peripherals_events;
+	self.peripherals_events = [];
+	return ret;
+}
+
 self.date_now = Date.now
 
 self.tilemap_load_callback = null
@@ -22,6 +29,8 @@ self.onmessage = function(e) {
 		}
 	} else if (msg.type == "gamepad-update") {
 		self.gamepad_states = msg.states;
+	} else if (msg.type == "peripherals-event") {
+		self.peripherals_events.push(msg.ev)
 	} else {
 		console.log("received invalid message at worker/mod.js", msg);
 	}

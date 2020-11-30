@@ -3,13 +3,18 @@ use crate::prelude::*;
 pub struct WebInputBackend;
 
 pub struct WebEventIterator<'a> {
+	payload: Vec<PeripheralsUpdate>,
 	phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Iterator for WebEventIterator<'a> {
 	type Item = PeripheralsUpdate;
 
-	fn next(&mut self) -> Option<Self::Item> { None }
+	fn next(&mut self) -> Option<Self::Item> {
+		if self.payload.is_empty() { return None; }
+
+		Some(self.payload.remove(0))
+	}
 }
 
 impl InputBackend for WebInputBackend {
@@ -17,6 +22,7 @@ impl InputBackend for WebInputBackend {
 
 	fn events(&mut self) -> WebEventIterator<'_> {
 		WebEventIterator {
+			payload: peripherals_events(),
 			phantom: PhantomData
 		}
 	}
