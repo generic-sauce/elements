@@ -42,15 +42,20 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 						out.push(PeripheralsUpdate::KeyPress(key));
 					}
 				}
-				out.push(PeripheralsUpdate::Text(
-					match k {
-						"Backspace" => Character::Backspace,
-						"Delete" => Character::Delete,
-						"ArrowRight" => Character::Right,
-						"ArrowLeft" => Character::Left,
-						_ => Character::Char(k.chars().next().unwrap()), // TODO this case is pretty imperfect
-					}
-				));
+
+				// PeripheralsUpdate::Text
+				match k {
+					"Backspace" => out.push(PeripheralsUpdate::Text(Character::Backspace)),
+					"Delete" => out.push(PeripheralsUpdate::Text(Character::Delete)),
+					"ArrowRight" => out.push(PeripheralsUpdate::Text(Character::Right)),
+					"ArrowLeft" => out.push(PeripheralsUpdate::Text(Character::Left)),
+					k => {
+						let chrs: Vec<_> = k.chars().collect();
+						if chrs.len() == 1 { // something like "a" or "-", and no symbolic thingy
+							out.push(PeripheralsUpdate::Text(Character::Char(chrs[0])));
+						}
+					},
+				}
 			},
 			"keyup" => {
 				let k = &*x.key.unwrap();

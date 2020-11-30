@@ -1,4 +1,4 @@
-window.onkeypress = function(ev) {
+window.onkeydown = function(ev) {
 	if (!worker) { return; }
 
 	worker.postMessage({
