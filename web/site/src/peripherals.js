@@ -5,7 +5,6 @@ window.onkeydown = function(ev) {
 		type: "peripherals-event",
 		ev: {
 			peri_type: "keydown",
-			repeat: ev.repeat,
 			key: ev.key,
 		},
 	});

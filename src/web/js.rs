@@ -41,7 +41,6 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 		key: Option<String>,
 		movement: Option<SubPixelVec>,
 		button: Option<u8>,
-		repeat: Option<bool>,
 	}
 
 	let mut out = Vec::new();
@@ -49,10 +48,8 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 		match &*x.peri_type {
 			"keydown" => {
 				let k = &*x.key.unwrap();
-				if !x.repeat.unwrap() {
-					if let Some(key) = js_to_rust_key(k) {
-						out.push(PeripheralsUpdate::KeyPress(key));
-					}
+				if let Some(key) = js_to_rust_key(k) {
+					out.push(PeripheralsUpdate::KeyPress(key));
 				}
 
 				out.push(PeripheralsUpdate::Text(js_to_rust_character(k)));
