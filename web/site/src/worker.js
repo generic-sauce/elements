@@ -13,6 +13,13 @@ self.peripherals_events_js = function() {
 	return ret;
 }
 
+self.handle_audio_command = function(cmd) {
+	self.postMessage({
+		type: "audio-command",
+		cmd,
+	});
+}
+
 self.date_now = Date.now
 
 self.tilemap_load_callback = null

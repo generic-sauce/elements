@@ -2,6 +2,7 @@ import * as render_mod from "./render/mod.js"
 import * as tilemapmod from "./tilemap.js"
 import * as gamepadmod from "./gamepad.js"
 import * as peripheralsmod from "./peripherals.js"
+import * as audiomod from "./audio.js"
 
 window.onload = function() {
 	document.addEventListener("click", function () {
@@ -27,6 +28,8 @@ window.onload = function() {
 					tilemap,
 				});
 			});
+		} else if (msg.type == "audio-command") {
+			audiomod.handle_command(msg.cmd)
 		} else {
 			console.log("invalid message received at main.js", msg)
 		}

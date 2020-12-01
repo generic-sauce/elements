@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+// TODO this file needs to be reordered..
+
 // generic js
 
 #[wasm_bindgen]
@@ -21,6 +23,7 @@ extern {
 	pub fn js_render(draw: JsValue, tilemap_data: Uint8Array, fluidmap_data: Uint8Array, vertex_data: Uint8Array);
 	// pub fn js_get_text_size(text: JsValue, scale: JsValue) -> JsValue;
 	pub fn load_tilemap(name: &str, closure: &Closure<dyn FnMut(JsValue)>);
+	pub fn handle_audio_command(cmd: JsValue); // this receives a WebAudioCommand
 
 	#[wasm_bindgen(js_name = "gamepad_state")]
 	fn gamepad_state_js(i: usize) -> JsValue;
