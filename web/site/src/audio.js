@@ -8,8 +8,24 @@ export function handle_command(cmd) {
 	}
 }
 
+var next_music = null
+
+function start_music() {
+	new Howl({
+		src: next_music,
+		onend: start_music,
+	}).play()
+}
+
 function queue_music(file) {
-	console.log("TODO: queue music!");
+	const abs_file = "res/" + file
+
+	if (next_music) {
+		next_music = abs_file
+	} else {
+		next_music = abs_file
+		start_music()
+	}
 }
 
 function play_sound(file, volume) {
