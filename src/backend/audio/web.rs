@@ -18,8 +18,4 @@ impl AudioBackend for WebAudioBackend {
 	fn play_sound(&mut self, sound_id: SoundId, volume: f32) {
 		// TODO
 	}
-
-	fn current_music_id(&self) -> Option<SoundId> {
-		None // TODO
-	}
 }

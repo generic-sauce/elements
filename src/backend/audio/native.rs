@@ -60,10 +60,6 @@ impl AudioBackend for NativeAudioBackend {
 			play_raw(&self.device, buf.amplify(WHIZ_VOLUME * volume));
 		}
 	}
-
-	fn current_music_id(&self) -> Option<SoundId> {
-		self.current_music_id.clone()
-	}
 }
 
 fn load_samples() -> Vec<Sound> {
