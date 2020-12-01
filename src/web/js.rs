@@ -1,5 +1,17 @@
 use crate::prelude::*;
 
+// generic js
+
+#[wasm_bindgen]
+extern {
+	pub fn setInterval(closure: &Closure<dyn FnMut()>, time_ms: f64);
+	pub fn prompt(txt: &str) -> String;
+	pub fn alert(txt: &str);
+
+	#[wasm_bindgen(js_namespace = console)]
+	pub fn log(txt: &str);
+}
+
 // my js code
 
 #[wasm_bindgen] // TODO put into module!
@@ -43,19 +55,7 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 					}
 				}
 
-				// PeripheralsUpdate::Text
-				match k {
-					"Backspace" => out.push(PeripheralsUpdate::Text(Character::Backspace)),
-					"Delete" => out.push(PeripheralsUpdate::Text(Character::Delete)),
-					"ArrowRight" => out.push(PeripheralsUpdate::Text(Character::Right)),
-					"ArrowLeft" => out.push(PeripheralsUpdate::Text(Character::Left)),
-					k => {
-						let chrs: Vec<_> = k.chars().collect();
-						if chrs.len() == 1 { // something like "a" or "-", and no symbolic thingy
-							out.push(PeripheralsUpdate::Text(Character::Char(chrs[0])));
-						}
-					},
-				}
+				out.push(PeripheralsUpdate::Text(js_to_rust_character(k)));
 			},
 			"keyup" => {
 				let k = &*x.key.unwrap();
@@ -73,18 +73,7 @@ pub fn peripherals_events() -> Vec<PeripheralsUpdate> {
 	out
 }
 
-// generic js
-
-#[wasm_bindgen]
-extern {
-	pub fn setInterval(closure: &Closure<dyn FnMut()>, time_ms: f64);
-	pub fn prompt(txt: &str) -> String;
-	pub fn alert(txt: &str);
-
-	#[wasm_bindgen(js_namespace = console)]
-	pub fn log(txt: &str);
-}
-
+// TODO extend
 fn js_to_rust_key(js_key: &str) -> Option<Key> {
 	Some(match js_key {
 		"a" => Key::A,
@@ -95,8 +84,28 @@ fn js_to_rust_key(js_key: &str) -> Option<Key> {
 		"f" => Key::F,
 		"q" => Key::Q,
 		"Space" => Key::Space,
-		_ => None?, // TODO
+		"ArrowRight" => Key::Right,
+		"ArrowLeft" => Key::Left,
+		_ => None?,
 	})
+}
+
+// TODO extend
+fn js_to_rust_character(js_char: &str) -> Character {
+	match js_char {
+		"Backspace" => Character::Backspace,
+		"Delete" => Character::Delete,
+		"ArrowRight" => Character::Right,
+		"ArrowLeft" => Character::Left,
+		k => {
+			let chrs: Vec<_> = k.chars().collect();
+			if chrs.len() == 1 { // something like "a" or "-", and no symbolic thingy
+				Character::Char(chrs[0])
+			} else {
+				Character::Unknown
+			}
+		},
+	}
 }
 
 fn js_to_rust_button(js_button: u8) -> Key {
