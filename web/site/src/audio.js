@@ -8,24 +8,17 @@ export function handle_command(cmd) {
 	}
 }
 
-var next_music = null
-
-function start_music() {
-	new Howl({
-		src: next_music,
-		onend: start_music,
-	}).play()
-}
+var howl = null
 
 function queue_music(file) {
-	const abs_file = "res/" + file
+	const first_time = (howl == null);
 
-	if (next_music) {
-		next_music = abs_file
-	} else {
-		next_music = abs_file
-		start_music()
-	}
+	howl = new Howl({
+		src: "res/" + file,
+		onend: () => howl.play(),
+	})
+
+	if (first_time) { howl.play(); }
 }
 
 function play_sound(file, volume) {
