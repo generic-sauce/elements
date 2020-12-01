@@ -3,6 +3,8 @@ export function handle_command(cmd) {
 		queue_music(cmd["QueueMusic"])
 	} else if ("PlaySound" in cmd) {
 		play_sound(...cmd["PlaySound"])
+	} else {
+		console.log("invalid audio command!", cmd);
 	}
 }
 
