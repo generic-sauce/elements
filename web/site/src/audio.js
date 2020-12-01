@@ -13,5 +13,8 @@ function queue_music(file) {
 }
 
 function play_sound(file, volume) {
-	console.log("TODO: play sound " + file + " " + volume);
+	new Howl({
+		src: "res/" + file,
+		volume,
+	}).play()
 }
