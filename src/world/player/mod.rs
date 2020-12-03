@@ -242,4 +242,34 @@ impl Player {
 
 		self.collides_rect(o_lb, o_rt)
 	}
+
+	pub fn collides_fluid(&self, point: GameVec, radius: i32, t: &TileMap) -> bool {
+		// this is the closest point within the player to `point`
+		let closest: GameVec = v(
+			point.x.min(self.left_bot.x + PLAYER_SIZE.x).max(self.left_bot.x),
+			point.y.min(self.left_bot.y + PLAYER_SIZE.y).max(self.left_bot.y),
+		);
+
+		if !(closest - point).as_short_as(radius) { return false; }
+
+		// raycast in order to not damage through walls
+		if t.check_solid(point) { return false; }
+
+		let mut last_p = point;
+		let n = radius;
+
+		for i in 0..=n {
+			let p = (point * (n-i)) / n + (closest * i) / n;
+			// if they go diagonal
+			if !(p.to_tile() - last_p.to_tile()).as_short_as(1) {
+				let between: TileVec = v(p.to_tile().x, last_p.to_tile().y);
+				if t.check_solid(between) { return false; }
+			}
+			if t.check_solid(p) { return false; }
+
+			last_p = p;
+		}
+
+		true
+	}
 }

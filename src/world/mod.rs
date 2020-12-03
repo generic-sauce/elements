@@ -204,16 +204,17 @@ impl World {
 
 	fn check_damage(&mut self, handler: &mut impl EventHandler) {
 		for i in 0..2 {
-			let player = &mut self.players[i];
 			let mut dmg = 0;
+			let t = &self.tilemap;
+			let pl = &self.players;
 			for v in self.fluidmap.grid.iter_mut() {
 				dmg += v.drain_filter(|x|
-					x.owner != i && player.collides_point_with_radius(x.position, FLUID_DAMAGE_RADIUS)
+					x.owner != i && pl[i].collides_fluid(x.position, FLUID_DAMAGE_RADIUS, t)
 				).map(|f| f.damage())
 				.sum::<i32>();
 			}
 			if dmg > 0 {
-				player.damage(dmg);
+				self.players[i].damage(dmg);
 				handler.damage_inflicted(dmg, i);
 			}
 		}
