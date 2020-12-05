@@ -8,7 +8,7 @@ layout (set = 0, binding = 1) uniform sampler tilemap_sam;
 layout (location = 0) in vec2 uv;
 
 float n21(vec2 s) {
-	return fract(9542.276 * sin(dot(vec2(527.831, 699.258), s + vec2(1.753, 1.245))));
+	return fract(9542.276 * sin(dot(vec2(527.831, 699.258), s)));
 }
 
 float smooth_n21(vec2 seed) {
@@ -26,6 +26,7 @@ float smooth_n21(vec2 seed) {
 }
 
 float round_n21(vec2 seed) {
+	seed += 17.63;
 	float n0 = smooth_n21(seed);
 	float n1 = smooth_n21(seed * 2.);
 	float n2 = smooth_n21(seed * 4.);
@@ -34,7 +35,7 @@ float round_n21(vec2 seed) {
 	return n0 * .1 + n1 * .2 + n2 * .3 + n3 * .4;
 }
 
-vec2 size() {
+vec2 tilemap_size() {
 	return textureSize(sampler2D(tilemap_tex, tilemap_sam), 0);
 }
 
@@ -43,25 +44,30 @@ int tile(vec2 uv) {
 }
 
 vec3 ground_color(vec2 uv) {
-	vec2 s = size();
-	float a = s.x / s.y;
-	vec2 px = 1. / s;
-	float up0 = tile(uv + vec2(0, px.y * 1.)) == 1 ? 1. : 0.;
-	float up1 = tile(uv + vec2(0, px.y * 2.)) == 1 ? 1. : 0.;
-	float up2 = tile(uv + vec2(0, px.y * 3.)) == 1 ? 1. : 0.;
-	float up3 = tile(uv + vec2(0, px.y * 4.)) == 1 ? 1. : 0.;
-	float up = (up0 + up1 + up2 + up3) / 4.;
+	vec2 size = tilemap_size();
+	float aspect = size.x / size.y;
+	vec2 px = 1. / size;
+	vec2 pxy = vec2(0, px.y);
+	vec2 lv = fract(uv * size);
+
+	float up0 = tile(uv + pxy * 1.) == 1 ? 1. : 0.;
+	float up1 = tile(uv + pxy * 2.) == 1 ? 1. : 0.;
+	float up2 = tile(uv + pxy * 3.) == 1 ? 1. : 0.;
+	float up = (up0 + up1 + up2) / 2.;
+	float upb = up0 * up1 * up2;
 
 	vec3 dirt0 = vec3(75, 50, 27) / 255. * 1.1;
 	vec3 dirt1 = vec3(229, 187, 128) / 255. * .7;
 
-	vec3 grass0 = vec3(15, 75, 32) / 255.;
-	vec3 grass1 = vec3(123, 231, 118) / 255.;
+	vec3 grass0 = vec3(123, 231, 118) / 255. * .8;
+	vec3 grass1 = vec3(15, 75, 32) / 255.;
 
-	float n = round_n21(floor(uv / px) * px * 2. * vec2(a, 1));
+	float n = round_n21(uv * 2. * vec2(aspect, 1));
+	float n1 = mix(n, .0, .65 * (((1. - up) * 2. - (1. - up2)) / 2. + ((1. - upb) * lv.y) / 2.));
+	float s = .42;
 	vec3 dirt = mix(dirt0, dirt1, vec3(floor(n * 4.) / 4.));
-	vec3 grass = mix(grass0, grass1, vec3(floor(n * 10.) / 10.));
-	vec3 c = mix(grass, dirt, step(.9, up + (n - .5)));
+	vec3 grass = mix(grass0, grass1, vec3(floor((n1 / s) * 4.) / 4.));
+	vec3 c = mix(grass, dirt, step(s, n1));
 
 	return c;
 }
