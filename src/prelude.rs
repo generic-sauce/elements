@@ -77,6 +77,7 @@ pub use {
 	native_tls::{Identity, TlsAcceptor},
 	crate::{
 		timed_loop::*,
-		server::*
+		server::*,
+		peer::*,
 	}
 };

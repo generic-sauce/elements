@@ -1,8 +1,5 @@
 use crate::prelude::*;
 
-const JOIN_FPS: u32 = 10;
-const MAX_SILENT_JOIN_SECONDS: u32 = 2*60;
-
 enum WebPeer {
 	Http(TungSocket),
 	Https(TungTlsSocket),
@@ -15,15 +12,16 @@ enum Peer {
 
 pub struct PeerManager {
 	udp_socket: UdpSocket,
-	peers: [Peer; 2],
+	https_listener: TcpListener,
+	http_listener: TcpListener,
+	acceptor: Option<Arc<TlsAcceptor>>,
+	peers: Vec<Peer>,
 }
 
 impl PeerManager {
-	pub fn wait_for_players() -> PeerManager {
-		let mut peers = Vec::new();
-
+	pub fn new() -> PeerManager {
 		// native
-		let mut udp_socket = UdpSocket::bind(("0.0.0.0", PORT)).expect("Could not create server udp-socket");
+		let udp_socket = UdpSocket::bind(("0.0.0.0", PORT)).expect("Could not create server udp-socket");
 		udp_socket.set_nonblocking(true).unwrap();
 
 		// https
@@ -34,72 +32,46 @@ impl PeerManager {
 		let http_listener = TcpListener::bind(("0.0.0.0", PORT)).expect("Could not create server http tcp-listener");
 		http_listener.set_nonblocking(true).unwrap();
 
-		let mut acceptor = tls_acceptor();
+		let acceptor = tls_acceptor();
 
-		let mut silent_frames = 0;
+		PeerManager {
+			udp_socket,
+			https_listener,
+			http_listener,
+			acceptor,
+			peers: Vec::new(),
+		}
+	}
 
-		for _ in TimedLoop::with_fps(JOIN_FPS) {
-			// native
-			if let Some((Init::Init, recv_addr)) = recv_packet(&mut udp_socket) {
-				peers.push(Peer::Native(recv_addr));
-				println!("new player joined {}", recv_addr);
-				silent_frames = 0;
-				if peers.len() == 2 {
-					break;
-				}
-			}
+	pub fn accept(&mut self) {
+		// native
+		if let Some((Init::Init, recv_addr)) = recv_packet(&mut self.udp_socket) {
+			self.peers.push(Peer::Native(recv_addr));
+		}
 
-			// https
-			if let Some(acceptor) = acceptor.as_mut() {
-				match https_listener.accept().map_err(|e| e.kind()) {
-					Ok((stream, recv_addr)) => {
-						let tls_stream = acceptor.accept(stream).unwrap();
-						let mut tung = tungstenite::server::accept(tls_stream).unwrap();
-						tung.get_mut().get_mut().set_nonblocking(true).unwrap();
-						peers.push(Peer::Web(WebPeer::Https(tung)));
-
-						println!("new player joined {}", recv_addr);
-						silent_frames = 0;
-						if peers.len() == 2 {
-							break;
-						}
-					},
-					Err(ErrorKind::WouldBlock) => {},
-					Err(_) => panic!("listener.accept() failed"),
-				}
-			}
-
-			// http
-			match http_listener.accept().map_err(|e| e.kind()) {
-				Ok((stream, recv_addr)) => {
-					let mut tung = tungstenite::server::accept(stream).unwrap();
-					tung.get_mut().set_nonblocking(true).unwrap();
-					peers.push(Peer::Web(WebPeer::Http(tung)));
-
-					println!("new player joined {}", recv_addr);
-					silent_frames = 0;
-					if peers.len() == 2 {
-						break;
-					}
+		// https
+		if let Some(acceptor) = self.acceptor.as_mut() {
+			match self.https_listener.accept().map_err(|e| e.kind()) {
+				Ok((stream, _)) => {
+					let tls_stream = acceptor.accept(stream).unwrap();
+					let mut tung = tungstenite::server::accept(tls_stream).unwrap();
+					tung.get_mut().get_mut().set_nonblocking(true).unwrap();
+					self.peers.push(Peer::Web(WebPeer::Https(tung)));
 				},
 				Err(ErrorKind::WouldBlock) => {},
 				Err(_) => panic!("listener.accept() failed"),
 			}
-
-			if !peers.is_empty() {
-				silent_frames += 1;
-			}
-
-			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
-				panic!("No more players joined! Shutting down...");
-			}
 		}
 
-		let peers = [peers.remove(0), peers.remove(0)];
-
-		PeerManager {
-			udp_socket,
-			peers,
+		// http
+		match self.http_listener.accept().map_err(|e| e.kind()) {
+			Ok((stream, _)) => {
+				let mut tung = tungstenite::server::accept(stream).unwrap();
+				tung.get_mut().set_nonblocking(true).unwrap();
+				self.peers.push(Peer::Web(WebPeer::Http(tung)));
+			},
+			Err(ErrorKind::WouldBlock) => {},
+			Err(_) => panic!("listener.accept() failed"),
 		}
 	}
 
@@ -140,6 +112,10 @@ impl PeerManager {
 				_ => None,
 			})
 			.next()
+	}
+
+	pub fn count(&self) -> usize {
+		self.peers.len()
 	}
 }
 

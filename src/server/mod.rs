@@ -1,12 +1,12 @@
 use crate::prelude::*;
 
-mod peer;
-pub use peer::*;
-
 // update_desire is within 0..=1000
 const UPDATE_DESIRE_PER_FRAME: u32 = 350;
 const GAME_FPS: u32 = 60;
 const MAX_SILENT_GAME_SECONDS: u32 = 3;
+
+const JOIN_FPS: u32 = 10;
+const MAX_SILENT_JOIN_SECONDS: u32 = 2*60;
 
 pub struct Server {
 	world: World,
@@ -24,7 +24,7 @@ impl Server {
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
 			update_desire: [0, 0],
-			peer_manager: PeerManager::wait_for_players(),
+			peer_manager: waiting_for_players(),
 			silent_frames: 0,
 		};
 
@@ -79,4 +79,31 @@ impl Server {
 			}
 		}
 	}
+}
+
+fn waiting_for_players() -> PeerManager {
+	let mut peer_manager = PeerManager::new();
+
+	let mut silent_frames = 0;
+
+	for _ in TimedLoop::with_fps(JOIN_FPS) {
+		let prev_cnt = peer_manager.count();
+		peer_manager.accept();
+		let cnt = peer_manager.count();
+
+		if cnt > prev_cnt { // a new peer!
+			println!("a new player joined!");
+			if cnt == 2 {
+				break;
+			}
+			silent_frames = 0;
+		} else if cnt > 0 { // if already a player is waiting..
+			silent_frames += 1;
+			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
+				panic!("No more players joined! Shutting down...");
+			}
+		}
+	}
+
+	peer_manager
 }
