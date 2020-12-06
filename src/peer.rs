@@ -19,17 +19,17 @@ pub struct PeerManager {
 }
 
 impl PeerManager {
-	pub fn new() -> PeerManager {
+	pub fn new(port: u16, https_port: u16) -> PeerManager {
 		// native
-		let udp_socket = UdpSocket::bind(("0.0.0.0", PORT)).expect("Could not create server udp-socket");
+		let udp_socket = UdpSocket::bind(("0.0.0.0", port)).expect("Could not create server udp-socket");
 		udp_socket.set_nonblocking(true).unwrap();
 
 		// https
-		let https_listener = TcpListener::bind(("0.0.0.0", HTTPS_PORT)).expect("Could not create server https tcp-listener");
+		let https_listener = TcpListener::bind(("0.0.0.0", https_port)).expect("Could not create server https tcp-listener");
 		https_listener.set_nonblocking(true).unwrap();
 
 		// http
-		let http_listener = TcpListener::bind(("0.0.0.0", PORT)).expect("Could not create server http tcp-listener");
+		let http_listener = TcpListener::bind(("0.0.0.0", port)).expect("Could not create server http tcp-listener");
 		http_listener.set_nonblocking(true).unwrap();
 
 		let acceptor = tls_acceptor();

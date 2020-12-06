@@ -109,7 +109,7 @@ fn main() {
 
 #[cfg(feature = "master-server")]
 fn main() {
-	println!("hello from master server!");
+	MasterServer::new().run();
 }
 
 #[cfg(all(feature = "game-server", not(feature = "client")))]

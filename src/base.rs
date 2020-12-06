@@ -29,3 +29,4 @@ mod net;
 #[cfg(feature = "game")] mod animation;
 mod prelude;
 #[cfg(feature = "game")] mod input;
+#[cfg(feature = "master-server")] mod master_server;

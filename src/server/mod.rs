@@ -82,9 +82,15 @@ impl Server {
 }
 
 fn waiting_for_players() -> PeerManager {
-	let mut peer_manager = PeerManager::new();
+	let mut peer_manager = PeerManager::new(PORT, HTTPS_PORT);
 
 	let mut silent_frames = 0;
+	let mut packet_send_counter = 0;
+
+	println!("creating master server socket");
+	let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket for master server connection");
+	socket.set_nonblocking(true).unwrap();
+	socket.connect(("127.0.0.1", MASTER_SERVER_PORT)).expect("Could not connect to master server");
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
 		let prev_cnt = peer_manager.count();
@@ -102,6 +108,14 @@ fn waiting_for_players() -> PeerManager {
 			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
 				panic!("No more players joined! Shutting down...");
 			}
+		}
+
+		// master server networking
+		packet_send_counter += 1;
+		if packet_send_counter > 1 {
+			println!("sending master server packet");
+			send_packet(&mut socket, &GameServerStatusUpdate { num_players: 42 as u32 });
+			packet_send_counter = 0;
 		}
 	}
 

@@ -96,3 +96,7 @@ pub use {
 		peer::*,
 	}
 };
+
+#[cfg(feature = "master-server")] pub use {
+	crate::master_server::*,
+};
