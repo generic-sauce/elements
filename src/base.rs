@@ -16,16 +16,16 @@ extern crate serde_derive;
 // server (or native-client)
 #[cfg(feature = "server")] mod server;
 #[cfg(feature = "server")] mod timed_loop;
-#[cfg(feature = "server")] mod peer;
-mod resource;
+#[cfg(feature = "game")] mod peer;
+#[cfg(feature = "game")] mod resource;
 
 #[macro_use]
 mod fps_timer;
 
 mod net;
-mod rng;
-mod world;
-mod vec;
-mod animation;
+#[cfg(feature = "game")] mod rng;
+#[cfg(feature = "game")] mod world;
+#[cfg(feature = "game")] mod vec;
+#[cfg(feature = "game")] mod animation;
 mod prelude;
-mod input;
+#[cfg(feature = "game")] mod input;
