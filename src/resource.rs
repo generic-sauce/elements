@@ -1,7 +1,7 @@
-#[cfg(feature = "server")]
+#[cfg(feature = "game-server")]
 use std::path::PathBuf;
 
-#[cfg(feature = "server")]
+#[cfg(feature = "game-server")]
 pub fn res(s: &str) -> String {
 	let mut p = res_dir();
 	p.push(s);
@@ -10,7 +10,7 @@ pub fn res(s: &str) -> String {
 		.to_string()
 }
 
-#[cfg(feature = "server")]
+#[cfg(feature = "game-server")]
 fn res_dir() -> PathBuf {
 	let s = std::env::args()
 		.next()

@@ -112,7 +112,7 @@ fn main() {
 	println!("hello from master server!");
 }
 
-#[cfg(all(feature = "server", not(feature = "client")))]
+#[cfg(all(feature = "game-server", not(feature = "client")))]
 fn main() {
 	Server::new().run();
 }

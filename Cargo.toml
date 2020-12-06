@@ -9,11 +9,12 @@ edition = "2018"
 [features]
 default = ["native-client"]
 game = []
-server = ["game", "tungstenite", "native-tls"]
+server = ["tungstenite", "native-tls"]
+game-server = ["game", "server"]
 client = ["game", "glyph_brush"]
-native-client = ["server", "client", "gilrs", "rodio", "wgpu", "winit", "bytemuck", "wgpu_glyph", "once_cell", "futures"]
+native-client = ["game-server", "client", "gilrs", "rodio", "wgpu", "winit", "bytemuck", "wgpu_glyph", "once_cell", "futures"]
 web-client =    ["client", "wasm-bindgen", "console_error_panic_hook", "js-sys", "web-sys"]
-master-server = ["tungstenite", "native-tls"]
+master-server = ["server"]
 
 [dependencies] # TODO not all of those dependencies are always required!
 image = "0.23"

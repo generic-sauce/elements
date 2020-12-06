@@ -4,20 +4,23 @@ pub use {
 	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},
 	std::{
 		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
+		io::{Read, BufReader, ErrorKind},
+		time::{Duration, SystemTime, Instant},
+		thread::{self, sleep},
+		fs::File,
 	},
 	bincode::{serialize, deserialize},
+	crate::{
+		net::*,
+	},
 };
 
 #[cfg(feature = "game")]
 pub use {
 	std::{
 		sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError},
-		time::{Duration, SystemTime, Instant},
-		thread::{self, sleep},
 		rc::Rc,
 		collections::{HashMap, HashSet},
-		io::{Read, BufReader, ErrorKind},
-		fs::File,
 		any::Any,
 		marker::PhantomData,
 		cmp::Ordering,
@@ -30,7 +33,6 @@ pub use {
 		world::*,
 		vec::*,
 		input::*,
-		net::*,
 		resource::res,
 	},
 };
@@ -76,7 +78,13 @@ pub use {
 	},
 };
 
-// server (or native-client)
+#[cfg(feature = "game-server")] pub use {
+	crate::{
+		server::*,
+	},
+};
+
+// game-server (or native-client)
 #[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
 #[cfg(feature = "server")] pub type TungTlsSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
 #[cfg(feature = "server")] pub use {
@@ -85,9 +93,6 @@ pub use {
 	native_tls::{Identity, TlsAcceptor},
 	crate::{
 		timed_loop::*,
-		server::*,
 		peer::*,
 	}
 };
-
-//
