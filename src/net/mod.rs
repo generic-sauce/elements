@@ -1,5 +1,6 @@
-mod go;
-pub use go::*;
+#[cfg(feature = "game")] mod game;
+
+#[cfg(feature = "game")] pub use game::*;
 
 use crate::prelude::*;
 
@@ -13,8 +14,6 @@ pub trait Packet: Serialize + DeserializeOwned {}
 pub enum Init { Init }
 
 impl Packet for Init {}
-impl Packet for InputState {}
-impl Packet for WorldUpdate {}
 
 #[allow(unused)]
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {

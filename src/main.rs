@@ -7,7 +7,7 @@ include!("base.rs");
 
 use crate::prelude::*;
 
-const DEFAULT_CURSOR_POSITION: SubPixelVec = SubPixelVec::new(300.0, 300.0);
+#[cfg(feature = "game")] const DEFAULT_CURSOR_POSITION: SubPixelVec = SubPixelVec::new(300.0, 300.0);
 
 #[cfg(feature = "native-client")]
 fn main() {
@@ -107,7 +107,12 @@ fn main() {
 	panic!("web version does not have a main()!")
 }
 
-#[cfg(not(feature = "client"))]
+#[cfg(feature = "master-server")]
+fn main() {
+	println!("hello from master server!");
+}
+
+#[cfg(all(feature = "server", not(feature = "client")))]
 fn main() {
 	Server::new().run();
 }

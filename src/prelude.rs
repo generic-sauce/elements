@@ -1,11 +1,20 @@
 // generic
+
+pub use {
+	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},
+	std::{
+		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
+	},
+	bincode::{serialize, deserialize},
+};
+
+#[cfg(feature = "game")]
 pub use {
 	std::{
 		sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError},
 		time::{Duration, SystemTime, Instant},
 		thread::{self, sleep},
 		rc::Rc,
-		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
 		collections::{HashMap, HashSet},
 		io::{Read, BufReader, ErrorKind},
 		fs::File,
@@ -15,13 +24,11 @@ pub use {
 		ops::Mul,
 	},
 	itertools::iproduct,
-	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},
-	bincode::{serialize, deserialize},
 	crate::{
+		animation::*,
 		rng::*,
 		world::*,
 		vec::*,
-		animation::*,
 		input::*,
 		net::*,
 		resource::res,
@@ -48,6 +55,7 @@ pub use {
 		graphics::*,
 	},
 };
+
 #[cfg(feature = "native-client")] pub mod win {
 	pub use winit::{
 		dpi::{ LogicalPosition, LogicalSize, PhysicalSize, PhysicalPosition, },
@@ -81,3 +89,5 @@ pub use {
 		peer::*,
 	}
 };
+
+//
