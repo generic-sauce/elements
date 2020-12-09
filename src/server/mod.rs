@@ -103,6 +103,10 @@ fn waiting_for_players() -> PeerManager {
 				panic!("No more players joined! Shutting down...");
 			}
 		}
+
+		while let Some((p, _)) = peer_manager.recv_from::<Init>() {
+			assert!(matches!(p, Init::Init));
+		}
 	}
 
 	peer_manager

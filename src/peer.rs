@@ -16,6 +16,10 @@ pub struct PeerManager {
 	http_listener: TcpListener,
 	acceptor: Option<Arc<TlsAcceptor>>,
 	peers: Vec<Peer>,
+
+	// the following are always disjoint
+	accept_udp_packets: Vec<(Vec<u8>, SocketAddr)>, // packets which will be handled on calling `accept`
+	recv_udp_packets: Vec<(Vec<u8>, usize /* peer index */)>, // packets which will be handled on calling `recv_from`
 }
 
 impl PeerManager {
@@ -40,38 +44,64 @@ impl PeerManager {
 			http_listener,
 			acceptor,
 			peers: Vec::new(),
+			accept_udp_packets: Vec::new(),
+			recv_udp_packets: Vec::new(),
 		}
 	}
 
 	pub fn accept(&mut self) {
-		// native
-		if let Some((Init::Init, recv_addr)) = recv_packet(&mut self.udp_socket) {
-			self.peers.push(Peer::Native(recv_addr));
+		{ // native
+			let Self { recv_udp_packets, peers, .. } = self; // this allows me to borrow just what I need in the closure below
+			let mut handle_packet = |(bytes, recv_addr)| {
+				let new_peer = Peer::Native(recv_addr);
+				let already_exists = peers.iter().any(|x| match x {
+					Peer::Native(a) => a == &recv_addr,
+					_ => false,
+				});
+
+				if !already_exists {
+					peers.push(new_peer);
+				}
+				let len = peers.len();
+				recv_udp_packets.push((bytes, len));
+			};
+
+			// handle old packets
+			self.accept_udp_packets.drain(..).for_each(&mut handle_packet);
+
+			// fetch new packets
+			while let Some(x) = recv_bytes(&mut self.udp_socket) {
+				handle_packet(x);
+			}
 		}
 
 		// https
 		if let Some(acceptor) = self.acceptor.as_mut() {
-			match self.https_listener.accept().map_err(|e| e.kind()) {
-				Ok((stream, _)) => {
-					let tls_stream = acceptor.accept(stream).unwrap();
-					let mut tung = tungstenite::server::accept(tls_stream).unwrap();
-					tung.get_mut().get_mut().set_nonblocking(true).unwrap();
-					self.peers.push(Peer::Web(WebPeer::Https(tung)));
-				},
-				Err(ErrorKind::WouldBlock) => {},
-				Err(_) => panic!("listener.accept() failed"),
+			loop {
+				match self.https_listener.accept().map_err(|e| e.kind()) {
+					Ok((stream, _)) => {
+						let tls_stream = acceptor.accept(stream).unwrap();
+						let mut tung = tungstenite::server::accept(tls_stream).unwrap();
+						tung.get_mut().get_mut().set_nonblocking(true).unwrap();
+						self.peers.push(Peer::Web(WebPeer::Https(tung)));
+					},
+					Err(ErrorKind::WouldBlock) => break,
+					Err(_) => panic!("listener.accept() failed"),
+				}
 			}
 		}
 
 		// http
-		match self.http_listener.accept().map_err(|e| e.kind()) {
-			Ok((stream, _)) => {
-				let mut tung = tungstenite::server::accept(stream).unwrap();
-				tung.get_mut().set_nonblocking(true).unwrap();
-				self.peers.push(Peer::Web(WebPeer::Http(tung)));
-			},
-			Err(ErrorKind::WouldBlock) => {},
-			Err(_) => panic!("listener.accept() failed"),
+		loop {
+			match self.http_listener.accept().map_err(|e| e.kind()) {
+				Ok((stream, _)) => {
+					let mut tung = tungstenite::server::accept(stream).unwrap();
+					tung.get_mut().set_nonblocking(true).unwrap();
+					self.peers.push(Peer::Web(WebPeer::Http(tung)));
+				},
+				Err(ErrorKind::WouldBlock) => break,
+				Err(_) => panic!("listener.accept() failed"),
+			}
 		}
 	}
 
@@ -92,6 +122,13 @@ impl PeerManager {
 	}
 
 	fn native_recv_from<P: Packet>(&mut self) -> Option<(P, usize)> {
+		// return old packets
+		if !self.recv_udp_packets.is_empty() {
+			let (bytes, i) = self.recv_udp_packets.swap_remove(0);
+			return Some((deser::<P>(&bytes), i));
+		}
+
+		// fetch new packets
 		let (p, addr) = recv_packet::<P>(&mut self.udp_socket)?;
 		let idx = (0..2)
 			.find(|&i| match self.peers[i] {
