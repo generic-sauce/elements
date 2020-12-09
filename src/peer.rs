@@ -54,16 +54,18 @@ impl PeerManager {
 			let Self { recv_udp_packets, peers, .. } = self; // this allows me to borrow just what I need in the closure below
 			let mut handle_packet = |(bytes, recv_addr)| {
 				let new_peer = Peer::Native(recv_addr);
-				let already_exists = peers.iter().any(|x| match x {
-					Peer::Native(a) => a == &recv_addr,
+
+				let pos = (0..peers.len()).find(|&i| match peers[i] {
+					Peer::Native(a) => a == recv_addr,
 					_ => false,
 				});
 
-				if !already_exists {
+				let pos = pos.unwrap_or_else(|| {
 					peers.push(new_peer);
-				}
-				let len = peers.len();
-				recv_udp_packets.push((bytes, len));
+					peers.len() - 1
+				});
+
+				recv_udp_packets.push((bytes, pos));
 			};
 
 			// handle old packets
