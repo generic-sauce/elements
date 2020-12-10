@@ -5,9 +5,9 @@ pub fn rng(rate: u32, antirate: u32, seed: [u32; 4]) -> bool {
 
 fn mini_rng(a: u32, b: u32) -> u32 {
 	use rand::{SeedableRng, RngCore};
-	use rand_xorshift::XorShiftRng;
+	use rand_chacha::ChaCha8Rng;
 
 	let combined = (a as u64) + ((b as u64) << 32);
 
-	XorShiftRng::seed_from_u64(combined).next_u32()
+	ChaCha8Rng::seed_from_u64(combined).next_u32()
 }
