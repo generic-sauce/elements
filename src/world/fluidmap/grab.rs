@@ -17,7 +17,7 @@ impl FluidMap {
 					&& matches!(n.state, FluidState::AtHand { .. })
 				);
 		if condition {
-			f.state = FluidState::AtHand { friendly_glitched: false };
+			f.state = FluidState::AtHand;
 		}
 
 		f

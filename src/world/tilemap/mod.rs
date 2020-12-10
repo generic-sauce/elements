@@ -7,6 +7,7 @@ pub use tilemap_image::*;
 use crate::prelude::*;
 
 pub const WALL_LIFETIME: u32 = 40;
+pub const WALL_IGNORE_FRIENDLY_FLUIDS_TIME: u32 = 10;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Tile {

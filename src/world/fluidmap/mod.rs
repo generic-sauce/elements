@@ -15,7 +15,7 @@ pub const MAX_IGNORE_COUNTER: u32 = 20;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FluidState {
-	AtHand { friendly_glitched: bool }, // is true if the fluid has been glitched by friendly ice
+	AtHand,
 	Free,
 }
 
@@ -45,7 +45,6 @@ impl World {
 			.map(|f| self.fluidmap.apply_grab(f, &self.players))
 			.map(|f| self.fluidmap.apply_forces(f, &self.tilemap, &self.players, self.frame_id))
 			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap))
-			.map(|f| FluidMap::update_friendly_glitched(f, &self.tilemap))
 			.map(|mut f| { f.update_reference_position(); f});
 		self.fluidmap.grid = FluidMap::mk_grid(iter, self.fluidmap.size);
 	}
@@ -108,19 +107,5 @@ impl FluidMap {
 		let tile_pos: FluidVec = fluid.position.into();
 		let index = (tile_pos.x + tile_pos.y * self.size.x) as usize;
 		self.grid[index].push(fluid);
-	}
-
-	fn update_friendly_glitched(mut f: Fluid, t: &TileMap) -> Fluid {
-		let tile = t.get(f.position.to_tile());
-		let friendly_glitched = match tile {
-			Tile::Wall { owner, .. } if owner == f.owner => true,
-			_ => false,
-		};
-
-		if let FluidState::AtHand { .. } = f.state {
-			f.state = FluidState::AtHand { friendly_glitched };
-		}
-
-		f
 	}
 }
