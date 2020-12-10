@@ -14,7 +14,7 @@ impl FluidMap {
 			self.neighbours_with_owner(&f)
 				.any(|n|
 					(f.position - n.position).as_short_as(FLUID_GRAB_DIST)
-					&& matches!(n.state, FluidState::AtHand { .. })
+					&& matches!(n.state, FluidState::AtHand)
 				);
 		if condition {
 			f.state = FluidState::AtHand;
