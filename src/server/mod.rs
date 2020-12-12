@@ -92,6 +92,8 @@ fn waiting_for_players() -> PeerManager {
 	socket.set_nonblocking(true).unwrap();
 	socket.connect(("127.0.0.1", MASTER_SERVER_PORT)).expect("Could not connect to master server");
 
+	send_packet(&mut socket, &Init::Init);
+
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
 		let prev_cnt = peer_manager.count();
 		peer_manager.accept();
