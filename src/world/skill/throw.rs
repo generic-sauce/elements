@@ -6,7 +6,7 @@ const THROW_THREE_DISTANCE: i32 = TILESIZE*2;
 impl World {
 	pub(in super) fn handle_throw(&mut self, p: usize) {
 		self.fluidmap.iter_mut_notranslate()
-			.filter(|x| x.owner == p && matches!(x.state, FluidState::AtHand { .. }))
+			.filter(|x| x.owner == p && matches!(x.state, FluidState::AtHand))
 			.for_each(|f| f.state = FluidState::Free);
 
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
@@ -15,14 +15,18 @@ impl World {
 	pub(in super) fn handle_throw3(&mut self, p: usize) {
 		let player = &self.players[p];
 		let mut v: Vec<&mut Fluid> = self.fluidmap.iter_mut_notranslate()
-			.filter(|x| x.owner == p && matches!(x.state, FluidState::AtHand { .. }))
+			.filter(|x| x.owner == p && matches!(x.state, FluidState::AtHand))
 			.collect();
-		v.sort_by_cached_key(|f| throw_priority(f, player));
+		v.sort_by_cached_key(|f| (f.position - player.cursor_position()).length_squared());
 		if v.is_empty() { return; }
-		let best = v.pop().unwrap();
-		v.sort_by_cached_key(|f| (f.position - best.position).length());
+		let best = v.swap_remove(0);
+		v.sort_by_cached_key(|f| (f.position - best.position).length_squared());
 		v.truncate(2);
-		v.push(best);
+
+		const MAX_BEST_DIST: i32 = TILESIZE * 10;
+		v.retain(|f| (f.position - best.position).length_squared() <= MAX_BEST_DIST * MAX_BEST_DIST);
+
+		v.insert(0, best);
 
 		let target_vel = v.iter().map(|x| x.velocity).sum::<GameVec>() / (v.len() as i32);
 
@@ -38,6 +42,8 @@ impl World {
 				v[1].position = p;
 			}
 		}
+		// at this point v[0] and v[1] have distance THROW_THREE_DISTANCE
+
 		if v.len() >= 3 {
 			let v0_to_v1 = v[1].position - v[0].position;
 			let v0_to_v1_rotated = GameVec::new(v0_to_v1.y, -v0_to_v1.x);
@@ -49,9 +55,4 @@ impl World {
 
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
 	}
-}
-
-fn throw_priority(f: &Fluid, player: &Player) -> i32 {
-	let relative_pos = f.position - player.center_position();
-	relative_pos.dot(f.velocity)
 }
