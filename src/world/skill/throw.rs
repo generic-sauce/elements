@@ -53,6 +53,10 @@ impl World {
 			}
 		}
 
+		// Because positions may have changed, we need to update the grid
+		// can be done much more efficiently though!
+		self.fluidmap.grid = FluidMap::mk_grid(self.fluidmap.iter().cloned(), self.fluidmap.size);
+
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
 	}
 }
