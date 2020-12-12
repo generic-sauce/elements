@@ -6,7 +6,7 @@ impl SocketBackend for NativeSocketBackend {
 	fn new(server_ip: &str) -> Self {
 		let socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.set_nonblocking(true).unwrap();
-		socket.connect((server_ip, PORT)).expect("Could not connect to server");
+		socket.connect((server_ip, DEFAULT_GAME_SERVER_PORT)).expect("Could not connect to server");
 
 		let mut socket = NativeSocketBackend(socket);
 

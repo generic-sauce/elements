@@ -12,6 +12,7 @@ pub struct GameServerInfo {
 }
 
 pub struct ClientInfo {
+	pub peer_index: usize,
 	pub name: String,
 }
 
@@ -32,9 +33,22 @@ impl MasterServer {
 				println!("new peer connected, count: {}", self.peer_manager.count());
 			}
 
-			while let Some((p, i)) = self.peer_manager.recv_from::<GameServerStatusUpdate>() {
-				println!("got packet from {}. Num players: {}", i, p.num_players);
+			while let Some((packet, peer_index)) = self.peer_manager.recv_from::<MasterServerPacket>() {
+				match packet {
+					MasterServerPacket::GameServerStatusUpdate { num_players } => {
+						self.apply_game_server_status_update(num_players, peer_index);
+					}
+				}
 			}
+		}
+	}
+
+	fn apply_game_server_status_update(&mut self, num_players: u32, peer_index: usize) {
+		println!("got packet from peer {}. Num players: {}", peer_index, num_players);
+		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer_index == peer_index) {
+			game_server.num_players = num_players;
+		} else {
+			self.game_servers.push(GameServerInfo { num_players, peer_index });
 		}
 	}
 }

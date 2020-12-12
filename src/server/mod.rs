@@ -84,7 +84,7 @@ impl Server {
 }
 
 fn waiting_for_players() -> PeerManager {
-	let mut peer_manager = PeerManager::new(PORT, HTTPS_PORT);
+	let mut peer_manager = PeerManager::new(DEFAULT_GAME_SERVER_PORT, DEFAULT_GAME_SERVER_HTTPS_PORT);
 
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;
@@ -130,5 +130,5 @@ fn waiting_for_players() -> PeerManager {
 
 fn update_master_server(socket: &mut UdpSocket, num_players: u32) {
 	println!("sending master server packet");
-	send_packet(socket, &GameServerStatusUpdate { num_players });
+	send_packet(socket, &MasterServerPacket::GameServerStatusUpdate { num_players });
 }

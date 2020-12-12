@@ -5,20 +5,20 @@
 
 use crate::prelude::*;
 
-pub const PORT: u16 = 7575; // HTTP / UDP
-pub const HTTPS_PORT: u16 = 7576; // HTTPS
+pub const DEFAULT_GAME_SERVER_PORT: u16 = 7575; // HTTP / UDP
+pub const DEFAULT_GAME_SERVER_HTTPS_PORT: u16 = 7576; // HTTPS
 
-pub const MASTER_SERVER_PORT: u16 = 8000;
-pub const MASTER_SERVER_HTTPS_PORT: u16 = 8001;
+pub const MASTER_SERVER_PORT: u16 = 7542;
+pub const MASTER_SERVER_HTTPS_PORT: u16 = 7543;
 
 pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
-pub struct GameServerStatusUpdate {
-	pub num_players: u32,
+pub enum MasterServerPacket {
+	GameServerStatusUpdate { num_players: u32 },
 }
 
-impl Packet for GameServerStatusUpdate {}
+impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize)]
 // this is an enum as every socket object needs a size > 0

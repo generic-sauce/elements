@@ -9,8 +9,8 @@ pub struct WebSocketBackend {
 impl SocketBackend for WebSocketBackend {
 	fn new(server_ip: &str) -> Self {
 		let ip_string = match server_ip.starts_with("http://") {
-			true => format!("ws://{}:{}", server_ip.trim_start_matches("http://"), PORT),
-			false => format!("wss://{}:{}", server_ip, HTTPS_PORT),
+			true => format!("ws://{}:{}", server_ip.trim_start_matches("http://"), DEFAULT_GAME_SERVER_PORT),
+			false => format!("wss://{}:{}", server_ip, DEFAULT_GAME_SERVER_HTTPS_PORT),
 		};
 		let socket = WebSocket::new(&ip_string).unwrap();
 		socket.set_binary_type(web_sys::BinaryType::Arraybuffer);
