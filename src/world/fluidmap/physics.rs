@@ -74,10 +74,14 @@ fn route(velocity: i32, pos: i32) -> i32 {
 
 fn check_solid(position: GameVec, f: &Fluid, t: &TileMap) -> bool {
 	let tile = t.get(position.to_tile());
-	match tile {
-		Tile::Wall { owner, .. } if owner == f.owner && f.state == FluidState::AtHand { friendly_glitched: true } => false,
-		_ => t.check_solid(position),
+	if let Tile::Wall { owner, remaining_lifetime } = tile {
+		if owner == f.owner
+			&& f.state == FluidState::AtHand
+			&& (WALL_LIFETIME - remaining_lifetime) <= WALL_IGNORE_FRIENDLY_FLUIDS_TIME {
+				return false;
+		}
 	}
+	t.check_solid(position)
 }
 
 impl FluidMap {

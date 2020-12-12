@@ -44,6 +44,12 @@ pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAdd
 }
 
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
+	let (bytes, addr) = recv_bytes(socket)?;
+	let p = deser::<P>(&bytes[..]);
+	Some((p, addr))
+}
+
+pub fn recv_bytes(socket: &mut UdpSocket) -> Option<(Vec<u8>, SocketAddr)> {
 	let mut n_bytes = [0u8; 4];
 	assert_eq!(match socket.peek(&mut n_bytes[..]) {
 		Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return None,
@@ -54,8 +60,9 @@ pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)>
 
 	let (n_full, addr) = socket.recv_from(&mut bytes[..]).unwrap();
 	assert_eq!(n_full, (n + 4) as usize);
-	let p = deser::<P>(&bytes[4..]);
-	Some((p, addr))
+	bytes.drain(..4);
+	assert_eq!(bytes.len(), n as usize);
+	Some((bytes, addr))
 }
 
 pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
