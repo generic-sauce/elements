@@ -43,33 +43,63 @@ int tile(vec2 uv) {
 	return int(255.9 * texture(sampler2D(tilemap_tex, tilemap_sam), uv).r);
 }
 
+float tilef(vec2 uv) {
+	return 255. * texture(sampler2D(tilemap_tex, tilemap_sam), uv).r;
+}
+
+float ground(vec2 uv) {
+	return tile(uv) == 1 ? 1. : 0.;
+}
+
 vec3 ground_color(vec2 uv) {
-	vec2 size = tilemap_size();
-	float aspect = size.x / size.y;
-	vec2 px = 1. / size;
-	vec2 pxy = vec2(0, px.y);
-	vec2 lv = fract(uv * size);
+	// tweaks
+	const float density = 2.;
+	const float grass_scale = .7;
+	float grass_thickness = 3.;
+	const float dirt_grass_threshold = .2;
 
-	float up0 = tile(uv + pxy * 1.) == 1 ? 1. : 0.;
-	float up1 = tile(uv + pxy * 2.) == 1 ? 1. : 0.;
-	float up2 = tile(uv + pxy * 3.) == 1 ? 1. : 0.;
-	float up = (up0 + up1 + up2) / 2.;
-	float upb = up0 * up1 * up2;
-
+	// colors
 	vec3 dirt0 = vec3(75, 50, 27) / 255. * 1.1;
 	vec3 dirt1 = vec3(229, 187, 128) / 255. * .7;
-
 	vec3 grass0 = vec3(123, 231, 118) / 255. * .8;
 	vec3 grass1 = vec3(15, 75, 32) / 255.;
 
-	float n = round_n21(uv * 2. * vec2(aspect, 1));
-	float n1 = mix(n, .0, .65 * (((1. - up) * 2. - (1. - up2)) / 2. + ((1. - upb) * lv.y) / 2.));
-	float s = .42;
-	vec3 dirt = mix(dirt0, dirt1, vec3(floor(n * 4.) / 4.));
-	vec3 grass = mix(grass0, grass1, vec3(floor((n1 / s) * 4.) / 4.));
-	vec3 c = mix(grass, dirt, step(s, n1));
+	// consts
+	vec2 size = tilemap_size();
+	vec2 aspect = vec2(size.x / size.y, 1);
+	vec2 px = 1. / size;
+	vec2 pxx = vec2(px.x, 0);
+	vec2 pxy = vec2(0, px.y);
 
-	return c;
+	// grid cell local uv
+	vec2 lv = fract(uv * size);
+
+	float sum = 0.;
+	float all = 1.;
+	for (float i = 1.; i < grass_thickness + 1.5; ++i) {
+		float t = ground(uv + pxy * i);
+		all *= t;
+		sum += all;
+	}
+
+	float grass_portion = 0.;
+	grass_portion += lv.y + (grass_thickness - sum);
+	grass_portion += (1. - lv.x) * (1. - ground(uv + pxy * sum - pxx));
+	grass_portion += lv.x * (1. - ground(uv + pxy * sum + pxx));
+	grass_portion *= (grass_scale / grass_thickness);
+	grass_portion *= 1. - all;
+
+	float n_dirt = round_n21(uv * aspect * density);
+	float n_grass = mix(n_dirt, .0, grass_portion);
+
+	float dirt_color_ratio = floor(n_dirt * 4.) / 4.;
+	float grass_color_ratio = floor(n_grass / dirt_grass_threshold * 4.) / 4.;
+
+	vec3 dirt_color = mix(dirt0, dirt1, vec3(dirt_color_ratio));
+	vec3 grass_color = mix(grass0, grass1, vec3(grass_color_ratio));
+
+	/* return vec3(grass_portion); */
+	return mix(grass_color, dirt_color, step(dirt_grass_threshold, n_grass));
 }
 
 void main() {
@@ -79,7 +109,7 @@ void main() {
 	int t = tile(uv);
 	switch (t) {
 	case 1: // ground
-		c = ground_color(uv);
+		c = ground_color(uv + .00001);
 		break;
 	case 2: // wall player 0
 		c = wall_color;
