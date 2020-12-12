@@ -8,6 +8,8 @@ const MAX_SILENT_GAME_SECONDS: u32 = 3;
 const JOIN_FPS: u32 = 10;
 const MAX_SILENT_JOIN_SECONDS: u32 = 2*60;
 
+const MASTER_SERVER_FRAME_INTERVAL: u32 = 10;
+
 pub struct Server {
 	world: World,
 	update_desire: [u32; 2],
@@ -92,14 +94,13 @@ fn waiting_for_players() -> PeerManager {
 	socket.set_nonblocking(true).unwrap();
 	socket.connect(("127.0.0.1", MASTER_SERVER_PORT)).expect("Could not connect to master server");
 
-	send_packet(&mut socket, &Init::Init);
-
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
 		let prev_cnt = peer_manager.count();
 		peer_manager.accept();
 		let cnt = peer_manager.count();
 
 		if cnt > prev_cnt { // a new peer!
+			update_master_server(&mut socket, cnt as u32);
 			println!("a new player joined!");
 			if cnt == 2 {
 				break;
@@ -114,9 +115,8 @@ fn waiting_for_players() -> PeerManager {
 
 		// master server networking
 		packet_send_counter += 1;
-		if packet_send_counter > 1 {
-			println!("sending master server packet");
-			send_packet(&mut socket, &GameServerStatusUpdate { num_players: 42 as u32 });
+		if packet_send_counter >= MASTER_SERVER_FRAME_INTERVAL {
+			update_master_server(&mut socket, cnt as u32);
 			packet_send_counter = 0;
 		}
 	}
@@ -126,4 +126,9 @@ fn waiting_for_players() -> PeerManager {
 	}
 
 	peer_manager
+}
+
+fn update_master_server(socket: &mut UdpSocket, num_players: u32) {
+	println!("sending master server packet");
+	send_packet(socket, &GameServerStatusUpdate { num_players });
 }
