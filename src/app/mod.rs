@@ -66,9 +66,8 @@ impl<B: Backend> App<B> {
 	}
 
 	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {
-		let opt_world = runnable.get_world();
-
-		if let Some(world) = opt_world {
+		// TODO: make this more generic. Runnable should be able to change runnable/menu
+		if let Some(world) = runnable.get_world() {
 			let winner_found = match world.is_game_over() {
 				GameResult::None => false,
 				GameResult::Winner(winner) => {
@@ -81,6 +80,12 @@ impl<B: Backend> App<B> {
 				}
 			};
 			if winner_found {
+				*runnable = Runnable::Menu;
+				self.menu = Menu::main_menu();
+			}
+		}
+		if let Runnable::ServerConnector(server_connector) = runnable {
+			if server_connector.request_failed {
 				*runnable = Runnable::Menu;
 				self.menu = Menu::main_menu();
 			}

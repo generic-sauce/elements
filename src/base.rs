@@ -4,6 +4,7 @@ extern crate serde_derive;
 #[cfg(feature = "client")] mod backend;
 #[cfg(feature = "client")] mod draw;
 #[cfg(feature = "client")] mod client;
+#[cfg(feature = "client")] mod server_connector;
 #[cfg(feature = "client")] mod app;
 #[cfg(feature = "client")] mod local;
 #[cfg(feature = "client")] mod menu;

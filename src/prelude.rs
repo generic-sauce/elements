@@ -42,6 +42,7 @@ pub use {
 	crate::{
 		draw::*,
 		client::*,
+		server_connector::*,
 		local::*,
 		app::*,
 		menu::*,

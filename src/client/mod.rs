@@ -15,9 +15,9 @@ pub struct Client<B: Backend> {
 
 impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
-		let mut socket = B::SocketBackend::new(server_ip);
+		let mut socket = B::SocketBackend::new(server_ip, DEFAULT_GAME_SERVER_PORT);
 
-		socket.send(&Init::Init);
+		socket.send(&Init::Init).unwrap();
 
 		Client {
 			socket,
@@ -47,7 +47,7 @@ impl<B: Backend> Client<B> {
 				world.players[*player_id].input.update_peripherals(&app.peripherals_state);
 
 				// send packets
-				self.socket.send(&world.players[*player_id].input);
+				self.socket.send(&world.players[*player_id].input).unwrap();
 
 				// tick world
 				world.tick_within_app(app);

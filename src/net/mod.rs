@@ -16,9 +16,17 @@ pub trait Packet: Serialize + DeserializeOwned {}
 #[derive(Serialize, Deserialize)]
 pub enum MasterServerPacket {
 	GameServerStatusUpdate { num_players: u32 },
+    ClientRequest { name: String },
 }
 
 impl Packet for MasterServerPacket {}
+
+#[derive(Serialize, Deserialize)]
+pub enum MasterClientPacket {
+	GameRedirection(String),
+}
+
+impl Packet for MasterClientPacket {}
 
 #[derive(Serialize, Deserialize)]
 // this is an enum as every socket object needs a size > 0
@@ -27,12 +35,13 @@ pub enum Init { Init }
 impl Packet for Init {}
 
 #[allow(unused)]
-pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
+pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) -> std::io::Result<()> {
 	let packet_bytes = ser(p);
 	let n: u32 = packet_bytes.len() as u32;
 	let mut bytes = ser(&n);
 	bytes.extend(packet_bytes);
-	socket.send(&bytes[..]).unwrap();
+	socket.send(&bytes[..])?;
+	Ok(())
 }
 
 pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAddr) {

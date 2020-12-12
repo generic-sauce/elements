@@ -130,5 +130,8 @@ fn waiting_for_players() -> PeerManager {
 
 fn update_master_server(socket: &mut UdpSocket, num_players: u32) {
 	println!("sending master server packet");
-	send_packet(socket, &MasterServerPacket::GameServerStatusUpdate { num_players });
+	match send_packet(socket, &MasterServerPacket::GameServerStatusUpdate { num_players }) {
+		Ok(()) => {},
+		Err(_e) => { println!("failed to inform master server!")},
+	}
 }

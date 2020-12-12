@@ -7,10 +7,10 @@ pub struct WebSocketBackend {
 }
 
 impl SocketBackend for WebSocketBackend {
-	fn new(server_ip: &str) -> Self {
+	fn new(server_ip: &str, port: u16) -> Self {
 		let ip_string = match server_ip.starts_with("http://") {
-			true => format!("ws://{}:{}", server_ip.trim_start_matches("http://"), DEFAULT_GAME_SERVER_PORT),
-			false => format!("wss://{}:{}", server_ip, DEFAULT_GAME_SERVER_HTTPS_PORT),
+			true => format!("ws://{}:{}", server_ip.trim_start_matches("http://"), port),
+			false => format!("wss://{}:{}", server_ip, port+1),
 		};
 		let socket = WebSocket::new(&ip_string).unwrap();
 		socket.set_binary_type(web_sys::BinaryType::Arraybuffer);
@@ -37,11 +37,12 @@ impl SocketBackend for WebSocketBackend {
 		self.socket.ready_state() == WebSocket::OPEN
 	}
 
-	fn send(&mut self, packet: &impl Packet) {
+	fn send(&mut self, packet: &impl Packet) -> std::io::Result<()> {
 		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
 
 		let input_bytes = ser(packet);
 		self.socket.send_with_u8_array(&input_bytes[..]).unwrap();
+		Ok(())
 	}
 
 	fn try_recv<P: Packet>(&mut self) -> Option<P> {
