@@ -48,9 +48,7 @@ fn main() {
 			println!("starting new deploy");
 			let mut command = Command::new("bash");
 			command.arg("-c").arg("./deploy.sh")
-				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
-				.uid(1000)
-				.gid(115);
+				.current_dir(ELEMENTS_DEPLOY_DIRECTORY);
 
 			match command.output() {
 				Ok(x) => {
