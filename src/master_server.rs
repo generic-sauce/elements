@@ -84,7 +84,6 @@ impl MasterServer {
 	}
 
 	fn apply_game_server_status_update(&mut self, peer_index: usize, num_players: u32, port: u16) {
-		println!("got packet from peer {}. Num players: {}", peer_index, num_players);
 		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer_index == peer_index) {
 			game_server.num_players = num_players;
 			if num_players == 2 {
