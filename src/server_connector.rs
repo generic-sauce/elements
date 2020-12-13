@@ -20,6 +20,7 @@ impl<B: Backend> ServerConnector<B> {
     }
 
     pub fn tick(&mut self, _app: &mut App<B>) {
+        if !self.socket.open() { return; }
         if !self.request_send {
             match self.socket.send(&MasterServerPacket::ClientRequest { name: String::from("test player") }) {
                 Ok(()) => {},
