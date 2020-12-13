@@ -1,13 +1,32 @@
+#[cfg(feature = "master-server")] mod master;
+#[cfg(feature = "master-server")] pub use master::*;
 #[cfg(feature = "game")] mod game;
-
 #[cfg(feature = "game")] pub use game::*;
 
 use crate::prelude::*;
 
-pub const PORT: u16 = 7575; // HTTP / UDP
-pub const HTTPS_PORT: u16 = 7576; // HTTPS
+pub const DEFAULT_GAME_SERVER_PORT: u16 = 7575; // HTTP / UDP
+pub const DEFAULT_GAME_SERVER_HTTPS_PORT: u16 = 7576; // HTTPS
+
+pub const MASTER_SERVER_PORT: u16 = 7542;
+pub const MASTER_SERVER_HTTPS_PORT: u16 = 7543;
 
 pub trait Packet: Serialize + DeserializeOwned {}
+
+#[derive(Serialize, Deserialize)]
+pub enum MasterServerPacket {
+	GameServerStatusUpdate { num_players: u32, port: u16 },
+    ClientRequest { name: String },
+}
+
+impl Packet for MasterServerPacket {}
+
+#[derive(Serialize, Deserialize)]
+pub enum MasterClientPacket {
+	GameRedirection(String, u16),
+}
+
+impl Packet for MasterClientPacket {}
 
 #[derive(Serialize, Deserialize)]
 // this is an enum as every socket object needs a size > 0
@@ -16,12 +35,13 @@ pub enum Init { Init }
 impl Packet for Init {}
 
 #[allow(unused)]
-pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) {
+pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) -> std::io::Result<()> {
 	let packet_bytes = ser(p);
 	let n: u32 = packet_bytes.len() as u32;
 	let mut bytes = ser(&n);
 	bytes.extend(packet_bytes);
-	socket.send(&bytes[..]).unwrap();
+	socket.send(&bytes[..])?;
+	Ok(())
 }
 
 pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAddr) {

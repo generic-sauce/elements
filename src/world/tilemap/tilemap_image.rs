@@ -10,7 +10,7 @@ pub struct TileMapImage {
 
 pub const DEFAULT_TILEMAP: &'static str = "map/map04.png";
 
-#[cfg(feature = "server")]
+#[cfg(feature = "game-server")]
 impl TileMapImage {
 	pub fn new(src: &str) -> Self {
 		use image::GenericImageView;

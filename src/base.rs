@@ -4,6 +4,7 @@ extern crate serde_derive;
 #[cfg(feature = "client")] mod backend;
 #[cfg(feature = "client")] mod draw;
 #[cfg(feature = "client")] mod client;
+#[cfg(feature = "client")] mod server_connector;
 #[cfg(feature = "client")] mod app;
 #[cfg(feature = "client")] mod local;
 #[cfg(feature = "client")] mod menu;
@@ -13,10 +14,11 @@ extern crate serde_derive;
 
 #[cfg(feature = "web-client")] mod web;
 
-// server (or native-client)
-#[cfg(feature = "server")] mod server;
+// game-server (or native-client)
+#[cfg(feature = "game-server")] mod server;
 #[cfg(feature = "server")] mod timed_loop;
 #[cfg(feature = "server")] mod peer;
+#[cfg(feature = "server")] mod native_socket_backend;
 #[cfg(feature = "game")] mod resource;
 
 #[macro_use]
@@ -29,3 +31,4 @@ mod net;
 #[cfg(feature = "game")] mod animation;
 mod prelude;
 #[cfg(feature = "game")] mod input;
+#[cfg(feature = "master-server")] mod master_server;

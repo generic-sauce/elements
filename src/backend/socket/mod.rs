@@ -7,8 +7,8 @@ use crate::prelude::*;
 #[cfg(feature = "web-client")] pub use web::*;
 
 pub trait SocketBackend {
-	fn new(server_ip: &str) -> Self;
+	fn new(server_ip: &str, port: u16) -> Self;
 	fn is_open(&self) -> bool;
-	fn send(&mut self, packet: &impl Packet);
+	fn send(&mut self, packet: &impl Packet) -> std::io::Result<()>;  // TODO: use better Result-Type
 	fn try_recv<P: Packet>(&mut self) -> Option<P>;
 }

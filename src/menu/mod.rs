@@ -22,15 +22,23 @@ fn create_client<B: Backend>() -> OnEvent<B> {
 		if let MenuKind::EditField( EditField { text, .. } ) = &app.menu.get_element_by_name("ip").unwrap().kind {
 			let text = text.clone();
 			app.menu.elements.clear();
-			*runnable = Runnable::Client(Client::new(&text));
+			*runnable = Runnable::Client(Client::new(&text, DEFAULT_GAME_SERVER_PORT));
 		} else {
 			panic!("Could not read ip from edit field!");
 		}
 	})
 }
 
+fn noop<B: Backend>(_app: &mut App<B>, _runnable: &mut Runnable<B>) {
+}
+
 fn create_join_server<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
 	app.menu = Menu::connect_server_menu();
+}
+
+fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
+	*runnable = Runnable::ServerConnector(ServerConnector::new("127.0.0.1"));
+	app.menu = Menu::server_connector_menu();
 }
 
 fn create_main_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
@@ -48,6 +56,7 @@ impl<B: Backend> Menu<B> {
 	pub fn main_menu() -> Menu<B> {
 		Menu {
 			elements: vec!(
+				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.5), CanvasVec::new(0.15, 0.05), "Join Game", Box::new(create_server_connector)),
 				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", create_local(9)),
 				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", create_local(5)),
 				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", create_local(0)),
@@ -64,6 +73,14 @@ impl<B: Backend> Menu<B> {
 				MenuElement::new_button(CanvasVec::new(0.15 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Back", Box::new(create_main_menu)),
 				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", Box::new(|_, _| std::process::exit(0))),
 				MenuElement::new_edit_field("ip", CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), ""),
+			)
+		}
+	}
+
+	pub fn server_connector_menu() -> Menu<B> {
+		Menu {
+			elements: vec!(
+				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connecting", Box::new(noop)),
 			)
 		}
 	}

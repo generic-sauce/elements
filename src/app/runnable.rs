@@ -4,6 +4,7 @@ pub enum Runnable<B: Backend> {
 	Menu,
 	Local(Local<B>),
 	Client(Client<B>),
+	ServerConnector(ServerConnector<B>),
 }
 
 impl<B: Backend> Runnable<B> {
@@ -19,6 +20,7 @@ impl<B: Backend> Runnable<B> {
 			Runnable::Menu => {},
 			Runnable::Local(local) => local.tick(app),
 			Runnable::Client(client) => client.tick(app),
+			Runnable::ServerConnector(server_connector) => server_connector.tick(app),
 		}
 	}
 
@@ -27,6 +29,7 @@ impl<B: Backend> Runnable<B> {
 			Runnable::Menu => {},
 			Runnable::Local(local) => local.draw(app),
 			Runnable::Client(client) => client.draw(app),
+			Runnable::ServerConnector(server_connector) => server_connector.draw(app),
 		}
 	}
 

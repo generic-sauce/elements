@@ -23,17 +23,17 @@ pub struct PeerManager {
 }
 
 impl PeerManager {
-	pub fn new() -> PeerManager {
+	pub fn new(port: u16, https_port: u16) -> PeerManager {
 		// native
-		let udp_socket = UdpSocket::bind(("0.0.0.0", PORT)).expect("Could not create server udp-socket");
+		let udp_socket = UdpSocket::bind(("0.0.0.0", port)).expect("Could not create server udp-socket");
 		udp_socket.set_nonblocking(true).unwrap();
 
 		// https
-		let https_listener = TcpListener::bind(("0.0.0.0", HTTPS_PORT)).expect("Could not create server https tcp-listener");
+		let https_listener = TcpListener::bind(("0.0.0.0", https_port)).expect("Could not create server https tcp-listener");
 		https_listener.set_nonblocking(true).unwrap();
 
 		// http
-		let http_listener = TcpListener::bind(("0.0.0.0", PORT)).expect("Could not create server http tcp-listener");
+		let http_listener = TcpListener::bind(("0.0.0.0", port)).expect("Could not create server http tcp-listener");
 		http_listener.set_nonblocking(true).unwrap();
 
 		let acceptor = tls_acceptor();
@@ -60,12 +60,13 @@ impl PeerManager {
 					_ => false,
 				});
 
-				let pos = pos.unwrap_or_else(|| {
-					peers.push(new_peer);
-					peers.len() - 1
-				});
-
-				recv_udp_packets.push((bytes, pos));
+				match pos {
+					Some(x) => recv_udp_packets.push((bytes, x)),
+					None => {
+						deser::<Init>(&bytes); // This will unwrap() in case its not an init packet!
+						peers.push(new_peer)
+					},
+				}
 			};
 
 			// handle old packets
@@ -131,14 +132,20 @@ impl PeerManager {
 		}
 
 		// fetch new packets
-		let (p, addr) = recv_packet::<P>(&mut self.udp_socket)?;
-		let idx = (0..2)
+		let (bytes, addr) = recv_bytes(&mut self.udp_socket)?;
+		let idx = (0..self.peers.len())
 			.find(|&i| match self.peers[i] {
 				Peer::Native(peer_addr) => peer_addr == addr,
 				_ => false,
-			})
-			.unwrap();
-		Some((p, idx))
+			});
+
+		match idx {
+			Some(i) => Some((deser::<P>(&bytes), i)),
+			None => {
+				self.accept_udp_packets.push((bytes, addr));
+				None
+			},
+		}
 	}
 
 	fn web_recv_from<P: Packet>(&mut self) -> Option<(P, usize)> {
@@ -155,6 +162,14 @@ impl PeerManager {
 
 	pub fn count(&self) -> usize {
 		self.peers.len()
+	}
+
+	pub fn get_udp_ip(&self, index: usize) -> Option<SocketAddr> {
+		if let Peer::Native(sock_addr) = self.peers[index] {
+			Some(sock_addr)
+		} else {
+			None
+		}
 	}
 }
 
