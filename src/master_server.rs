@@ -108,6 +108,7 @@ impl MasterServer {
 			self.clients.push(ClientInfo::new(peer_index, &name));
 		}
 		self.check_game_start();
+		
 	}
 
 	fn check_game_start(&mut self) {
