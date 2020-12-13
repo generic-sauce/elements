@@ -132,7 +132,6 @@ impl MasterServer {
 	}
 }
 
-
 impl ClientInfo {
 	fn new(peer_index: usize, name: &str) -> ClientInfo {
 		ClientInfo {

@@ -50,16 +50,16 @@ fn main() {
 			command.arg("-c").arg("./deploy.sh")
 				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
 				.uid(1000)
-				.gid(1000);
+				.gid(115);
 
 			match command.output() {
 				Ok(x) => {
 					println!("Deployed.status: {}", x.status);
 					if let Ok(text) = str::from_utf8(&x.stdout) {
-						println!("Deployed.stdout: {}", text);
+						println!("Deployed.stdout:\n{}", text);
 					}
 					if let Ok(text) = str::from_utf8(&x.stderr) {
-						println!("Deployed.stderr: {}", text);
+						println!("Deployed.stderr:\n{}", text);
 					}
 				}
 				Err(e) => { println!("Error executing deploy.sh: {}", e) }
