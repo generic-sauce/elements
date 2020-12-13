@@ -51,11 +51,16 @@ float ground(vec2 uv) {
 	return tile(uv) == 1 ? 1. : 0.;
 }
 
-vec3 ground_color(vec2 uv) {
+float xor(float a, float b) {
+	return 1. - abs(1. - a - b);
+}
+
+vec4 ground_color(vec2 uv) {
 	// tweaks
 	const float density = 2.;
 	const float grass_scale = .7;
-	float grass_thickness = 3.;
+	const int igrass_thickness = 3;
+	const float grass_thickness = float(igrass_thickness);
 	const float dirt_grass_threshold = .2;
 
 	// colors
@@ -76,11 +81,12 @@ vec3 ground_color(vec2 uv) {
 
 	float sum = 0.;
 	float all = 1.;
-	for (float i = 1.; i < grass_thickness + 1.5; ++i) {
-		float t = ground(uv + pxy * i);
+	for (int i = 1; i < igrass_thickness + 1; ++i) {
+		float t = ground(uv + pxy * float(i));
 		all *= t;
 		sum += all;
 	}
+	float any = step(.001, sum);
 
 	float grass_portion = 0.;
 	grass_portion += lv.y + (grass_thickness - sum);
@@ -98,12 +104,22 @@ vec3 ground_color(vec2 uv) {
 	vec3 dirt_color = mix(dirt0, dirt1, vec3(dirt_color_ratio));
 	vec3 grass_color = mix(grass0, grass1, vec3(grass_color_ratio));
 
-	/* return vec3(grass_portion); */
-	return mix(grass_color, dirt_color, step(dirt_grass_threshold, n_grass));
+	vec3 c = mix(grass_color, dirt_color, step(dirt_grass_threshold, n_grass));
+
+	float left = ground(uv - pxx);
+	float right = ground(uv + pxx);
+	float a = 1.;
+	a *= (1. - any);
+	a *= xor(left, right);
+	a -= left * step(0., (1. - lv.y) - lv.x);
+	a -= right * step(0., (1. - lv.y) - (1. - lv.x));
+	a = 1. - a;
+
+	return vec4(c, a);
 }
 
 void main() {
-	vec3 c;
+	vec4 c;
 	vec3 wall_color = vec3(.85, .95, .99);
 
 	int t = tile(uv);
@@ -112,21 +128,19 @@ void main() {
 		c = ground_color(uv + .00001);
 		break;
 	case 2: // wall player 0
-		c = wall_color;
+		c = vec4(wall_color, 1);
 		break;
 	case 3: // wall player 1
-		c = (1. - wall_color) * .5;
+		c = vec4((1. - wall_color) * .5, 1);
 		break;
 	case 0: // background
 	default:
-		{
-			discard; // discard until depth test is enabled
-			/* vec3 bright_bg = vec3(133, 178, 215) / 255.; */
-			/* vec3 dark_bg = vec3(37, 78, 205) / 255.; */
-			/* c = mix(dark_bg, bright_bg, vec3(uv.y)); */
-		}
+		c.a = 0.;
 	}
 
-	c = pow(c, vec3(2.2));
-	frag_color = vec4(c, 1);
+	if (c.a < .5)
+		discard;
+
+	c.rgb = pow(c.rgb, vec3(2.2));
+	frag_color = vec4(c.rgb, 1);
 }
