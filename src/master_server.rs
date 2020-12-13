@@ -122,6 +122,7 @@ impl MasterServer {
 	}
 
 	fn initiate_game(peer_manager: &mut PeerManager, game_server: &mut GameServerInfo, clients: &mut [&mut ClientInfo]) {
+		println!("initiating game with players: {}, {}", clients[0].name, clients[1].name);
 		for client in clients {
 			let game_server_ip = format!("{}", peer_manager.get_udp_ip(game_server.peer_index).unwrap().ip());
 			peer_manager.send_to(client.peer_index, &MasterClientPacket::GameRedirection(game_server_ip, game_server.port));
