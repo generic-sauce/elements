@@ -23,6 +23,7 @@ pub trait Backend: 'static {
 
 #[cfg(feature = "native-client")] mod native {
 	use super::*;
+	use crate::prelude::*;
 
 	pub struct NativeBackend;
 

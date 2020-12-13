@@ -95,6 +95,7 @@ pub use {
 	crate::{
 		timed_loop::*,
 		peer::*,
+		native_socket_backend::*,
 	}
 };
 
