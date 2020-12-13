@@ -14,9 +14,9 @@ pub struct Client<B: Backend> {
 }
 
 impl<B: Backend> Client<B> {
-	pub fn new(server_ip: &str) -> Client<B> {
+	pub fn new(server_ip: &str, port: u16) -> Client<B> {
 		Client {
-			socket: B::SocketBackend::new(server_ip, DEFAULT_GAME_SERVER_PORT),
+			socket: B::SocketBackend::new(server_ip, port),
 			mode: ClientMode::Lobby,
 		}
 	}

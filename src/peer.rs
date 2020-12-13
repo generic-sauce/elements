@@ -163,6 +163,14 @@ impl PeerManager {
 	pub fn count(&self) -> usize {
 		self.peers.len()
 	}
+
+	pub fn get_udp_ip(&self, index: usize) -> Option<SocketAddr> {
+		if let Peer::Native(sock_addr) = self.peers[index] {
+			Some(sock_addr)
+		} else {
+			None
+		}
+	}
 }
 
 fn tung_recv_packet<P: Packet>(socket: &mut WebPeer) -> Option<P> {

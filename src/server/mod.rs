@@ -8,7 +8,7 @@ const MAX_SILENT_GAME_SECONDS: u32 = 3;
 const JOIN_FPS: u32 = 10;
 const MAX_SILENT_JOIN_SECONDS: u32 = 2*60;
 
-const MASTER_SERVER_FRAME_INTERVAL: u32 = 10;
+const MASTER_SERVER_FRAME_INTERVAL: u32 = 50;
 
 pub struct Server {
 	world: World,
@@ -112,11 +112,11 @@ fn waiting_for_players() -> PeerManager {
 		}
 
 		// master server networking
-		packet_send_counter += 1;
-		if packet_send_counter >= MASTER_SERVER_FRAME_INTERVAL {
+		if packet_send_counter == 0 {
 			update_master_server(&mut socket, cnt as u32);
 			packet_send_counter = 0;
 		}
+		packet_send_counter = (packet_send_counter + 1) % MASTER_SERVER_FRAME_INTERVAL;
 	}
 
 	peer_manager
@@ -124,7 +124,7 @@ fn waiting_for_players() -> PeerManager {
 
 fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32) {
 	println!("sending master server packet");
-	if socket.send(&MasterServerPacket::GameServerStatusUpdate { num_players }).is_err() {
+	if socket.send(&MasterServerPacket::GameServerStatusUpdate { num_players, port: DEFAULT_GAME_SERVER_PORT }).is_err() {
 		println!("failed to inform master server!");
 	}
 }

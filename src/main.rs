@@ -23,7 +23,7 @@ fn main() {
 	thread::spawn(move || {
 		let mut runnable = match server_arg.as_deref() {
 			Some("menu") => Runnable::Menu,
-			Some(ip) => Runnable::Client(Client::new(ip)),
+			Some(ip) => Runnable::Client(Client::new(ip, DEFAULT_GAME_SERVER_PORT)),
 			None => Runnable::Local(Local::new(0)),
 		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);

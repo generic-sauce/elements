@@ -22,7 +22,7 @@ fn create_client<B: Backend>() -> OnEvent<B> {
 		if let MenuKind::EditField( EditField { text, .. } ) = &app.menu.get_element_by_name("ip").unwrap().kind {
 			let text = text.clone();
 			app.menu.elements.clear();
-			*runnable = Runnable::Client(Client::new(&text));
+			*runnable = Runnable::Client(Client::new(&text, DEFAULT_GAME_SERVER_PORT));
 		} else {
 			panic!("Could not read ip from edit field!");
 		}

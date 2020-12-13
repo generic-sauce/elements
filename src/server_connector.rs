@@ -4,16 +4,18 @@ pub struct ServerConnector<B: Backend> {
     pub socket: B::SocketBackend,
     pub request_send: bool,
     pub request_failed: bool,
+    pub game_ip: Option<(String, u16)>,
 }
 
 impl<B: Backend> ServerConnector<B> {
     pub fn new(master_server_ip: &str) -> ServerConnector<B> {
-        let mut socket = B::SocketBackend::new(master_server_ip, MASTER_SERVER_PORT);
+        let socket = B::SocketBackend::new(master_server_ip, MASTER_SERVER_PORT);
 
         ServerConnector {
             socket,
             request_send: false,
             request_failed: false,
+            game_ip: None,
         }
     }
 
@@ -25,8 +27,8 @@ impl<B: Backend> ServerConnector<B> {
             }
             self.request_send = true;
         }
-        if let Some(MasterClientPacket::GameRedirection(game_ip)) = self.socket.try_recv() {
-            unimplemented!("TODO: instantiate client");
+        if let Some(MasterClientPacket::GameRedirection(game_ip, port)) = self.socket.try_recv() {
+            self.game_ip = Some((game_ip, port));
         }
     }
 

@@ -17,7 +17,7 @@ pub fn client_main(answer: &str) {
 	let mut runnable = match answer {
 		"menu" => Runnable::Menu,
 		"" | "local" => Runnable::Local(Local::<WebBackend>::new(0)),
-		ip => Runnable::Client(Client::<WebBackend>::new(ip)),
+		ip => Runnable::Client(Client::<WebBackend>::new(ip, DEFAULT_GAME_SERVER_PORT)),
 	};
 
 	let input_backend = WebInputBackend;

@@ -59,7 +59,7 @@ impl<B: Backend> App<B> {
 		runnable.draw(self);
 
 		// TODO: improve
-		if let Runnable::Menu = runnable {
+		if matches!(runnable, Runnable::Menu | Runnable::ServerConnector(_)) {
 			self.draw_menu();
 		}
 
@@ -87,7 +87,10 @@ impl<B: Backend> App<B> {
 		if let Runnable::ServerConnector(server_connector) = runnable {
 			if server_connector.request_failed {
 				*runnable = Runnable::Menu;
-				self.menu = Menu::main_menu();
+				self.menu = Menu::main_menu();  // TODO: change to failed info
+			} else if let Some((ip, port)) = &server_connector.game_ip {
+				*runnable = Runnable::Client(Client::new(ip, *port));
+				self.menu = Menu::new();
 			}
 		}
 	}
