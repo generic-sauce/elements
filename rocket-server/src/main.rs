@@ -4,7 +4,6 @@
 
 use serde::{Serialize, Deserialize};
 use std::process::Command;
-use std::os::unix::process::CommandExt;
 use std::{str, thread};
 use rocket_contrib::json::Json;
 use std::sync::mpsc::{channel, Sender};
