@@ -15,12 +15,8 @@ pub struct Client<B: Backend> {
 
 impl<B: Backend> Client<B> {
 	pub fn new(server_ip: &str) -> Client<B> {
-		let mut socket = B::SocketBackend::new(server_ip, DEFAULT_GAME_SERVER_PORT);
-
-		socket.send(&Init::Init).unwrap();
-
 		Client {
-			socket,
+			socket: B::SocketBackend::new(server_ip, DEFAULT_GAME_SERVER_PORT),
 			mode: ClientMode::Lobby,
 		}
 	}

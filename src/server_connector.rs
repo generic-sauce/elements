@@ -10,8 +10,6 @@ impl<B: Backend> ServerConnector<B> {
     pub fn new(master_server_ip: &str) -> ServerConnector<B> {
         let mut socket = B::SocketBackend::new(master_server_ip, MASTER_SERVER_PORT);
 
-        // socket.send(&Init::Init).unwrap();
-
         ServerConnector {
             socket,
             request_send: false,

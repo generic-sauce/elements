@@ -121,10 +121,6 @@ fn waiting_for_players() -> PeerManager {
 		}
 	}
 
-	while let Some((p, _)) = peer_manager.recv_from::<Init>() {
-		assert!(matches!(p, Init::Init));
-	}
-
 	peer_manager
 }
 
