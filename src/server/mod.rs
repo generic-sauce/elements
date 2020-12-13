@@ -90,9 +90,7 @@ fn waiting_for_players() -> PeerManager {
 	let mut packet_send_counter = 0;
 
 	println!("creating master server socket");
-	let mut socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket for master server connection");
-	socket.set_nonblocking(true).unwrap();
-	socket.connect(("127.0.0.1", MASTER_SERVER_PORT)).expect("Could not connect to master server");
+	let mut socket = NativeSocketBackend::new("127.0.0.1", MASTER_SERVER_PORT);
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
 		let prev_cnt = peer_manager.count();
@@ -124,10 +122,9 @@ fn waiting_for_players() -> PeerManager {
 	peer_manager
 }
 
-fn update_master_server(socket: &mut UdpSocket, num_players: u32) {
+fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32) {
 	println!("sending master server packet");
-	match send_packet(socket, &MasterServerPacket::GameServerStatusUpdate { num_players }) {
-		Ok(()) => {},
-		Err(_e) => { println!("failed to inform master server!")},
+	if socket.send(&MasterServerPacket::GameServerStatusUpdate { num_players }).is_err() {
+		println!("failed to inform master server!");
 	}
 }
