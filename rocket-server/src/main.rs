@@ -44,6 +44,8 @@ fn main() {
 	thread::spawn(move || {
 		loop {
 			receiver.recv().unwrap();
+
+			println!("starting new deploy");
 			let mut command = Command::new("bash");
 			command.arg("-c").arg("./deploy.sh")
 				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
@@ -54,6 +56,9 @@ fn main() {
 					println!("Deployed.status: {}", x.status);
 					if let Ok(text) = str::from_utf8(&x.stdout) {
 						println!("Deployed.stdout: {}", text);
+					}
+					if let Ok(text) = str::from_utf8(&x.stderr) {
+						println!("Deployed.stderr: {}", text);
 					}
 				}
 				Err(e) => { println!("Error executing deploy.sh: {}", e) }
