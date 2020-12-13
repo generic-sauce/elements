@@ -37,7 +37,7 @@ fn create_join_server<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>)
 }
 
 fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
-	*runnable = Runnable::ServerConnector(ServerConnector::new("127.0.0.1"));
+	*runnable = Runnable::ServerConnector(ServerConnector::new("generic-sauce.de"));
 	app.menu = Menu::server_connector_menu();
 }
 

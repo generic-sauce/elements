@@ -90,7 +90,7 @@ fn waiting_for_players() -> PeerManager {
 	let mut packet_send_counter = 0;
 
 	println!("creating master server socket");
-	let mut socket = NativeSocketBackend::new("127.0.0.1", MASTER_SERVER_PORT);
+	let mut socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
 		let prev_cnt = peer_manager.count();
