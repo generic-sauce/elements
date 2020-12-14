@@ -21,7 +21,7 @@ impl Server {
 	pub fn new() -> Server {
 		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
 
-		println!("Server started. Waiting for players.");
+		println!("INFO: Server started. Waiting for players.");
 
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
@@ -45,11 +45,11 @@ impl Server {
 	}
 
 	pub fn run(&mut self) {
-		println!("Game has started!");
+		println!("INFO: Game started");
 
 		for timed_loop_info in TimedLoop::with_fps(GAME_FPS) {
 			if timed_loop_info.delta_time > timed_loop_info.interval {
-				println!("Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
+				println!("WARN: Framedrop. Frame took {}ms instead of {}ms", timed_loop_info.delta_time.as_millis(), timed_loop_info.interval.as_millis());
 			}
 
 			// receive packets
@@ -89,7 +89,7 @@ fn waiting_for_players() -> PeerManager {
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;
 
-	println!("creating master server socket");
+	println!("INFO: creating master server socket");
 	let mut socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
@@ -99,7 +99,7 @@ fn waiting_for_players() -> PeerManager {
 
 		if cnt > prev_cnt { // a new peer!
 			update_master_server(&mut socket, cnt as u32);
-			println!("a new player joined!");
+			println!("INFO: new player joined!");
 			if cnt == 2 {
 				break;
 			}
@@ -107,7 +107,7 @@ fn waiting_for_players() -> PeerManager {
 		} else if cnt > 0 { // if already a player is waiting..
 			silent_frames += 1;
 			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
-				panic!("No more players joined! Shutting down...");
+				panic!("WARN: Missing second player. Timeout! Shutting down...");
 			}
 		}
 
@@ -123,8 +123,7 @@ fn waiting_for_players() -> PeerManager {
 }
 
 fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32) {
-	println!("sending master server packet");
 	if socket.send(&MasterServerPacket::GameServerStatusUpdate { num_players, port: DEFAULT_GAME_SERVER_PORT }).is_err() {
-		println!("failed to inform master server!");
+		println!("WARN: failed to inform master server!");
 	}
 }
