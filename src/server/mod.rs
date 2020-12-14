@@ -15,10 +15,11 @@ pub struct Server {
 	update_desire: [u32; 2],
 	peer_manager: PeerManager,
 	silent_frames: u32,
+	port: u16,
 }
 
 impl Server {
-	pub fn new() -> Server {
+	pub fn new(port: u16) -> Server {
 		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
 
 		println!("INFO: Server started. Waiting for players.");
@@ -26,8 +27,9 @@ impl Server {
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
 			update_desire: [0, 0],
-			peer_manager: waiting_for_players(),
+			peer_manager: waiting_for_players(port),
 			silent_frames: 0,
+			port,
 		};
 
 		for i in 0..2 {
@@ -82,8 +84,8 @@ impl Server {
 	}
 }
 
-fn waiting_for_players() -> PeerManager {
-	let mut peer_manager = PeerManager::new(DEFAULT_GAME_SERVER_PORT, DEFAULT_GAME_SERVER_HTTPS_PORT);
+fn waiting_for_players(port: u16) -> PeerManager {
+	let mut peer_manager = PeerManager::new(port, port+1);
 
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;

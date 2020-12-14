@@ -11,9 +11,52 @@ use crate::prelude::*;
 
 #[cfg(feature = "native-client")]
 fn main() {
-	let server_arg = std::env::args().nth(1);
-	if let Some("server") = server_arg.as_deref() {
-		Server::new().run();
+	let matches = ClapApp::new("Elements Native Client")
+		.about("This is the Native Client of the Elements Game. Have fun :D")
+		.subcommand(SubCommand::with_name("server")
+			.about("Starts the Elements game server")
+			.arg(Arg::with_name("port")
+				.short("-p")
+				.long("--port")
+				.value_name("PORT")
+				.help(&format!("The server will bind this port. (default: {})", DEFAULT_GAME_SERVER_PORT))
+				.takes_value(true)
+			)
+		)
+		.subcommand(SubCommand::with_name("menu")
+			.about("Starts the Elements Native Clients menu")
+		)
+		.subcommand(SubCommand::with_name("connect")
+			.about("Connects to the following ip")
+			.arg(Arg::with_name("server-ip")
+				.help("The server ip to connect to")
+				.required(true)
+				.index(1)
+			)
+			.arg(Arg::with_name("port")
+				.short("-p")
+				.long("--port")
+				.value_name("PORT")
+				.help(&format!("The client will connect to this game server port. (default: {})", DEFAULT_GAME_SERVER_PORT))
+				.takes_value(true)
+			)
+		)
+		.subcommand(SubCommand::with_name("local")
+			.about("Starts the game locally")
+			.arg(Arg::with_name("best_of")
+				.short("-n")
+				.long("--best-of")
+				.value_name("BEST_OF")
+				.help("Defines the win condition of the match. The winner is the player who wins the most out of <best-of> games. (default: infinite)")
+			)
+		)
+		.get_matches();
+
+	if let Some(matches) = matches.subcommand_matches("server") {
+		let port = matches.value_of("port")
+			.map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
+			.unwrap_or(DEFAULT_GAME_SERVER_PORT);
+		Server::new(port).run();
 		return;
 	}
 
@@ -21,10 +64,22 @@ fn main() {
 	let (peripherals_sender, peripherals_receiver) = channel::<PeripheralsUpdate>();
 
 	thread::spawn(move || {
-		let mut runnable = match server_arg.as_deref() {
+		let mut runnable = match matches.subcommand_name() {
 			Some("menu") => Runnable::Menu,
-			Some(ip) => Runnable::Client(Client::new(ip, DEFAULT_GAME_SERVER_PORT)),
-			None => Runnable::Local(Local::new(0)),
+			Some("connect") => {
+				let matches = matches.subcommand_matches("connect").unwrap();
+				let ip = matches.value_of("server-ip").unwrap();
+				let port = matches.value_of("port")
+					.map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
+					.unwrap_or(DEFAULT_GAME_SERVER_PORT);
+				Runnable::Client(Client::new(&ip, port))
+			},
+			Some("local") => {
+				let matches = matches.subcommand_matches("local").unwrap();
+				let best_of = matches.value_of("best_of").map(|n| n.parse::<u32>().expect("Value of best of is invalid!")).unwrap_or(0);
+				Runnable::Local(Local::new(best_of))
+			},
+			_ => Runnable::Local(Local::new(0)),
 		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend::new(draw_sender);

@@ -84,6 +84,7 @@ pub use {
 		server::*,
 	},
 };
+#[cfg(feature = "game-server")] pub use clap::{App as ClapApp, Arg, SubCommand};
 
 // game-server (or native-client)
 #[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;

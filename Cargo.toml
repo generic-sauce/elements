@@ -10,7 +10,7 @@ edition = "2018"
 default = ["native-client"]
 game = []
 server = ["tungstenite", "native-tls"]
-game-server = ["game", "server"]
+game-server = ["game", "server", "clap"]
 client = ["game", "glyph_brush"]
 native-client = ["game-server", "client", "gilrs", "rodio", "wgpu", "winit", "bytemuck", "wgpu_glyph", "once_cell", "futures"]
 web-client =    ["client", "wasm-bindgen", "console_error_panic_hook", "js-sys", "web-sys"]
@@ -46,6 +46,7 @@ web-sys = { version = "0.3.45", optional = true, features = ["Window", "Performa
 # server
 tungstenite = { version = "0.11", optional = true }
 native-tls = { version = "0.2.6", optional = true }
+clap = { version = "~2.33.3", optional = true }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
