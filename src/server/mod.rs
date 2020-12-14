@@ -22,7 +22,7 @@ impl Server {
 	pub fn new(port: u16) -> Server {
 		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
 
-		println!("INFO: Server started. Waiting for players.");
+		println!("INFO: Server starting on port {}. Waiting for players.", port);
 
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
