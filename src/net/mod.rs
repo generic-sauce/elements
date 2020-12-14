@@ -15,7 +15,11 @@ pub trait Packet: Serialize + DeserializeOwned {}
 
 #[derive(Serialize, Deserialize)]
 pub enum MasterServerPacket {
-	GameServerStatusUpdate { num_players: u32, port: u16 },
+	GameServerStatusUpdate {
+		domain_name: String,
+		num_players: u32,
+		port: u16
+	},
     ClientRequest { name: String },
 }
 

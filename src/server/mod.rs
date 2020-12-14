@@ -122,7 +122,12 @@ fn waiting_for_players() -> PeerManager {
 }
 
 fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32) {
-	if socket.send(&MasterServerPacket::GameServerStatusUpdate { num_players, port: DEFAULT_GAME_SERVER_PORT }).is_err() {
+	let master_server_packet = MasterServerPacket::GameServerStatusUpdate {
+		domain_name: String::from("generic-sauce.de"), // TODO: make configurable
+		num_players,
+		port: DEFAULT_GAME_SERVER_PORT
+	};
+	if socket.send(&master_server_packet).is_err() {
 		println!("WARN: failed to inform master server!");
 	}
 }
