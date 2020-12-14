@@ -1,6 +1,8 @@
 use crate::prelude::*;
 
-pub const AWAITING_TIMEOUT: u32 = 50;
+pub const MASTER_SERVER_FPS: u32 = 10;
+pub const AWAITING_TIMEOUT: u32 = 5 * MASTER_SERVER_FPS;
+pub const CLIENT_REQUEST_TIMEOUT: u32 = 5 * MASTER_SERVER_FPS;
 
 pub struct MasterServer {
 	pub peer_manager: PeerManager,
@@ -15,17 +17,17 @@ pub struct GameServerInfo {
 	pub port: u16,
 }
 
-#[derive(Clone)]
 pub struct ClientInfo {
 	pub peer_index: usize,
 	pub name: String,
 	pub state: ClientState,
+	pub last_request_counter: u32,
 }
 
-#[derive(Clone)]
 pub enum ClientState {
 	Ready,
 	InGame,
+	Disconnected,
 }
 
 pub enum GameServerState {
@@ -49,12 +51,8 @@ impl MasterServer {
 	}
 
 	pub fn run(&mut self) {
-		for _info in TimedLoop::with_fps(10) {
-			let count_before = self.peer_manager.count();
+		for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
 			self.peer_manager.accept();
-			if self.peer_manager.count() != count_before {
-				println!("new peer connected, count: {}", self.peer_manager.count());
-			}
 
 			while let Some((packet, peer_index)) = self.peer_manager.recv_from::<MasterServerPacket>() {
 				match packet {
@@ -77,8 +75,19 @@ impl MasterServer {
 				*frames += 1;
 				if *frames > AWAITING_TIMEOUT {
 					// clients did not connect in 5 seconds -> make this server available again
+					println!("WARN: players did not connect. making Game Server available again.");
 					server.state = GameServerState::Ready;
 				}
+			}
+		}
+	}
+
+	fn check_clients(&mut self) {
+		for client in self.clients.iter_mut() {
+			client.last_request_counter += 1;
+			if client.last_request_counter >= CLIENT_REQUEST_TIMEOUT {
+				client.state = ClientState::Disconnected;
+				println!("INFO: client disconnected:  {}", client.name);
 			}
 		}
 	}
@@ -92,19 +101,25 @@ impl MasterServer {
 				game_server.state = GameServerState::Ready;
 			}
 			if game_server.port != port {
-				eprintln!("WARNING: game server changing port {} -> {}", game_server.port, port);
+				eprintln!("WARN: game server changing port {} -> {}", game_server.port, port);
 			}
 			game_server.port = port;
 		} else {
+			println!("INFO: new game server connected");
 			self.game_servers.push(GameServerInfo::new(peer_index, num_players, port));
 		}
 	}
 
 	fn apply_client_request(&mut self, peer_index: usize, name: String) {
-		println!("got client request: {}", name);
-		if let Some(client_info) = self.clients.iter_mut().find(|c| c.peer_index == peer_index) {
-			client_info.name = name;
+		if let Some(client) = self.clients.iter_mut().find(|c| c.peer_index == peer_index) {
+			client.name = name;
+			client.last_request_counter = 0;
+			if matches!(client.state, ClientState::Disconnected) {
+				println!("INFO: reactivating client: {}", client.name);
+				client.state = ClientState::Ready;
+			}
 		} else {
+			println!("INFO: new client connected: {}", name);
 			self.clients.push(ClientInfo::new(peer_index, &name));
 		}
 		self.check_game_start();
@@ -122,7 +137,7 @@ impl MasterServer {
 	}
 
 	fn initiate_game(peer_manager: &mut PeerManager, game_server: &mut GameServerInfo, clients: &mut [&mut ClientInfo]) {
-		println!("initiating game with players: {}, {}", clients[0].name, clients[1].name);
+		println!("INFO: initiating game with players: {}, {}", clients[0].name, clients[1].name);
 		for client in clients {
 			let game_server_ip = format!("{}", peer_manager.get_udp_ip(game_server.peer_index).unwrap().ip());
 			peer_manager.send_to(client.peer_index, &MasterClientPacket::GameRedirection(game_server_ip, game_server.port));
@@ -138,6 +153,7 @@ impl ClientInfo {
 			peer_index,
 			name: String::from(name),
 			state: ClientState::Ready,
+			last_request_counter: 0,
 		}
 	}
 }
