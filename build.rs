@@ -1,5 +1,6 @@
 use std::process::{Command, exit};
 use std::io::ErrorKind;
+use std::env;
 
 fn compile_shader(shader_name: &str) {
 	let glsl_path = format!("res/shader/{}{}", shader_name, ".glsl");
@@ -15,19 +16,19 @@ fn compile_shader(shader_name: &str) {
 		.arg("-o").arg(spv_path)
 		.status();
 
-    let status = match status.map_err(|e| e.kind()) {
-        Err(ErrorKind::NotFound) => {
-            println!("cargo:warning=glslangValidator not installed. Skipping shader compilation.");
-            exit(0)
-        },
-        Err(e) => Err(e).unwrap(),
-        Ok(exit_status) => exit_status,
-    };
+	let status = match status.map_err(|e| e.kind()) {
+		Err(ErrorKind::NotFound) => {
+			println!("cargo:warning=glslangValidator not installed. Skipping shader compilation.");
+			exit(0)
+		},
+		Err(e) => Err(e).unwrap(),
+		Ok(exit_status) => exit_status,
+	};
 
-    match status.code() {
-        Some(code) => if code != 0 { exit(code); },
-        None => if !status.success() { exit(1); },
-    }
+	match status.code() {
+		Some(code) => if code != 0 { exit(code); },
+		None => if !status.success() { exit(1); },
+	}
 }
 
 fn main() {
