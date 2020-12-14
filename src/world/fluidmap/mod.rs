@@ -45,7 +45,11 @@ impl World {
 			.map(|f| self.fluidmap.apply_grab(f, &self.players))
 			.map(|f| self.fluidmap.apply_forces(f, &self.tilemap, &self.players, self.frame_id))
 			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap))
-			.map(|mut f| { f.update_reference_position(); f});
+			.map(|mut f| {
+				f.update_reference_position();
+				f.ignore_counter = f.ignore_counter.checked_sub(1).unwrap_or(0);
+				f
+			});
 		self.fluidmap.grid = FluidMap::mk_grid(iter, self.fluidmap.size);
 	}
 }
