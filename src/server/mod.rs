@@ -90,7 +90,7 @@ fn waiting_for_players(port: u16) -> PeerManager {
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;
 
-	println!("INFO: creating master server socket");
+	println!("INFO: connecting to master server");
 	let mut socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
@@ -99,7 +99,7 @@ fn waiting_for_players(port: u16) -> PeerManager {
 		let cnt = peer_manager.count();
 
 		if cnt > prev_cnt { // a new peer!
-			update_master_server(&mut socket, cnt as u32);
+			update_master_server(&mut socket, cnt as u32, port);
 			println!("INFO: new player joined!");
 			if cnt == 2 {
 				break;
@@ -114,7 +114,7 @@ fn waiting_for_players(port: u16) -> PeerManager {
 
 		// master server networking
 		if packet_send_counter == 0 {
-			update_master_server(&mut socket, cnt as u32);
+			update_master_server(&mut socket, cnt as u32, port);
 			packet_send_counter = 0;
 		}
 		packet_send_counter = (packet_send_counter + 1) % MASTER_SERVER_FRAME_INTERVAL;
@@ -123,11 +123,11 @@ fn waiting_for_players(port: u16) -> PeerManager {
 	peer_manager
 }
 
-fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32) {
+fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32, port: u16) {
 	let master_server_packet = MasterServerPacket::GameServerStatusUpdate {
 		domain_name: String::from("generic-sauce.de"), // TODO: make configurable
 		num_players,
-		port: DEFAULT_GAME_SERVER_PORT
+		port,
 	};
 	if socket.send(&master_server_packet).is_err() {
 		println!("WARN: failed to inform master server!");
