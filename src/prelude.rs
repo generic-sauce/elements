@@ -7,7 +7,7 @@ pub use {
 		io::{Read, BufReader, ErrorKind},
 		time::{Duration, SystemTime, Instant},
 		thread::{self, sleep},
-		fs::File,
+		fs::{File, read},
 	},
 	bincode::{serialize, deserialize},
 	crate::{

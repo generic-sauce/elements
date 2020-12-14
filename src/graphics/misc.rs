@@ -56,3 +56,10 @@ pub(in crate::graphics) fn create_depth_texture(device: &wgpu::Device, size: Pix
 		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
 	})
 }
+
+pub(in crate::graphics) fn load_shader_from_file(device: &wgpu::Device, filepath: String) -> wgpu::ShaderModule {
+	let source = read(&filepath).expect(&format!("Could not read shader file: {}", filepath));
+	let source: Vec<u32> = bytemuck::cast_slice(&source[..]).to_vec();
+	let source = wgpu::ShaderModuleSource::SpirV(std::borrow::Cow::from(&source));
+	device.create_shader_module(source)
+}

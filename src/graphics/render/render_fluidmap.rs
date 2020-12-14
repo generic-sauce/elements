@@ -33,8 +33,8 @@ impl RenderFluidmap {
 			]
 		};
 
-		let vert = device.create_shader_module(wgpu::include_spirv!("../../../res/shader/fluidmap.vert.spv"));
-		let frag = device.create_shader_module(wgpu::include_spirv!("../../../res/shader/fluidmap.frag.spv"));
+		let vert = load_shader_from_file(device, res("shader/fluidmap.vert.spv"));
+		let frag = load_shader_from_file(device, res("shader/fluidmap.frag.spv"));
 
 		let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
 			label: Some("bind group layout"),
