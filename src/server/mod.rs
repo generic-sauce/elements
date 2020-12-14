@@ -41,7 +41,6 @@ impl Server {
 		}
 
 		server
-
 	}
 
 	pub fn run(&mut self) {

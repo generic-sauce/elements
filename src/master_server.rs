@@ -31,7 +31,7 @@ pub enum ClientState {
 }
 
 pub enum GameServerState {
-	Ready,
+	Ready, // TODO: make game servers disconnect
 	/*
 	 * This state is set, if this master server redirected clients to this game server,
 	 * but the game server did not acknowledged until now.
@@ -138,10 +138,10 @@ impl MasterServer {
 	}
 
 	fn initiate_game(peer_manager: &mut PeerManager, game_server: &mut GameServerInfo, clients: &mut [&mut ClientInfo]) {
-		println!("INFO: initiating game with players: {}, {}", clients[0].name, clients[1].name);
+		let game_server_ip = format!("{}", peer_manager.get_udp_ip(game_server.peer_index).unwrap().ip());
+		println!("INFO: initiating game with players: {}, {}\t server ip: {}", clients[0].name, clients[1].name, game_server_ip);
 		for client in clients {
-			let game_server_ip = format!("{}", peer_manager.get_udp_ip(game_server.peer_index).unwrap().ip());
-			peer_manager.send_to(client.peer_index, &MasterClientPacket::GameRedirection(game_server_ip, game_server.port));
+			peer_manager.send_to(client.peer_index, &MasterClientPacket::GameRedirection(game_server_ip.clone(), game_server.port));
 			game_server.state = GameServerState::AwaitingGame(0);
 			client.state = ClientState::InGame;
 		}
