@@ -84,7 +84,7 @@ impl MasterServer {
 	}
 
 	fn check_clients(&mut self) {
-		for client in self.clients.iter_mut() {
+		for client in self.clients.iter_mut().filter(|c| matches!(c.state, ClientState::Ready)) {
 			client.last_request_counter += 1;
 			if client.last_request_counter >= CLIENT_REQUEST_TIMEOUT {
 				client.state = ClientState::Disconnected;
