@@ -107,7 +107,7 @@ impl MasterServer {
 			}
 			game_server.port = port;
 		} else {
-			println!("INFO: new game server connected");
+			println!("INFO: new game server connected: {}:{}", domain_name, port);
 			self.game_servers.push(GameServerInfo::new(peer_index, domain_name, num_players, port));
 		}
 	}
