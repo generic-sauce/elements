@@ -65,6 +65,7 @@ impl MasterServer {
 				}
 			}
 
+			self.check_clients();
 			self.check_awaiting_servers();
 		}
 	}
