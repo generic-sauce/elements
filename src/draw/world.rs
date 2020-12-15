@@ -7,17 +7,18 @@ const WINNER_POSITIONS: [ViewVec; 2] = [ViewVec::new(0.065, 0.95), ViewVec::new(
 impl World {
 	pub fn draw<B: Backend>(&self, draw: &mut Draw, app: &App<B>) {
 		let sky_color = Color::rgb(
-			24.0 / 255.0,
-			18.0 / 255.0,
-			55.0 / 255.0,
+			48.0 / 455.0,
+			31.0 / 455.0,
+			25.0 / 455.0,
 		);
 
 		let sky_color = match self.restart_state {
 			RestartState::Restart { counter, .. } => {
-				let mut scale_color = Color { r: 3.0, g: 2.0, b: 0.4, a: 1.0 };
-				if let Some(1) = self.player_dead() {
-					scale_color = Color { r: 1.0, g: 3.0, b: 2.0, a: 1.0 };
-				}
+				let scale_color = Color::rgb(
+						3.0,
+						3.0,
+						3.0,
+					);
 				let rdc = FIGHT_END_COUNT as f32;
 				let counter = counter as f32;
 				let factor = (rdc - counter.min(rdc) * 0.9) / rdc;
