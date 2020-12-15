@@ -53,16 +53,15 @@ impl MasterServer {
 
 	pub fn run(&mut self) {
 		for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
-			self.peer_manager.accept();
-
-			while let Some((packet, peer_index)) = self.peer_manager.recv_from::<MasterServerPacket>() {
-				match packet {
-					MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port } => {
+			for ev in self.peer_manager.tick::<MasterServerPacket>() {
+				match ev {
+					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port }, peer_index) => {
 						self.apply_game_server_status_update(peer_index, domain_name, num_players, port);
 					},
-					MasterServerPacket::ClientRequest { name } => {
+					PeerEvent::ReceivedPacket(MasterServerPacket::ClientRequest { name }, peer_index) => {
 						self.apply_client_request(peer_index, name);
 					}
+					PeerEvent::NewPeer(_) => {},
 				}
 			}
 

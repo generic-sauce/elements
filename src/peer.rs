@@ -5,6 +5,11 @@ enum WebPeer {
 	Https(TungTlsSocket),
 }
 
+pub enum PeerEvent<R: Packet> {
+	NewPeer(usize),
+	ReceivedPacket(R, usize),
+}
+
 enum Peer {
 	Web(WebPeer),
 	Native(SocketAddr),
@@ -16,10 +21,6 @@ pub struct PeerManager {
 	http_listener: TcpListener,
 	acceptor: Option<Arc<TlsAcceptor>>,
 	peers: Vec<Peer>,
-
-	// the following are always disjoint
-	accept_udp_packets: Vec<(Vec<u8>, SocketAddr)>, // packets which will be handled on calling `accept`
-	recv_udp_packets: Vec<(Vec<u8>, usize /* peer index */)>, // packets which will be handled on calling `recv_from`
 }
 
 impl PeerManager {
@@ -44,41 +45,34 @@ impl PeerManager {
 			http_listener,
 			acceptor,
 			peers: Vec::new(),
-			accept_udp_packets: Vec::new(),
-			recv_udp_packets: Vec::new(),
 		}
 	}
 
-	pub fn accept(&mut self) {
-		{ // native
-			let Self { recv_udp_packets, peers, .. } = self; // this allows me to borrow just what I need in the closure below
-			let mut handle_packet = |(bytes, recv_addr)| {
-				let new_peer = Peer::Native(recv_addr);
+	pub fn tick<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
+		let mut events = Vec::new();
 
-				let pos = (0..peers.len()).find(|&i| match peers[i] {
-					Peer::Native(a) => a == recv_addr,
-					_ => false,
-				});
+		{ // native
+			while let Some((bytes, recv_addr)) = recv_bytes(&mut self.udp_socket) {
+				let pos = self.peers.iter().position(|p|
+					match p {
+						&Peer::Native(a) => a == recv_addr,
+						_ => false,
+					}
+				);
 
 				match pos {
-					Some(x) => recv_udp_packets.push((bytes, x)),
+					Some(x) => events.push(PeerEvent::ReceivedPacket(deser::<R>(&bytes), x)),
 					None => {
 						deser::<Init>(&bytes); // This will unwrap() in case its not an init packet!
-						peers.push(new_peer)
+
+						events.push(PeerEvent::NewPeer(self.peers.len()));
+						self.peers.push(Peer::Native(recv_addr));
 					},
 				}
-			};
-
-			// handle old packets
-			self.accept_udp_packets.drain(..).for_each(&mut handle_packet);
-
-			// fetch new packets
-			while let Some(x) = recv_bytes(&mut self.udp_socket) {
-				handle_packet(x);
 			}
 		}
 
-		// https
+		// https-accept
 		if let Some(acceptor) = self.acceptor.as_mut() {
 			loop {
 				match self.https_listener.accept().map_err(|e| e.kind()) {
@@ -86,6 +80,8 @@ impl PeerManager {
 						let tls_stream = acceptor.accept(stream).unwrap();
 						let mut tung = tungstenite::server::accept(tls_stream).unwrap();
 						tung.get_mut().get_mut().set_nonblocking(true).unwrap();
+
+						events.push(PeerEvent::NewPeer(self.peers.len()));
 						self.peers.push(Peer::Web(WebPeer::Https(tung)));
 					},
 					Err(ErrorKind::WouldBlock) => break,
@@ -94,18 +90,31 @@ impl PeerManager {
 			}
 		}
 
-		// http
+		// http-accept
 		loop {
 			match self.http_listener.accept().map_err(|e| e.kind()) {
 				Ok((stream, _)) => {
 					let mut tung = tungstenite::server::accept(stream).unwrap();
 					tung.get_mut().set_nonblocking(true).unwrap();
+
+					events.push(PeerEvent::NewPeer(self.peers.len()));
 					self.peers.push(Peer::Web(WebPeer::Http(tung)));
 				},
 				Err(ErrorKind::WouldBlock) => break,
 				Err(_) => panic!("listener.accept() failed"),
 			}
 		}
+
+		// http/https-recv
+		for (i, peer) in self.peers.iter_mut().enumerate() {
+			if let Peer::Web(web_peer) = peer {
+				while let Some(p) = tung_recv_packet::<R>(web_peer) {
+					events.push(PeerEvent::ReceivedPacket(p, i));
+				}
+			}
+		}
+
+		events
 	}
 
 	pub fn send_to(&mut self, i: usize, p: &impl Packet) {
@@ -117,34 +126,6 @@ impl PeerManager {
 			Peer::Web(WebPeer::Https(socket)) => {
 				socket.write_message(Message::Binary(ser(p))).unwrap();
 			}
-		}
-	}
-
-	pub fn recv_from<P: Packet>(&mut self) -> Option<(P, usize)> {
-		self.native_recv_from::<P>().or_else(|| self.web_recv_from::<P>())
-	}
-
-	fn native_recv_from<P: Packet>(&mut self) -> Option<(P, usize)> {
-		// return old packets
-		if !self.recv_udp_packets.is_empty() {
-			let (bytes, i) = self.recv_udp_packets.swap_remove(0);
-			return Some((deser::<P>(&bytes), i));
-		}
-
-		// fetch new packets
-		let (bytes, addr) = recv_bytes(&mut self.udp_socket)?;
-		let idx = (0..self.peers.len())
-			.find(|&i| match self.peers[i] {
-				Peer::Native(peer_addr) => peer_addr == addr,
-				_ => false,
-			});
-
-		match idx {
-			Some(i) => Some((deser::<P>(&bytes), i)),
-			None => {
-				self.accept_udp_packets.push((bytes, addr));
-				None
-			},
 		}
 	}
 
@@ -160,16 +141,16 @@ impl PeerManager {
 			.next()
 	}
 
-	pub fn count(&self) -> usize {
-		self.peers.len()
-	}
-
 	pub fn get_udp_ip(&self, index: usize) -> Option<SocketAddr> {
 		if let Peer::Native(sock_addr) = self.peers[index] {
 			Some(sock_addr)
 		} else {
 			None
 		}
+	}
+
+	pub fn count(&self) -> usize {
+		self.peers.len()
 	}
 }
 

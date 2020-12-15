@@ -54,13 +54,18 @@ impl Server {
 			}
 
 			// receive packets
-			while let Some((input_state, i)) = self.peer_manager.recv_from() {
-				let diff = self.world.players[i].input.diff(&input_state);
-				self.update_desire[0] += diff;
-				self.update_desire[1] += diff;
-				self.world.players[i].input = input_state;
-				self.world.players[i].input.clamp();
-				self.silent_frames = 0;
+			for ev in self.peer_manager.tick::<InputState>() {
+				match ev {
+					PeerEvent::ReceivedPacket(input_state, i) => {
+						let diff = self.world.players[i].input.diff(&input_state);
+						self.update_desire[0] += diff;
+						self.update_desire[1] += diff;
+						self.world.players[i].input = input_state;
+						self.world.players[i].input.clamp();
+						self.silent_frames = 0;
+					},
+					PeerEvent::NewPeer(_) => println!("new player joined while game is already running!"),
+				}
 			}
 
 			self.world.tick(&mut ());
@@ -94,18 +99,24 @@ fn waiting_for_players(port: u16) -> PeerManager {
 	let mut socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
-		let prev_cnt = peer_manager.count();
-		peer_manager.accept();
+		let events = peer_manager.tick::<InputState>(); // TODO this generic parameter is unused!
 		let cnt = peer_manager.count();
-
-		if cnt > prev_cnt { // a new peer!
-			update_master_server(&mut socket, cnt as u32, port);
-			println!("INFO: new player joined!");
-			if cnt == 2 {
-				break;
+		for ev in events {
+			match ev {
+				PeerEvent::NewPeer(_) => {
+					update_master_server(&mut socket, cnt as u32, port);
+					println!("INFO: new player joined!");
+					silent_frames = 0;
+				},
+				PeerEvent::ReceivedPacket(..) => println!("received packet before game start!"),
 			}
-			silent_frames = 0;
-		} else if cnt > 0 { // if already a player is waiting..
+		}
+
+		if cnt == 2 {
+			break;
+		}
+
+		if cnt > 0 {
 			silent_frames += 1;
 			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
 				panic!("WARN: Missing second player. Timeout! Shutting down...");
