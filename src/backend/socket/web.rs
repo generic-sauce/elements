@@ -45,7 +45,7 @@ impl SocketBackend for WebSocketBackend {
 		Ok(())
 	}
 
-	fn try_recv<P: Packet>(&mut self) -> Option<P> {
+	fn tick<P: Packet>(&mut self) -> Option<P> {
 		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
 
 		let bytes = match self.msg_receiver.try_recv() {
