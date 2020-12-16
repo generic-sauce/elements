@@ -170,11 +170,6 @@ fn main() {
 	panic!("web version does not have a main()!")
 }
 
-#[cfg(feature = "master-server")]
-fn main() {
-	MasterServer::new().run();
-}
-
 #[cfg(all(feature = "game-server", not(feature = "client")))]
 fn main() {
 	let matches = ClapApp::new("Elements Game Server")

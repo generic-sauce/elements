@@ -1,4 +1,5 @@
-use crate::prelude::*;
+use std::time::{Duration, Instant};
+use std::thread::sleep;
 
 #[derive(Clone)]
 pub struct TimedLoop {

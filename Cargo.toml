@@ -14,7 +14,6 @@ game-server = ["game", "server_feature", "clap"]
 client = ["game", "glyph_brush"]
 native-client = ["game-server", "client", "gilrs", "rodio", "wgpu", "winit", "bytemuck", "wgpu_glyph", "once_cell", "futures"]
 web-client =    ["client", "wasm-bindgen", "console_error_panic_hook", "js-sys", "web-sys"]
-master-server = ["server_feature"]
 
 [dependencies] # TODO not all of those dependencies are always required!
 image = "0.23"
@@ -50,6 +49,7 @@ clap = { version = "~2.33.3", optional = true }
 
 networking = { path = "networking" }
 server = { path = "server", optional = true }
+utils = { path = "utils" }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -58,4 +58,4 @@ crate-type = ["cdylib", "rlib"]
 debug = true
 
 [workspace]
-members = ["networking", "server"]
+members = ["networking", "server", "master_server", "utils"]
