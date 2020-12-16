@@ -1,6 +1,5 @@
 use std::process::{Command, exit};
 use std::io::ErrorKind;
-use std::env;
 
 fn compile_shader(shader_name: &str) {
 	let glsl_path = format!("res/shader/{}{}", shader_name, ".glsl");
