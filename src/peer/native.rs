@@ -6,23 +6,24 @@ impl PeerManager {
 		let mut events = Vec::new();
 
 		while let Some((bytes, recv_addr)) = recv_bytes(&mut self.udp_socket) {
-			let pos = self.peers.iter_mut()
-				.map(|p| &mut p.kind)
+			let pos = self.peers.iter()
 				.position(|p|
 					match p.kind {
 						PeerKind::Native(a) => a == recv_addr,
 						_ => false,
 					}
-				)
-				.filter(|p| p.alive);
+				);
 
 			match pos {
-				Some(x) => events.push(PeerEvent::ReceivedPacket(deser::<R>(&bytes), x)),
+				Some(i) => {
+					let handle = PeerHandle { index: i, generation: self.peers[i].generation };
+					events.push(PeerEvent::ReceivedPacket(deser::<R>(&bytes), handle));
+				},
 				None => {
 					deser::<Init>(&bytes); // This will unwrap() in case its not an init packet!
 
-					events.push(PeerEvent::NewPeer(self.peers.len()));
-					self.peers.push(Peer::Native(recv_addr));
+					let handle = add_peer(&mut self.peers, PeerKind::Native(recv_addr));
+					events.push(PeerEvent::NewPeer(handle));
 				},
 			}
 		}
