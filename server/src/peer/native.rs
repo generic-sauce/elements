@@ -1,7 +1,9 @@
-use super::*;
+use crate::peer::*;
+use networking::{recv_bytes, deser, PEER_DROP_TIMEOUT_SECS};
+use networking::packets::NativeCSPacket;
 
 impl PeerManager {
-	pub(super) fn tick_native<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
+	pub fn tick_native<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
 		let mut events = Vec::new();
 
 		// recv-packets

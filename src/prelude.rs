@@ -88,15 +88,12 @@ pub use {
 #[cfg(feature = "game-server")] pub use clap::{App as ClapApp, Arg, SubCommand};
 
 // game-server (or native-client)
-#[cfg(feature = "server")] pub type TungSocket = tungstenite::WebSocket<TcpStream>;
-#[cfg(feature = "server")] pub type TungTlsSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
-#[cfg(feature = "server")] pub use {
+#[cfg(feature = "server_feature")] pub use {
 	std::sync::Arc,
 	tungstenite::{protocol::Role, Message},
 	native_tls::{Identity, TlsAcceptor},
 	crate::{
 		timed_loop::*,
-		peer::*,
 		native_socket_backend::*,
 	}
 };

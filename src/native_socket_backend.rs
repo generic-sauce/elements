@@ -1,8 +1,5 @@
 use crate::prelude::*;
 
-pub const HEARTBEAT_TIME_SECS: u32 = 1;
-pub const PEER_DROP_TIMEOUT_SECS: u32 = 3; // = how long does a peer have to be inactive in order to be dropped
-
 pub struct NativeSocketBackend {
 	socket: UdpSocket,
 	last_sent_time: Instant,

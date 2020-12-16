@@ -1,7 +1,17 @@
-use crate::prelude::*;
+use std::net::{SocketAddr, UdpSocket, TcpListener, TcpStream};
+use std::time::Instant;
+use std::sync::Arc;
+use std::fs::File;
+use std::io::Read;
+use networking::{Packet, send_packet_to, ser};
+use native_tls::{TlsAcceptor, Identity};
+use tungstenite::Message;
 
-mod web;
 mod native;
+mod web;
+
+pub type TungSocket = tungstenite::WebSocket<TcpStream>;
+pub type TungTlsSocket = tungstenite::WebSocket<native_tls::TlsStream<TcpStream>>;
 
 pub enum PeerEvent<R: Packet> {
 	NewPeer(PeerHandle),

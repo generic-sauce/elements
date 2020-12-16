@@ -19,9 +19,8 @@ extern crate serde_derive;
 
 // game-server (or native-client)
 #[cfg(feature = "game-server")] mod server;
-#[cfg(feature = "server")] mod timed_loop;
-#[cfg(feature = "server")] mod peer;
-#[cfg(feature = "server")] mod native_socket_backend;
+#[cfg(feature = "server_feature")] mod timed_loop;
+#[cfg(feature = "server_feature")] mod native_socket_backend;
 #[cfg(feature = "game")] mod resource;
 
 

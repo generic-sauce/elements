@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use server::peer::{PeerManager, PeerHandle, PeerEvent};
 
 // update_desire is within 0..=1000
 const UPDATE_DESIRE_PER_FRAME: u32 = 350;

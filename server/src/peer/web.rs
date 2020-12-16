@@ -1,7 +1,10 @@
-use super::*;
+use crate::peer::{PeerManager, PeerEvent, add_peer, PeerKind, PeerHandle};
+use networking::{Packet, deser};
+use std::io::{ErrorKind, Read, Write};
+use tungstenite::Message;
 
 impl PeerManager {
-	pub(super) fn tick_web<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
+	pub fn tick_web<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
 		let mut events = Vec::new();
 
 		// https-accept
