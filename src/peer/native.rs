@@ -8,6 +8,7 @@ impl PeerManager {
 		while let Some((bytes, recv_addr)) = recv_bytes(&mut self.udp_socket) {
 			let handle = self.peers.iter()
 				.enumerate()
+				.filter(|(_, p)| p.alive)
 				.find(|(_, p)|
 					match p.kind {
 						PeerKind::Native { addr, .. } => addr == recv_addr,
@@ -41,9 +42,11 @@ impl PeerManager {
 
 		// drop old peers
 		for (i, p) in self.peers.iter_mut().enumerate() {
+			if !p.alive { continue; }
+
 			if let PeerKind::Native { last_recv_time, .. } = p.kind {
 				if last_recv_time.elapsed().as_secs() > PEER_DROP_TIMEOUT_SECS as u64 {
-					p.dead_since = Some(Instant::now());
+					p.alive = false;
 
 					let handle = PeerHandle {
 						index: i,
