@@ -13,6 +13,7 @@ pub use {
 	crate::{
 		net::*,
 	},
+	networking::{*, packets::*},
 };
 
 #[cfg(feature = "game")]
