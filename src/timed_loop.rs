@@ -3,9 +3,9 @@ use crate::prelude::*;
 #[derive(Clone)]
 pub struct TimedLoop {
 	pub interval: Duration,
-	current: SystemTime,
-	start_time: SystemTime,
-	prev_second: SystemTime,
+	current: Instant,
+	start_time: Instant,
+	prev_second: Instant,
 	frames_since_prev_second: u32,
 	duration_since_prev_second: Duration,
 	fps: u32,
@@ -14,7 +14,7 @@ pub struct TimedLoop {
 
 impl TimedLoop {
 	pub fn new(interval: Duration) -> TimedLoop {
-		let now = SystemTime::now();
+		let now = Instant::now();
 		TimedLoop {
 			interval,
 			current: now,
@@ -32,7 +32,7 @@ impl TimedLoop {
 	}
 
 	pub fn elapsed_time(&self) -> Duration {
-		(SystemTime::now().duration_since(self.start_time)).unwrap()
+		Instant::now().duration_since(self.start_time)
 	}
 }
 
@@ -48,23 +48,22 @@ impl Iterator for TimedLoop {
 	type Item = TimedLoopInfo;
 
 	fn next(&mut self) -> Option<Self::Item> {
-		let now = SystemTime::now();
+		let now = Instant::now();
 		let next = self.current + self.interval;
-		let sleep_duration = next.duration_since(now);
-		let delta_time = match sleep_duration {
-			Ok(duration) => {
+		let delta_time = match next.checked_duration_since(now) {
+			Some(duration) => {
 				self.current = next;
 				sleep(duration);
 				self.interval - duration
 			},
-			Err(err) => {
+			None => {
 				self.current = now;
-				self.interval + err.duration()
+				self.interval + now.duration_since(next)
 			},
 		};
 
 		let next_second = self.prev_second + Duration::from_secs(1);
-		if now.duration_since(next_second).is_ok() {
+		if now.checked_duration_since(next_second).is_some() {
 			self.fps = self.frames_since_prev_second;
 			self.frames_since_prev_second = 0;
 
