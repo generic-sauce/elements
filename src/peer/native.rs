@@ -41,10 +41,17 @@ impl PeerManager {
 		}
 
 		// drop old peers
-		for p in self.peers.iter_mut() {
+		for (i, p) in self.peers.iter_mut().enumerate() {
 			if let PeerKind::Native { last_recv_time, .. } = p.kind {
 				if last_recv_time.elapsed().as_secs() > PEER_DROP_TIMEOUT_SECS as u64 {
-					p.alive = false; // TODO actually drop them
+					p.alive = false;
+
+					let handle = PeerHandle {
+						index: i,
+						generation: p.generation,
+					};
+
+					events.push(PeerEvent::Disconnect(handle));
 				}
 			}
 		}

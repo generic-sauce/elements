@@ -40,14 +40,16 @@ impl PeerManager {
 
 		// recv + disconnect
 		for (index, peer) in self.peers.iter_mut().enumerate() {
+			if !peer.alive { continue; }
+
 			let handle = PeerHandle {
 				index,
 				generation: peer.generation,
 			};
 
 			match &mut peer.kind {
-				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s)),
-				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s)),
+				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)),
+				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)),
 				_ => {},
 			}
 		}
@@ -56,7 +58,7 @@ impl PeerManager {
 	}
 }
 
-fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mut tungstenite::WebSocket<C>) -> Vec<PeerEvent<P>> {
+fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mut tungstenite::WebSocket<C>, alive: &mut bool) -> Vec<PeerEvent<P>> {
 	let mut events = Vec::new();
 
 	if socket.can_write() {
@@ -69,6 +71,7 @@ fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mu
 				Ok(Message::Text(_)) => panic!("text should not be sent!"),
 				Ok(Message::Close(_)) => {
 					events.push(PeerEvent::Disconnect(handle));
+					*alive = false;
 				}
 				Ok(_) => continue,
 				Err(tungstenite::error::Error::Io(io_err)) => {
@@ -82,6 +85,7 @@ fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mu
 		}
 	} else {
 		events.push(PeerEvent::Disconnect(handle)); // TODO this may spam too much!
+		*alive = false;
 	}
 
 	events
