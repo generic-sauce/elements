@@ -4,7 +4,7 @@ pub use {
 	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},
 	std::{
 		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
-		io::{Read, BufReader, ErrorKind},
+		io::{Read, Write, BufReader, ErrorKind},
 		time::{Duration, SystemTime, Instant},
 		thread::{self, sleep},
 		fs::{File, read},

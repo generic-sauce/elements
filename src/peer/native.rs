@@ -6,12 +6,11 @@ impl PeerManager {
 		let mut events = Vec::new();
 
 		while let Some((bytes, recv_addr)) = recv_bytes(&mut self.udp_socket) {
-
 			let pos = self.peers.iter_mut()
 				.map(|p| &mut p.kind)
 				.position(|p|
 					match p.kind {
-						&PeerKind::Native(a) => a == recv_addr,
+						PeerKind::Native(a) => a == recv_addr,
 						_ => false,
 					}
 				)

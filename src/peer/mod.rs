@@ -63,14 +63,19 @@ impl PeerManager {
 	pub fn tick<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
 		let mut events = Vec::new();
 
-		events.extend(self.tick_udp());
+		events.extend(self.tick_native());
 		events.extend(self.tick_web());
 
 		events
 	}
 
 	pub fn send_to(&mut self, handle: PeerHandle, p: &impl Packet) {
-		match self.get_mut(handle) {
+		let opt = self.peers.get_mut(handle.index)
+			.filter(|p| p.alive)
+			.filter(|p| p.generation == handle.generation)
+			.map(|p| &mut p.kind);
+
+		match opt {
 			Some(PeerKind::Native(addr)) => send_packet_to(&mut self.udp_socket, p, *addr),
 			Some(PeerKind::Http(socket)) => {
 				if socket.can_write() { socket.write_message(Message::Binary(ser(p))).unwrap(); }
@@ -83,9 +88,13 @@ impl PeerManager {
 	}
 
 	pub fn get_udp_ip(&self, handle: PeerHandle) -> Option<SocketAddr> {
-		let k = self.get(handle).map(|p| p.kind);
-		if let Some(PeerKind::Native(addr)) = k {
-			Some(addr)
+		let opt = self.peers.get(handle.index)
+			.filter(|p| p.alive)
+			.filter(|p| p.generation == handle.generation)
+			.map(|p| &p.kind);
+
+		if let Some(PeerKind::Native(addr)) = opt {
+			Some(*addr)
 		} else {
 			None
 		}

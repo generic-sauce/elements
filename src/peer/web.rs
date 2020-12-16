@@ -39,9 +39,16 @@ impl PeerManager {
 		}
 
 		// recv + disconnect
-		for (i, peer) in self.peers.iter_mut().enumerate() {
-			if let Peer::Web(web_peer) = peer {
-				events.extend(tung_fetch_events::<R>(i, web_peer));
+		for (index, peer) in self.peers.iter_mut().enumerate() {
+			let handle = PeerHandle {
+				index,
+				generation: peer.generation,
+			};
+
+			match &mut peer.kind {
+				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s)),
+				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s)),
+				_ => {},
 			}
 		}
 
@@ -49,29 +56,19 @@ impl PeerManager {
 	}
 }
 
-fn tung_fetch_events<P: Packet>(i: usize, socket: &mut WebPeer) -> Vec<PeerEvent<P>> {
+fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mut tungstenite::WebSocket<C>) -> Vec<PeerEvent<P>> {
 	let mut events = Vec::new();
 
-	let is_tung_open = |socket: &mut WebPeer| match socket {
-		WebPeer::Http(s) => s.can_write(),
-		WebPeer::Https(s) => s.can_write(),
-	};
-
-	let read_fn = |socket: &mut WebPeer| match socket {
-		WebPeer::Http(s) => s.read_message(),
-		WebPeer::Https(s) => s.read_message(),
-	};
-
-	if is_tung_open(socket) {
+	if socket.can_write() {
 		loop {
-			match read_fn(socket) {
+			match socket.read_message() {
 				Ok(Message::Binary(bytes)) => {
 					let p = deser::<P>(&bytes[..]);
-					events.push(PeerEvent::ReceivedPacket(p, i));
+					events.push(PeerEvent::ReceivedPacket(p, handle));
 				},
 				Ok(Message::Text(_)) => panic!("text should not be sent!"),
 				Ok(Message::Close(_)) => {
-					events.push(PeerEvent::Disconnect(i));
+					events.push(PeerEvent::Disconnect(handle));
 				}
 				Ok(_) => continue,
 				Err(tungstenite::error::Error::Io(io_err)) => {
@@ -83,6 +80,8 @@ fn tung_fetch_events<P: Packet>(i: usize, socket: &mut WebPeer) -> Vec<PeerEvent
 				e @ Err(_) => { e.unwrap(); unreachable!(); },
 			}
 		}
+	} else {
+		events.push(PeerEvent::Disconnect(handle)); // TODO this may spam too much!
 	}
 
 	events
