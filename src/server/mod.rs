@@ -149,6 +149,8 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>) -> (PeerManager, [P
 
 		// master server networking
 		if let Some((domain_name, socket)) = &mut master_socket {
+			master_socket.tick::<()>();
+
 			if packet_send_counter == 0 {
 				update_master_server(socket, cnt as u32, port, domain_name);
 				packet_send_counter = 0;
