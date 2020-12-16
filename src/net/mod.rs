@@ -11,9 +11,9 @@ pub const DEFAULT_GAME_SERVER_HTTPS_PORT: u16 = 7576; // HTTPS
 pub const MASTER_SERVER_PORT: u16 = 7542;
 pub const MASTER_SERVER_HTTPS_PORT: u16 = 7543;
 
-pub trait Packet: Serialize + DeserializeOwned {}
+pub trait Packet: Serialize + DeserializeOwned + Clone {}
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum MasterServerPacket {
 	GameServerStatusUpdate {
 		domain_name: String,
@@ -25,18 +25,12 @@ pub enum MasterServerPacket {
 
 impl Packet for MasterServerPacket {}
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum MasterClientPacket {
 	GameRedirection(String, u16),
 }
 
 impl Packet for MasterClientPacket {}
-
-#[derive(Serialize, Deserialize)]
-// this is an enum as every socket object needs a size > 0
-pub enum Init { Init }
-
-impl Packet for Init {}
 
 #[allow(unused)]
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) -> std::io::Result<()> {
@@ -85,3 +79,35 @@ pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
 pub fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
 	deserialize(bytes).unwrap()
 }
+
+
+// native
+
+#[derive(Clone)]
+pub enum NativeCSPacket<P: Packet> { // Native Client To Server Packet
+	Payload(P),
+	Heartbeat,
+}
+
+impl<P: Packet> Serialize for NativeCSPacket<P> {
+	fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where S: Serializer {
+		match self {
+			NativeCSPacket::Heartbeat => None,
+			NativeCSPacket::Payload(p) => Some(p.clone()),
+		}.serialize(serializer)
+	}
+}
+
+impl<'de, P: Packet> Deserialize<'de> for NativeCSPacket<P> {
+	fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where D: Deserializer<'de> {
+		<Option<P>>::deserialize(deserializer)
+			.map(|opt| match opt {
+				None => NativeCSPacket::Heartbeat,
+				Some(p) => NativeCSPacket::Payload(p),
+			})
+	}
+}
+
+impl<P: Packet> Packet for NativeCSPacket<P> {}
+
+impl Packet for () {}

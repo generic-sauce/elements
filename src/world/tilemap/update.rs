@@ -1,13 +1,13 @@
 use crate::prelude::*;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TileMapUpdateWall {
 	owner: usize,
 	remaining_lifetime: u32,
 	position: TileVec,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TileMapUpdate {
 	walls: Vec<TileMapUpdateWall>,
 }

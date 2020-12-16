@@ -25,7 +25,7 @@ impl<B: Backend> Client<B> {
 		match &mut self.mode {
 			ClientMode::Lobby => {
 				if !self.socket.is_open() { return; }
-				if let Some(Go { your_player_id, tilemap_image }) = self.socket.try_recv() {
+				if let Some(Go { your_player_id, tilemap_image }) = self.socket.tick() {
 					self.mode = ClientMode::InGame {
 						player_id: your_player_id,
 						world: World::new(0, &tilemap_image),
@@ -34,7 +34,7 @@ impl<B: Backend> Client<B> {
 			},
 			ClientMode::InGame { player_id, world } => {
 				// receive packets
-				if let Some(update) = self.socket.try_recv::<WorldUpdate>() {
+				if let Some(update) = self.socket.tick::<WorldUpdate>() {
 					world.apply_update_within_app(update, app);
 				}
 
