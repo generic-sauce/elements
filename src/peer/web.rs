@@ -14,8 +14,8 @@ impl PeerManager {
 						let mut tung = tungstenite::server::accept(tls_stream).unwrap();
 						tung.get_mut().get_mut().set_nonblocking(true).unwrap();
 
-						events.push(PeerEvent::NewPeer(self.peers.len()));
-						self.peers.push(Peer::Web(WebPeer::Https(tung)));
+						let handle = add_peer(&mut self.peers, PeerKind::Https(tung));
+						events.push(PeerEvent::NewPeer(handle));
 					},
 					Err(ErrorKind::WouldBlock) => break,
 					Err(_) => panic!("listener.accept() failed"),
@@ -30,8 +30,8 @@ impl PeerManager {
 					let mut tung = tungstenite::server::accept(stream).unwrap();
 					tung.get_mut().set_nonblocking(true).unwrap();
 
-					events.push(PeerEvent::NewPeer(self.peers.len()));
-					self.peers.push(Peer::Web(WebPeer::Http(tung)));
+					let handle = add_peer(&mut self.peers, PeerKind::Http(tung));
+					events.push(PeerEvent::NewPeer(handle));
 				},
 				Err(ErrorKind::WouldBlock) => break,
 				Err(_) => panic!("listener.accept() failed"),

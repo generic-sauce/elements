@@ -91,23 +91,6 @@ impl PeerManager {
 		}
 	}
 
-	fn get(&self, handle: PeerHandle) -> Option<&PeerKind> {
-		self.peers.get(handle.index)
-			.filter(|p| p.generation == handle.generation)
-			.filter(|p| p.alive)
-			.map(|p| &p.kind)
-	}
-
-	fn get_mut(&mut self, handle: PeerHandle) -> Option<&mut PeerKind> {
-		self.peers.get_mut(handle.index)
-			.filter(|p| p.generation == handle.generation)
-			.filter(|p| p.alive)
-			.map(|p| &mut p.kind)
-	}
-
-	fn kinds(&mut self) -> impl Iterator<Item=&mut PeerKind> + '_ {
-	}
-
 	pub fn get_peer_handles(&self) -> Vec<PeerHandle> {
 		self.peers.iter()
 			.enumerate()
@@ -120,6 +103,21 @@ impl PeerManager {
 	}
 }
 
+fn add_peer(peers: &mut Vec<Peer>, kind: PeerKind) -> PeerHandle { // TODO re-use long-dead indices
+	let index = peers.len();
+	let peer = Peer {
+		generation: 0,
+		alive: true,
+		kind,
+	};
+	peers.push(peer);
+
+	PeerHandle {
+		generation: 0,
+		index,
+	}
+}
+
 fn tls_acceptor() -> Option<Arc<TlsAcceptor>> {
 	let mut file = File::open("/root/identity.pfx").ok()?;
 	let mut identity = vec![];
@@ -129,3 +127,4 @@ fn tls_acceptor() -> Option<Arc<TlsAcceptor>> {
 	let acceptor = TlsAcceptor::new(identity).unwrap();
 	Some(Arc::new(acceptor))
 }
+
