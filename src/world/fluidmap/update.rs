@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct FluidMapUpdate {
 	pub fluids: Vec<Fluid>,
 	pub next_id: u32,

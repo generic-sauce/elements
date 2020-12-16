@@ -6,25 +6,32 @@ impl PeerManager {
 		let mut events = Vec::new();
 
 		while let Some((bytes, recv_addr)) = recv_bytes(&mut self.udp_socket) {
-			let pos = self.peers.iter()
-				.position(|p|
+			let handle = self.peers.iter()
+				.enumerate()
+				.find(|(_, p)|
 					match p.kind {
 						PeerKind::Native(a) => a == recv_addr,
 						_ => false,
 					}
+				).map(|(i, p)|
+					PeerHandle {
+						index: i,
+						generation: p.generation,
+					}
 				);
 
-			match pos {
-				Some(i) => {
-					let handle = PeerHandle { index: i, generation: self.peers[i].generation };
-					events.push(PeerEvent::ReceivedPacket(deser::<R>(&bytes), handle));
-				},
-				None => {
-					deser::<Init>(&bytes); // This will unwrap() in case its not an init packet!
+			let packet = deser::<NativeCSPacket<R>>(&bytes);
 
-					let handle = add_peer(&mut self.peers, PeerKind::Native(recv_addr));
-					events.push(PeerEvent::NewPeer(handle));
-				},
+			// guarantee that peer exists
+			let handle = handle.unwrap_or_else(|| {
+				let new_handle = add_peer(&mut self.peers, PeerKind::Native(recv_addr));
+				events.push(PeerEvent::NewPeer(new_handle));
+
+				new_handle
+			});
+
+			if let NativeCSPacket::Payload(p) = packet {
+				events.push(PeerEvent::ReceivedPacket(p, handle));
 			}
 		}
 

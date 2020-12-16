@@ -13,7 +13,7 @@ impl SocketBackend for NativeSocketBackend {
 		NativeSocketBackend::send(self, packet)
 	}
 
-	fn try_recv<P: Packet>(&mut self) -> Option<P> {
-		NativeSocketBackend::try_recv(self)
+	fn tick<P: Packet>(&mut self) -> Option<P> {
+		NativeSocketBackend::tick(self)
 	}
 }
