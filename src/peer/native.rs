@@ -23,17 +23,25 @@ impl PeerManager {
 
 			let packet = deser::<NativeCSPacket<R>>(&bytes);
 
-			// guarantee that peer exists
-			let handle = handle.unwrap_or_else(|| {
-				let kind = PeerKind::Native {
-					addr: recv_addr,
-					last_recv_time: Instant::now(),
-				};
-				let new_handle = add_peer(&mut self.peers, kind);
-				events.push(PeerEvent::NewPeer(new_handle));
+			let handle = match handle {
+				Some(h) => { // if peer existed before: update last_recv_time
+					if let PeerKind::Native { last_recv_time, .. } = &mut self.peers[h.index].kind {
+						*last_recv_time = Instant::now();
+					}
 
-				new_handle
-			});
+					h
+				},
+				None => { // if peer didn't exist before: add new peer
+					let kind = PeerKind::Native {
+						addr: recv_addr,
+						last_recv_time: Instant::now(),
+					};
+					let new_handle = add_peer(&mut self.peers, kind);
+					events.push(PeerEvent::NewPeer(new_handle));
+
+					new_handle
+				}
+			};
 
 			if let NativeCSPacket::Payload(p) = packet {
 				events.push(PeerEvent::ReceivedPacket(p, handle));
