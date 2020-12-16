@@ -1,5 +1,3 @@
-#[cfg(feature = "master-server")] mod master;
-#[cfg(feature = "master-server")] pub use master::*;
 #[cfg(feature = "game")] mod game;
 #[cfg(feature = "game")] pub use game::*;
 
