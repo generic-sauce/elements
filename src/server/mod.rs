@@ -65,6 +65,7 @@ impl Server {
 						self.silent_frames = 0;
 					},
 					PeerEvent::NewPeer(_) => println!("new player joined while game is already running!"),
+					PeerEvent::Disconnect(_) => println!("a player disconnected!"),
 				}
 			}
 
@@ -109,6 +110,7 @@ fn waiting_for_players(port: u16) -> PeerManager {
 					silent_frames = 0;
 				},
 				PeerEvent::ReceivedPacket(..) => println!("received packet before game start!"),
+				PeerEvent::Disconnect(_) => unimplemented!("handle disconnect"), // TODO
 			}
 		}
 
