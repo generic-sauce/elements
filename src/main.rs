@@ -22,6 +22,13 @@ fn main() {
 				.help(&format!("The server will bind this port. (default: {})", DEFAULT_GAME_SERVER_PORT))
 				.takes_value(true)
 			)
+			.arg(Arg::with_name("domain_name")
+				.short("-d")
+				.long("--domain-name")
+				.value_name("DOMAIN_NAME")
+				.help(&"The domain name of this server. Only used, if connecting to a master server.")
+				.takes_value(true)
+			)
 		)
 		.subcommand(SubCommand::with_name("menu")
 			.about("Starts the Elements Native Clients menu")
@@ -56,7 +63,8 @@ fn main() {
 		let port = matches.value_of("port")
 			.map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
 			.unwrap_or(DEFAULT_GAME_SERVER_PORT);
-		Server::new(port).run();
+		let domain_name = matches.value_of("domain_name");
+		Server::new(port, domain_name).run();
 		return;
 	}
 
@@ -178,9 +186,17 @@ fn main() {
 			.help(&format!("The server will bind this port. (default: {})", DEFAULT_GAME_SERVER_PORT))
 			.takes_value(true)
 		)
+		.arg(Arg::with_name("domain_name")
+			.short("-d")
+			.long("--domain-name")
+			.value_name("DOMAIN_NAME")
+			.help(&"The domain name of this server. Only used, if connecting to a master server.")
+			.takes_value(true)
+		)
 		.get_matches();
 	let port = matches.value_of("port")
 		.map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
 		.unwrap_or(DEFAULT_GAME_SERVER_PORT);
-	Server::new(port).run();
+	let domain_name = matches.value_of("domain_name");
+	Server::new(port, domain_name).run();
 }

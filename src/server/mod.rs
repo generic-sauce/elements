@@ -15,11 +15,10 @@ pub struct Server {
 	update_desire: [u32; 2],
 	peer_manager: PeerManager,
 	silent_frames: u32,
-	port: u16,
 }
 
 impl Server {
-	pub fn new(port: u16) -> Server {
+	pub fn new(port: u16, domain_name: Option<&str>) -> Server {
 		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
 
 		println!("INFO: Server starting on port {}. Waiting for players.", port);
@@ -27,9 +26,8 @@ impl Server {
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
 			update_desire: [0, 0],
-			peer_manager: waiting_for_players(port),
+			peer_manager: waiting_for_players(port, domain_name),
 			silent_frames: 0,
-			port,
 		};
 
 		for i in 0..2 {
@@ -84,14 +82,19 @@ impl Server {
 	}
 }
 
-fn waiting_for_players(port: u16) -> PeerManager {
+fn waiting_for_players(port: u16, domain_name: Option<&str>) -> PeerManager {
 	let mut peer_manager = PeerManager::new(port, port+1);
 
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;
 
-	println!("INFO: connecting to master server");
-	let mut socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
+	let mut master_socket = None;
+	if domain_name.is_some() {
+		println!("INFO: connecting to master server");
+		master_socket = Some(NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT));
+	} else {
+		println!("INFO: NOT connecting to master server as domain name is not specified");
+	}
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
 		let prev_cnt = peer_manager.count();
@@ -99,7 +102,8 @@ fn waiting_for_players(port: u16) -> PeerManager {
 		let cnt = peer_manager.count();
 
 		if cnt > prev_cnt { // a new peer!
-			update_master_server(&mut socket, cnt as u32, port);
+			// update master
+			packet_send_counter = 0;
 			println!("INFO: new player joined!");
 			if cnt == 2 {
 				break;
@@ -113,19 +117,21 @@ fn waiting_for_players(port: u16) -> PeerManager {
 		}
 
 		// master server networking
-		if packet_send_counter == 0 {
-			update_master_server(&mut socket, cnt as u32, port);
-			packet_send_counter = 0;
+		if let Some(socket) = &mut master_socket {
+			if packet_send_counter == 0 {
+				update_master_server(socket, cnt as u32, port, domain_name.unwrap());
+				packet_send_counter = 0;
+			}
+			packet_send_counter = (packet_send_counter + 1) % MASTER_SERVER_FRAME_INTERVAL;
 		}
-		packet_send_counter = (packet_send_counter + 1) % MASTER_SERVER_FRAME_INTERVAL;
 	}
 
 	peer_manager
 }
 
-fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32, port: u16) {
+fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32, port: u16, domain_name: &str) {
 	let master_server_packet = MasterServerPacket::GameServerStatusUpdate {
-		domain_name: String::from("generic-sauce.de"), // TODO: make configurable
+		domain_name: String::from(domain_name),
 		num_players,
 		port,
 	};
