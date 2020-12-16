@@ -11,7 +11,7 @@ pub struct MasterServer {
 }
 
 pub struct GameServerInfo {
-	pub peer_index: usize,
+	pub peer: PeerHandle,
 	pub domain_name: String,
 	pub num_players: u32,
 	pub state: GameServerState,
@@ -19,7 +19,7 @@ pub struct GameServerInfo {
 }
 
 pub struct ClientInfo {
-	pub peer_index: usize,
+	pub peer: PeerHandle,
 	pub name: String,
 	pub state: ClientState,
 	pub last_request_counter: u32,
@@ -55,13 +55,17 @@ impl MasterServer {
 		for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
 			for ev in self.peer_manager.tick::<MasterServerPacket>() {
 				match ev {
-					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port }, peer_index) => {
-						self.apply_game_server_status_update(peer_index, domain_name, num_players, port);
-					},
-					PeerEvent::ReceivedPacket(MasterServerPacket::ClientRequest { name }, peer_index) => {
-						self.apply_client_request(peer_index, name);
+					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port }, peer) => {
+						self.apply_game_server_status_update(peer, domain_name, num_players, port);
+					}
+					PeerEvent::ReceivedPacket(MasterServerPacket::ClientRequest { name }, peer) => {
+						self.apply_client_request(peer, name);
 					}
 					PeerEvent::NewPeer(_) => {},
+					PeerEvent::Disconnect(peer) => {
+						self.game_servers.retain(|gs| gs.peer != peer);
+						self.clients.retain(|gs| gs.peer != peer);
+					}
 				}
 			}
 
@@ -93,8 +97,8 @@ impl MasterServer {
 		}
 	}
 
-	fn apply_game_server_status_update(&mut self, peer_index: usize, domain_name: String, num_players: u32, port: u16) {
-		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer_index == peer_index) {
+	fn apply_game_server_status_update(&mut self, peer_index: PeerHandle, domain_name: String, num_players: u32, port: u16) {
+		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer == peer_index) {
 			game_server.num_players = num_players;
 			if num_players == 2 {
 				game_server.state = GameServerState::InGame;
@@ -112,8 +116,8 @@ impl MasterServer {
 		}
 	}
 
-	fn apply_client_request(&mut self, peer_index: usize, name: String) {
-		if let Some(client) = self.clients.iter_mut().find(|c| c.peer_index == peer_index) {
+	fn apply_client_request(&mut self, peer: PeerHandle, name: String) {
+		if let Some(client) = self.clients.iter_mut().find(|c| c.peer == peer) {
 			client.name = name;
 			client.last_request_counter = 0;
 			if matches!(client.state, ClientState::Disconnected) {
@@ -122,7 +126,7 @@ impl MasterServer {
 			}
 		} else {
 			println!("INFO: new client connected: {}", name);
-			self.clients.push(ClientInfo::new(peer_index, &name));
+			self.clients.push(ClientInfo::new(peer, &name));
 		}
 		self.check_game_start();
 	}
@@ -141,7 +145,7 @@ impl MasterServer {
 	fn initiate_game(peer_manager: &mut PeerManager, game_server: &mut GameServerInfo, clients: &mut [&mut ClientInfo]) {
 		println!("INFO: initiating game with players: {}, {}\t server addr: {}:{}", clients[0].name, clients[1].name, &game_server.domain_name, game_server.port);
 		for client in clients {
-			peer_manager.send_to(client.peer_index, &MasterClientPacket::GameRedirection(game_server.domain_name.clone(), game_server.port));
+			peer_manager.send_to(client.peer, &MasterClientPacket::GameRedirection(game_server.domain_name.clone(), game_server.port));
 			game_server.state = GameServerState::AwaitingGame(0);
 			client.state = ClientState::InGame;
 		}
@@ -149,9 +153,9 @@ impl MasterServer {
 }
 
 impl ClientInfo {
-	fn new(peer_index: usize, name: &str) -> ClientInfo {
+	fn new(peer: PeerHandle, name: &str) -> ClientInfo {
 		ClientInfo {
-			peer_index,
+			peer,
 			name: String::from(name),
 			state: ClientState::Ready,
 			last_request_counter: 0,
@@ -160,9 +164,9 @@ impl ClientInfo {
 }
 
 impl GameServerInfo {
-	pub fn new(peer_index: usize, domain_name: String, num_players: u32, port: u16) -> GameServerInfo {
+	pub fn new(peer: PeerHandle, domain_name: String, num_players: u32, port: u16) -> GameServerInfo {
 		GameServerInfo {
-			peer_index,
+			peer,
 			domain_name,
 			num_players,
 			state: GameServerState::Ready,
