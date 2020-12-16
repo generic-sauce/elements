@@ -12,7 +12,10 @@ pub enum PeerEvent<R: Packet> {
 enum PeerKind {
 	Http(TungSocket),
 	Https(TungTlsSocket),
-	Native(SocketAddr),
+	Native {
+		addr: SocketAddr,
+		last_recv_time: Instant,
+	},
 }
 
 struct Peer {
@@ -76,7 +79,7 @@ impl PeerManager {
 			.map(|p| &mut p.kind);
 
 		match opt {
-			Some(PeerKind::Native(addr)) => send_packet_to(&mut self.udp_socket, p, *addr),
+			Some(PeerKind::Native { addr, .. }) => send_packet_to(&mut self.udp_socket, p, *addr),
 			Some(PeerKind::Http(socket)) => {
 				if socket.can_write() { socket.write_message(Message::Binary(ser(p))).unwrap(); }
 			},
@@ -93,7 +96,7 @@ impl PeerManager {
 			.filter(|p| p.generation == handle.generation)
 			.map(|p| &p.kind);
 
-		if let Some(PeerKind::Native(addr)) = opt {
+		if let Some(PeerKind::Native { addr, .. }) = opt {
 			Some(*addr)
 		} else {
 			None
