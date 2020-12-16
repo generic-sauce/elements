@@ -14,6 +14,7 @@ pub struct Server {
 	world: World,
 	update_desire: [u32; 2],
 	peer_manager: PeerManager,
+	peers: [PeerHandle; 2],
 	silent_frames: u32,
 	port: u16,
 }
@@ -24,20 +25,23 @@ impl Server {
 
 		println!("INFO: Server starting on port {}. Waiting for players.", port);
 
+		let (peer_manager, peers) = waiting_for_players(port);
+
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
 			update_desire: [0, 0],
-			peer_manager: waiting_for_players(port),
+			peer_manager,
+			peers,
 			silent_frames: 0,
 			port,
 		};
 
-		for i in 0..2 {
+		for (i, p) in server.peers.iter().enumerate() {
 			let go = Go {
 				your_player_id: i,
 				tilemap_image,
 			};
-			server.peer_manager.send_to(i, &go);
+			server.peer_manager.send_to(*p, &go);
 
 			tilemap_image = go.tilemap_image;
 		}
@@ -56,7 +60,15 @@ impl Server {
 			// receive packets
 			for ev in self.peer_manager.tick::<InputState>() {
 				match ev {
-					PeerEvent::ReceivedPacket(input_state, i) => {
+					PeerEvent::ReceivedPacket(input_state, p) => {
+						let i = match self.peers.iter().position(|p2| *p2 == p) {
+							Some(i) => i,
+							None => {
+								println!("Got packet from external player");
+								continue
+							}
+						};
+
 						let diff = self.world.players[i].input.diff(&input_state);
 						self.update_desire[0] += diff;
 						self.update_desire[1] += diff;
@@ -77,7 +89,7 @@ impl Server {
 				if self.update_desire[i] >= 1000 {
 					self.update_desire[i] = 0;
 					let update = self.world.update();
-					self.peer_manager.send_to(i, &update);
+					self.peer_manager.send_to(self.peers[i], &update);
 				}
 			}
 
@@ -90,7 +102,7 @@ impl Server {
 	}
 }
 
-fn waiting_for_players(port: u16) -> PeerManager {
+fn waiting_for_players(port: u16) -> (PeerManager, [PeerHandle; 2]) {
 	let mut peer_manager = PeerManager::new(port, port+1);
 
 	let mut silent_frames = 0;
@@ -100,29 +112,34 @@ fn waiting_for_players(port: u16) -> PeerManager {
 	let mut socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
-		let events = peer_manager.tick::<InputState>(); // TODO this generic parameter is unused!
-		let cnt = peer_manager.count();
-		for ev in events {
+		let old_cnt = peer_manager.get_peer_handles().len();
+		let evs = peer_manager.tick::<()>();
+		let cnt = peer_manager.get_peer_handles().len();
+
+		for ev in evs {
 			match ev {
 				PeerEvent::NewPeer(_) => {
-					update_master_server(&mut socket, cnt as u32, port);
 					println!("INFO: new player joined!");
 					silent_frames = 0;
 				},
 				PeerEvent::ReceivedPacket(..) => println!("received packet before game start!"),
-				PeerEvent::Disconnect(_) => unimplemented!("handle disconnect"), // TODO
+				PeerEvent::Disconnect(_) => println!("INFO: player disconnected!"),
 			}
 		}
 
-		if cnt == 2 {
-			break;
+		if cnt != old_cnt {
+			update_master_server(&mut socket, cnt as u32, port);
 		}
 
-		if cnt > 0 {
-			silent_frames += 1;
-			if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
-				panic!("WARN: Missing second player. Timeout! Shutting down...");
-			}
+		match cnt {
+			0 => {},
+			1 => {
+				silent_frames += 1;
+				if silent_frames > MAX_SILENT_JOIN_SECONDS*JOIN_FPS {
+					panic!("WARN: Missing second player. Timeout! Shutting down...");
+				}
+			},
+			_ => break, // enough players joined!
 		}
 
 		// master server networking
@@ -133,7 +150,10 @@ fn waiting_for_players(port: u16) -> PeerManager {
 		packet_send_counter = (packet_send_counter + 1) % MASTER_SERVER_FRAME_INTERVAL;
 	}
 
-	peer_manager
+	let peers = peer_manager.get_peer_handles();
+	let peers = [peers[0], peers[1]];
+
+	(peer_manager, peers)
 }
 
 fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32, port: u16) {
