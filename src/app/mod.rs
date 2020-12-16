@@ -42,7 +42,6 @@ impl<B: Backend> App<B> {
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
 		self.peripherals_state.reset();
 
-		self.fetch_peripherals();
 		self.input_backend.tick();
 		self.update_cursor();
 

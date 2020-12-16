@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate serde_derive;
 
+// #[macro_use]
+// mod fps_timer;
+
 #[cfg(feature = "client")] mod backend;
 #[cfg(feature = "client")] mod draw;
 #[cfg(feature = "client")] mod client;
@@ -21,8 +24,6 @@ extern crate serde_derive;
 #[cfg(feature = "server")] mod native_socket_backend;
 #[cfg(feature = "game")] mod resource;
 
-#[macro_use]
-mod fps_timer;
 
 mod net;
 #[cfg(feature = "game")] mod rng;
