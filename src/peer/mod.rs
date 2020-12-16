@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+const OVERWRITE_TIME_SECS: u32 = 2; // how long the peer manager waits before overwriting some peer
+
 mod web;
 mod native;
 
@@ -21,7 +23,7 @@ enum PeerKind {
 struct Peer {
 	kind: PeerKind,
 	generation: u32,
-	alive: bool,
+	dead_since: Option<Instant>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -74,7 +76,7 @@ impl PeerManager {
 
 	pub fn send_to(&mut self, handle: PeerHandle, p: &impl Packet) {
 		let opt = self.peers.get_mut(handle.index)
-			.filter(|p| p.alive)
+			.filter(|p| p.is_alive())
 			.filter(|p| p.generation == handle.generation)
 			.map(|p| &mut p.kind);
 
@@ -92,7 +94,7 @@ impl PeerManager {
 
 	pub fn get_udp_ip(&self, handle: PeerHandle) -> Option<SocketAddr> {
 		let opt = self.peers.get(handle.index)
-			.filter(|p| p.alive)
+			.filter(|p| p.is_alive())
 			.filter(|p| p.generation == handle.generation)
 			.map(|p| &p.kind);
 
@@ -106,7 +108,7 @@ impl PeerManager {
 	pub fn get_peer_handles(&self) -> Vec<PeerHandle> {
 		self.peers.iter()
 			.enumerate()
-			.filter(|(_, p)| p.alive)
+			.filter(|(_, p)| p.is_alive())
 			.map(|(i, p)| PeerHandle {
 				index: i,
 				generation: p.generation
@@ -115,18 +117,37 @@ impl PeerManager {
 	}
 }
 
-fn add_peer(peers: &mut Vec<Peer>, kind: PeerKind) -> PeerHandle { // TODO re-use long-dead indices
-	let index = peers.len();
-	let peer = Peer {
-		generation: 0,
-		alive: true,
-		kind,
-	};
-	peers.push(peer);
+fn add_peer(peers: &mut Vec<Peer>, kind: PeerKind) -> PeerHandle {
+	let long_dead = |p: &Peer| p.dead_since
+		.map(|i| i.elapsed().as_secs() > OVERWRITE_TIME_SECS as u64)
+		.unwrap_or(false);
 
-	PeerHandle {
-		generation: 0,
-		index,
+	if let Some(i) = peers.iter().position(long_dead) {
+		let generation = peers[i].generation + 1;
+
+		peers[i] = Peer {
+			generation,
+			dead_since: None,
+			kind,
+		};
+
+		PeerHandle {
+			generation,
+			index: i,
+		}
+	} else {
+		let index = peers.len();
+
+		peers.push(Peer {
+			generation: 0,
+			dead_since: None,
+			kind,
+		});
+
+		PeerHandle {
+			generation: 0,
+			index,
+		}
 	}
 }
 
@@ -140,3 +161,8 @@ fn tls_acceptor() -> Option<Arc<TlsAcceptor>> {
 	Some(Arc::new(acceptor))
 }
 
+impl Peer {
+	fn is_alive(&self) -> bool {
+		self.dead_since.is_none()
+	}
+}

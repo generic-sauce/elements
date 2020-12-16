@@ -1,4 +1,3 @@
-use crate::prelude;
 use super::*;
 
 impl PeerManager {
@@ -40,17 +39,22 @@ impl PeerManager {
 
 		// recv + disconnect
 		for (index, peer) in self.peers.iter_mut().enumerate() {
-			if !peer.alive { continue; }
+			if !peer.is_alive() { continue; }
 
 			let handle = PeerHandle {
 				index,
 				generation: peer.generation,
 			};
 
+			let mut alive = true;
 			match &mut peer.kind {
-				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)),
-				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)),
+				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s, &mut alive)),
+				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s, &mut alive)),
 				_ => {},
+			}
+
+			if !alive {
+				peer.dead_since = Some(Instant::now());
 			}
 		}
 

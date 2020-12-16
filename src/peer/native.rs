@@ -1,4 +1,3 @@
-use crate::prelude;
 use super::*;
 
 impl PeerManager {
@@ -44,7 +43,7 @@ impl PeerManager {
 		for (i, p) in self.peers.iter_mut().enumerate() {
 			if let PeerKind::Native { last_recv_time, .. } = p.kind {
 				if last_recv_time.elapsed().as_secs() > PEER_DROP_TIMEOUT_SECS as u64 {
-					p.alive = false;
+					p.dead_since = Some(Instant::now());
 
 					let handle = PeerHandle {
 						index: i,
