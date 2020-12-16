@@ -71,6 +71,7 @@ fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mu
 				Ok(Message::Close(_)) => {
 					events.push(PeerEvent::Disconnect(handle));
 					*alive = false;
+					break;
 				}
 				Ok(_) => continue,
 				Err(tungstenite::error::Error::Io(io_err)) => {
@@ -83,7 +84,7 @@ fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mu
 			}
 		}
 	} else {
-		events.push(PeerEvent::Disconnect(handle)); // TODO this may spam too much!
+		events.push(PeerEvent::Disconnect(handle));
 		*alive = false;
 	}
 
