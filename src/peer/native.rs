@@ -38,6 +38,7 @@ impl PeerManager {
 					};
 					let new_handle = add_peer(&mut self.peers, kind);
 					events.push(PeerEvent::NewPeer(new_handle));
+					println!("adding new peer: {}.{}", new_handle.index, new_handle.generation);
 
 					new_handle
 				}

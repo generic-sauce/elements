@@ -107,12 +107,13 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>) -> (PeerManager, [P
 	let mut packet_send_counter = 0;
 
 	let mut master_socket = domain_name.map(|d| {
-		println!("INFO: connecting to master server");
 		let master_socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
 		(d, master_socket)
 	});
-	if master_socket.is_some() {
-		println!("INFO: NOT connecting to master server as domain name is not specified");
+
+	match master_socket {
+		Some(_) => println!("INFO: connecting to master server"),
+		None => println!("INFO: NOT connecting to master server as domain name is not specified"),
 	}
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {

@@ -97,8 +97,8 @@ impl MasterServer {
 		}
 	}
 
-	fn apply_game_server_status_update(&mut self, peer_index: PeerHandle, domain_name: String, num_players: u32, port: u16) {
-		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer == peer_index) {
+	fn apply_game_server_status_update(&mut self, peer: PeerHandle, domain_name: String, num_players: u32, port: u16) {
+		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer == peer) {
 			game_server.num_players = num_players;
 			if num_players == 2 {
 				game_server.state = GameServerState::InGame;
@@ -111,7 +111,7 @@ impl MasterServer {
 			game_server.port = port;
 		} else {
 			println!("INFO: new game server connected: {}:{}", domain_name, port);
-			self.game_servers.push(GameServerInfo::new(peer_index, domain_name, num_players, port));
+			self.game_servers.push(GameServerInfo::new(peer, domain_name, num_players, port));
 			self.check_game_start();
 		}
 	}
