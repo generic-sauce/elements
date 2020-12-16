@@ -27,13 +27,14 @@ impl NativeSocketBackend {
 	pub fn is_open(&self) -> bool { true }
 
 	pub fn send(&mut self, packet: &impl Packet) -> std::io::Result<()> {
-		send_packet(&mut self.socket, &NativeCSPacket::Payload(packet.clone()))
+		self.last_sent_time = Instant::now();
+		send_packet(&mut self.socket, &NativeCSPacket::Payload(packet.clone())) // TODO: maybe fix this clone, see https://serde.rs/lifetimes.html
 	}
 
 	pub fn tick<P: Packet>(&mut self) -> Option<P> {
 		if self.last_sent_time.elapsed().as_secs() >= HEARTBEAT_TIME_SECS as u64 {
-			send_packet(&mut self.socket, &NativeCSPacket::<()>::Heartbeat).unwrap();
 			self.last_sent_time = Instant::now();
+			send_packet(&mut self.socket, &NativeCSPacket::<()>::Heartbeat).unwrap();
 		}
 
 		recv_packet::<P>(&mut self.socket)
