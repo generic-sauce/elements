@@ -95,5 +95,5 @@ pub use {
 	crate::{
 		native_socket_backend::*,
 	},
-	utils::*,
+	native_utils::*,
 };

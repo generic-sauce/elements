@@ -49,7 +49,7 @@ clap = { version = "~2.33.3", optional = true }
 
 networking = { path = "networking" }
 server = { path = "server", optional = true }
-utils = { path = "utils" }
+native_utils = { path = "native_utils" }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -58,4 +58,4 @@ crate-type = ["cdylib", "rlib"]
 debug = true
 
 [workspace]
-members = ["networking", "server", "master_server", "utils"]
+members = ["networking", "server", "master_server", "native_utils"]

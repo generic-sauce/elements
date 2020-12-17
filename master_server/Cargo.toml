@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 server = { path = "../server" }
 networking = { path = "../networking" }
-utils = { path = "../utils" }
+native_utils = { path = "../native_utils" }

@@ -640,6 +640,7 @@ dependencies = [
  "itertools",
  "js-sys",
  "native-tls",
+ "native_utils",
  "networking",
  "num-traits",
  "once_cell",
@@ -650,7 +651,6 @@ dependencies = [
  "serde_derive",
  "server",
  "tungstenite",
- "utils",
  "wasm-bindgen",
  "web-sys",
  "wgpu",
@@ -1350,9 +1350,9 @@ dependencies = [
 name = "master_server"
 version = "0.1.0"
 dependencies = [
+ "native_utils",
  "networking",
  "server",
- "utils",
 ]
 
 [[package]]
@@ -1518,6 +1518,10 @@ dependencies = [
  "security-framework-sys",
  "tempfile",
 ]
+
+[[package]]
+name = "native_utils"
+version = "0.1.0"
 
 [[package]]
 name = "ndk"
@@ -2619,10 +2623,6 @@ name = "utf-8"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05e42f7c18b8f902290b009cde6d651262f956c98bc51bca4cd1d511c9cd85c7"
-
-[[package]]
-name = "utils"
-version = "0.1.0"
 
 [[package]]
 name = "uuid"

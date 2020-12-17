@@ -14,6 +14,7 @@ use bincode::{serialize, deserialize};
 pub trait Packet: Serialize + DeserializeOwned + Clone {}
 
 impl Packet for () {}
+
 #[allow(unused)]
 pub fn send_packet(socket: &mut UdpSocket, p: &impl Packet) -> std::io::Result<()> {
 	let packet_bytes = ser(p);
