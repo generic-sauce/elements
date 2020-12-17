@@ -637,7 +637,6 @@ dependencies = [
  "gilrs",
  "glyph_brush",
  "image",
- "itertools",
  "js-sys",
  "native-tls",
  "native_utils",
@@ -1576,6 +1575,7 @@ name = "networking"
 version = "0.1.0"
 dependencies = [
  "bincode",
+ "itertools",
  "serde",
  "serde_derive",
 ]

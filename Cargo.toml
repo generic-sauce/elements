@@ -17,7 +17,6 @@ web-client =    ["client", "wasm-bindgen", "console_error_panic_hook", "js-sys",
 
 [dependencies] # TODO not all of those dependencies are always required!
 image = "0.23"
-itertools = "0.9"
 num-traits = "0.2"
 rand = "0.7"
 rand_chacha = "0.2"

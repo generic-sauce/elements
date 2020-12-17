@@ -4,11 +4,10 @@ extern crate serde_derive;
 mod constants;
 
 mod packets;
-pub mod prelude;
 
-use serde::Serialize;
-use serde::de::DeserializeOwned;
-use bincode::{serialize, deserialize};
+pub mod prelude;
+pub use prelude::*;
+
 
 pub trait Packet: Serialize + DeserializeOwned + Clone {}
 

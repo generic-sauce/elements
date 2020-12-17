@@ -1,15 +1,6 @@
 // generic
 
 pub use {
-	serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned},
-	std::{
-		net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},
-		io::{Read, Write, BufReader, ErrorKind},
-		time::{Duration, SystemTime, Instant},
-		thread::{self, sleep},
-		fs::{File, read},
-	},
-	bincode::{serialize, deserialize},
 	crate::{
 		net::*,
 	},
@@ -18,16 +9,6 @@ pub use {
 
 #[cfg(feature = "game")]
 pub use {
-	std::{
-		sync::mpsc::{channel, Sender, Receiver, SendError, TryRecvError},
-		rc::Rc,
-		collections::{HashMap, HashSet},
-		any::Any,
-		marker::PhantomData,
-		cmp::Ordering,
-		ops::Mul,
-	},
-	itertools::iproduct,
 	crate::{
 		animation::*,
 		rng::*,
