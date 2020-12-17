@@ -21,7 +21,7 @@ pub struct Server {
 
 impl Server {
 	pub fn new(port: u16, domain_name: Option<&str>) -> Server {
-		let mut tilemap_image = TileMapImage::new(DEFAULT_TILEMAP);
+		let mut tilemap_image = load_tilemap_image(DEFAULT_TILEMAP);
 
 		println!("INFO: Server starting on port {}. Waiting for players.", port);
 

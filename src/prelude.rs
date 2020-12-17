@@ -5,18 +5,8 @@ pub use {
 		net::*,
 	},
 	networking::prelude::*,
-};
-
-#[cfg(feature = "game")]
-pub use {
-	crate::{
-		animation::*,
-		rng::*,
-		world::*,
-		vec::*,
-		input::*,
-		resource::res,
-	},
+	world::prelude::*,
+	native_world::*,
 };
 
 // *-client

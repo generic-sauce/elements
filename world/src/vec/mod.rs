@@ -1,8 +1,11 @@
 mod generic;
-mod custom;
-
 pub use generic::*;
+
+mod custom;
 pub use custom::*;
+
+mod draw;
+pub use draw::*;
 
 use std::marker::PhantomData;
 use std::ops::{Add, Sub, Mul, Div};

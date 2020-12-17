@@ -1,4 +1,5 @@
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
+pub use serde_derive::*;
 pub use bincode::{serialize, deserialize};
 pub use std::{
 	net::{ToSocketAddrs, UdpSocket, SocketAddr, TcpStream, TcpListener},

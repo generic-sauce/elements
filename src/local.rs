@@ -34,7 +34,7 @@ impl<B: Backend> Local<B> {
 					player.input.update_gamepad(&app.input_backend.gamepad(i as u32));
 				}
 				world.players.last_mut().unwrap().input.update_peripherals(&app.peripherals_state);
-				world.tick_within_app(app);
+				tick_within_app(world, app);
 			}
 		}
 	}
@@ -44,7 +44,7 @@ impl<B: Backend> Local<B> {
 			LocalMode::LoadingTileMap { .. } => {} // TODO
 			LocalMode::InGame(world) => {
 				let mut draw = Draw::new();
-				world.draw(&mut draw, app);
+				draw_world(world, &mut draw, app);
 				app.graphics_backend.submit(draw);
 			}
 		}

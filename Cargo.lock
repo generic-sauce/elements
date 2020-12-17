@@ -640,11 +640,9 @@ dependencies = [
  "js-sys",
  "native-tls",
  "native_utils",
+ "native_world",
  "networking",
- "num-traits",
  "once_cell",
- "rand",
- "rand_chacha",
  "rodio",
  "serde",
  "serde_derive",
@@ -655,6 +653,7 @@ dependencies = [
  "wgpu",
  "wgpu_glyph",
  "winit",
+ "world",
 ]
 
 [[package]]
@@ -1526,6 +1525,14 @@ dependencies = [
  "networking",
  "serde",
  "serde_derive",
+]
+
+[[package]]
+name = "native_world"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "world",
 ]
 
 [[package]]
@@ -2974,6 +2981,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d129932f4644ac2396cb456385cbf9e63b5b30c6e8dc4820bdca4eb082037a5"
 dependencies = [
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "world"
+version = "0.1.0"
+dependencies = [
+ "networking",
+ "num-traits",
+ "rand",
+ "rand_chacha",
+ "serde",
 ]
 
 [[package]]

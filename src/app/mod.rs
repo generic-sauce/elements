@@ -1,6 +1,9 @@
 mod runnable;
 pub use runnable::*;
 
+mod event_handler;
+pub use event_handler::*;
+
 use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
@@ -105,29 +108,27 @@ impl<B: Backend> App<B> {
 	}
 }
 
-impl World {
-	pub fn tick_within_app<B: Backend>(&mut self, app: &mut App<B>) {
-		let mut handler = AppEventHandler::new();
-		self.tick(&mut handler);
-		app.handle(&handler);
+pub fn tick_within_app<B: Backend>(world: &mut World, app: &mut App<B>) {
+	let mut handler = AppEventHandler::new();
+	world.tick(&mut handler);
+	app.handle(&handler);
 
-		self.update_music_within_app(app);
-	}
+	update_music_within_app(world, app);
+}
 
-	fn update_music_within_app<B: Backend>(&mut self, app: &mut App<B>) {
-		let mut critical_level = 0;
-		for player in &self.players {
-			if player.health < MAX_HEALTH / 2 {
-				critical_level += 1;
-			}
+fn update_music_within_app<B: Backend>(world: &mut World, app: &mut App<B>) {
+	let mut critical_level = 0;
+	for player in &world.players {
+		if player.health < MAX_HEALTH / 2 {
+			critical_level += 1;
 		}
-		let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
-		app.audio_backend.queue_music(sound_id);
 	}
+	let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
+	app.audio_backend.queue_music(sound_id);
+}
 
-	pub fn apply_update_within_app<B: Backend>(&mut self, update: WorldUpdate, app: &mut App<B>) {
-		let mut handler = AppEventHandler::new();
-		self.apply_update(update, &mut handler);
-		app.handle(&handler);
-	}
+pub fn apply_update_within_app<B: Backend>(world: &mut World, update: WorldUpdate, app: &mut App<B>) {
+	let mut handler = AppEventHandler::new();
+	world.apply_update(update, &mut handler);
+	app.handle(&handler);
 }

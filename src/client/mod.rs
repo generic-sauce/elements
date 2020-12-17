@@ -35,7 +35,7 @@ impl<B: Backend> Client<B> {
 			ClientMode::InGame { player_id, world } => {
 				// receive packets
 				if let Some(update) = self.socket.tick::<WorldUpdate>() {
-					world.apply_update_within_app(update, app);
+					apply_update_within_app(world, update, app);
 				}
 
 				// handle inputs
@@ -46,7 +46,7 @@ impl<B: Backend> Client<B> {
 				self.socket.send(&world.players[*player_id].input).unwrap();
 
 				// tick world
-				world.tick_within_app(app);
+				tick_within_app(world, app);
 			}
 		}
 	}
@@ -59,7 +59,7 @@ impl<B: Backend> Client<B> {
 				draw_lobby(&mut draw, &app.graphics_backend);
 			},
 			ClientMode::InGame { world, .. } => {
-				world.draw(&mut draw, app);
+				draw_world(world, &mut draw, app);
 			}
 		}
 

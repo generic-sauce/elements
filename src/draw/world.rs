@@ -4,36 +4,34 @@ const TROPHY_SIZE: CanvasVec = CanvasVec::new(0.035, 0.035);
 const TROPHY_SHOW_START: u32 = 115;
 const WINNER_POSITIONS: [ViewVec; 2] = [ViewVec::new(0.065, 0.95), ViewVec::new(0.97, 0.95)];
 
-impl World {
-	pub fn draw<B: Backend>(&self, draw: &mut Draw, app: &App<B>) {
-		let sky_color = Color::rgb(
-			48.0 / 455.0,
-			31.0 / 455.0,
-			25.0 / 455.0,
-		);
+pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
+	let sky_color = Color::rgb(
+		48.0 / 455.0,
+		31.0 / 455.0,
+		25.0 / 455.0,
+	);
 
-		let sky_color = match self.restart_state {
-			RestartState::Restart { counter, .. } => {
-				let scale_color = Color::rgb(
-						3.0,
-						3.0,
-						3.0,
-					);
-				let rdc = FIGHT_END_COUNT as f32;
-				let counter = counter as f32;
-				let factor = (rdc - counter.min(rdc) * 0.9) / rdc;
-				sky_color * scale_color * factor.max(0.5)
-			},
-			RestartState::Game => sky_color
-		};
+	let sky_color = match world.restart_state {
+		RestartState::Restart { counter, .. } => {
+			let scale_color = Color::rgb(
+					3.0,
+					3.0,
+					3.0,
+				);
+			let rdc = FIGHT_END_COUNT as f32;
+			let counter = counter as f32;
+			let factor = (rdc - counter.min(rdc) * 0.9) / rdc;
+			sky_color * scale_color * factor.max(0.5)
+		},
+		RestartState::Game => sky_color
+	};
 
-		draw.set_clear_color(sky_color);
-		draw.map(&self.tilemap, &self.fluidmap);
-		draw_players(draw, self);
-		draw_cursors(draw, self);
-		draw_healthbars(draw, self);
-		draw_trophy(draw, self, app);
-	}
+	draw.set_clear_color(sky_color);
+	draw.map(&world.tilemap, &world.fluidmap);
+	draw_players(draw, world);
+	draw_cursors(draw, world);
+	draw_healthbars(draw, world);
+	draw_trophy(draw, world, app);
 }
 
 fn trophy_position_curve(mix: f32) -> f32 {

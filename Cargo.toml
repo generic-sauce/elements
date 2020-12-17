@@ -17,9 +17,6 @@ web-client =    ["client", "wasm-bindgen", "console_error_panic_hook", "js-sys",
 
 [dependencies] # TODO not all of those dependencies are always required!
 image = "0.23"
-num-traits = "0.2"
-rand = "0.7"
-rand_chacha = "0.2"
 serde = "1.0"
 serde_derive = "1.0"
 bincode = "1.3"
@@ -49,6 +46,8 @@ clap = { version = "~2.33.3", optional = true }
 networking = { path = "networking" }
 server = { path = "server", optional = true }
 native_utils = { path = "native_utils" }
+world = { path = "world" }
+native_world = { path = "native_world" }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -57,4 +56,4 @@ crate-type = ["cdylib", "rlib"]
 debug = true
 
 [workspace]
-members = ["networking", "server", "master_server", "native_utils"]
+members = ["networking", "server", "master_server", "native_utils", "world", "native_world"]

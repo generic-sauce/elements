@@ -4,13 +4,10 @@ mod player;
 use player::*;
 
 mod world;
-pub use world::*;
+pub use self::world::*;
 
 mod texture;
 pub use texture::*;
-
-mod vec;
-pub use vec::*;
 
 mod color;
 pub use color::*;

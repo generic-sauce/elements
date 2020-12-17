@@ -1,22 +1,23 @@
+#![feature(drain_filter)]
+#![feature(const_fn)]
+
+mod animation;
+mod vec;
+mod input;
+mod rng;
+mod resource;
 mod player;
-pub use player::*;
-
 mod tilemap;
-pub use tilemap::*;
-
 mod fluidmap;
-pub use fluidmap::*;
-
 mod skill;
-pub use skill::*;
-
 mod event;
-pub use event::*;
-
 mod update;
-pub use update::*;
+mod packet;
+
+pub mod prelude;
 
 use crate::prelude::*;
+
 
 pub const FIGHT_END_COUNT: u32 = 120;
 pub const TROPHY_END_COUNT: u32 = 160;

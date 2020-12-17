@@ -50,7 +50,6 @@ impl ViewVec {
 		SurfaceVec::new(v.x, v.y)
 	}
 
-	#[cfg(feature = "web-client")]
 	pub fn to_surface_correct_aspect(self) -> SurfaceVec {
 		let mut v = self * 2.0 - 1.0;
 		SurfaceVec::new(v.x, v.y)
