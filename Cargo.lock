@@ -635,6 +635,7 @@ dependencies = [
  "console_error_panic_hook",
  "futures",
  "game_server",
+ "game_server_bin",
  "gilrs",
  "glyph_brush",
  "image",
@@ -801,6 +802,21 @@ dependencies = [
 [[package]]
 name = "game_server"
 version = "0.1.0"
+dependencies = [
+ "native-tls",
+ "native_world",
+ "server",
+ "tungstenite",
+]
+
+[[package]]
+name = "game_server_bin"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "game_server",
+ "networking",
+]
 
 [[package]]
 name = "generic-array"
@@ -1537,6 +1553,7 @@ name = "native_world"
 version = "0.1.0"
 dependencies = [
  "image",
+ "native_utils",
  "world",
 ]
 

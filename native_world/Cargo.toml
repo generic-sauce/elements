@@ -10,3 +10,4 @@ edition = "2018"
 image = "0.23"
 
 world = { path = "../world" }
+native_utils = { path = "../native_utils" }

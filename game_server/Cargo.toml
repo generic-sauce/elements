@@ -7,3 +7,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+native_world = { path = "../native_world" }
+server = { path = "../server" }
+
+tungstenite = { version = "0.11" }
+native-tls = { version = "0.2.6" }
+

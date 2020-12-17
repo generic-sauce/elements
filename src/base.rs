@@ -17,9 +17,5 @@ extern crate serde_derive;
 
 #[cfg(feature = "web-client")] mod web;
 
-// game-server (or native-client)
-#[cfg(feature = "game-server")] mod server;
-#[cfg(feature = "server_feature")] mod native_socket_backend;
-
 mod net;
 mod prelude;

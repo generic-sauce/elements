@@ -1,2 +1,3 @@
-pub mod peer;
-mod prelude;
+mod peer;
+
+pub mod prelude;

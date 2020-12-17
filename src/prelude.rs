@@ -6,7 +6,8 @@ pub use {
 	},
 	networking::prelude::*,
 	world::prelude::*,
-	native_world::*,
+	native_world::prelude::*,
+	game_server::*,
 };
 
 // *-client
@@ -51,20 +52,12 @@ pub use {
 	},
 };
 
-#[cfg(feature = "game-server")] pub use {
-	crate::{
-		server::*,
-	},
-};
 #[cfg(feature = "game-server")] pub use clap::{App as ClapApp, Arg, SubCommand};
 
 // game-server (or native-client)
-#[cfg(feature = "server_feature")] pub use {
+pub use {
 	std::sync::Arc,
 	tungstenite::{protocol::Role, Message},
 	native_tls::{Identity, TlsAcceptor},
-	crate::{
-		native_socket_backend::*,
-	},
 	native_utils::prelude::*,
 };
