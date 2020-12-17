@@ -13,7 +13,7 @@ pub use {
 	crate::{
 		net::*,
 	},
-	networking::{*, packets::*},
+	networking::prelude::*,
 };
 
 #[cfg(feature = "game")]
@@ -95,5 +95,5 @@ pub use {
 	crate::{
 		native_socket_backend::*,
 	},
-	native_utils::*,
+	native_utils::prelude::*,
 };

@@ -5,3 +5,7 @@ authors = ["Bluemi <bruno.schilling@protonmail.ch>", "memoryleak47 <memoryleak47
 edition = "2018"
 
 [dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+bincode = "1.3"
+networking = { path = "../networking" }

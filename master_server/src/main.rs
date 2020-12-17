@@ -1,9 +1,8 @@
 #![feature(drain_filter)]
 
 use server::peer::{PeerManager, PeerHandle, PeerEvent};
-use networking::{MASTER_SERVER_PORT, MASTER_SERVER_HTTPS_PORT};
-use networking::packets::{MasterServerPacket, MasterClientPacket};
-use native_utils::TimedLoop;
+use networking::prelude::{MASTER_SERVER_PORT, MASTER_SERVER_HTTPS_PORT, MasterServerPacket, MasterClientPacket};
+use native_utils::prelude::TimedLoop;
 
 pub const MASTER_SERVER_FPS: u32 = 10;
 pub const AWAITING_TIMEOUT: u32 = 5 * MASTER_SERVER_FPS;

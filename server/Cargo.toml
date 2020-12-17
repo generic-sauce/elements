@@ -10,3 +10,4 @@ edition = "2018"
 tungstenite = { version = "0.11" }
 native-tls = { version = "0.2.6" }
 networking = { path = "../networking" }
+native_utils = { path = "../native_utils" }

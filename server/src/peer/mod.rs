@@ -1,11 +1,4 @@
-use std::net::{SocketAddr, UdpSocket, TcpListener, TcpStream};
-use std::time::Instant;
-use std::sync::Arc;
-use std::fs::File;
-use std::io::Read;
-use networking::{Packet, send_packet_to, ser};
-use native_tls::{TlsAcceptor, Identity};
-use tungstenite::Message;
+use crate::prelude::*;
 
 mod native;
 mod web;
@@ -19,7 +12,7 @@ pub enum PeerEvent<R: Packet> {
 	Disconnect(PeerHandle),
 }
 
-enum PeerKind {
+pub enum PeerKind {
 	Http(TungSocket),
 	Https(TungTlsSocket),
 	Native {
@@ -28,7 +21,7 @@ enum PeerKind {
 	},
 }
 
-struct Peer {
+pub struct Peer {
 	kind: PeerKind,
 	generation: u32,
 	alive: bool,
@@ -125,7 +118,7 @@ impl PeerManager {
 	}
 }
 
-fn add_peer(peers: &mut Vec<Peer>, kind: PeerKind) -> PeerHandle {
+pub fn add_peer(peers: &mut Vec<Peer>, kind: PeerKind) -> PeerHandle {
 	if let Some(i) = peers.iter().position(|p| !p.alive) {
 		let generation = peers[i].generation + 1;
 

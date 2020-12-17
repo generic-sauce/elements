@@ -1522,6 +1522,12 @@ dependencies = [
 [[package]]
 name = "native_utils"
 version = "0.1.0"
+dependencies = [
+ "bincode",
+ "networking",
+ "serde",
+ "serde_derive",
+]
 
 [[package]]
 name = "ndk"
@@ -2228,6 +2234,7 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "native-tls",
+ "native_utils",
  "networking",
  "tungstenite",
 ]
