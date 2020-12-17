@@ -10,6 +10,12 @@ use crate::prelude::*;
 #[cfg(feature = "game")] const DEFAULT_CURSOR_POSITION: SubPixelVec = SubPixelVec::new(300.0, 300.0);
 
 #[cfg(feature = "native-client")]
+fn main_loop(mut f: impl FnMut(), fps: u32) {
+	TimedLoop::with_fps(fps)
+		.for_each(move |_| f());
+}
+
+#[cfg(feature = "native-client")]
 fn main() {
 	let matches = ClapApp::new("Elements Native Client")
 		.about("This is the Native Client of the Elements Game. Have fun :D")

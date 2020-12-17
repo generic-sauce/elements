@@ -6,6 +6,13 @@ pub use render::*;
 mod js;
 pub use js::*;
 
+fn main_loop(f: impl FnMut() + 'static, fps: u32) {
+	let cb = Closure::<dyn FnMut()>::wrap(Box::new(f));
+	let leaked_cb = Box::leak(Box::new(cb)); // TODO
+	setInterval(leaked_cb, 1000 as f64 / fps as f64);
+}
+
+
 #[wasm_bindgen]
 pub fn client_main(answer: &str) {
 	std::panic::set_hook(Box::new(console_error_panic_hook::hook));
