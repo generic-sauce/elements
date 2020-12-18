@@ -1,4 +1,5 @@
 use native_world::prelude::*;
+use clap::{App as ClapApp, Arg, ArgMatches};
 use server::prelude::*;
 
 // update_desire is within 0..=1000
@@ -99,6 +100,26 @@ impl Server {
 			}
 		}
 	}
+}
+
+pub fn game_server_cli_args() -> ArgMatches<'static> {
+	ClapApp::new("Elements Game Server")
+		.about("This is the Game Server of the Elements Game. Lets host some game :D")
+		.arg(Arg::with_name("port")
+			.short("-p")
+			.long("--port")
+			.value_name("PORT")
+			.help(&format!("The server will bind this port. (default: {})", DEFAULT_GAME_SERVER_PORT))
+			.takes_value(true)
+		)
+		.arg(Arg::with_name("domain_name")
+			.short("-d")
+			.long("--domain-name")
+			.value_name("DOMAIN_NAME")
+			.help(&"The domain name of this server. Only used, if connecting to a master server.")
+			.takes_value(true)
+		)
+		.get_matches()
 }
 
 fn waiting_for_players(port: u16, domain_name: Option<&str>) -> (PeerManager, [PeerHandle; 2]) {
