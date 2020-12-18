@@ -11,14 +11,12 @@ use misc::*;
 
 const SURFACE_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 
-impl Color {
-	fn to_wgpu(self) -> wgpu::Color {
-		wgpu::Color {
-			r: self.r as f64,
-			g: self.g as f64,
-			b: self.b as f64,
-			a: self.a as f64,
-		}
+pub fn color_to_wgpu(color: Color) -> wgpu::Color {
+	wgpu::Color {
+		r: color.r as f64,
+		g: color.g as f64,
+		b: color.b as f64,
+		a: color.a as f64,
 	}
 }
 
@@ -133,12 +131,12 @@ impl Graphics {
 		});
 
 		let draw = RenderDraw::new(draw, self.window_size.to_subpixel());
-		let clear_color = Color::rgba(
+		let clear_color = color_to_wgpu(Color::rgba(
 			f32::powf(draw.clear_color.r, 2.2),
 			f32::powf(draw.clear_color.g, 2.2),
 			f32::powf(draw.clear_color.b, 2.2),
 			draw.clear_color.a,
-		).to_wgpu();
+		));
 
 		let mut graphics_context = GraphicsContext::new(
 			&self.device,

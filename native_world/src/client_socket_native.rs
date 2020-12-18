@@ -1,18 +1,18 @@
 use world::prelude::*;
 use native_utils::prelude::*;
 
-pub struct NativeSocketBackend {
+pub struct ClientSocketNative {
 	socket: UdpSocket,
 	last_sent_time: Instant,
 }
 
-impl NativeSocketBackend {
+impl ClientSocketNative {
 	pub fn new(server_ip: &str, port: u16) -> Self {
 		let socket = UdpSocket::bind("0.0.0.0:0").expect("Could not create client socket");
 		socket.set_nonblocking(true).unwrap();
 		socket.connect((server_ip, port)).expect("Could not connect to server");
 
-		let mut socket_backend = NativeSocketBackend {
+		let mut socket_backend = ClientSocketNative {
 			socket,
 			last_sent_time: Instant::now(),
 		};

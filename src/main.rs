@@ -176,7 +176,7 @@ fn main() {
 	panic!("web version does not have a main()!")
 }
 
-#[cfg(all(feature = "game-server", not(feature = "client")))]
+#[cfg(all(feature = "game-server", not(feature = "client_feature")))]
 fn main() {
 	let matches = game_server_cli_args();
 	let port = matches.value_of("port")

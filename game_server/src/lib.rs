@@ -129,7 +129,7 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>) -> (PeerManager, [P
 	let mut packet_send_counter = 0;
 
 	let mut master_socket = domain_name.map(|d| {
-		let master_socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
+		let master_socket = ClientSocketNative::new("generic-sauce.de", MASTER_SERVER_PORT);
 		(d, master_socket)
 	});
 
@@ -187,7 +187,7 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>) -> (PeerManager, [P
 	(peer_manager, peers)
 }
 
-fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32, port: u16, domain_name: &str) {
+fn update_master_server(socket: &mut ClientSocketNative, num_players: u32, port: u16, domain_name: &str) {
 	let master_server_packet = MasterServerPacket::GameServerStatusUpdate {
 		domain_name: String::from(domain_name),
 		num_players,

@@ -1,19 +1,21 @@
 use crate::prelude::*;
 
+pub struct NativeSocketBackend(ClientSocketNative);
+
 impl SocketBackend for NativeSocketBackend {
 	fn new(server_ip: &str, port: u16) -> Self {
-		NativeSocketBackend::new(server_ip, port)
+		NativeSocketBackend(ClientSocketNative::new(server_ip, port))
 	}
 
 	fn is_open(&self) -> bool {
-		NativeSocketBackend::is_open(self)
+		self.0.is_open()
 	}
 
 	fn send(&mut self, packet: &impl Packet) -> std::io::Result<()> {
-		NativeSocketBackend::send(self, packet)
+		self.0.send(packet)
 	}
 
 	fn tick<P: Packet>(&mut self) -> Option<P> {
-		NativeSocketBackend::tick(self)
+		self.0.tick()
 	}
 }

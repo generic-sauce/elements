@@ -1,4 +1,15 @@
+#![feature(generic_associated_types)]
+
+pub mod prelude;
 use crate::prelude::*;
+
+mod app;
+mod backend;
+mod draw;
+mod menu;
+mod server_connector;
+mod local;
+
 
 pub enum ClientMode {
 	Lobby,
@@ -56,7 +67,7 @@ impl<B: Backend> Client<B> {
 
 		match &self.mode {
 			ClientMode::Lobby => {
-				draw_lobby(&mut draw, &app.graphics_backend);
+				draw_lobby::<B>(&mut draw, &app.graphics_backend);
 			},
 			ClientMode::InGame { world, .. } => {
 				draw_world(world, &mut draw, app);

@@ -1,6 +1,7 @@
 #[cfg(feature = "native-client")] mod native {
 	use crate::prelude::*;
 
+	// TODO: this is code duplication, also defined in backend
 	pub fn now() -> f64 {
 		std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.
 	}
@@ -27,6 +28,7 @@
 #[cfg(feature = "web-client")] mod web {
 	use crate::prelude::*;
 
+	// TODO: this is code duplication, also defined in backend
 	pub fn now() -> f64 {
 		date_now()
 	}

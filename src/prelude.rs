@@ -1,24 +1,16 @@
 // generic
 
 pub use {
-	crate::{
-		net::*,
-	},
 	networking::prelude::*,
 	world::prelude::*,
 	native_world::prelude::*,
 	game_server::*,
+	client::prelude::*,
 };
 
 // *-client
-#[cfg(feature = "client")] pub use {
+#[cfg(feature = "client_feature")] pub use {
 	crate::{
-		draw::*,
-		client::*,
-		server_connector::*,
-		local::*,
-		app::*,
-		menu::*,
 		backend::*,
 		timer::*,
 	},

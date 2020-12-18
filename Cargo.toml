@@ -11,9 +11,9 @@ default = ["native-client"]
 game = []
 server_feature = ["tungstenite", "native-tls", "server"]
 game-server = ["game", "server_feature", "clap"]
-client = ["game", "glyph_brush"]
-native-client = ["game-server", "client", "gilrs", "rodio", "wgpu", "winit", "bytemuck", "wgpu_glyph", "once_cell", "futures"]
-web-client =    ["client", "wasm-bindgen", "console_error_panic_hook", "js-sys", "web-sys"]
+client_feature = ["game", "glyph_brush"]
+native-client = ["game-server", "client_feature", "gilrs", "rodio", "wgpu", "winit", "bytemuck", "wgpu_glyph", "once_cell", "futures"]
+web-client =    ["client_feature", "wasm-bindgen", "console_error_panic_hook", "js-sys", "web-sys"]
 
 [dependencies] # TODO not all of those dependencies are always required!
 image = "0.23"
@@ -50,6 +50,7 @@ world = { path = "world" }
 native_world = { path = "native_world" }
 game_server = { path = "game_server" }
 game_server_bin = { path = "game_server_bin" }
+client = { path = "client" }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -58,4 +59,4 @@ crate-type = ["cdylib", "rlib"]
 debug = true
 
 [workspace]
-members = ["networking", "server", "master_server", "native_utils", "world", "native_world", "game_server", "game_server_bin"]
+members = ["networking", "server", "master_server", "native_utils", "world", "native_world", "game_server", "game_server_bin", "client"]

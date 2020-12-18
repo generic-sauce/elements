@@ -13,14 +13,6 @@ pub use socket::*;
 mod tilemap_loader;
 pub use tilemap_loader::*;
 
-pub trait Backend: 'static {
-	type InputBackend: InputBackend;
-	type GraphicsBackend: GraphicsBackend;
-	type AudioBackend: AudioBackend;
-	type SocketBackend: SocketBackend;
-	type TileMapLoaderBackend: TileMapLoaderBackend;
-}
-
 #[cfg(feature = "native-client")] mod native {
 	use super::*;
 	use crate::prelude::*;
@@ -33,6 +25,10 @@ pub trait Backend: 'static {
 		type AudioBackend = NativeAudioBackend;
 		type SocketBackend = NativeSocketBackend;
 		type TileMapLoaderBackend = NativeTileMapLoaderBackend;
+
+		fn now() -> f64 {
+			std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.
+		}
 	}
 }
 #[cfg(feature = "native-client")] pub use native::*;
