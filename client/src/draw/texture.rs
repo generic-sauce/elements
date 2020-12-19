@@ -32,6 +32,7 @@ setup!(
 	Unknown: "images/checkerboard.png",
 	White: "images/white.png",
 	Trophy: "images/trophy/trophy.png",
+	SkyBackground: "images/background/sky_background.png"
 );
 
 impl TextureId {

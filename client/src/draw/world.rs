@@ -5,28 +5,19 @@ const TROPHY_SHOW_START: u32 = 115;
 const WINNER_POSITIONS: [ViewVec; 2] = [ViewVec::new(0.065, 0.95), ViewVec::new(0.97, 0.95)];
 
 pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
-	let sky_color = Color::rgb(
-		48.0 / 455.0,
-		31.0 / 455.0,
-		25.0 / 455.0,
-	);
-
+	let sky_color = Color::rgb(1.0, 1.0, 1.0);
 	let sky_color = match world.restart_state {
 		RestartState::Restart { counter, .. } => {
-			let scale_color = Color::rgb(
-					3.0,
-					3.0,
-					3.0,
-				);
 			let rdc = FIGHT_END_COUNT as f32;
 			let counter = counter as f32;
-			let factor = (rdc - counter.min(rdc) * 0.9) / rdc;
-			sky_color * scale_color * factor.max(0.5)
+			let factor = (rdc - counter.min(rdc)*3.0) / rdc;
+			let f = 1.0 + factor.max(0.0).min(0.5);
+			sky_color * f
 		},
 		RestartState::Game => sky_color
 	};
 
-	draw.set_clear_color(sky_color);
+	draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	draw.map(&world.tilemap, &world.fluidmap);
 	draw_players(draw, world);
 	draw_cursors(draw, world);
