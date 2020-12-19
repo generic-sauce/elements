@@ -152,7 +152,7 @@ fn tls_acceptor(identity_file: Option<&str>) -> Option<Arc<TlsAcceptor>> {
 	let mut file = File::open(identity_file?).ok()?;
 	let mut identity = vec![];
 	file.read_to_end(&mut identity).unwrap();
-	let identity = Identity::from_pkcs12(&identity, "test123").unwrap();
+	let identity = Identity::from_pkcs12(&identity, "test123").unwrap();  // TODO: replace passphrase
 
 	let acceptor = TlsAcceptor::new(identity).unwrap();
 	Some(Arc::new(acceptor))
