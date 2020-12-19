@@ -52,8 +52,8 @@ fn main() {
 				.stderr(Stdio::inherit());
 
 			match command.output() {
-				Ok(_) => { println!("Successfully executed deploy.sh"); }
-				Err(e) => { println!("Error executing deploy.sh: {}", e) }
+				Ok(_) => println!("Successfully executed deploy.sh"),
+				Err(e) => println!("Error executing deploy.sh: {}", e),
 			}
 		}
 	});
