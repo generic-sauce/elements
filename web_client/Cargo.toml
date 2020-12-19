@@ -1,7 +1,7 @@
 [package]
 name = "web_client"
 version = "0.1.0"
-authors = ["Bluemi <bruno.schilling@protonmail.ch>"]
+authors = ["Bluemi <bruno.schilling@protonmail.ch>", "memoryleak47 <memoryleak47@protonmail.ch>", "ichinii <ogtoad@protonmail.com>"]
 edition = "2018"
 
 [dependencies]
