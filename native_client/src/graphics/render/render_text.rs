@@ -4,6 +4,7 @@ use wgpu_glyph::{ab_glyph, GlyphBrush, GlyphBrushBuilder, Section, Text};
 pub(in crate::graphics) struct RenderText {
 	glyph_brush: GlyphBrush<(), ab_glyph::FontArc>,
 	staging_belt: wgpu::util::StagingBelt,
+	first_render: bool, // ugly
 }
 
 impl RenderText {
@@ -20,6 +21,7 @@ impl RenderText {
 		RenderText {
 			glyph_brush,
 			staging_belt,
+			first_render: true
 		}
 	}
 
@@ -28,7 +30,10 @@ impl RenderText {
 		context: &mut GraphicsContext,
 		draw: &RenderDraw,
 	) {
-		self.staging_belt.recall();
+		if self.first_render {
+			futures::executor::block_on(self.staging_belt.recall());
+			self.first_render = false;
+		}
 
 		for text in &draw.texts {
 			let window_size = context.window_size.to_subpixel();
