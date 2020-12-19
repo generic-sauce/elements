@@ -5,7 +5,6 @@ use once_cell::sync::OnceCell;
 
 const START_MUSIC_OFFSET: Duration = Duration::from_micros(1000);
 const NUM_PARTS: usize = 4;
-const WHIZ_VOLUME: f32 = 0.1;
 
 static SOUNDS: OnceCell<Vec<Sound>> = OnceCell::new();
 
@@ -57,7 +56,7 @@ impl AudioBackend for NativeAudioBackend {
 
 	fn play_sound(&mut self, sound_id: SoundId, volume: f32) {
 		if let Some(buf) = get_sample_buffer(sound_id) {
-			play_raw(&self.device, buf.amplify(WHIZ_VOLUME * volume));
+			play_raw(&self.device, buf.amplify(volume));
 		}
 	}
 }
