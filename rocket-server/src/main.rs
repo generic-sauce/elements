@@ -3,7 +3,7 @@
 #[macro_use] extern crate rocket;
 
 use serde::{Serialize, Deserialize};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::{str, thread};
 use rocket_contrib::json::Json;
 use std::sync::mpsc::{channel, Sender};
@@ -47,18 +47,12 @@ fn main() {
 			println!("starting new deploy");
 			let mut command = Command::new("bash");
 			command.arg("-c").arg("./deploy.sh")
-				.current_dir(ELEMENTS_DEPLOY_DIRECTORY);
+				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
+				.stdout(Stdio::piped())
+				.stderr(Stdio::piped());
 
 			match command.output() {
-				Ok(x) => {
-					println!("Deployed.status: {}", x.status);
-					if let Ok(text) = str::from_utf8(&x.stdout) {
-						println!("Deployed.stdout:\n{}", text);
-					}
-					if let Ok(text) = str::from_utf8(&x.stderr) {
-						println!("Deployed.stderr:\n{}", text);
-					}
-				}
+				Ok(_) => { println!("Successfully executed deploy.sh"); }
 				Err(e) => { println!("Error executing deploy.sh: {}", e) }
 			}
 		}
