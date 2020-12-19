@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+set -e
 ELEMENTS_ROOT_DIR="${PWD%/*/*}"
 MASTER_SERVER_PATH="$PWD/master_server"
 GAME_SERVER_PATH="$PWD/game_server"
