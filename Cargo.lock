@@ -784,15 +784,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "game_server_bin"
-version = "0.1.0"
-dependencies = [
- "clap",
- "game_server",
- "networking",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
