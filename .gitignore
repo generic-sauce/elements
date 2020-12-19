@@ -22,8 +22,15 @@
 # Other
 /local/
 
-# rocket-server
-/rocket-server/target
-/rocket-server/Rocket.toml
-/rocket-server/static
+# infrastructure
+/infrastructure/rocket-server/target
+/infrastructure/rocket-server/static
+
+/infrastructure/deploy/game_server/res
+/infrastructure/deploy/game_server/target
+/infrastructure/deploy/master_server/target
+
+identity.pfx
+
+# web
 /web/site/dist

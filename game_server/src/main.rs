@@ -9,5 +9,8 @@ fn main() {
 		.unwrap_or(DEFAULT_GAME_SERVER_PORT);
 
 	let domain_name = matches.value_of("domain_name");
-	Server::new(port, domain_name).run();
+
+	let identity_file = matches.value_of("identity_file");
+
+	Server::new(port, domain_name, identity_file).run();
 }

@@ -42,7 +42,7 @@ pub struct PeerManager {
 }
 
 impl PeerManager {
-	pub fn new(port: u16, https_port: u16) -> PeerManager {
+	pub fn new(port: u16, https_port: u16, identity_file: Option<&str>) -> PeerManager {
 		// native
 		let udp_socket = UdpSocket::bind(("0.0.0.0", port)).expect("Could not create server udp-socket");
 		udp_socket.set_nonblocking(true).unwrap();
@@ -55,7 +55,7 @@ impl PeerManager {
 		let http_listener = TcpListener::bind(("0.0.0.0", port)).expect("Could not create server http tcp-listener");
 		http_listener.set_nonblocking(true).unwrap();
 
-		let acceptor = tls_acceptor();
+		let acceptor = tls_acceptor(identity_file);
 
 		PeerManager {
 			udp_socket,
@@ -148,8 +148,8 @@ pub fn add_peer(peers: &mut Vec<Peer>, kind: PeerKind) -> PeerHandle {
 	}
 }
 
-fn tls_acceptor() -> Option<Arc<TlsAcceptor>> {
-	let mut file = File::open("/root/identity.pfx").ok()?;
+fn tls_acceptor(identity_file: Option<&str>) -> Option<Arc<TlsAcceptor>> {
+	let mut file = File::open(identity_file?).ok()?;
 	let mut identity = vec![];
 	file.read_to_end(&mut identity).unwrap();
 	let identity = Identity::from_pkcs12(&identity, "test123").unwrap();

@@ -1,0 +1,36 @@
+version: "3.3"
+
+services:
+  elements-game-server-0:
+    image: "archlinux:latest"
+    volumes:
+      - /home/sauce/elements_deploy/game_server:/root
+    environment:
+      RUST_BACKTRACE: full
+    restart: "always"
+    network_mode: "host"
+    container_name: "elements-game-server-0"
+    working_dir: "/root"
+    command: "/root/target/release/elements-game-server --port 7575 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
+  elements-game-server-1:
+    image: "archlinux:latest"
+    volumes:
+      - /home/sauce/elements_deploy/game_server:/root
+    environment:
+      RUST_BACKTRACE: full
+    restart: "always"
+    network_mode: "host"
+    container_name: "elements-game-server-1"
+    working_dir: "/root"
+    command: "/root/target/release/elements-game-server --port 7577 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
+  elements-game-server-2:
+    image: "archlinux:latest"
+    volumes:
+      - /home/sauce/elements_deploy/game_server:/root
+    environment:
+      RUST_BACKTRACE: full
+    restart: "always"
+    network_mode: "host"
+    container_name: "elements-game-server-2"
+    working_dir: "/root"
+    command: "/root/target/release/elements-game-server --port 7579 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
