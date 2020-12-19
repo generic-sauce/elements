@@ -1,0 +1,24 @@
+[package]
+name = "native_client"
+version = "0.1.0"
+authors = ["Bluemi <bruno.schilling@protonmail.ch>"]
+edition = "2018"
+
+[dependencies]
+once_cell = "1.4.1"
+wgpu = "0.6.0"
+winit = "0.22.0"
+gilrs = "0.7.2"
+rodio = "0.11"
+bytemuck = "1.4.1"
+wgpu_glyph = "0.10.0"
+glyph_brush = "0.7.0"
+futures = "0.3.6"
+clap = "~2.33.3"
+image = "0.23"
+
+networking = { path = "../networking" }
+world = { path = "../world" }
+native_world = { path = "../native_world" }
+client = { path = "../client" }
+game_server = { path = "../game_server" }

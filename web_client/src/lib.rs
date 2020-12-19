@@ -3,6 +3,5 @@
 #![allow(incomplete_features)]
 #![feature(generic_associated_types)]
 
-fn main() {
-    println!("hello world!");
-}
+#[cfg(feature = "web-client")]
+include!("base.rs");

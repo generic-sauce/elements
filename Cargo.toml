@@ -51,6 +51,8 @@ native_world = { path = "native_world" }
 game_server = { path = "game_server" }
 game_server_bin = { path = "game_server_bin" }
 client = { path = "client" }
+native_client = { path = "native_client" }
+web_client = { path = "web_client" }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -59,4 +61,4 @@ crate-type = ["cdylib", "rlib"]
 debug = true
 
 [workspace]
-members = ["networking", "server", "master_server", "native_utils", "world", "native_world", "game_server", "game_server_bin", "client"]
+members = ["networking", "server", "master_server", "native_utils", "world", "native_world", "game_server", "game_server_bin", "client", "native_client", "web_client"]

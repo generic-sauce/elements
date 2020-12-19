@@ -650,6 +650,7 @@ dependencies = [
  "image",
  "js-sys",
  "native-tls",
+ "native_client",
  "native_utils",
  "native_world",
  "networking",
@@ -661,6 +662,7 @@ dependencies = [
  "tungstenite",
  "wasm-bindgen",
  "web-sys",
+ "web_client",
  "wgpu",
  "wgpu_glyph",
  "winit",
@@ -1546,6 +1548,28 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "tempfile",
+]
+
+[[package]]
+name = "native_client"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "clap",
+ "client",
+ "futures",
+ "game_server",
+ "gilrs",
+ "glyph_brush",
+ "image",
+ "native_world",
+ "networking",
+ "once_cell",
+ "rodio",
+ "wgpu",
+ "wgpu_glyph",
+ "winit",
+ "world",
 ]
 
 [[package]]
@@ -2854,6 +2878,10 @@ dependencies = [
  "js-sys",
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "web_client"
+version = "0.1.0"
 
 [[package]]
 name = "weezl"

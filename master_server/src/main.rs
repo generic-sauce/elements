@@ -1,6 +1,6 @@
 #![feature(drain_filter)]
 
-use server::peer::{PeerManager, PeerHandle, PeerEvent};
+use server::prelude::*;
 use networking::prelude::{MASTER_SERVER_PORT, MASTER_SERVER_HTTPS_PORT, MasterServerPacket, MasterClientPacket};
 use native_utils::prelude::TimedLoop;
 
