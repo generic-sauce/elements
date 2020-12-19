@@ -1,7 +1,7 @@
 mod peripherals_update;
-mod peripherals_state;
-
 pub use peripherals_update::*;
+
+mod peripherals_state;
 pub use peripherals_state::*;
 
 use crate::prelude::*;

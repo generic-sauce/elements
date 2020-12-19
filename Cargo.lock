@@ -2883,12 +2883,14 @@ dependencies = [
 name = "web_client"
 version = "0.1.0"
 dependencies = [
+ "bincode",
+ "client",
  "console_error_panic_hook",
- "game_server",
  "glyph_brush",
  "js-sys",
  "networking",
  "serde",
+ "serde_derive",
  "wasm-bindgen",
  "web-sys",
 ]

@@ -1,3 +1,5 @@
+#![feature(generic_associated_types)]
+
 use crate::prelude::*;
 
 mod prelude;
