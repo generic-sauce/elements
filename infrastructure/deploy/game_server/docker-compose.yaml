@@ -11,7 +11,7 @@ services:
     network_mode: "host"
     container_name: "elements-game-server-0"
     working_dir: "/root"
-    command: "/root/target/release/elements-game-server --port 7575 --domain-name generic-sauce.de"
+    command: "/root/target/release/elements-game-server --port 7575 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
   elements-game-server-1:
     image: "archlinux:latest"
     volumes:
@@ -22,7 +22,7 @@ services:
     network_mode: "host"
     container_name: "elements-game-server-1"
     working_dir: "/root"
-    command: "/root/target/release/elements-game-server --port 7577 --domain-name generic-sauce.de"
+    command: "/root/target/release/elements-game-server --port 7577 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
   elements-game-server-2:
     image: "archlinux:latest"
     volumes:
@@ -33,4 +33,4 @@ services:
     network_mode: "host"
     container_name: "elements-game-server-2"
     working_dir: "/root"
-    command: "/root/target/release/elements-game-server --port 7579 --domain-name generic-sauce.de"
+    command: "/root/target/release/elements-game-server --port 7579 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
