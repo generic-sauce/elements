@@ -24,9 +24,7 @@
 
 # infrastructure
 /infrastructure/rocket-server/target
-/infrastructure/rocket-server/Rocket.toml
 /infrastructure/rocket-server/static
-/infrastructure/elements_root_dir
 
 /infrastructure/deploy/game_server/res
 /infrastructure/deploy/game_server/target
