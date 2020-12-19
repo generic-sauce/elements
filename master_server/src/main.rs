@@ -47,6 +47,9 @@ pub enum GameServerState {
 
 impl MasterServer {
     pub fn new(port: u16, identity_file: Option<&str>) -> MasterServer {
+		if identity_file.is_none() {
+            println!("WARN: no identity file given. HTTPS is disabled!");
+        }
         MasterServer {
             peer_manager: PeerManager::new(port, port+1, identity_file),
             game_servers: Vec::new(),
@@ -204,7 +207,7 @@ fn main() {
 
     let port = matches.value_of("port")
         .map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
-        .unwrap_or(DEFAULT_GAME_SERVER_PORT);
+        .unwrap_or(DEFAULT_MASTER_SERVER_PORT);
 
     let identity_file = matches.value_of("identity_file");
 
