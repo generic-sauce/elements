@@ -23,7 +23,8 @@
 /local/
 
 # rocket-server
-/rocket-server/target
-/rocket-server/Rocket.toml
-/rocket-server/static
+/infrastructure/rocket-server/target
+/infrastructure/rocket-server/Rocket.toml
+/infrastructure/rocket-server/static
+/infrastructure/elements_root_dir
 /web/site/dist
