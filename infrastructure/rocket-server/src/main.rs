@@ -11,8 +11,6 @@ use rocket::State;
 use std::sync::{Arc, Mutex};
 use rocket_contrib::serve::StaticFiles;
 
-const ELEMENTS_DEPLOY_DIRECTORY: &str = "/home/sauce/elements_deploy";
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GithubPushCommit {
 	pub message: String,
@@ -47,7 +45,6 @@ fn main() {
 			println!("starting new deploy");
 			let mut command = Command::new("bash");
 			command.arg("-c").arg("./deploy.sh")
-				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
 				.stdout(Stdio::inherit())
 				.stderr(Stdio::inherit());
 
