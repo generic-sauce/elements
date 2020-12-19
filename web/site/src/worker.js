@@ -1,4 +1,5 @@
 const rust = import("../node_modules/elements/web_client.js") // TODO use web/pkg-path without linking
+rust.then(rust => rust.client_main())
 
 self.gamepad_states = [default_gamepad_state(), default_gamepad_state()];
 
@@ -22,12 +23,11 @@ self.handle_audio_command = function(cmd) {
 
 self.date_now = Date.now
 
+
 self.tilemap_load_callback = null
 self.onmessage = function(e) {
 	const msg = e.data;
-	if (msg.type == "init-request") {
-		rust.then(rust => rust.client_main(msg.answer))
-	} else if (msg.type == "load_tilemap_response") {
+	if (msg.type == "load_tilemap_response") {
 		if (self.tilemap_load_callback) {
 			self.tilemap_load_callback(msg.tilemap);
 			self.tilemap_load_callback = null;

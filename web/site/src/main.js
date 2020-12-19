@@ -10,8 +10,6 @@ window.onload = function() {
 		document.body.requestFullscreen();
 	});
 
-	const answer = prompt("menu / local / ip")
-
 	window.draw = null
 	window.worker = new Worker("./src/worker.js")
 	window.worker.onmessage = function(e) {
@@ -34,10 +32,6 @@ window.onload = function() {
 			console.log("invalid message received at main.js", msg)
 		}
 	}
-	window.worker.postMessage({
-		type: "init-request",
-		answer
-	});
 
 	function send_gamepad_update() {
 		window.worker.postMessage({

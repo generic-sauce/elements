@@ -16,18 +16,14 @@ fn main_loop(f: impl FnMut() + 'static, fps: u32) {
 
 
 #[wasm_bindgen]
-pub fn client_main(answer: &str) {
+pub fn client_main() {
 	std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
 	let texture_filenames: Vec<_> = texture_filenames_iter().collect();
 	let texture_filenames = JsValue::from_serde(&texture_filenames).unwrap();
 	js_init(texture_filenames);
 
-	let mut runnable = match answer {
-		"menu" => Runnable::Menu,
-		"" | "local" => Runnable::Local(Local::<WebBackend>::new(0)),
-		ip => Runnable::Client(Client::<WebBackend>::new(ip, DEFAULT_GAME_SERVER_PORT)),
-	};
+	let mut runnable = Runnable::Menu;
 
 	let input_backend = WebInputBackend;
 	let graphics_backend = WebGraphicsBackend::new();
