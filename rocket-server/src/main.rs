@@ -48,8 +48,8 @@ fn main() {
 			let mut command = Command::new("bash");
 			command.arg("-c").arg("./deploy.sh")
 				.current_dir(ELEMENTS_DEPLOY_DIRECTORY)
-				.stdout(Stdio::piped())
-				.stderr(Stdio::piped());
+				.stdout(Stdio::inherit())
+				.stderr(Stdio::inherit());
 
 			match command.output() {
 				Ok(_) => { println!("Successfully executed deploy.sh"); }
