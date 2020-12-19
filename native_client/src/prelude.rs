@@ -5,7 +5,6 @@ pub use {
 
 	networking::prelude::*,
 	world::prelude::*,
-	native_world::prelude::*,
 	game_server::*,
 	client::prelude::*,
 

@@ -1,6 +1,6 @@
-use world::prelude::*;
-use native_utils::prelude::*;
+use networking::prelude::*;
 
+// TODO: move
 pub struct ClientSocketNative {
 	socket: UdpSocket,
 	last_sent_time: Instant,

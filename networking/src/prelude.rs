@@ -14,9 +14,18 @@ pub use std::{
 	marker::PhantomData,
 	cmp::Ordering,
 	ops::Mul,
+	sync::Arc,
 };
 pub use itertools::iproduct;
+
+#[cfg(not(target_arch = "wasm32"))] pub use native_tls::{TlsAcceptor, Identity};
+#[cfg(not(target_arch = "wasm32"))] pub use tungstenite::Message;
 
 pub use crate::*;
 pub use crate::packets::*;
 pub use crate::constants::*;
+
+#[cfg(not(target_arch = "wasm32"))] pub use timed_loop::*;
+#[cfg(not(target_arch = "wasm32"))] pub use udp::*;
+#[cfg(not(target_arch = "wasm32"))] pub use peer::*;
+#[cfg(not(target_arch = "wasm32"))] pub use fps_timer::*;
