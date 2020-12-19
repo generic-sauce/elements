@@ -45,6 +45,7 @@ fn main() {
 			println!("starting new deploy");
 			let mut command = Command::new("bash");
 			command.arg("-c").arg("./deploy.sh")
+				.current_dir("../deploy")
 				.stdout(Stdio::inherit())
 				.stderr(Stdio::inherit());
 
