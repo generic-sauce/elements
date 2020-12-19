@@ -11,7 +11,7 @@ pub struct ServerConnector<B: Backend> {
 
 impl<B: Backend> ServerConnector<B> {
     pub fn new(master_server_ip: &str) -> ServerConnector<B> {
-        let socket = B::SocketBackend::new(master_server_ip, MASTER_SERVER_PORT);
+        let socket = B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT);
 
         ServerConnector {
             socket,
