@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 native_world = { path = "../native_world" }
 server = { path = "../server" }
+networking = { path = "../networking" }
 
 tungstenite = { version = "0.11" }
 native-tls = { version = "0.2.6" }

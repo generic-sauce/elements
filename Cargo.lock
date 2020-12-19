@@ -781,17 +781,9 @@ dependencies = [
  "clap",
  "native-tls",
  "native_world",
+ "networking",
  "server",
  "tungstenite",
-]
-
-[[package]]
-name = "game_server_bin"
-version = "0.1.0"
-dependencies = [
- "clap",
- "game_server",
- "networking",
 ]
 
 [[package]]
