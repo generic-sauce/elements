@@ -7,6 +7,7 @@ pub use event_handler::*;
 use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
+pub const CURSOR_SPEED: f32 = 0.001;
 const WHIZ_VOLUME: f32 = 0.1;
 
 pub struct App<B: Backend> {
@@ -38,7 +39,7 @@ impl<B: Backend> App<B> {
 
 	fn update_cursor(&mut self) {
 		let mouse_update = self.peripherals_state.cursor_move;
-		self.cursor_position += mouse_update.cast() * 0.001 * (1.0, -1.0);
+		self.cursor_position += mouse_update.cast() * CURSOR_SPEED * (1.0, -1.0);
 		self.cursor_position.y = self.cursor_position.y.max(0.0).min(1.0);
 		self.cursor_position.x = self.cursor_position.x.max(0.0).min(ASPECT_RATIO);
 	}

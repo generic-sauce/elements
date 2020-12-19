@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 const DEADZONE_MIN: f32 = 0.35;
 const CURSOR_DEADZONE: f32 = 0.1;
-const CURSOR_MOUSE_SPEED: f32 = 0.001;
+const CURSOR_MOUSE_SPEED: f32 = 0.002;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InputState {
