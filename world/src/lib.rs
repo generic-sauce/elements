@@ -1,7 +1,6 @@
 #![feature(drain_filter)]
 #![feature(const_fn)]
 
-
 mod animation;
 mod vec;
 mod input;
