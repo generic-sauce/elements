@@ -1,8 +1,6 @@
 #![feature(drain_filter)]
 
-use server::prelude::*;
-use networking::prelude::{MASTER_SERVER_PORT, MASTER_SERVER_HTTPS_PORT, MasterServerPacket, MasterClientPacket};
-use native_utils::prelude::TimedLoop;
+use networking::prelude::*;
 
 pub const MASTER_SERVER_FPS: u32 = 10;
 pub const AWAITING_TIMEOUT: u32 = 5 * MASTER_SERVER_FPS;

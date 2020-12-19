@@ -1,2 +1,2 @@
 [workspace]
-members = ["networking", "server", "master_server", "native_utils", "world", "native_world", "game_server", "client", "native_client", "web_client"]
+members = ["networking", "master_server", "world", "game_server", "client", "native_client", "web_client"]

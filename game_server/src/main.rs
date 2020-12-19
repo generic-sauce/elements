@@ -1,5 +1,5 @@
 use game_server::*;
-use networking::DEFAULT_GAME_SERVER_PORT;
+use world::prelude::*;
 
 fn main() {
 	let matches = game_server_cli_args();

@@ -1,6 +1,6 @@
-use native_world::prelude::*;
 use clap::{App as ClapApp, Arg, ArgMatches};
-use server::prelude::*;
+
+use world::prelude::*;
 
 // update_desire is within 0..=1000
 const UPDATE_DESIRE_PER_FRAME: u32 = 350;

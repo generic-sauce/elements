@@ -14,10 +14,10 @@ mod event;
 mod update;
 mod packet;
 
+#[cfg(not(target_arch = "wasm32"))] mod client_socket_native;
+
 pub mod prelude;
-
 use crate::prelude::*;
-
 
 pub const FIGHT_END_COUNT: u32 = 120;
 pub const TROPHY_END_COUNT: u32 = 160;

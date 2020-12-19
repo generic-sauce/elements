@@ -19,6 +19,5 @@ image = "0.23"
 
 networking = { path = "../networking" }
 world = { path = "../world" }
-native_world = { path = "../native_world" }
 client = { path = "../client" }
 game_server = { path = "../game_server" }
