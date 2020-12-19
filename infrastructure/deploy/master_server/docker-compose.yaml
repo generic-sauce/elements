@@ -1,0 +1,14 @@
+version: "3.3"
+
+services:
+  elements-master-server:
+    image: "archlinux:latest"
+    environment:
+      RUST_BACKTRACE: full
+    volumes:
+      - /home/sauce/elements_deploy/master_server:/root
+    restart: "always"
+    network_mode: "host"
+    container_name: "elements-master-server"
+    working_dir: "/root"
+    command: "/root/target/release/elements-master-server"
