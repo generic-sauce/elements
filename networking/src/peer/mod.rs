@@ -57,6 +57,10 @@ impl PeerManager {
 
 		let acceptor = tls_acceptor(identity_file);
 
+		if acceptor.is_none() {
+			println!("WARN: no identity file found. HTTPS is disabled!");
+		}
+
 		PeerManager {
 			udp_socket,
 			https_listener,
