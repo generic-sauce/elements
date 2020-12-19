@@ -1,6 +1,7 @@
 #![feature(drain_filter)]
 
 use networking::prelude::*;
+use clap::{App as ClapApp, Arg};
 
 pub const MASTER_SERVER_FPS: u32 = 10;
 pub const AWAITING_TIMEOUT: u32 = 5 * MASTER_SERVER_FPS;
@@ -45,16 +46,16 @@ pub enum GameServerState {
 }
 
 impl MasterServer {
-    pub fn new() -> MasterServer {
+    pub fn new(port: u16, identity_file: Option<&str>) -> MasterServer {
         MasterServer {
-            peer_manager: PeerManager::new(MASTER_SERVER_PORT, MASTER_SERVER_HTTPS_PORT),
+            peer_manager: PeerManager::new(port, port+1, identity_file),
             game_servers: Vec::new(),
             clients: Vec::new(),
         }
     }
 
     pub fn run(&mut self) {
-        println!("INFO: master server started. Listening on port {}", MASTER_SERVER_PORT);
+        println!("INFO: master server started. Listening on port {}", DEFAULT_MASTER_SERVER_PORT);
         for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
             for ev in self.peer_manager.tick::<MasterServerPacket>() {
                 match ev {
@@ -183,5 +184,29 @@ impl GameServerInfo {
 }
 
 fn main() {
-    MasterServer::new().run();
+    let matches = ClapApp::new("Elements Master Server")
+        .about("This is the Master Server of the Elements Game. Lets connect some clients with games :D")
+        .arg(Arg::with_name("port")
+            .short("-p")
+            .long("--port")
+            .value_name("PORT")
+            .help(&format!("The server will bind this port. (default: {})", DEFAULT_MASTER_SERVER_PORT))
+            .takes_value(true)
+        )
+        .arg(Arg::with_name("identity_file")
+            .short("-i")
+            .long("--identity-file")
+            .value_name("IDENTITY_FILE")
+            .help(&"The identity file for tls. If not given https is not supported")
+            .takes_value(true)
+        )
+        .get_matches();
+
+    let port = matches.value_of("port")
+        .map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
+        .unwrap_or(DEFAULT_GAME_SERVER_PORT);
+
+    let identity_file = matches.value_of("identity_file");
+
+    MasterServer::new(port, identity_file).run();
 }

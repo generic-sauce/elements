@@ -33,6 +33,13 @@ fn main() {
 				.help(&"The domain name of this server. Only used, if connecting to a master server.")
 				.takes_value(true)
 			)
+			.arg(Arg::with_name("identity_file")
+				.short("-i")
+				.long("--identity-file")
+				.value_name("IDENTITY_FILE")
+				.help(&"The identity file for tls. If not given https is not supported")
+				.takes_value(true)
+			)
 		)
 		.subcommand(SubCommand::with_name("menu")
 			.about("Starts the Elements Native Clients menu")
@@ -68,7 +75,10 @@ fn main() {
 			.map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
 			.unwrap_or(DEFAULT_GAME_SERVER_PORT);
 		let domain_name = matches.value_of("domain_name");
-		Server::new(port, domain_name).run();
+
+		let identity_file = matches.value_of("identity_file");
+
+		Server::new(port, domain_name, identity_file).run();
 		return;
 	}
 

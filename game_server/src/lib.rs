@@ -21,12 +21,12 @@ pub struct Server {
 }
 
 impl Server {
-	pub fn new(port: u16, domain_name: Option<&str>) -> Server {
+	pub fn new(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> Server {
 		let mut tilemap_image = load_tilemap_image(DEFAULT_TILEMAP);
 
 		println!("INFO: Server starting on port {}. Waiting for players.", port);
 
-		let (peer_manager, peers) = waiting_for_players(port, domain_name);
+		let (peer_manager, peers) = waiting_for_players(port, domain_name, identity_file);
 
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
@@ -109,7 +109,7 @@ pub fn game_server_cli_args() -> ArgMatches<'static> {
 			.short("-p")
 			.long("--port")
 			.value_name("PORT")
-			.help(&format!("The server will bind this port. (default: {})", DEFAULT_GAME_SERVER_PORT))
+			.help(&format!("The server will bind this port. (default: {})", DEFAULT_MASTER_SERVER_PORT))
 			.takes_value(true)
 		)
 		.arg(Arg::with_name("domain_name")
@@ -119,17 +119,24 @@ pub fn game_server_cli_args() -> ArgMatches<'static> {
 			.help(&"The domain name of this server. Only used, if connecting to a master server.")
 			.takes_value(true)
 		)
+		.arg(Arg::with_name("identity_file")
+			.short("-i")
+			.long("--identity-file")
+			.value_name("IDENTITY_FILE")
+			.help(&"The identity file for tls. If not given https is not supported")
+			.takes_value(true)
+		)
 		.get_matches()
 }
 
-fn waiting_for_players(port: u16, domain_name: Option<&str>) -> (PeerManager, [PeerHandle; 2]) {
-	let mut peer_manager = PeerManager::new(port, port+1);
+fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> (PeerManager, [PeerHandle; 2]) {
+	let mut peer_manager = PeerManager::new(port, port+1, identity_file);
 
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;
 
 	let mut master_socket = domain_name.map(|d| {
-		let master_socket = NativeSocketBackend::new("generic-sauce.de", MASTER_SERVER_PORT);
+		let master_socket = NativeSocketBackend::new("generic-sauce.de", DEFAULT_MASTER_SERVER_PORT);
 		(d, master_socket)
 	});
 

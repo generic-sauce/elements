@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 networking = { path = "../networking" }
+
+clap = "~2.33.3"
