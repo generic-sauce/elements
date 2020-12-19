@@ -1,8 +1,6 @@
 use game_server::*;
 use networking::DEFAULT_GAME_SERVER_PORT;
 
-use clap::{App as ClapApp, Arg};
-
 fn main() {
 	let matches = game_server_cli_args();
 

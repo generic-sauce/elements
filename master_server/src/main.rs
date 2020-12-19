@@ -56,6 +56,7 @@ impl MasterServer {
     }
 
     pub fn run(&mut self) {
+        println!("INFO: master server started. Listening on port {}", MASTER_SERVER_PORT);
         for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
             for ev in self.peer_manager.tick::<MasterServerPacket>() {
                 match ev {

@@ -2882,6 +2882,16 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "game_server",
+ "glyph_brush",
+ "js-sys",
+ "networking",
+ "serde",
+ "wasm-bindgen",
+ "web-sys",
+]
 
 [[package]]
 name = "weezl"
