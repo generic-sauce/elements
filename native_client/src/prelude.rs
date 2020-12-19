@@ -3,8 +3,6 @@ pub use {
 	crate::backend::*,
 	crate::timer::*,
 
-	networking::prelude::*,
-	world::prelude::*,
 	game_server::*,
 	client::prelude::*,
 

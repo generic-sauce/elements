@@ -2,7 +2,6 @@ pub use crate::backend::*;
 pub use crate::render::*;
 pub use crate::js::*;
 
-pub use networking::prelude::*;
 pub use client::prelude::*;
 
 pub use {
