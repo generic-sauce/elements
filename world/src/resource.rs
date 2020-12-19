@@ -1,7 +1,7 @@
-use std::path::PathBuf;
-
 #[cfg(not(target_arch = "wasm32"))]
 pub fn res(s: &str) -> String {
+	use std::path::PathBuf;
+
 	fn res_dir() -> PathBuf {
 		let s = std::env::args()
 			.next()
