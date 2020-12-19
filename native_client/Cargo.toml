@@ -17,7 +17,5 @@ futures = "0.3.6"
 clap = "~2.33.3"
 image = "0.23"
 
-networking = { path = "../networking" }
-world = { path = "../world" }
 client = { path = "../client" }
 game_server = { path = "../game_server" }

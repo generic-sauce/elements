@@ -1503,13 +1503,11 @@ dependencies = [
  "gilrs",
  "glyph_brush",
  "image",
- "networking",
  "once_cell",
  "rodio",
  "wgpu",
  "wgpu_glyph",
  "winit",
- "world",
 ]
 
 [[package]]
@@ -2825,7 +2823,6 @@ dependencies = [
  "console_error_panic_hook",
  "glyph_brush",
  "js-sys",
- "networking",
  "serde",
  "serde_derive",
  "wasm-bindgen",

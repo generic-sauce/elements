@@ -15,7 +15,6 @@ js-sys = { version = "0.3.45" }
 web-sys = { version = "0.3.45", features = ["Window", "Performance", "WebSocket", "MessageEvent", "BinaryType"] }
 
 client = { path = "../client" }
-networking = { path = "../networking" }
 
 [lib]
 crate-type = ["cdylib", "rlib"]

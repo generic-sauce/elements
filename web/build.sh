@@ -8,4 +8,4 @@ elif [ -n "$1" ]; then
 	exit
 fi
 
-(cd ..; wasm-pack build $mode -d web/pkg -- --no-default-features --features "web-client")
+(cd ../web_client; wasm-pack build $mode -d ../web/pkg)
