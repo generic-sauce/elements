@@ -634,42 +634,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
-name = "elements"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "bytemuck",
- "clap",
- "client",
- "console_error_panic_hook",
- "futures",
- "game_server",
- "game_server_bin",
- "gilrs",
- "glyph_brush",
- "image",
- "js-sys",
- "native-tls",
- "native_client",
- "native_utils",
- "native_world",
- "networking",
- "once_cell",
- "rodio",
- "serde",
- "serde_derive",
- "server",
- "tungstenite",
- "wasm-bindgen",
- "web-sys",
- "web_client",
- "wgpu",
- "wgpu_glyph",
- "winit",
- "world",
-]
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
