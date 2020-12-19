@@ -21,9 +21,11 @@ pub use itertools::iproduct;
 #[cfg(not(target_arch = "wasm32"))] pub use native_tls::{TlsAcceptor, Identity};
 #[cfg(not(target_arch = "wasm32"))] pub use tungstenite::Message;
 
-pub use crate::*;
-pub use crate::packets::*;
-pub use crate::constants::*;
+pub use crate::{*,
+	packets::*,
+	constants::*,
+	socket_backend::*,
+};
 
 #[cfg(not(target_arch = "wasm32"))] pub use timed_loop::*;
 #[cfg(not(target_arch = "wasm32"))] pub use udp::*;

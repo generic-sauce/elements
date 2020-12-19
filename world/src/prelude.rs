@@ -17,6 +17,3 @@ pub use {
 	},
 	networking::prelude::*,
 };
-
-#[cfg(not(target_arch = "wasm32"))]
-pub use crate::client_socket_native::*;

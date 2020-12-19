@@ -9,11 +9,10 @@ pub use input::*;
 mod audio;
 pub use audio::*;
 
-mod socket;
-pub use socket::*;
-
 mod tilemap_loader;
 pub use tilemap_loader::*;
+
+// The SocketBackend is defined in the networking crate!
 
 pub trait Backend: 'static {
 	type InputBackend: InputBackend;

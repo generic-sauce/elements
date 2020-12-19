@@ -1,3 +1,5 @@
+use crate::prelude::*;
+
 mod audio;
 pub use audio::*;
 
@@ -7,14 +9,8 @@ pub use graphics::*;
 mod input;
 pub use input::*;
 
-mod socket;
-pub use socket::*;
-
 mod tilemap_loader;
 pub use tilemap_loader::*;
-
-use crate::prelude::*;
-
 
 pub struct NativeBackend;
 

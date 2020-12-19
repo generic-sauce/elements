@@ -2,6 +2,7 @@ extern crate serde_derive;
 
 mod constants;
 mod packets;
+mod socket_backend;
 
 #[cfg(not(target_arch = "wasm32"))] mod timed_loop;
 #[cfg(not(target_arch = "wasm32"))] mod udp;
