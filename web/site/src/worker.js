@@ -1,4 +1,4 @@
-const rust = import("../node_modules/elements/elements.js") // TODO use web/pkg-path without linking
+const rust = import("../node_modules/elements/web_client.js") // TODO use web/pkg-path without linking
 
 self.gamepad_states = [default_gamepad_state(), default_gamepad_state()];
 
