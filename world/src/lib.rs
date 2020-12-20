@@ -96,8 +96,10 @@ impl World {
 		match &mut self.restart_state {
 			RestartState::Game => {
 				self.tick_impl(handler);
-				if self.player_dead().is_some() {
-					self.restart_state = RestartState::new_restart();
+				for player_dead in &self.player_dead() {
+					if *player_dead {
+						self.restart_state = RestartState::new_restart();
+					}
 				}
 				self.frame_id += 1;
 			},
@@ -219,8 +221,8 @@ impl World {
 		}
 	}
 
-	pub fn player_dead(&self) -> Option<usize> {
-		(0..2).find(|&p| self.players[p].health == 0)
+	pub fn player_dead(&self) -> [bool; 2] {
+		[self.players[0].health == 0, self.players[1].health == 0]
 	}
 
 	pub fn is_game_over(&self) -> GameResult {

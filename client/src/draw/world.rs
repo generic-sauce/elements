@@ -5,17 +5,34 @@ const TROPHY_SHOW_START: u32 = 115;
 const WINNER_POSITIONS: [ViewVec; 2] = [ViewVec::new(0.065, 0.95), ViewVec::new(0.97, 0.95)];
 
 pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
-	let sky_color = Color::rgb(1.0, 1.0, 1.0);
-	let sky_color = match world.restart_state {
+	const SKY_COLOR_FADE_SPEED: f32 = 1.5;
+	const MAX_SKY_FACTOR: f32 = 1.0;
+
+	let mut sky_color = Color::rgb(1.0, 1.0, 1.0);
+	match world.restart_state {
 		RestartState::Restart { counter, .. } => {
 			let rdc = FIGHT_END_COUNT as f32;
 			let counter = counter as f32;
-			let factor = (rdc - counter.min(rdc)*3.0) / rdc;
-			let f = 1.0 + factor.max(0.0).min(0.5);
-			sky_color * f
+			let factor = ((rdc - counter.min(rdc)*SKY_COLOR_FADE_SPEED) / rdc).max(0.0).min(MAX_SKY_FACTOR); // factor goes from 1.0 -> 0.0
+			if world.player_dead()[0] {
+				sky_color.r *= 1.0 + (factor*0.7);
+				sky_color.b /= 1.0 + (factor*2.5);
+				sky_color.g /= 1.0 + (factor*1.7);
+			}
+			if world.player_dead()[1] {
+				sky_color.r /= 1.0 + (factor*2.0);
+				sky_color.b *= 1.0 + (factor*0.7);
+				sky_color.g /= 1.0 + (factor*1.3);
+			}
 		},
-		RestartState::Game => sky_color
-	};
+		RestartState::Game => {
+			/*
+			sky_color.r /= 3.0;
+			sky_color.b *= 1.7;
+			sky_color.g /= 2.3;
+			 */
+		}
+	}
 
 	draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	draw.map(&world.tilemap, &world.fluidmap);
