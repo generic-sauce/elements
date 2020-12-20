@@ -15,14 +15,14 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 			let counter = counter as f32;
 			let factor = ((rdc - counter.min(rdc)*SKY_COLOR_FADE_SPEED) / rdc).max(0.0).min(MAX_SKY_FACTOR); // factor goes from 1.0 -> 0.0
 			if world.player_dead()[0] {
-				sky_color.r *= 1.0 + (factor*0.7);
-				sky_color.b /= 1.0 + (factor*2.5);
-				sky_color.g /= 1.0 + (factor*1.7);
+				sky_color.r *= 1.0 + factor*0.7;
+				sky_color.b /= 1.0 + factor*2.5;
+				sky_color.g /= 1.0 + factor*1.7;
 			}
 			if world.player_dead()[1] {
-				sky_color.r /= 1.0 + (factor*2.0);
-				sky_color.b *= 1.0 + (factor*0.7);
-				sky_color.g /= 1.0 + (factor*1.3);
+				sky_color.r /= 1.0 + factor*2.0;
+				sky_color.b *= 1.0 + factor*0.7;
+				sky_color.g /= 1.0 + factor*1.3;
 			}
 		},
 		RestartState::Game => {}
