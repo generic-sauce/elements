@@ -30,3 +30,5 @@ pub fn client_main() {
 	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, runnable.build_menu());
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }
+
+// #[cfg(not(target_arch = "wasm32"))] compile_error!("This only compiles for wasm32 target");
