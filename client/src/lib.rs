@@ -11,7 +11,6 @@ mod menu;
 mod server_connector;
 mod local;
 
-
 pub enum ClientMode {
 	Lobby,
 	InGame {
@@ -37,17 +36,23 @@ impl<B: Backend> Client<B> {
 		match &mut self.mode {
 			ClientMode::Lobby => {
 				if !self.socket.is_open() { return; }
-				if let Some(Go { your_player_id, tilemap_image }) = self.socket.tick() {
-					self.mode = ClientMode::InGame {
-						player_id: your_player_id,
-						world: World::new(0, &tilemap_image),
-					};
+				match self.socket.tick() {
+					Some(GameSCPacket::Go { your_player_id, tilemap_image}) => {
+						self.mode = ClientMode::InGame {
+							player_id: your_player_id,
+							world: World::new(0, &tilemap_image),
+						};
+					}
+					Some(_) => println!("received non-Go packet while in ClientMode::Lobby"),
+					None => {},
 				}
 			},
 			ClientMode::InGame { player_id, world } => {
 				// receive packets
-				if let Some(update) = self.socket.tick::<WorldUpdate>() {
-					apply_update_within_app(world, update, app);
+				match self.socket.tick() {
+					Some(GameSCPacket::WorldUpdate(update)) => apply_update_within_app(world, update, app),
+					Some(_) => println!("received non-WorldUpdate packet while in ClientMode::InGame"),
+					None => {},
 				}
 
 				// handle inputs
@@ -55,7 +60,7 @@ impl<B: Backend> Client<B> {
 				world.players[*player_id].input.update_peripherals(&app.peripherals_state);
 
 				// send packets
-				self.socket.send(&world.players[*player_id].input).unwrap();
+				self.socket.send(&GameCSPacket::InputState(world.players[*player_id].input.clone())).unwrap(); // TODO: fix clone
 
 				// tick world
 				tick_within_app(world, app);

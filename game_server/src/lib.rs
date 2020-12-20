@@ -22,7 +22,7 @@ pub struct Server {
 
 impl Server {
 	pub fn new(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> Server {
-		let mut tilemap_image = load_tilemap_image(DEFAULT_TILEMAP);
+		let tilemap_image = load_tilemap_image(DEFAULT_TILEMAP);
 
 		println!("INFO: Server starting on port {}. Waiting for players.", port);
 
@@ -37,13 +37,11 @@ impl Server {
 		};
 
 		for (i, p) in server.peers.iter().enumerate() {
-			let go = Go {
+			let go = GameSCPacket::Go {
 				your_player_id: i,
-				tilemap_image,
+				tilemap_image: tilemap_image.clone(),
 			};
 			server.peer_manager.send_to(*p, &go);
-
-			tilemap_image = go.tilemap_image;
 		}
 
 		server
@@ -58,9 +56,9 @@ impl Server {
 			}
 
 			// receive packets
-			for ev in self.peer_manager.tick::<InputState>() {
+			for ev in self.peer_manager.tick::<GameCSPacket>() {
 				match ev {
-					PeerEvent::ReceivedPacket(input_state, p) => {
+					PeerEvent::ReceivedPacket(GameCSPacket::InputState(input_state), p) => {
 						let i = match self.peers.iter().position(|p2| *p2 == p) {
 							Some(i) => i,
 							None => {
@@ -88,7 +86,7 @@ impl Server {
 				self.update_desire[i] += UPDATE_DESIRE_PER_FRAME;
 				if self.update_desire[i] >= 1000 {
 					self.update_desire[i] = 0;
-					let update = self.world.update();
+					let update = GameSCPacket::WorldUpdate(self.world.update());
 					self.peer_manager.send_to(self.peers[i], &update);
 				}
 			}
