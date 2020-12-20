@@ -4,7 +4,7 @@ services:
   elements-game-server-0:
     image: "archlinux:latest"
     volumes:
-      - /home/sauce/elements_deploy/game_server:/root
+      - .:/root
     environment:
       RUST_BACKTRACE: full
     restart: "always"
@@ -15,7 +15,7 @@ services:
   elements-game-server-1:
     image: "archlinux:latest"
     volumes:
-      - /home/sauce/elements_deploy/game_server:/root
+      - .:/root
     environment:
       RUST_BACKTRACE: full
     restart: "always"
@@ -26,7 +26,7 @@ services:
   elements-game-server-2:
     image: "archlinux:latest"
     volumes:
-      - /home/sauce/elements_deploy/game_server:/root
+      - .:/root
     environment:
       RUST_BACKTRACE: full
     restart: "always"
