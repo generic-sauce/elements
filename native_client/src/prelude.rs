@@ -2,6 +2,7 @@ pub use {
 	crate::graphics::*,
 	crate::backend::*,
 	crate::timer::*,
+	crate::winit_inputs::*,
 
 	game_server::*,
 	client::prelude::*,
