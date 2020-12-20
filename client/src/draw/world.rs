@@ -25,13 +25,7 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 				sky_color.g /= 1.0 + (factor*1.3);
 			}
 		},
-		RestartState::Game => {
-			/*
-			sky_color.r /= 3.0;
-			sky_color.b *= 1.7;
-			sky_color.g /= 2.3;
-			 */
-		}
+		RestartState::Game => {}
 	}
 
 	draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
