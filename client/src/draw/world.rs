@@ -8,27 +8,31 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 	const SKY_COLOR_FADE_SPEED: f32 = 1.5;
 	const MAX_SKY_FACTOR: f32 = 1.0;
 
-	let mut sky_color = Color::rgb(1.0, 1.0, 1.0);
-	match world.restart_state {
-		RestartState::Restart { counter, .. } => {
-			let rdc = FIGHT_END_COUNT as f32;
-			let counter = counter as f32;
-			let factor = ((rdc - counter.min(rdc)*SKY_COLOR_FADE_SPEED) / rdc).max(0.0).min(MAX_SKY_FACTOR); // factor goes from 1.0 -> 0.0
-			if world.player_dead()[0] {
-				sky_color.r *= 1.0 + factor*0.7;
-				sky_color.b /= 1.0 + factor*2.5;
-				sky_color.g /= 1.0 + factor*1.7;
-			}
-			if world.player_dead()[1] {
-				sky_color.r /= 1.0 + factor*2.0;
-				sky_color.b *= 1.0 + factor*0.7;
-				sky_color.g /= 1.0 + factor*1.3;
-			}
-		},
-		RestartState::Game => {}
+	#[cfg(not(target_arch = "wasm32"))] // TODO generalize to web
+	{
+		let mut sky_color = Color::rgb(1.0, 1.0, 1.0);
+		match world.restart_state {
+			RestartState::Restart { counter, .. } => {
+				let rdc = FIGHT_END_COUNT as f32;
+				let counter = counter as f32;
+				let factor = ((rdc - counter.min(rdc)*SKY_COLOR_FADE_SPEED) / rdc).max(0.0).min(MAX_SKY_FACTOR); // factor goes from 1.0 -> 0.0
+				if world.player_dead()[0] {
+					sky_color.r *= 1.0 + factor*0.7;
+					sky_color.b /= 1.0 + factor*2.5;
+					sky_color.g /= 1.0 + factor*1.7;
+				}
+				if world.player_dead()[1] {
+					sky_color.r /= 1.0 + factor*2.0;
+					sky_color.b *= 1.0 + factor*0.7;
+					sky_color.g /= 1.0 + factor*1.3;
+				}
+			},
+			RestartState::Game => {}
+		}
+
+		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	}
 
-	draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	draw.map(&world.tilemap, &world.fluidmap);
 	draw_players(draw, world);
 	draw_cursors(draw, world);
