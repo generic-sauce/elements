@@ -2,6 +2,8 @@
 
 #[macro_use] extern crate rocket;
 
+use rocket::config::*;
+use rocket::response::Redirect;
 use serde::{Serialize, Deserialize};
 use std::process::{Command, Stdio};
 use std::{str, thread};
@@ -54,6 +56,23 @@ fn main() {
 				Err(e) => println!("Error executing deploy.sh: {}", e),
 			}
 		}
+	});
+
+	// redirect HTTP -> HTTPS
+	thread::spawn(|| {
+		let config = Config::build(Environment::Production)
+			.port(80)
+			.unwrap();
+
+
+		#[get("/")]
+		fn redirect() -> Redirect {
+			Redirect::to("https://generic-sauce.de") // TODO make generic
+		}
+
+		rocket::custom(config)
+			.mount("/", routes![redirect])
+			.launch();
 	});
 
     rocket::ignite()
