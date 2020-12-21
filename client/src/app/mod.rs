@@ -9,7 +9,7 @@ use crate::prelude::*;
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 pub const CURSOR_SPEED: f32 = 0.001;
 const WHIZ_VOLUME: f32 = 0.1;
-const BONG_VOLUME: f32 = 0.15;
+const BONG_VOLUME: f32 = 0.1;
 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
