@@ -6,7 +6,7 @@ services:
     environment:
       RUST_BACKTRACE: full
     volumes:
-      - /home/sauce/elements_deploy/master_server:/root
+      - .:/root
     restart: "always"
     network_mode: "host"
     container_name: "elements-master-server"

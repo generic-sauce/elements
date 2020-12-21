@@ -38,7 +38,7 @@ cd "$MASTER_SERVER_PATH"
 rm -rf "$MASTER_SERVER_PATH/target"
 mkdir -p "$MASTER_SERVER_PATH/target/release"
 
-cp -r "$ELEMENTS_ROOT_DIR/target/release/master_server" "$MASTER_SERVER_PATH/target/release/elements-master-server"
+cp "$ELEMENTS_ROOT_DIR/target/release/master_server" "$MASTER_SERVER_PATH/target/release/elements-master-server"
 
 echo "Starting new master-server..."
 docker-compose up -d
@@ -55,7 +55,7 @@ rm -rf "$GAME_SERVER_PATH/res"
 
 mkdir -p "$GAME_SERVER_PATH/target/release"
 
-cp -r "$ELEMENTS_ROOT_DIR/target/release/game_server" "$GAME_SERVER_PATH/target/release/elements-game-server"
+cp "$ELEMENTS_ROOT_DIR/target/release/game_server" "$GAME_SERVER_PATH/target/release/elements-game-server"
 cp -r "$ELEMENTS_ROOT_DIR/res" "$GAME_SERVER_PATH/res"
 
 echo "Starting new game-servers..."
