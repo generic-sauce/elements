@@ -8,4 +8,4 @@ elif [ -n "$1" ]; then
 	exit
 fi
 
-(cd ../web_client; wasm-pack build $mode -d ../web/pkg)
+wasm-pack build $mode -d ./pkg

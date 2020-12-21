@@ -31,4 +31,4 @@ pub fn client_main() {
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }
 
-// #[cfg(not(target_arch = "wasm32"))] compile_error!("This only compiles for wasm32 target");
+#[cfg(not(target_arch = "wasm32"))] compile_error!("This only compiles for wasm32 target");

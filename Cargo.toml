@@ -1,3 +1,3 @@
 [workspace]
-members = ["networking", "master_server", "world", "game_server", "client", "native_client", "web_client"]
-exclude = ["infrastructure/rocket-server"]
+members = ["networking", "master_server", "world", "game_server", "client", "native_client"]
+exclude = ["infrastructure/rocket-server", "web_client"]

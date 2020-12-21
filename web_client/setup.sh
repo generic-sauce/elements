@@ -2,7 +2,7 @@
 
 set -e
 
-(cd ../web_client; wasm-pack build -d ../web/pkg)
+wasm-pack build -d ./pkg
 (cd site; npm install)
 
 ln -s "$(readlink -f ./pkg)" ./site/node_modules/elements

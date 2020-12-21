@@ -1,16 +1,6 @@
 #!/bin/bash
 
-function check() {
-	echo "checking $1"
-	(cd $1; cargo check)
-	if [ "$?" -ne 0 ]; then
-		echo "ERROR: $1 does not compile"
-		exit 1
-	fi
-}
+set -e
 
-
-check master_server
-check game_server
-check native_client
-check web_client
+cargo check
+(cd web_client; cargo check)
