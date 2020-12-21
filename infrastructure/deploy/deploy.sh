@@ -5,6 +5,7 @@ set -e
 ELEMENTS_ROOT_DIR="${PWD%/*/*}"
 MASTER_SERVER_PATH="$PWD/master_server"
 GAME_SERVER_PATH="$PWD/game_server"
+ELEMENTS_BUILD_CONTAINER_NAME="elements-build-container"
 
 
 ############## CLEANUP OLD CONTAINER ##############
@@ -26,9 +27,15 @@ echo "Pulling Repository..."
 git pull
 echo "Pulling Repository: Done"
 
-# building
+# start build container, if not already running
+if [ ! "$( docker container inspect -f '{{.State.Status}}' "$ELEMENTS_BUILD_CONTAINER_NAME" )" == "running" ]; then
+	echo "starting build container"
+	docker run -v "$ELEMENTS_ROOT_DIR":"/root/elements" --rm -d --name "$ELEMENTS_BUILD_CONTAINER_NAME" bruno1996/elements2-server sleep infinity
+fi
+
+# build
 echo "Building Game Server + Master Server..."
-/home/sauce/.cargo/bin/cargo build --release --package=master_server --package=game_server
+docker exec -w /root/elements elements-build-container /root/.cargo/bin/cargo build --release --package master_server --package game_server
 echo "Building Game Server + Master Server: Done"
 
 
@@ -68,4 +75,3 @@ if [ ! "$1" == "--skip-web" ]; then
 
 	./do-it.sh
 fi
-
