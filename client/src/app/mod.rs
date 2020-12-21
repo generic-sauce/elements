@@ -10,6 +10,7 @@ pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 
 pub const CURSOR_SPEED: f32 = 0.001;
 const WHIZ_VOLUME: f32 = 0.1;
 const BONG_VOLUME: f32 = 0.1;
+const END_SOUND_VOLUME: f32 = 0.3;
 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
@@ -111,6 +112,10 @@ impl<B: Backend> App<B> {
 
 		if handler.new_game_started {
 			self.audio_backend.play_sound(SoundId::Bong, BONG_VOLUME);
+		}
+
+		if handler.game_ended {
+			self.audio_backend.play_sound(SoundId::End, END_SOUND_VOLUME);
 		}
 	}
 }

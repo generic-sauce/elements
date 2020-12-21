@@ -99,6 +99,7 @@ impl World {
 				for player_dead in &self.player_dead() {
 					if *player_dead {
 						self.restart_state = RestartState::new_restart();
+						handler.game_ended();
 					}
 				}
 				self.frame_id += 1;
