@@ -48,4 +48,5 @@ setup!(
 	CPart: "audio/c_part.wav",
 	DPart: "audio/d_part.wav",
 	Whiz: "audio/whiz.wav",
+	Bong: "audio/bong.wav",
 );

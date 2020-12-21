@@ -9,6 +9,7 @@ use crate::prelude::*;
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 pub const CURSOR_SPEED: f32 = 0.001;
 const WHIZ_VOLUME: f32 = 0.1;
+const BONG_VOLUME: f32 = 0.15;
 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
@@ -106,6 +107,10 @@ impl<B: Backend> App<B> {
 				let volume = (dmg as f32 / 100.0).max(0.5).min(2.0);
 				self.audio_backend.play_sound(SoundId::Whiz, volume*WHIZ_VOLUME);
 			}
+		}
+
+		if handler.new_game_started {
+			self.audio_backend.play_sound(SoundId::Bong, BONG_VOLUME);
 		}
 	}
 }
