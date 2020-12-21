@@ -122,6 +122,7 @@ impl World {
 					if self.players.iter().any(|p| p.input.restart()) {
 						self.reset(handler);
 						self.restart_state = RestartState::Game;
+						handler.new_game_started();
 					}
 				} else if *counter > FIGHT_END_COUNT {
 

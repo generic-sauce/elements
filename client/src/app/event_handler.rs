@@ -3,6 +3,7 @@ use crate::prelude::*;
 pub struct AppEventHandler {
     pub tilemap_changed: bool,
     pub damages: [i32; 2],
+    pub new_game_started: bool,
 }
 
 impl AppEventHandler {
@@ -10,6 +11,7 @@ impl AppEventHandler {
         AppEventHandler {
             tilemap_changed: false,
             damages: [0; 2],
+            new_game_started: false,
         }
     }
 }
@@ -21,5 +23,9 @@ impl EventHandler for AppEventHandler {
 
     fn damage_inflicted(&mut self, damage: i32, player: usize) {
         self.damages[player] += damage;
+    }
+
+    fn new_game_started(&mut self) {
+        self.new_game_started = true;
     }
 }

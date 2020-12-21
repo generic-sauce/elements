@@ -2,8 +2,8 @@ use std::process::{Command, exit};
 use std::io::ErrorKind;
 
 fn compile_shader(shader_name: &str) {
-	let glsl_path = format!("res/shader/{}{}", shader_name, ".glsl");
-	let spv_path = format!("res/shader/{}{}", shader_name, ".spv");
+	let glsl_path = format!("../res/shader/{}{}", shader_name, ".glsl");
+	let spv_path = format!("../res/shader/{}{}", shader_name, ".spv");
 
 	println!("cargo:rerun-if-changed={}", glsl_path);
 	// this line is usefull but unfortunately forces linkage of the app
