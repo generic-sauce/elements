@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   elements-game-server-0:
-    image: "archlinux:latest"
+    image: "bruno1996/elements2-server"
     volumes:
       - .:/root
     environment:
@@ -13,7 +13,7 @@ services:
     working_dir: "/root"
     command: "/root/target/release/elements-game-server --port 7575 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
   elements-game-server-1:
-    image: "archlinux:latest"
+    image: "bruno1996/elements2-server"
     volumes:
       - .:/root
     environment:
@@ -24,7 +24,7 @@ services:
     working_dir: "/root"
     command: "/root/target/release/elements-game-server --port 7577 --domain-name generic-sauce.de --identity-file /root/identity.pfx"
   elements-game-server-2:
-    image: "archlinux:latest"
+    image: "bruno1996/elements2-server"
     volumes:
       - .:/root
     environment:

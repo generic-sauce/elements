@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   elements-master-server:
-    image: "archlinux:latest"
+    image: "bruno1996/elements2-server"
     environment:
       RUST_BACKTRACE: full
     volumes:
