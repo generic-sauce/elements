@@ -2,8 +2,6 @@ use crate::prelude::*;
 
 pub type OnEvent<B> = Box<dyn OnEventImpl<B>>;
 
-pub fn noop<B: Backend>(_app: &mut App<B>, _runnable: &mut Runnable<B>) {}
-
 pub fn create_local<B: Backend>(best_of_n: u32) -> OnEvent<B> {
 	Box::new(move |app, runnable| {
 		app.menu.elements.clear();
