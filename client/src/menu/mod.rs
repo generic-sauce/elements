@@ -55,6 +55,13 @@ impl<B: Backend> Menu<B> {
 				BUTTON_TEXT_SIZE,
 				Box::new(|_, _| std::process::exit(0))
 			),
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.9),
+				CanvasVec::new(0.15, 0.15),
+				0.1,
+				"Elements",
+				TextAlign::Center,
+			),
 		];
 		elements[selected as usize].color = Color::hex("295e9a");
 		elements
@@ -63,6 +70,13 @@ impl<B: Backend> Menu<B> {
 	pub fn online_menu() -> Menu<B> {
 		let mut elements = Menu::main_menu_items(0);
 		elements.extend(vec![
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+				CanvasVec::new(0.15, 0.15),
+				0.05,
+				"Online",
+				TextAlign::Center,
+			),
 			MenuElement::new_button(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
@@ -88,6 +102,13 @@ impl<B: Backend> Menu<B> {
 	pub fn local_menu() -> Menu<B> {
 		let mut elements = Menu::main_menu_items(1);
 		elements.extend(vec![
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+				CanvasVec::new(0.15, 0.15),
+				0.05,
+				"Local",
+				TextAlign::Center,
+			),
 			MenuElement::new_button(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
@@ -103,8 +124,16 @@ impl<B: Backend> Menu<B> {
 	}
 
 	pub fn tutorial_menu() -> Menu<B> {
-		let elements = Menu::main_menu_items(2);
-		// TODO: add tutorial menu
+		let mut elements = Menu::main_menu_items(2);
+		elements.extend(vec![
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+				CanvasVec::new(0.15, 0.15),
+				0.05,
+				"Tutorial",
+				TextAlign::Center,
+			),
+		]);
 		Menu {
 			elements,
 		}
@@ -160,6 +189,7 @@ impl<B: Backend> App<B> {
 				MenuKind::EditField( EditField { selected, .. } ) => {
 					*selected = true;
 				}
+				MenuKind::Label(_) => {}
 			}
 		}
 

@@ -39,9 +39,21 @@ pub struct EditField {
 	pub font_size: f32,
 }
 
+pub enum TextAlign {
+	Left,
+	Center,
+}
+
+pub struct Label {
+	pub text: String,
+	pub align: TextAlign,
+	pub font_size: f32,
+}
+
 pub enum MenuKind<B: Backend> {
 	Button(Button<B>),
-	EditField(EditField)
+	EditField(EditField),
+	Label(Label),
 }
 
 impl<B: Backend> MenuElement<B> {
@@ -67,6 +79,23 @@ impl<B: Backend> MenuElement<B> {
 			clicked: false,
 			color,
 		}
+	}
+
+	pub fn new_label(position: CanvasVec, size: CanvasVec, font_size: f32, text: &str, align: TextAlign) -> MenuElement<B> {
+		MenuElement {
+			name: "",
+			kind: MenuKind::Label(Label {
+				text: text.to_string(),
+				align,
+				font_size,
+			}),
+			position,
+			size,
+			hovered: false,
+			clicked: false,
+			color: Color::WHITE
+		}
+
 	}
 
 	pub fn is_colliding(&self, pos: CanvasVec) -> bool {
@@ -98,6 +127,9 @@ impl<B: Backend> MenuElement<B> {
 			MenuKind::EditField (edit_field) => {
 				self.draw_edit_field(draw, edit_field, color, graphics_backend)
 			},
+			MenuKind::Label(label) => {
+				self.draw_label(draw, label, color, graphics_backend)
+			}
 		}
 	}
 
@@ -153,7 +185,22 @@ impl<B: Backend> MenuElement<B> {
 			);
 			draw.rectangle(left_bot, right_top, Color::WHITE);
 		}
+	}
 
+	fn draw_label(&self, draw: &mut Draw, label: &Label, color: Color, graphics_backend: &impl GraphicsBackend) {
+		let Label { text, font_size, align, .. } = label;
+
+
+		let text_size = graphics_backend.get_text_size(text, *font_size);
+		let text_pos = match align {
+			TextAlign::Left => CanvasVec::new(
+				self.position.x - self.size.x,
+				center_position(self.position.y - self.size.y, self.position.y + self.size.y, text_size.y)
+			),
+			TextAlign::Center => center_position::<CanvasVec>(self.position - self.size, self.position + self.size, text_size),
+		};
+
+		draw.text(text_pos, *font_size, color, text);
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character]) {
