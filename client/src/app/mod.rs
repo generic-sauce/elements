@@ -55,9 +55,7 @@ impl<B: Backend> App<B> {
 
 		runnable.tick(self);
 
-		if let Runnable::Menu = runnable {
-			self.tick_menu(runnable);
-		}
+		self.tick_menu(runnable);
 
 		self.audio_backend.tick();
 
@@ -69,7 +67,6 @@ impl<B: Backend> App<B> {
 		if matches!(runnable, Runnable::Menu | Runnable::ServerConnector(_)) {
 			self.draw_menu();
 		}
-
 	}
 
 	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {

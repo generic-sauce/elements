@@ -83,15 +83,16 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
 				"Play Now",
-				Color::hex("116201"),
+				Color::hex("2f6f10"),
 				Box::new(create_server_connector)
 			),
 			MenuElement::new_edit_field(
 				"player_name",
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.6),
+				CanvasVec::new(0.9 * ASPECT_RATIO, 0.95),
 				CanvasVec::new(0.15, 0.03),
 				"",
-				DEFAULT_BUTTON_COLOR
+				DEFAULT_BUTTON_COLOR,
+				"Your Name"
 			)
 		]);
 		Menu {
@@ -106,7 +107,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
 				"Start Game",
-				Color::hex("116201"),
+				Color::hex("2f6f10"),
 				Box::new(create_local(5)),
 			),
 		]);
@@ -126,7 +127,13 @@ impl<B: Backend> Menu<B> {
 	pub fn server_connector_menu() -> Menu<B> {
 		Menu {
 			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connecting", DEFAULT_BUTTON_COLOR, Box::new(noop)),
+				MenuElement::new_button(
+					CanvasVec::new(0.5 * ASPECT_RATIO, 0.25),
+					CanvasVec::new(0.15, 0.05),
+					"Abort",
+					Color::hex("b52f1c"),
+					Box::new(noop)
+				),
 			)
 		}
 	}
@@ -185,8 +192,7 @@ impl<B: Backend> App<B> {
 
 	pub fn draw_menu(&mut self) {
 		let mut draw = Draw::new();
-		// draw.set_clear_color(Color::BLACK);
-		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(Color::rgb(0.6, 0.6, 0.6)));
+		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(Color::rgb(0.8, 0.8, 0.8)));
 
 		// draw elements
 		for element in &mut self.menu.elements {

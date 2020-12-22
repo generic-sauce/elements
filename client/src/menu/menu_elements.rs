@@ -1,8 +1,8 @@
 use crate::prelude::*;
 use std::ops::{Add, Sub, Mul};
 
-const BUTTON_TEXT_SIZE: f32 = 0.05;
-const EDIT_FIELD_TEXT_SIZE: f32 = 0.05;
+const BUTTON_TEXT_SIZE: f32 = 0.03;
+const EDIT_FIELD_TEXT_SIZE: f32 = 0.03;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
 const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 60;
@@ -24,6 +24,7 @@ pub struct MenuElement<B: Backend> {
 
 pub struct EditField {
 	pub text: String,
+	pub template_text: String,
 	pub selected: bool,
 	pub cursor: usize,
 	pub cursor_blink_counter: u32,
@@ -52,10 +53,10 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str, color: Color) -> MenuElement<B> {
+	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str, color: Color, template_text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
-			kind: MenuKind::EditField( EditField::new(text) ),
+			kind: MenuKind::EditField( EditField::new(text, template_text) ),
 			position,
 			size,
 			hovered: false,
@@ -106,7 +107,7 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {
-		let EditField { cursor_blink_counter, cursor, selected, view_offset, .. } = edit_field;
+		let EditField { cursor_blink_counter, cursor, selected, view_offset, template_text, .. } = edit_field;
 		draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
@@ -116,14 +117,22 @@ impl<B: Backend> MenuElement<B> {
 
 		let text = edit_field.get_render_text();
 
-		let text_width = graphics_backend.get_text_size(text, EDIT_FIELD_TEXT_SIZE);
+		let text_size = if !text.is_empty() {
+			 graphics_backend.get_text_size(text, EDIT_FIELD_TEXT_SIZE)
+		} else {
+			graphics_backend.get_text_size(&template_text, EDIT_FIELD_TEXT_SIZE)
+		};
 
 		let text_pos = CanvasVec::new(
 			self.position.x - self.size.x + EDIT_FIELD_BORDER_WIDTH * 2.7,
-			center_position(self.position.y - self.size.y, self.position.y + self.size.y, text_width.y)
+			center_position(self.position.y - self.size.y, self.position.y + self.size.y, text_size.y)
 		);
 
-		draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
+		if edit_field.text.is_empty() {
+			draw.text(text_pos, EDIT_FIELD_TEXT_SIZE, Color::gray(0.04), &template_text);
+		} else {
+			draw.text(text_pos, EDIT_FIELD_TEXT_SIZE, Color::WHITE, text);
+		}
 
 		// draw cursor
 		if *selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
@@ -185,9 +194,10 @@ impl<B: Backend> MenuElement<B> {
 }
 
 impl EditField {
-	fn new(text: &str) -> EditField {
+	fn new(text: &str, template_text: &str) -> EditField {
 		EditField {
 			text: String::from(text),
+			template_text: String::from(template_text),
 			selected: false,
 			cursor: 0,
 			cursor_blink_counter: 0,
