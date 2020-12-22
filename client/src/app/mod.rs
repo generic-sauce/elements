@@ -88,13 +88,13 @@ impl<B: Backend> App<B> {
 			};
 			if winner_found {
 				*runnable = Runnable::Menu;
-				self.menu = Menu::quick_play_menu();
+				self.menu = Menu::online_menu();
 			}
 		}
 		if let Runnable::ServerConnector(server_connector) = runnable {
 			if server_connector.request_failed {
 				*runnable = Runnable::Menu;
-				self.menu = Menu::quick_play_menu();  // TODO: change to failed info
+				self.menu = Menu::online_menu();  // TODO: change to failed info
 			} else if let Some((ip, port)) = &server_connector.game_ip {
 				*runnable = Runnable::Client(Client::new(ip, *port));
 				self.menu = Menu::new();

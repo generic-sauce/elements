@@ -4,10 +4,6 @@ pub type OnEvent<B> = Box<dyn OnEventImpl<B>>;
 
 pub fn noop<B: Backend>(_app: &mut App<B>, _runnable: &mut Runnable<B>) {}
 
-pub fn create_join_server_menu<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
-	app.menu = Menu::connect_server_menu();
-}
-
 pub fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
 	let player_name = app.menu.get_element_by_name("player_name").map(|ef| {
 		match &ef.kind {
@@ -20,15 +16,17 @@ pub fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runn
 	app.menu = Menu::server_connector_menu();
 }
 
-pub fn create_quick_play_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
+pub fn create_online_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
 	*runnable = Runnable::Menu;
-	app.menu = Menu::quick_play_menu();
+	app.menu = Menu::online_menu();
 }
 
-pub fn create_local_menu<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
+pub fn create_local_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
+	*runnable = Runnable::Menu;
 	app.menu = Menu::local_menu();
 }
 
-pub fn create_tutorial_menu<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
+pub fn create_tutorial_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
+	*runnable = Runnable::Menu;
 	app.menu = Menu::tutorial_menu();
 }

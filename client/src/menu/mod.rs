@@ -8,7 +8,7 @@ use crate::prelude::*;
 
 pub const ASPECT_RATIO: f32 = 16.0 / 9.0;
 const MENU_BUTTONS_WIDTH: f32 = 0.1;
-const MENU_BUTTONS_HEIGHT: f32 = 0.08;
+const MENU_BUTTONS_HEIGHT: f32 = 0.05;
 
 pub struct Menu<B: Backend> {
 	pub elements: Vec<MenuElement<B>>,
@@ -41,54 +41,49 @@ impl<B: Backend> Menu<B> {
 		}
 	}
 
-	pub fn main_menu_items() -> Vec<MenuElement<B>> {
-		vec![
+	pub fn main_menu_items(selected: u8) -> Vec<MenuElement<B>> {
+		let mut elements = vec![
 			MenuElement::new_button(
 				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - MENU_BUTTONS_HEIGHT),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
-				"Quick Play",
-				Color::hex("4a380b"),
-				Box::new(create_quick_play_menu),
+				"Online",
+				Color::hex("153962"),
+				Box::new(create_online_menu),
 			),
 			MenuElement::new_button(
 				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 3.0)),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Local",
-				Color::hex("46420f"),
+				Color::hex("153962"),
 				Box::new(create_local_menu)
 			),
 			MenuElement::new_button(
 				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 5.0)),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
-				"Connect",
-				Color::hex("343c0e"),
-				Box::new(create_join_server_menu)
-			),
-			MenuElement::new_button(
-				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 7.0)),
-				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Tutorial",
-				Color::hex("12320d"),
+				Color::hex("153962"),
 				Box::new(create_tutorial_menu)
 			),
 			MenuElement::new_button(
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Quit",
-				Color::hex("0c212f"),
+				Color::hex("0c2542"),
 				Box::new(|_, _| std::process::exit(0))
 			),
-		]
+		];
+		elements[selected as usize].color = Color::hex("295e9a");
+		elements
 	}
 
-	pub fn quick_play_menu() -> Menu<B> {
-		let mut elements = Menu::main_menu_items();
+	pub fn online_menu() -> Menu<B> {
+		let mut elements = Menu::main_menu_items(0);
 		elements.extend(vec![
 			MenuElement::new_button(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
 				"Play Now",
-				DEFAULT_BUTTON_COLOR,
+				Color::hex("116201"),
 				Box::new(create_server_connector)
 			),
 			MenuElement::new_edit_field(
@@ -104,22 +99,14 @@ impl<B: Backend> Menu<B> {
 		}
 	}
 
-	pub fn tutorial_menu() -> Menu<B> {
-		let elements = Menu::main_menu_items();
-		// TODO: add tutorial menu
-		Menu {
-			elements,
-		}
-	}
-
 	pub fn local_menu() -> Menu<B> {
-		let mut elements = Menu::main_menu_items();
+		let mut elements = Menu::main_menu_items(1);
 		elements.extend(vec![
 			MenuElement::new_button(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
 				"Start Game",
-				DEFAULT_BUTTON_COLOR,
+				Color::hex("116201"),
 				Box::new(create_local(5)),
 			),
 		]);
@@ -128,14 +115,11 @@ impl<B: Backend> Menu<B> {
 		}
 	}
 
-	pub fn connect_server_menu() -> Menu<B> {
-		let mut elements = Menu::main_menu_items();
-		elements.extend(vec![
-			MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05),"Connect", DEFAULT_BUTTON_COLOR, create_client()),
-			MenuElement::new_edit_field("ip", CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), "", DEFAULT_BUTTON_COLOR),
-		]);
+	pub fn tutorial_menu() -> Menu<B> {
+		let elements = Menu::main_menu_items(2);
+		// TODO: add tutorial menu
 		Menu {
-			elements
+			elements,
 		}
 	}
 
@@ -194,7 +178,6 @@ impl<B: Backend> App<B> {
 			element.apply_key_events(&self.peripherals_state);
 		}
 
-		// draw elements
 		for element in &mut self.menu.elements {
 			element.tick(&self.graphics_backend);
 		}
@@ -202,7 +185,8 @@ impl<B: Backend> App<B> {
 
 	pub fn draw_menu(&mut self) {
 		let mut draw = Draw::new();
-		draw.set_clear_color(Color::BLACK);
+		// draw.set_clear_color(Color::BLACK);
+		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(Color::rgb(0.6, 0.6, 0.6)));
 
 		// draw elements
 		for element in &mut self.menu.elements {
