@@ -10,11 +10,12 @@ export function handle_command(cmd) {
 
 var howl = null
 
-function queue_music(file) {
+function queue_music(file, volume) {
 	const first_time = (howl == null);
 
 	howl = new Howl({
 		src: "res/" + file,
+		volume,
 		onend: () => howl.play(),
 	})
 

@@ -59,6 +59,10 @@ impl AudioBackend for NativeAudioBackend {
 			play_raw(&self.device, buf.amplify(volume));
 		}
 	}
+
+	fn set_music_volume(&mut self, volume: f32) {
+		self.music_sink.set_volume(volume);
+	}
 }
 
 fn load_samples() -> Vec<Sound> {

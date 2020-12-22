@@ -3,6 +3,7 @@ pub trait AudioBackend {
 	fn tick(&mut self);
 	fn queue_music(&mut self, music_id: SoundId);
 	fn play_sound(&mut self, sound_id: SoundId, volume: f32);
+	fn set_music_volume(&mut self, volume: f32);
 }
 
 macro_rules! setup {

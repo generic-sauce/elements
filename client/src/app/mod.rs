@@ -8,6 +8,7 @@ use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 pub const CURSOR_SPEED: f32 = 0.001;
+const MUSIC_VOLUME: f32 = 0.2;
 const WHIZ_VOLUME: f32 = 0.1;
 const BONG_VOLUME: f32 = 0.1;
 const END_SOUND_VOLUME: f32 = 0.3;
@@ -23,10 +24,12 @@ pub struct App<B: Backend> {
 
 impl<B: Backend> App<B> {
 	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, menu: Menu<B>) -> App<B> {
+		let mut audio_backend = B::AudioBackend::new();
+		audio_backend.set_music_volume(MUSIC_VOLUME);
 		App {
 			input_backend,
 			graphics_backend,
-			audio_backend: B::AudioBackend::new(),
+			audio_backend,
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
 			menu,
