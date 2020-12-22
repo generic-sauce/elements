@@ -12,7 +12,7 @@ pub fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runn
 	let player_name = app.menu.get_element_by_name("player_name").map(|ef| {
 		match &ef.kind {
 			MenuKind::EditField(edit_field) => &edit_field.text,
-			_ => { panic!("got player_name menu item that is not an edit field!")}
+			_ => panic!("got player_name menu item that is not an edit field!")
 		}
 	}).expect("Could not find player name");
 
