@@ -6,12 +6,11 @@ const EDIT_FIELD_TEXT_SIZE: f32 = 0.05;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
 const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 60;
+pub const DEFAULT_BUTTON_COLOR: Color = Color::rgb(0.08, 0.26, 0.42);
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
 	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
 }
-
-pub type OnEvent<B> = Box<dyn OnEventImpl<B>>;
 
 pub struct MenuElement<B: Backend> {
 	pub name: &'static str,
@@ -20,6 +19,7 @@ pub struct MenuElement<B: Backend> {
 	pub size: CanvasVec,
 	pub hovered: bool,
 	pub clicked: bool,
+	pub color: Color,
 }
 
 pub struct EditField {
@@ -40,7 +40,7 @@ pub enum MenuKind<B: Backend> {
 }
 
 impl<B: Backend> MenuElement<B> {
-	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, on_click: OnEvent<B>) -> MenuElement<B> {
+	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
 			name: "",
 			kind: MenuKind::Button { text, on_click },
@@ -48,10 +48,11 @@ impl<B: Backend> MenuElement<B> {
 			size,
 			hovered: false,
 			clicked: false,
+			color,
 		}
 	}
 
-	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str) -> MenuElement<B> {
+	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str, color: Color) -> MenuElement<B> {
 		MenuElement {
 			name,
 			kind: MenuKind::EditField( EditField::new(text) ),
@@ -59,6 +60,7 @@ impl<B: Backend> MenuElement<B> {
 			size,
 			hovered: false,
 			clicked: false,
+			color,
 		}
 	}
 
@@ -78,11 +80,11 @@ impl<B: Backend> MenuElement<B> {
 
 	pub fn draw(&mut self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend) {
 		let color = if self.clicked {
-			Color::rgb(0.18, 0.43, 0.54)
+			self.color * 2.0
 		} else if self.is_colliding(cursor_pos) {
-			Color::rgb(0.12, 0.32, 0.47)
+			self.color * 1.5
 		} else {
-			Color::rgb(0.08, 0.26, 0.42)
+			self.color
 		};
 		match &self.kind {
 			MenuKind::Button { text, .. } => {

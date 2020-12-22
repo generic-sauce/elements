@@ -10,7 +10,7 @@ pub enum Runnable<B: Backend> {
 impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&self) -> Menu<B> {
 		match self {
-			Runnable::Menu => Menu::main_menu(),
+			Runnable::Menu => Menu::quick_play_menu(),
 			_ => Menu::new(),
 		}
 	}

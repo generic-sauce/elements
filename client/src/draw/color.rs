@@ -29,6 +29,17 @@ impl Color {
 		}
 	}
 
+	pub fn hex(c: &str) -> Color {
+		let vec = hex::decode(c).expect(&format!("Could not decode {} as hex color", c));
+		assert_eq!(vec.len(), 3);
+		Color {
+			r: vec[0] as f32 / 255.0,
+			g: vec[1] as f32 / 255.0,
+			b: vec[2] as f32 / 255.0,
+			a: 0.0,
+		}
+	}
+
 	pub const WHITE: Color = Color::rgb(1.0, 1.0, 1.0);
 	pub const GRAY: Color = Color::rgb(0.2, 0.2, 0.2);
 	pub const BLACK: Color = Color::rgb(0.0, 0.0, 0.0);

@@ -1,10 +1,14 @@
 mod menu_elements;
-
 pub use menu_elements::*;
+
+mod events;
+pub use events::*;
+
 use crate::prelude::*;
 
-// pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
 pub const ASPECT_RATIO: f32 = 16.0 / 9.0;
+const MENU_BUTTONS_WIDTH: f32 = 0.1;
+const MENU_BUTTONS_HEIGHT: f32 = 0.08;
 
 pub struct Menu<B: Backend> {
 	pub elements: Vec<MenuElement<B>>,
@@ -29,22 +33,6 @@ fn create_client<B: Backend>() -> OnEvent<B> {
 	})
 }
 
-fn noop<B: Backend>(_app: &mut App<B>, _runnable: &mut Runnable<B>) {
-}
-
-fn create_join_server<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
-	app.menu = Menu::connect_server_menu();
-}
-
-fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
-	*runnable = Runnable::ServerConnector(ServerConnector::new("generic-sauce.de"));
-	app.menu = Menu::server_connector_menu();
-}
-
-fn create_main_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
-	*runnable = Runnable::Menu;
-	app.menu = Menu::main_menu();
-}
 
 impl<B: Backend> Menu<B> {
 	pub fn new() -> Menu<B> {
@@ -53,34 +41,108 @@ impl<B: Backend> Menu<B> {
 		}
 	}
 
-	pub fn main_menu() -> Menu<B> {
-		Menu {
-			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.5), CanvasVec::new(0.15, 0.05), "Join Game", Box::new(create_server_connector)),
-				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Best of 9", create_local(9)),
-				MenuElement::new_button(CanvasVec::new(0.3 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Best of 5", create_local(5)),
-				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.05), "Infinite Game", create_local(0)),
-				MenuElement::new_button(CanvasVec::new(0.7 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Join Server", Box::new(create_join_server)),
-				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", Box::new(|_, _| std::process::exit(0))),
+	pub fn main_menu_items() -> Vec<MenuElement<B>> {
+		vec![
+			MenuElement::new_button(
+				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - MENU_BUTTONS_HEIGHT),
+				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
+				"Quick Play",
+				Color::hex("4a380b"),
+				Box::new(create_quick_play_menu),
 			),
+			MenuElement::new_button(
+				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 3.0)),
+				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
+				"Local",
+				Color::hex("46420f"),
+				Box::new(create_local_menu)
+			),
+			MenuElement::new_button(
+				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 5.0)),
+				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
+				"Connect",
+				Color::hex("343c0e"),
+				Box::new(create_join_server_menu)
+			),
+			MenuElement::new_button(
+				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 7.0)),
+				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
+				"Tutorial",
+				Color::hex("12320d"),
+				Box::new(create_tutorial_menu)
+			),
+			MenuElement::new_button(
+				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
+				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
+				"Quit",
+				Color::hex("0c212f"),
+				Box::new(|_, _| std::process::exit(0))
+			),
+		]
+	}
+
+	pub fn quick_play_menu() -> Menu<B> {
+		let mut elements = Menu::main_menu_items();
+		elements.extend(vec![
+			MenuElement::new_button(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
+				CanvasVec::new(0.15, 0.05),
+				"Play Now",
+				DEFAULT_BUTTON_COLOR,
+				Box::new(create_server_connector)
+			),
+			MenuElement::new_edit_field(
+				"player_name",
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.6),
+				CanvasVec::new(0.15, 0.03),
+				"",
+				DEFAULT_BUTTON_COLOR
+			)
+		]);
+		Menu {
+			elements,
+		}
+	}
+
+	pub fn tutorial_menu() -> Menu<B> {
+		let elements = Menu::main_menu_items();
+		// TODO: add tutorial menu
+		Menu {
+			elements,
+		}
+	}
+
+	pub fn local_menu() -> Menu<B> {
+		let mut elements = Menu::main_menu_items();
+		elements.extend(vec![
+			MenuElement::new_button(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
+				CanvasVec::new(0.15, 0.05),
+				"Start Game",
+				DEFAULT_BUTTON_COLOR,
+				Box::new(create_local(5)),
+			),
+		]);
+		Menu {
+			elements
 		}
 	}
 
 	pub fn connect_server_menu() -> Menu<B> {
+		let mut elements = Menu::main_menu_items();
+		elements.extend(vec![
+			MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05),"Connect", DEFAULT_BUTTON_COLOR, create_client()),
+			MenuElement::new_edit_field("ip", CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), "", DEFAULT_BUTTON_COLOR),
+		]);
 		Menu {
-			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connect", create_client()),
-				MenuElement::new_button(CanvasVec::new(0.15 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Back", Box::new(create_main_menu)),
-				MenuElement::new_button(CanvasVec::new(0.85 * ASPECT_RATIO, 0.15), CanvasVec::new(0.15, 0.05), "Quit", Box::new(|_, _| std::process::exit(0))),
-				MenuElement::new_edit_field("ip", CanvasVec::new(0.5 * ASPECT_RATIO, 0.6), CanvasVec::new(0.15, 0.03), ""),
-			)
+			elements
 		}
 	}
 
 	pub fn server_connector_menu() -> Menu<B> {
 		Menu {
 			elements: vec!(
-				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connecting", Box::new(noop)),
+				MenuElement::new_button(CanvasVec::new(0.5 * ASPECT_RATIO, 0.4), CanvasVec::new(0.15, 0.05), "Connecting", DEFAULT_BUTTON_COLOR, Box::new(noop)),
 			)
 		}
 	}

@@ -7,10 +7,11 @@ pub struct ServerConnector<B: Backend> {
     pub request_send_counter: u32,
     pub request_failed: bool,
     pub game_ip: Option<(String, u16)>,
+    pub player_name: String,
 }
 
 impl<B: Backend> ServerConnector<B> {
-    pub fn new(master_server_ip: &str) -> ServerConnector<B> {
+    pub fn new(master_server_ip: &str, player_name: &str) -> ServerConnector<B> {
         let socket = B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT);
 
         ServerConnector {
@@ -18,6 +19,7 @@ impl<B: Backend> ServerConnector<B> {
             request_send_counter: 0,
             request_failed: false,
             game_ip: None,
+            player_name: String::from(player_name),
         }
     }
 

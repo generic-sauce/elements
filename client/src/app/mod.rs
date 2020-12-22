@@ -10,7 +10,7 @@ pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 
 pub const CURSOR_SPEED: f32 = 0.001;
 const WHIZ_VOLUME: f32 = 0.1;
 const BONG_VOLUME: f32 = 0.1;
-const END_SOUND_VOLUME: f32 = 0.4;
+const END_SOUND_VOLUME: f32 = 0.3;
 
 pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
@@ -88,13 +88,13 @@ impl<B: Backend> App<B> {
 			};
 			if winner_found {
 				*runnable = Runnable::Menu;
-				self.menu = Menu::main_menu();
+				self.menu = Menu::quick_play_menu();
 			}
 		}
 		if let Runnable::ServerConnector(server_connector) = runnable {
 			if server_connector.request_failed {
 				*runnable = Runnable::Menu;
-				self.menu = Menu::main_menu();  // TODO: change to failed info
+				self.menu = Menu::quick_play_menu();  // TODO: change to failed info
 			} else if let Some((ip, port)) = &server_connector.game_ip {
 				*runnable = Runnable::Client(Client::new(ip, *port));
 				self.menu = Menu::new();
