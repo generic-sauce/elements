@@ -6,6 +6,8 @@ const EDIT_FIELD_TEXT_SIZE: f32 = 0.03;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
 const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 60;
+pub const EXPLANATION_FONT_SIZE: f32 = 0.03;
+pub const SUBTITLE_FONT_SIZE: f32 = 0.05;
 pub const DEFAULT_BUTTON_COLOR: Color = Color::rgb(0.08, 0.26, 0.42);
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {

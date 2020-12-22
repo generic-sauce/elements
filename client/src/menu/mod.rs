@@ -73,7 +73,7 @@ impl<B: Backend> Menu<B> {
 			MenuElement::new_label(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
 				CanvasVec::new(0.15, 0.15),
-				0.05,
+				SUBTITLE_FONT_SIZE,
 				"Online",
 				TextAlign::Center,
 			),
@@ -92,7 +92,14 @@ impl<B: Backend> Menu<B> {
 				"",
 				DEFAULT_BUTTON_COLOR,
 				"Your Name"
-			)
+			),
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.2),
+				CanvasVec::new(0.15, 0.15),
+				EXPLANATION_FONT_SIZE,
+				"Play online against other players. You need an internet connection for this :D",
+				TextAlign::Center,
+			),
 		]);
 		Menu {
 			elements,
@@ -105,7 +112,7 @@ impl<B: Backend> Menu<B> {
 			MenuElement::new_label(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
 				CanvasVec::new(0.15, 0.15),
-				0.05,
+				SUBTITLE_FONT_SIZE,
 				"Local",
 				TextAlign::Center,
 			),
@@ -116,6 +123,13 @@ impl<B: Backend> Menu<B> {
 				Color::hex("2f6f10"),
 				0.05,
 				Box::new(create_local(5)),
+			),
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.2),
+				CanvasVec::new(0.15, 0.15),
+				EXPLANATION_FONT_SIZE,
+				"Play local with friends on the same computer :)",
+				TextAlign::Center,
 			),
 		]);
 		Menu {
@@ -129,8 +143,15 @@ impl<B: Backend> Menu<B> {
 			MenuElement::new_label(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
 				CanvasVec::new(0.15, 0.15),
-				0.05,
+				SUBTITLE_FONT_SIZE,
 				"Tutorial",
+				TextAlign::Center,
+			),
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.2),
+				CanvasVec::new(0.15, 0.15),
+				EXPLANATION_FONT_SIZE,
+				"Learn the player controls by playing simple exercises. This currently not implemented :|",
 				TextAlign::Center,
 			),
 		]);
