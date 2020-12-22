@@ -192,6 +192,9 @@ impl<B: Backend> App<B> {
 
 	pub fn draw_menu(&mut self) {
 		let mut draw = Draw::new();
+		#[cfg(target_arch = "wasm32")]
+		draw.set_clear_color(Color::BLACK);
+		#[cfg(not(target_arch = "wasm32"))]
 		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(Color::rgb(0.8, 0.8, 0.8)));
 
 		// draw elements
