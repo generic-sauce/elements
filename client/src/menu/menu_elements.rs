@@ -1,7 +1,9 @@
 use crate::prelude::*;
 use std::ops::{Add, Sub, Mul};
 
-pub const BUTTON_TEXT_SIZE: f32 = 0.04;
+pub const MAIN_BUTTON_FONT_SIZE: f32 = 0.03;
+pub const NORMAL_BUTTON_FONT_SIZE: f32 = 0.04;
+pub const GO_BUTTON_FONT_SIZE: f32 = 0.05;
 const EDIT_FIELD_TEXT_SIZE: f32 = 0.03;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
@@ -9,6 +11,7 @@ const EDIT_FIELD_CURSOR_BLINK_INTERVAL: u32 = 60;
 pub const EXPLANATION_FONT_SIZE: f32 = 0.03;
 pub const SUBTITLE_FONT_SIZE: f32 = 0.05;
 pub const DEFAULT_BUTTON_COLOR: Color = Color::rgb(0.08, 0.26, 0.42);
+pub const BUTTON_IMAGE_SIZE: CanvasVec = CanvasVec::new(0.04, 0.04);
 
 pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
 	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
@@ -28,6 +31,7 @@ pub struct Button<B: Backend> {
 	pub text: &'static str,
 	pub on_click: OnEvent<B>,
 	pub font_size: f32,
+	pub image: Option<TextureId>,
 }
 
 pub struct EditField {
@@ -59,10 +63,10 @@ pub enum MenuKind<B: Backend> {
 }
 
 impl<B: Backend> MenuElement<B> {
-	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, on_click: OnEvent<B>) -> MenuElement<B> {
+	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, image: Option<TextureId>, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
 			name: "",
-			kind: MenuKind::Button(Button { text, on_click, font_size } ),
+			kind: MenuKind::Button(Button { text, on_click, font_size, image } ),
 			position,
 			size,
 			hovered: false,
@@ -136,13 +140,22 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	fn draw_button(&self, draw: &mut Draw, button: &Button<B>, color: Color, graphics_backend: &impl GraphicsBackend) {
-		let Button { text, font_size, .. } = button;
+		let Button { text, font_size, image, .. } = button;
 		let left_bot = self.position - self.size;
 		let right_top = self.position + self.size;
 		draw.rectangle(left_bot, right_top, color);
 
-		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_size(text, *font_size));
+		let mut text_pos = center_position(left_bot, right_top, graphics_backend.get_text_size(text, *font_size));
+		if image.is_some() {
+			text_pos.y -= 0.03;
+		}
         draw.text(text_pos, *font_size, Color::WHITE, text);
+
+		if let Some(texture_id) = image {
+			let mut image_pos = center_position(left_bot, right_top, BUTTON_IMAGE_SIZE);
+			image_pos.y += 0.014;
+			draw.texture(image_pos, image_pos + BUTTON_IMAGE_SIZE, *texture_id, Flip::Normal, None);
+		}
 	}
 
 	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {

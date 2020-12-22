@@ -28,7 +28,8 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Online",
 				Color::hex("153962"),
-				BUTTON_TEXT_SIZE,
+				MAIN_BUTTON_FONT_SIZE,
+				Some(TextureId::Icon),
 				Box::new(create_online_menu),
 			),
 			MenuElement::new_button(
@@ -36,7 +37,8 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Local",
 				Color::hex("153962"),
-				BUTTON_TEXT_SIZE,
+				MAIN_BUTTON_FONT_SIZE,
+				Some(TextureId::Icon),
 				Box::new(create_local_menu)
 			),
 			MenuElement::new_button(
@@ -44,7 +46,8 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Tutorial",
 				Color::hex("153962"),
-				BUTTON_TEXT_SIZE,
+				MAIN_BUTTON_FONT_SIZE,
+				Some(TextureId::Icon),
 				Box::new(create_tutorial_menu)
 			),
 			MenuElement::new_button(
@@ -52,7 +55,8 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Quit",
 				Color::hex("0c2542"),
-				BUTTON_TEXT_SIZE,
+				NORMAL_BUTTON_FONT_SIZE,
+				None,
 				Box::new(|_, _| std::process::exit(0))
 			),
 			MenuElement::new_label(
@@ -82,7 +86,8 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(0.15, 0.05),
 				"Play Now",
 				Color::hex("2f6f10"),
-				0.05,
+				GO_BUTTON_FONT_SIZE,
+				None,
 				Box::new(create_server_connector)
 			),
 			MenuElement::new_edit_field(
@@ -121,7 +126,8 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(0.15, 0.05),
 				"Start Game",
 				Color::hex("2f6f10"),
-				0.05,
+				GO_BUTTON_FONT_SIZE,
+				None,
 				Box::new(create_local(5)),
 			),
 			MenuElement::new_label(
@@ -168,7 +174,8 @@ impl<B: Backend> Menu<B> {
 					CanvasVec::new(0.15, 0.05),
 					"Cancel",
 					Color::hex("b52f1c"),
-					BUTTON_TEXT_SIZE,
+					NORMAL_BUTTON_FONT_SIZE,
+					None,
 					Box::new(create_online_menu)
 				),
 			)

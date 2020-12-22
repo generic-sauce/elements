@@ -30,6 +30,7 @@ macro_rules! setup {
 
 setup!(
 	Unknown: "images/checkerboard.png",
+	Icon: "icon01.png",
 	White: "images/white.png",
 	Trophy: "images/trophy/trophy.png",
 	SkyBackground: "images/background/sky_background.png"
