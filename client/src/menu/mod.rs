@@ -14,26 +14,6 @@ pub struct Menu<B: Backend> {
 	pub elements: Vec<MenuElement<B>>,
 }
 
-fn create_local<B: Backend>(best_of_n: u32) -> OnEvent<B> {
-	Box::new(move |app, runnable| {
-		app.menu.elements.clear();
-		*runnable = Runnable::Local(Local::new(best_of_n));
-	})
-}
-
-fn create_client<B: Backend>() -> OnEvent<B> {
-	Box::new(|app, runnable| {
-		if let MenuKind::EditField( EditField { text, .. } ) = &app.menu.get_element_by_name("ip").unwrap().kind {
-			let text = text.clone();
-			app.menu.elements.clear();
-			*runnable = Runnable::Client(Client::new(&text, DEFAULT_GAME_SERVER_PORT));
-		} else {
-			panic!("Could not read ip from edit field!");
-		}
-	})
-}
-
-
 impl<B: Backend> Menu<B> {
 	pub fn new() -> Menu<B> {
 		Menu {
@@ -48,6 +28,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Online",
 				Color::hex("153962"),
+				BUTTON_TEXT_SIZE,
 				Box::new(create_online_menu),
 			),
 			MenuElement::new_button(
@@ -55,6 +36,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Local",
 				Color::hex("153962"),
+				BUTTON_TEXT_SIZE,
 				Box::new(create_local_menu)
 			),
 			MenuElement::new_button(
@@ -62,6 +44,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Tutorial",
 				Color::hex("153962"),
+				BUTTON_TEXT_SIZE,
 				Box::new(create_tutorial_menu)
 			),
 			MenuElement::new_button(
@@ -69,6 +52,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				"Quit",
 				Color::hex("0c2542"),
+				BUTTON_TEXT_SIZE,
 				Box::new(|_, _| std::process::exit(0))
 			),
 		];
@@ -84,6 +68,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(0.15, 0.05),
 				"Play Now",
 				Color::hex("2f6f10"),
+				0.05,
 				Box::new(create_server_connector)
 			),
 			MenuElement::new_edit_field(
@@ -108,6 +93,7 @@ impl<B: Backend> Menu<B> {
 				CanvasVec::new(0.15, 0.05),
 				"Start Game",
 				Color::hex("2f6f10"),
+				0.05,
 				Box::new(create_local(5)),
 			),
 		]);
@@ -132,6 +118,7 @@ impl<B: Backend> Menu<B> {
 					CanvasVec::new(0.15, 0.05),
 					"Abort",
 					Color::hex("b52f1c"),
+					BUTTON_TEXT_SIZE,
 					Box::new(noop)
 				),
 			)
@@ -167,7 +154,7 @@ impl<B: Backend> App<B> {
 		} else if let Some(element) = self.menu.get_clicked_element() {
 			element.clicked = false;
 			match &mut element.kind {
-				MenuKind::Button { on_click, .. } => {
+				MenuKind::Button(Button { on_click, ..}) => {
 					opt_on_click = Some(on_click.clone());
 				}
 				MenuKind::EditField( EditField { selected, .. } ) => {

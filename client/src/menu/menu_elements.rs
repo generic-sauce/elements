@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use std::ops::{Add, Sub, Mul};
 
-const BUTTON_TEXT_SIZE: f32 = 0.03;
+pub const BUTTON_TEXT_SIZE: f32 = 0.04;
 const EDIT_FIELD_TEXT_SIZE: f32 = 0.03;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
@@ -22,6 +22,12 @@ pub struct MenuElement<B: Backend> {
 	pub color: Color,
 }
 
+pub struct Button<B: Backend> {
+	pub text: &'static str,
+	pub on_click: OnEvent<B>,
+	pub font_size: f32,
+}
+
 pub struct EditField {
 	pub text: String,
 	pub template_text: String,
@@ -30,21 +36,19 @@ pub struct EditField {
 	pub cursor_blink_counter: u32,
 	pub view_offset: usize,
 	pub view_limit: usize,
+	pub font_size: f32,
 }
 
 pub enum MenuKind<B: Backend> {
-	Button {
-		text: &'static str,
-		on_click: OnEvent<B>,
-	},
+	Button(Button<B>),
 	EditField(EditField)
 }
 
 impl<B: Backend> MenuElement<B> {
-	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, on_click: OnEvent<B>) -> MenuElement<B> {
+	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
 			name: "",
-			kind: MenuKind::Button { text, on_click },
+			kind: MenuKind::Button(Button { text, on_click, font_size } ),
 			position,
 			size,
 			hovered: false,
@@ -88,8 +92,8 @@ impl<B: Backend> MenuElement<B> {
 			self.color
 		};
 		match &self.kind {
-			MenuKind::Button { text, .. } => {
-				self.draw_button(draw, text, color, graphics_backend)
+			MenuKind::Button(button) => {
+				self.draw_button(draw, button, color, graphics_backend)
 			},
 			MenuKind::EditField (edit_field) => {
 				self.draw_edit_field(draw, edit_field, color, graphics_backend)
@@ -97,17 +101,18 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	fn draw_button(&self, draw: &mut Draw, text: &str, color: Color, graphics_backend: &impl GraphicsBackend) {
+	fn draw_button(&self, draw: &mut Draw, button: &Button<B>, color: Color, graphics_backend: &impl GraphicsBackend) {
+		let Button { text, font_size, .. } = button;
 		let left_bot = self.position - self.size;
 		let right_top = self.position + self.size;
 		draw.rectangle(left_bot, right_top, color);
 
-		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_size(text, BUTTON_TEXT_SIZE));
-        draw.text(text_pos, BUTTON_TEXT_SIZE, Color::WHITE, text);
+		let text_pos = center_position(left_bot, right_top, graphics_backend.get_text_size(text, *font_size));
+        draw.text(text_pos, *font_size, Color::WHITE, text);
 	}
 
 	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {
-		let EditField { cursor_blink_counter, cursor, selected, view_offset, template_text, .. } = edit_field;
+		let EditField { cursor_blink_counter, cursor, selected, view_offset, template_text, font_size, .. } = edit_field;
 		draw.rectangle(self.position - self.size, self.position + self.size, color);
         draw.rectangle(
 			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
@@ -118,9 +123,9 @@ impl<B: Backend> MenuElement<B> {
 		let text = edit_field.get_render_text();
 
 		let text_size = if !text.is_empty() {
-			 graphics_backend.get_text_size(text, EDIT_FIELD_TEXT_SIZE)
+			 graphics_backend.get_text_size(text, *font_size)
 		} else {
-			graphics_backend.get_text_size(&template_text, EDIT_FIELD_TEXT_SIZE)
+			graphics_backend.get_text_size(&template_text, *font_size)
 		};
 
 		let text_pos = CanvasVec::new(
@@ -129,15 +134,15 @@ impl<B: Backend> MenuElement<B> {
 		);
 
 		if edit_field.text.is_empty() {
-			draw.text(text_pos, EDIT_FIELD_TEXT_SIZE, Color::gray(0.04), &template_text);
+			draw.text(text_pos, *font_size, Color::gray(0.04), &template_text);
 		} else {
-			draw.text(text_pos, EDIT_FIELD_TEXT_SIZE, Color::WHITE, text);
+			draw.text(text_pos, *font_size, Color::WHITE, text);
 		}
 
 		// draw cursor
 		if *selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
 			let subtext = &text[0..get_byte_pos(text, *cursor - view_offset)];
-			let text_width = graphics_backend.get_text_size(subtext, EDIT_FIELD_TEXT_SIZE).x;
+			let text_width = graphics_backend.get_text_size(subtext, *font_size).x;
 			let left_bot = CanvasVec::new(
 				self.position.x - self.size.x + text_width + EDIT_FIELD_BORDER_WIDTH * 2.0,
 				self.position.y - self.size.y + EDIT_FIELD_BORDER_WIDTH * 2.0
@@ -202,7 +207,8 @@ impl EditField {
 			cursor: 0,
 			cursor_blink_counter: 0,
 			view_offset: 0,
-			view_limit: 0
+			view_limit: 0,
+			font_size: EDIT_FIELD_TEXT_SIZE,
 		}
 	}
 
@@ -210,7 +216,7 @@ impl EditField {
 		let allowed_width = size.x * 2.0 - EDIT_FIELD_BORDER_WIDTH * 2.0;
 
 		// if text is not right aligned -> decrease view offset
-		while graphics_backend.get_text_size(self.get_text_post_view_offset(), EDIT_FIELD_TEXT_SIZE).x <= allowed_width - 0.03 {
+		while graphics_backend.get_text_size(self.get_text_post_view_offset(), self.font_size).x <= allowed_width - 0.03 {
 			if self.view_offset == 0 {
 				break;
 			}
@@ -232,13 +238,13 @@ impl EditField {
 
 		// view limit
 		self.view_limit = self.view_limit.min(self.text.len());
-		while graphics_backend.get_text_size(self.get_render_text(), EDIT_FIELD_TEXT_SIZE).x <= allowed_width {
+		while graphics_backend.get_text_size(self.get_render_text(), self.font_size).x <= allowed_width {
 			if self.view_limit == self.text.len() {
 				break;
 			}
 			self.view_limit += 1;
 		}
-		while graphics_backend.get_text_size(self.get_render_text(), EDIT_FIELD_TEXT_SIZE).x > allowed_width {
+		while graphics_backend.get_text_size(self.get_render_text(), self.font_size).x > allowed_width {
 			if self.view_limit == 0 {
 				break;
 			}
@@ -251,7 +257,7 @@ impl EditField {
 	}
 
 	fn get_cursor_render_offset(&self, graphics_backend: &impl GraphicsBackend) -> f32 {
-		graphics_backend.get_text_size(self.get_pre_cursor_text(), EDIT_FIELD_TEXT_SIZE).x
+		graphics_backend.get_text_size(self.get_pre_cursor_text(), self.font_size).x
 	}
 
 	// text after view offset but before cursor
