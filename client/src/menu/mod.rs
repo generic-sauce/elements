@@ -116,10 +116,10 @@ impl<B: Backend> Menu<B> {
 				MenuElement::new_button(
 					CanvasVec::new(0.5 * ASPECT_RATIO, 0.25),
 					CanvasVec::new(0.15, 0.05),
-					"Abort",
+					"Cancel",
 					Color::hex("b52f1c"),
 					BUTTON_TEXT_SIZE,
-					Box::new(noop)
+					Box::new(create_online_menu)
 				),
 			)
 		}

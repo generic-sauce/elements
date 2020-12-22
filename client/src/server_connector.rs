@@ -42,4 +42,3 @@ impl<B: Backend> ServerConnector<B> {
         // TODO: draw some status information
     }
 }
-
