@@ -84,7 +84,7 @@ impl<B: Backend> Menu<B> {
 			MenuElement::new_button(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
-				"Play Now",
+				"Play",
 				Color::hex("2f6f10"),
 				GO_BUTTON_FONT_SIZE,
 				None,
@@ -124,7 +124,7 @@ impl<B: Backend> Menu<B> {
 			MenuElement::new_button(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
-				"Start Game",
+				"Play",
 				Color::hex("2f6f10"),
 				GO_BUTTON_FONT_SIZE,
 				None,
