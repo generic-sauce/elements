@@ -24,12 +24,12 @@ impl<B: Backend> Runnable<B> {
 		}
 	}
 
-	pub fn draw(&mut self, app: &mut App<B>) {
+	pub fn draw(&mut self, app: &mut App<B>, draw: &mut Draw) {
 		match self {
 			Runnable::Menu => {},
-			Runnable::Local(local) => local.draw(app),
-			Runnable::Client(client) => client.draw(app),
-			Runnable::ServerConnector(server_connector) => server_connector.draw(app),
+			Runnable::Local(local) => local.draw(app, draw),
+			Runnable::Client(client) => client.draw(app, draw),
+			Runnable::ServerConnector(server_connector) => server_connector.draw(app, draw),
 		}
 	}
 

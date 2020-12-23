@@ -64,12 +64,13 @@ impl<B: Backend> App<B> {
 
 		self.check_game_over(runnable);
 
-		runnable.draw(self);
+		let mut draw = Draw::new();
+		runnable.draw(self, &mut draw);
 
 		// TODO: improve
-		if matches!(runnable, Runnable::Menu | Runnable::ServerConnector(_)) {
-			self.draw_menu();
-		}
+		self.draw_menu(&mut draw);
+
+		self.graphics_backend.submit(draw);
 	}
 
 	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {

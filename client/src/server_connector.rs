@@ -38,7 +38,7 @@ impl<B: Backend> ServerConnector<B> {
         }
     }
 
-    pub fn draw(&mut self, _app: &mut App<B>) {
+    pub fn draw(&mut self, _app: &mut App<B>, _draw: &mut Draw) {
         // TODO: draw some status information
     }
 }

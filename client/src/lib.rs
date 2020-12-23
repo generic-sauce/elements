@@ -68,18 +68,14 @@ impl<B: Backend> Client<B> {
 		}
 	}
 
-	pub fn draw(&mut self, app: &mut App<B>) {
-		let mut draw = Draw::new();
-
+	pub fn draw(&mut self, app: &mut App<B>, draw: &mut Draw) {
 		match &self.mode {
 			ClientMode::Lobby => {
-				draw_lobby::<B>(&mut draw, &app.graphics_backend);
+				draw_lobby::<B>(draw, &app.graphics_backend);
 			},
 			ClientMode::InGame { world, .. } => {
-				draw_world(world, &mut draw, app);
+				draw_world(world, draw, app);
 			}
 		}
-
-		app.graphics_backend.submit(draw);
 	}
 }

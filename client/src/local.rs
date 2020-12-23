@@ -39,13 +39,11 @@ impl<B: Backend> Local<B> {
 		}
 	}
 
-	pub fn draw(&mut self, app: &mut App<B>) {
+	pub fn draw(&mut self, app: &mut App<B>, draw: &mut Draw) {
 		match &self.mode {
 			LocalMode::LoadingTileMap { .. } => {} // TODO
 			LocalMode::InGame(world) => {
-				let mut draw = Draw::new();
-				draw_world(world, &mut draw, app);
-				app.graphics_backend.submit(draw);
+				draw_world(world, draw, app);
 			}
 		}
 	}
