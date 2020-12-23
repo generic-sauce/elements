@@ -188,17 +188,33 @@ impl<B: Backend> Menu<B> {
 		}
 	}
 
-	pub fn in_game_menu() -> Menu<B> {
+	pub fn in_game_menu(quit_action: OnEvent<B>) -> Menu<B> {
 		Menu {
 			elements: vec!(
+				MenuElement::new_label(
+					CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+					CanvasVec::new(0.15, 0.15),
+					SUBTITLE_FONT_SIZE,
+					"Game Paused",
+					TextAlign::Center,
+				),
 				MenuElement::new_button(
-					CanvasVec::new(0.06, 1.0 - 0.06),
-					CanvasVec::new(0.05, 0.05),
-					"X",
-					Color::hex("b52f1c"),
-					0.07,
+					CanvasVec::new(0.5 * ASPECT_RATIO, 0.6),
+					CanvasVec::new(0.15, 0.05),
+					"Resume",
+					Color::hex("2f6f10"),
+					GO_BUTTON_FONT_SIZE,
 					None,
-					Box::new(create_online_menu)
+					Box::new(unpause),
+				),
+				MenuElement::new_button(
+					CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
+					CanvasVec::new(0.15, 0.05),
+					"Quit",
+					Color::hex("b52f1c"),
+					GO_BUTTON_FONT_SIZE,
+					None,
+					quit_action,
 				),
 			),
 			background: None,
