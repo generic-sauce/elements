@@ -96,8 +96,9 @@ impl<B: Backend> App<B> {
 				*runnable = Runnable::Menu;
 				self.menu = Menu::online_menu();  // TODO: change to failed info
 			} else if let Some((ip, port)) = &server_connector.game_ip {
+				// TODO: merge with create_client()
+				self.menu = Menu::in_game_menu();
 				*runnable = Runnable::Client(Client::new(ip, *port));
-				self.menu = Menu::new();
 			}
 		}
 	}

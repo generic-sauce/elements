@@ -30,11 +30,13 @@ impl<B: Backend> Local<B> {
 				}
 			},
 			LocalMode::InGame(world) => {
-				for (i, player) in world.players.iter_mut().enumerate() {
-					player.input.update_gamepad(&app.input_backend.gamepad(i as u32));
+				if !app.menu.kind.is_active() {
+					for (i, player) in world.players.iter_mut().enumerate() {
+						player.input.update_gamepad(&app.input_backend.gamepad(i as u32));
+					}
+					world.players.last_mut().unwrap().input.update_peripherals(&app.peripherals_state);
+					tick_within_app(world, app);
 				}
-				world.players.last_mut().unwrap().input.update_peripherals(&app.peripherals_state);
-				tick_within_app(world, app);
 			}
 		}
 	}

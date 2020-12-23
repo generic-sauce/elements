@@ -13,10 +13,6 @@ pub const SUBTITLE_FONT_SIZE: f32 = 0.05;
 pub const DEFAULT_BUTTON_COLOR: Color = Color::rgb(0.08, 0.26, 0.42);
 pub const BUTTON_IMAGE_SIZE: CanvasVec = CanvasVec::new(0.04, 0.04);
 
-pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
-	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
-}
-
 pub struct MenuElement<B: Backend> {
 	pub name: &'static str,
 	pub kind: MenuKind<B>,

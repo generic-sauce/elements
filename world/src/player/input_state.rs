@@ -149,6 +149,17 @@ impl InputState {
 		self.cursor = self.cursor.length_clamped(1.0);
 		self.direction = self.direction.clamped(-1.0, 1.0);
 	}
+
+	pub fn clear(&mut self) {
+		self.direction = Vec2f::new(0.0, 0.0);
+		self.special1 = false;
+		self.special2 = false;
+		self.attack1 = false;
+		self.attack2 = false;
+		self.just_up = false;
+		self.just_down = false;
+		self.just_attack2 = false;
+	}
 }
 
 fn apply_deadzone_min(value: f32, deadzone_min: f32) -> f32 {

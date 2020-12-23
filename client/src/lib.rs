@@ -56,8 +56,12 @@ impl<B: Backend> Client<B> {
 				}
 
 				// handle inputs
-				world.players[*player_id].input.update_gamepad(&app.input_backend.gamepad(0));
-				world.players[*player_id].input.update_peripherals(&app.peripherals_state);
+				if !app.menu.kind.is_active() {
+					world.players[*player_id].input.update_gamepad(&app.input_backend.gamepad(0));
+					world.players[*player_id].input.update_peripherals(&app.peripherals_state);
+				} else {
+					world.players[*player_id].input.clear();
+				}
 
 				// send packets
 				self.socket.send(&GameCSPacket::InputState(world.players[*player_id].input.clone())).unwrap(); // TODO: fix clone

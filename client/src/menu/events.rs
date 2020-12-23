@@ -1,5 +1,9 @@
 use crate::prelude::*;
 
+pub trait OnEventImpl<B: Backend>: Fn(&mut App<B>, &mut Runnable<B>) {
+	fn clone_box(&self) -> Box<dyn OnEventImpl<B>>;
+}
+
 pub type OnEvent<B> = Box<dyn OnEventImpl<B>>;
 
 pub fn create_local<B: Backend>(best_of_n: u32) -> OnEvent<B> {
