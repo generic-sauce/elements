@@ -178,6 +178,13 @@ impl<B: Backend> Menu<B> {
 					None,
 					Box::new(create_online_menu)
 				),
+				MenuElement::new_label(
+					CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
+					CanvasVec::new(0.15, 0.15),
+					0.05,
+					"Waiting for other player.",
+					TextAlign::Center,
+				),
 			)
 		}
 	}
