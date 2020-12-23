@@ -1,6 +1,6 @@
 export function handle_command(cmd) {
 	if ("QueueMusic" in cmd) {
-		queue_music(cmd["QueueMusic"])
+		queue_music(...cmd["QueueMusic"])
 	} else if ("PlaySound" in cmd) {
 		play_sound(...cmd["PlaySound"])
 	} else {
