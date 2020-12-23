@@ -11,7 +11,9 @@ impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&self) -> Menu<B> {
 		match self {
 			Runnable::Menu => Menu::online_menu(),
-			_ => Menu::new(),
+			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),
+			Runnable::Local(_) => Menu::in_game_menu(Box::new(create_local_menu)),
+			Runnable::ServerConnector(_) => Menu::new(),
 		}
 	}
 
