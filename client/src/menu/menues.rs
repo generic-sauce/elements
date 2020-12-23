@@ -8,6 +8,7 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements: Vec::new(),
 			background: None,
+			kind: MenuMode::Normal,
 		}
 	}
 
@@ -99,6 +100,7 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
+			kind: MenuMode::Normal,
 		}
 	}
 
@@ -132,6 +134,7 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
+			kind: MenuMode::Normal,
 		}
 	}
 
@@ -156,6 +159,7 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
+			kind: MenuMode::Normal,
 		}
 	}
 
@@ -180,6 +184,7 @@ impl<B: Backend> Menu<B> {
 				),
 			),
 			background: Some(TextureId::SkyBackground),
+			kind: MenuMode::Normal,
 		}
 	}
 
@@ -197,6 +202,7 @@ impl<B: Backend> Menu<B> {
 				),
 			),
 			background: None,
+			kind: MenuMode::InGame { active: false },
 		}
 	}
 }

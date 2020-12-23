@@ -67,7 +67,6 @@ impl<B: Backend> App<B> {
 		let mut draw = Draw::new();
 		runnable.draw(self, &mut draw);
 
-		// TODO: improve
 		self.draw_menu(&mut draw);
 
 		self.graphics_backend.submit(draw);

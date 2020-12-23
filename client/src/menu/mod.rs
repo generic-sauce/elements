@@ -14,6 +14,14 @@ pub const ASPECT_RATIO: f32 = 16.0 / 9.0;
 pub struct Menu<B: Backend> {
 	pub elements: Vec<MenuElement<B>>,
 	pub background: Option<TextureId>,
+	pub kind: MenuMode,
+}
+
+pub enum MenuMode {
+	Normal,
+	InGame {
+		active: bool
+	},
 }
 
 impl<B: Backend> Menu<B> {
@@ -32,6 +40,9 @@ impl<B: Backend> Menu<B> {
 
 impl<B: Backend> App<B> {
 	pub fn tick_menu(&mut self, runnable: &mut Runnable<B>) {
+		self.check_menu_active();
+		if !self.menu.kind.is_active() { return; } // dont tick, if inactive
+
 		let mut opt_on_click = None;
 		if self.peripherals_state.key_pressed(Key::LeftMouse) {
 			for element in &mut self.menu.elements {
@@ -69,7 +80,18 @@ impl<B: Backend> App<B> {
 		}
 	}
 
+	fn check_menu_active(&mut self) {
+		if let MenuMode::InGame { active } = self.menu.kind {
+			// TODO: add controller key
+			if self.peripherals_state.key_just_pressed(Key::Escape) || self.peripherals_state.key_just_pressed(Key::P) {
+				self.menu.kind = MenuMode::InGame { active: !active };
+			}
+		}
+	}
+
 	pub fn draw_menu(&mut self, draw: &mut Draw) {
+		if !self.menu.kind.is_active() { return; }
+
 		if let Some(texture_id) = self.menu.background {
 			#[cfg(target_arch = "wasm32")]
 			draw.set_clear_color(Color::BLACK);
@@ -85,5 +107,14 @@ impl<B: Backend> App<B> {
 
 		// draw cursor
 		draw.rectangle(self.cursor_position, self.cursor_position + CanvasVec::new(0.01, 0.01), Color::RED);
+	}
+}
+
+impl MenuMode {
+	pub fn is_active(&self) -> bool {
+		match self {
+			MenuMode::InGame { active: false } => false,
+			_ => true,
+		}
 	}
 }
