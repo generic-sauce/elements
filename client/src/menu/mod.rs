@@ -93,7 +93,7 @@ impl<B: Backend> Menu<B> {
 			MenuElement::new_edit_field(
 				"player_name",
 				CanvasVec::new(0.9 * ASPECT_RATIO, 0.95),
-				CanvasVec::new(0.15, 0.03),
+				CanvasVec::new(0.15, 0.022),
 				"",
 				DEFAULT_BUTTON_COLOR,
 				"Your Name"
@@ -200,7 +200,6 @@ impl<B: Backend> Menu<B> {
 	pub fn get_element_by_name(&mut self, name: &'static str) -> Option<&mut MenuElement<B>> {
 		self.elements.iter_mut().find(|e| e.name == name)
 	}
-
 }
 
 impl<B: Backend> App<B> {
