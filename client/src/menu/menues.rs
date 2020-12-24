@@ -29,7 +29,7 @@ impl<B: Backend> Menu<B> {
 				"Local",
 				Color::hex("153962"),
 				MAIN_BUTTON_FONT_SIZE,
-				Some(TextureId::Icon),
+				Some(TextureId::Gamepad),
 				Box::new(create_local_menu)
 			),
 			MenuElement::new_button(
