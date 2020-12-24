@@ -20,7 +20,7 @@ impl<B: Backend> Menu<B> {
 				"Online",
 				Color::hex("153962"),
 				MAIN_BUTTON_FONT_SIZE,
-				Some(TextureId::Icon),
+				Some(TextureId::Globe),
 				Box::new(create_online_menu),
 			),
 			MenuElement::new_button(

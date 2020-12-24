@@ -33,7 +33,8 @@ setup!(
 	Icon: "icon01.png",
 	White: "images/white.png",
 	Trophy: "images/trophy/trophy.png",
-	SkyBackground: "images/background/sky_background.png"
+	SkyBackground: "images/background/sky_background.png",
+	Globe: "images/icons/globe.png",
 );
 
 impl TextureId {
