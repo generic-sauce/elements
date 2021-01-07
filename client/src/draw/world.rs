@@ -33,7 +33,8 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	}
 
-	draw.map(&world.tilemap, &world.fluidmap);
+	draw.tilemap(&world.tilemap);
+	draw.fluidmap(&world.fluidmap);
 	draw_players(draw, world);
 	draw_cursors(draw, world);
 	draw_healthbars(draw, world);

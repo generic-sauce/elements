@@ -28,32 +28,115 @@ pub trait IntoTextureIndex {
 	fn into_texture_index(self) -> usize;
 }
 
+#[derive(Copy, Clone)]
+struct Vertex {
+	position: ViewVec,
+	uv: TextureVec,
+	color: Color,
+}
+
+pub struct Text {
+	pub left_bot: ViewVec,
+	pub scale: f32,
+	pub color: Color,
+	pub string: String,
+}
+
+pub enum Command {
+	Triangles,
+	TileMap,
+	FluidMap,
+	Text,
+}
+
+pub struct TriangleCommand {
+	texture_index: TextureIndex,
+	count: usize,
+}
+
+pub struct DrawTilemap {
+	size: TileVec,
+	data: Vec<u8>,
+}
+
+impl DrawTilemap {
+	pub fn new(tilemap: &TileMap) -> DrawTilemap {
+		let size = tilemap.size;
+		let data: Vec<u8> = tilemap.iter()
+			.map(|p| tilemap.get(p))
+			.map(|t| match t {
+				Tile::Void => 0,
+				Tile::Ground => 1,
+				Tile::Wall { owner, .. } => 2 + owner as u8,
+			})
+			.collect();
+
+		DrawTilemap {
+			size,
+			data,
+		}
+	}
+}
+
+pub struct DrawFluidmap {
+	size: FluidVec,
+	data: Vec<u8>,
+}
+
+impl DrawFluidmap {
+	pub fn new(fluidmap: &FluidMap) -> DrawFluidmap {
+		let size: FluidVec = TileVec::new(128, 72).cast();
+
+		let mut data: Vec<u8> = Vec::new();
+		data.resize((4 * size.x * size.y) as usize, 0 as u8);
+
+		for fluid in fluidmap.iter() {
+			let cell_id = fluid.position / TILESIZE;
+			let local_position = ((fluid.position.x % TILESIZE) as u8, (fluid.position.y % TILESIZE) as u8);
+
+			let cell_index = 4 * (cell_id.x + cell_id.y * size.x as i32) as usize;
+			data[cell_index+3] = 255;
+			data[cell_index+2] = (fluid.owner * 255) as u8;
+			data[cell_index+1] = local_position.1 as u8;
+			data[cell_index]   = local_position.0 as u8;
+		}
+
+		DrawFluidmap {
+			size,
+			data,
+		}
+	}
+}
+
 pub struct Draw {
 	clear_color: Option<Color>,
-	depth_index: DepthIndex,
-	texture_triangles: TextureTriangles,
+	commands: Vec<Command>,
 	tilemap: Option<DrawTilemap>,
 	fluidmap: Option<DrawFluidmap>,
 	texts: Vec<Text>,
+	triangles: Vec<Vertex>,
+	triangle_commands: Vec<TriangleCommand>,
+	// unordered_triangles: Vec<Triangles>,
 }
 
 impl Draw {
 	pub fn new() -> Draw {
 		let clear_color = None;
-		let depth_index = 0.0;
-		let mut texture_triangles = TextureTriangles::new();
-		texture_triangles.resize_with(TextureId::texture_count(), Default::default);
-		let texts = Vec::new();
+		let commands = Vec::new();
 		let tilemap = None;
 		let fluidmap = None;
+		let texts = Vec::new();
+		let triangles = Vec::new();
+		let triangle_commands = Vec::new();
 
 		Draw {
 			clear_color,
-			depth_index,
-			texture_triangles,
-			texts,
+			commands,
 			tilemap,
 			fluidmap,
+			texts,
+			triangles,
+			triangle_commands,
 		}
 	}
 
@@ -62,6 +145,20 @@ impl Draw {
 			panic!("clear color was set already");
 		}
 		self.clear_color = Some(clear_color);
+	}
+
+	fn push_triangle_command(&mut self, texture_index: TextureIndex, count: usize) {
+		if let Some(prev) = self.triangle_commands.last_mut() {
+			if texture_index == prev.texture_index {
+				prev.count += count;
+				return;
+			}
+		}
+
+		self.triangle_commands.push(TriangleCommand {
+			texture_index,
+			count,
+		});
 	}
 
 	#[allow(unused)]
@@ -74,7 +171,6 @@ impl Draw {
 		color: Option<Color>,
 	) {
 		let texture_index = texture_index.into_texture_index();
-		let triangles = &mut self.texture_triangles[texture_index];
 		let left_bot = left_bot.to_view();
 		let right_top = right_top.to_view();
 		let color = color.unwrap_or(Color::WHITE);
@@ -83,25 +179,18 @@ impl Draw {
 			Flip::Horizontal => (1.0, 0.0),
 		};
 
-		triangles.push(Triangle {
-			vertices: [
-				Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
-				Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(right_uv, 0.0), color },
-				Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
-			],
-			depth_index: self.depth_index,
-		});
+		self.triangles.extend([
+			Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
+			Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(right_uv, 0.0), color },
+			Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
 
-		triangles.push(Triangle {
-			vertices: [
-				Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
-				Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
-				Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(left_uv, 1.0),  color },
-			],
-			depth_index: self.depth_index,
-		});
+			Vertex { position: left_bot,                   uv: TextureVec::new(left_uv, 0.0),  color },
+			Vertex { position: right_top,                  uv: TextureVec::new(right_uv, 1.0), color },
+			Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(left_uv, 1.0),  color },
+		].iter().cloned());
 
-		self.depth_index += 1.0;
+		self.push_triangle_command(texture_index, 6);
+		self.commands.push(Command::Triangles);
 	}
 
 	#[allow(unused)]
@@ -111,37 +200,40 @@ impl Draw {
 		right_top: impl IntoViewVec,
 		color: Color,
 	) {
-		let triangles = &mut self.texture_triangles[TextureId::White as usize];
+		let texture_index = TextureId::White.into_texture_index();
 		let left_bot = left_bot.to_view();
 		let right_top = right_top.to_view();
 
-		triangles.push(Triangle {
-			vertices: [
-				Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
-				Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(1.0, 0.0), color },
-				Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
-			],
-			depth_index: self.depth_index,
-		});
+		self.triangles.extend([
+			Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
+			Vertex { position: v(right_top.x, left_bot.y), uv: TextureVec::new(1.0, 0.0), color },
+			Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
 
-		triangles.push(Triangle {
-			vertices: [
-				Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
-				Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
-				Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(0.0, 1.0), color },
-			],
-			depth_index: self.depth_index,
-		});
+			Vertex { position: left_bot,                   uv: TextureVec::new(0.0, 0.0), color },
+			Vertex { position: right_top,                  uv: TextureVec::new(1.0, 1.0), color },
+			Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(0.0, 1.0), color },
+		].iter().cloned());
 
-		self.depth_index += 1.0;
+		self.push_triangle_command(texture_index, 6);
+		self.commands.push(Command::Triangles);
 	}
 
-	pub fn map(&mut self, tilemap: &TileMap, fluidmap: &FluidMap) {
-		// draw and render order have to be changed respectively
-		self.tilemap = Some(DrawTilemap::new(tilemap, self.depth_index + 1.0));
-		self.fluidmap = Some(DrawFluidmap::new(fluidmap, self.depth_index));
+	pub fn tilemap(&mut self, tilemap: &TileMap) {
+		if let Some(_) = self.tilemap {
+			panic!("tilemap was drawn already");
+		}
 
-		self.depth_index += 2.0;
+		self.tilemap = Some(DrawTilemap::new(tilemap));
+		self.commands.push(Command::TileMap);
+	}
+
+	pub fn fluidmap(&mut self, fluidmap: &FluidMap) {
+		if let Some(_) = self.fluidmap {
+			panic!("fluidmap was drawn already");
+		}
+
+		self.fluidmap = Some(DrawFluidmap::new(fluidmap));
+		self.commands.push(Command::FluidMap);
 	}
 
 	fn circle_frac_iter(points: u32) -> impl Iterator<Item=(f32, f32)> {
@@ -175,8 +267,8 @@ impl Draw {
 		let center = center.to_view();
 		let center_uv = TextureVec::new(0.5, 0.5);
 		let arc_offset = arc_offset * std::f32::consts::PI * 2.0;
-		let triangles = &mut self.texture_triangles[TextureId::White as usize];
 
+		let mut vertex_count = 0;
 		for (frac0, frac1) in Self::circle_frac_iter(points) {
 			let frac0 = frac0 * arc_size + arc_offset;
 			let frac1 = frac1 * arc_size + arc_offset;
@@ -191,17 +283,18 @@ impl Draw {
 			let uv0 = TextureVec::new(x0, y0) * 0.5 + 0.5;
 			let uv1 = TextureVec::new(x1, y1) * 0.5 + 0.5;
 
-			triangles.push(Triangle {
-				vertices: [
-					Vertex { position: center, uv: center_uv, color },
-					Vertex { position: point0, uv: uv0,       color },
-					Vertex { position: point1, uv: uv1,       color },
-				],
-				depth_index: self.depth_index,
-			});
+			self.triangles.extend([
+				Vertex { position: center, uv: center_uv, color },
+				Vertex { position: point0, uv: uv0,       color },
+				Vertex { position: point1, uv: uv1,       color },
+			].iter().cloned());
+
+			vertex_count += 3;
 		}
 
-		self.depth_index += 1.0;
+		let texture_index = TextureId::White.into_texture_index();
+		self.push_triangle_command(texture_index, vertex_count);
+		self.commands.push(Command::Triangles);
 	}
 
 	#[allow(unused)]
@@ -223,90 +316,6 @@ impl Draw {
 		};
 
 		self.texts.push(text);
-	}
-}
-
-struct Vertex {
-	position: ViewVec,
-	uv: TextureVec,
-	color: Color,
-}
-
-// index of draw command recorded by draw
-type DepthIndex = f32;
-
-// vertex depth used for actual rendering
-pub type DepthValue = f32;
-
-struct Triangle {
-	vertices: [Vertex; 3],
-	depth_index: DepthIndex,
-}
-
-type Triangles = Vec<Triangle>;
-type TextureTriangles = Vec<Triangles>;
-
-pub struct Text {
-	pub left_bot: ViewVec,
-	pub scale: f32,
-	pub color: Color,
-	pub string: String,
-}
-
-struct DrawTilemap {
-	size: TileVec,
-	data: Vec<u8>,
-	depth_index: DepthIndex,
-}
-
-impl DrawTilemap {
-	fn new(tilemap: &TileMap, depth_index: DepthIndex) -> DrawTilemap {
-		let size = tilemap.size;
-		let data: Vec<u8> = tilemap.iter()
-			.map(|p| tilemap.get(p))
-			.map(|t| match t {
-				Tile::Void => 0,
-				Tile::Ground => 1,
-				Tile::Wall { owner, .. } => 2 + owner as u8,
-			})
-			.collect();
-
-		DrawTilemap {
-			size,
-			data,
-			depth_index,
-		}
-	}
-}
-
-struct DrawFluidmap {
-	size: FluidVec,
-	data: Vec<u8>,
-	depth_index: DepthIndex,
-}
-
-impl DrawFluidmap {
-	fn new(fluidmap: &FluidMap, depth_index: DepthIndex) -> DrawFluidmap {
-		let size: FluidVec = TileVec::new(128, 72).cast();
-
-		let mut data: Vec<u8> = Vec::new();
-		data.resize((4 * size.x * size.y) as usize, 0 as u8);
-
-		for fluid in fluidmap.iter() {
-			let cell_id = fluid.position / TILESIZE;
-			let local_position = ((fluid.position.x % TILESIZE) as u8, (fluid.position.y % TILESIZE) as u8);
-
-			let cell_index = 4 * (cell_id.x + cell_id.y * size.x as i32) as usize;
-			data[cell_index+3] = 255;
-			data[cell_index+2] = (fluid.owner * 255) as u8;
-			data[cell_index+1] = local_position.1 as u8;
-			data[cell_index]   = local_position.0 as u8;
-		}
-
-		DrawFluidmap {
-			size,
-			data,
-			depth_index,
-		}
+		self.commands.push(Command::Text);
 	}
 }

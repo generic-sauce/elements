@@ -38,6 +38,8 @@ setup!(
 	Gamepad: "images/icons/gamepad.png",
 );
 
+pub type TextureIndex = usize;
+
 impl TextureId {
 	pub fn texture_count() -> usize {
 		TextureId::iter().count()
