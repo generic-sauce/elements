@@ -7,7 +7,7 @@ struct Vertex {
 }
 
 fn vertex_to_bytes_len() -> u64 {
-	(3 + 2) * std::mem::size_of::<f32>() as u64
+	(2 + 2) * std::mem::size_of::<f32>() as u64
 }
 
 fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
@@ -17,7 +17,6 @@ fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
 	for vertex in vertices {
 		bytes.extend(vertex.position.x.to_le_bytes().iter());
 		bytes.extend(vertex.position.y.to_le_bytes().iter());
-		bytes.extend((0.4 as f32).to_le_bytes().iter());
 		bytes.extend(vertex.uv.x.to_le_bytes().iter());
 		bytes.extend(vertex.uv.y.to_le_bytes().iter());
 	}
@@ -98,11 +97,11 @@ impl RenderTilemap {
 			attributes: &[
 				wgpu::VertexAttributeDescriptor {
 					offset: 0,
-					format: wgpu::VertexFormat::Float3,
+					format: wgpu::VertexFormat::Float2,
 					shader_location: 0
 				},
 				wgpu::VertexAttributeDescriptor {
-					offset: 3 * std::mem::size_of::<f32>() as u64,
+					offset: 2 * std::mem::size_of::<f32>() as u64,
 					format: wgpu::VertexFormat::Float2,
 					shader_location: 1
 				},
@@ -162,12 +161,7 @@ impl RenderTilemap {
 			}),
 			primitive_topology: wgpu::PrimitiveTopology::TriangleStrip,
 			color_states: &[SURFACE_FORMAT.into()],
-			depth_stencil_state: Some(wgpu::DepthStencilStateDescriptor {
-				format: wgpu::TextureFormat::Depth32Float,
-				depth_write_enabled: true,
-				depth_compare: wgpu::CompareFunction::Less,
-				stencil: Default::default(),
-			}),
+			depth_stencil_state: None,
 			vertex_state: wgpu::VertexStateDescriptor {
 				index_format: Default::default(),
 				vertex_buffers: &[vertex_buffer_desc],
@@ -252,7 +246,6 @@ impl RenderTilemap {
 		);
 
 		let color_load_op = context.color_load_op();
-		let depth_load_op = context.depth_load_op();
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
@@ -264,14 +257,7 @@ impl RenderTilemap {
 					}
 				},
 			],
-			depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachmentDescriptor {
-				attachment: context.depth_texture_view,
-				depth_ops: Some(wgpu::Operations {
-					load: depth_load_op,
-					store: true,
-				}),
-				stencil_ops: None,
-			}),
+			depth_stencil_attachment: None,
 		});
 
 		render_pass.set_pipeline(&self.pipeline);

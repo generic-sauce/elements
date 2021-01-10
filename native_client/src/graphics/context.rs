@@ -6,10 +6,8 @@ pub(in crate::graphics) struct GraphicsContext<'a> {
 	pub swap_chain_texture: &'a wgpu::SwapChainTexture,
 	pub encoder: &'a mut wgpu::CommandEncoder,
 	pub window_size: PixelVec,
-	pub depth_texture_view: &'a wgpu::TextureView,
 	pub clear_color: wgpu::Color,
 	color_cleared: bool,
-	depth_cleared: bool,
 	pub elapsed_ms: f32,
 }
 
@@ -20,7 +18,6 @@ impl<'a> GraphicsContext<'a> {
 		swap_chain_texture: &'a wgpu::SwapChainTexture,
 		encoder: &'a mut wgpu::CommandEncoder,
 		window_size: PixelVec,
-		depth_texture_view: &'a wgpu::TextureView,
 		clear_color: wgpu::Color,
 		elapsed_ms: f32,
 	) -> GraphicsContext<'a> {
@@ -30,10 +27,8 @@ impl<'a> GraphicsContext<'a> {
 			swap_chain_texture,
 			encoder,
 			window_size,
-			depth_texture_view,
 			clear_color,
 			color_cleared: false,
-			depth_cleared: false,
 			elapsed_ms,
 		}
 	}
@@ -44,15 +39,6 @@ impl<'a> GraphicsContext<'a> {
 			false => wgpu::LoadOp::Clear(self.clear_color),
 		};
 		self.color_cleared = true;
-		load_op
-	}
-
-	pub(in crate::graphics) fn depth_load_op(&mut self) -> wgpu::LoadOp<f32> {
-		let load_op = match self.depth_cleared {
-			true => wgpu::LoadOp::Load,
-			false => wgpu::LoadOp::Clear(f32::MAX),
-		};
-		self.depth_cleared = true;
 		load_op
 	}
 }

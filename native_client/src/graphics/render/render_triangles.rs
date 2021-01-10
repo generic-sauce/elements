@@ -93,12 +93,7 @@ impl RenderTriangles {
 			}),
 			primitive_topology: wgpu::PrimitiveTopology::TriangleList,
 			color_states: &[SURFACE_FORMAT.into()],
-			depth_stencil_state: Some(wgpu::DepthStencilStateDescriptor {
-				format: wgpu::TextureFormat::Depth32Float,
-				depth_write_enabled: true,
-				depth_compare: wgpu::CompareFunction::Less,
-				stencil: Default::default(),
-			}),
+			depth_stencil_state: None,
 			vertex_state: wgpu::VertexStateDescriptor {
 				index_format: Default::default(),
 				vertex_buffers: &[vertex_buffer_desc],
@@ -161,7 +156,6 @@ impl RenderTriangles {
 		to: VertexIndex,
 	) {
 		let color_load_op = context.color_load_op();
-		let depth_load_op = context.depth_load_op();
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[
 				wgpu::RenderPassColorAttachmentDescriptor {
@@ -173,14 +167,7 @@ impl RenderTriangles {
 					}
 				},
 			],
-			depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachmentDescriptor {
-				attachment: context.depth_texture_view,
-				depth_ops: Some(wgpu::Operations {
-					load: depth_load_op,
-					store: true,
-				}),
-				stencil_ops: None,
-			}),
+			depth_stencil_attachment: None,
 		});
 
 		render_pass.set_pipeline(&self.pipeline);

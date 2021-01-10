@@ -27,8 +27,6 @@ pub struct Graphics {
 	queue: wgpu::Queue,
 	window_size: PixelVec,
 	swap_chain: wgpu::SwapChain,
-	depth_texture: wgpu::Texture,
-	depth_texture_view: wgpu::TextureView,
 	triangles: RenderTriangles,
 	tilemap: RenderTilemap,
 	fluidmap: RenderFluidmap,
@@ -79,9 +77,6 @@ impl Graphics {
 
 		let swap_chain = create_swap_chain(&device, &surface, window_size);
 
-		let depth_texture = create_depth_texture(&device, window_size);
-		let depth_texture_view = create_texture_view(&depth_texture);
-
 		let triangles = RenderTriangles::new(&device, &queue);
 		let tilemap = RenderTilemap::new(&device);
 		let fluidmap = RenderFluidmap::new(&device);
@@ -96,8 +91,6 @@ impl Graphics {
 			queue,
 			window_size,
 			swap_chain,
-			depth_texture,
-			depth_texture_view,
 			triangles,
 			tilemap,
 			fluidmap,
@@ -144,7 +137,6 @@ impl Graphics {
 			&swap_chain_texture,
 			&mut encoder,
 			self.window_size,
-			&self.depth_texture_view,
 			clear_color,
 			self.timer.elapsed_ms(),
 		);
@@ -213,8 +205,5 @@ impl Graphics {
 	pub fn resize(&mut self, size: PixelVec) {
 		self.window_size = size;
 		self.swap_chain = create_swap_chain(&self.device, &self.surface, size);
-
-		self.depth_texture = create_depth_texture(&self.device, self.window_size);
-		self.depth_texture_view = create_texture_view(&self.depth_texture);
 	}
 }

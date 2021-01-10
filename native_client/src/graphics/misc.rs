@@ -41,22 +41,6 @@ pub(in crate::graphics) fn create_texture_view(texture: &wgpu::Texture) -> wgpu:
 	texture.create_view(&wgpu::TextureViewDescriptor::default())
 }
 
-pub(in crate::graphics) fn create_depth_texture(device: &wgpu::Device, size: PixelVec) -> wgpu::Texture {
-	device.create_texture(&wgpu::TextureDescriptor {
-		label: None,
-		size: wgpu::Extent3d {
-			width: size.x,
-			height: size.y,
-			depth: 1
-		},
-		mip_level_count: 1,
-		sample_count: 1,
-		dimension: wgpu::TextureDimension::D2,
-		format: wgpu::TextureFormat::Depth32Float,
-		usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
-	})
-}
-
 pub(in crate::graphics) fn load_shader_from_file(device: &wgpu::Device, filepath: String) -> wgpu::ShaderModule {
 	let source = read(&filepath).expect(&format!("Could not read shader file: {}", filepath));
 	let source: Vec<u32> = bytemuck::cast_slice(&source[..]).to_vec();
