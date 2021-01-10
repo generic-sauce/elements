@@ -172,9 +172,9 @@ impl RenderTriangles {
 
 		render_pass.set_pipeline(&self.pipeline);
 
-		render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(from as u64 .. to as u64));
+		render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
 		render_pass.set_bind_group(0, &self.bind_groups[texture_index], &[]);
-		render_pass.draw(0 .. (to - from) as u32, 0 .. 1);
+		render_pass.draw(from as u32 .. to as u32, 0 .. 1);
 	}
 
 	fn create_vertex_buffer(device: &wgpu::Device, size: u64) -> wgpu::Buffer {

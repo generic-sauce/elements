@@ -151,12 +151,12 @@ impl Draw {
 	}
 
 	fn push_triangle_command(&mut self, texture_index: TextureIndex, count: VertexIndex) {
-		if let Some(prev) = self.triangle_commands.last_mut() {
-			if texture_index == prev.texture_index {
-				prev.count += count;
-				return;
-			}
-		}
+		// if let Some(prev) = self.triangle_commands.last_mut() {
+		// 	if texture_index == prev.texture_index {
+		// 		prev.count += count;
+		// 		return;
+		// 	}
+		// }
 
 		self.commands.push(DrawCommand::Triangles);
 		self.triangle_commands.push(TriangleDrawCommand {
