@@ -8,7 +8,7 @@ pub use {
 	client::prelude::*,
 
 	gilrs::{GamepadId, Gilrs},
-    clap::{App as ClapApp, Arg, SubCommand},
+	clap::{App as ClapApp, Arg, SubCommand},
 };
 
 pub mod win {

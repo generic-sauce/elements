@@ -138,7 +138,7 @@ impl Graphics {
 			draw.clear_color.a,
 		));
 
-		let mut graphics_context = GraphicsContext::new(
+		let mut context = GraphicsContext::new(
 			&self.device,
 			&self.queue,
 			&swap_chain_texture,
@@ -149,25 +149,61 @@ impl Graphics {
 			self.timer.elapsed_ms(),
 		);
 
-		self.triangles.render(
-			&mut graphics_context,
-			&draw,
-		);
+		let mut indices = [0 as usize; DRAW_COMMAND_COUNT];
+		let mut vertex_count = 0;
 
-		self.tilemap.render(
-			&mut graphics_context,
-			&draw,
-		);
+		self.triangles.set_vertices(&mut context, &draw);
 
-		self.fluidmap.render(
-			&mut graphics_context,
-			&draw,
-		);
+		for command in &draw.commands {
+			let index = &mut indices[*command as usize];
+			match command {
+				DrawCommand::Text => {
 
-		self.text.render(
-			&mut graphics_context,
-			&draw,
-		);
+				},
+				DrawCommand::Tilemap => {
+					self.tilemap.render(
+						&mut context,
+						&draw,
+					);
+				},
+				DrawCommand::Fluidmap => {
+
+				},
+				DrawCommand::Triangles => {
+					let count = draw.triangle_commands.len();
+					self.triangles.render(
+						&mut context,
+						draw.triangle_commands[*index].texture_index,
+						vertex_count,
+						vertex_count + count,
+					);
+					vertex_count += count;
+				},
+			}
+
+			dbg!(*command as usize, index.clone());
+			*index += 1;
+		}
+
+		// self.triangles.render(
+		// 	&mut graphics_context,
+		// 	&draw,
+		// );
+    //
+		// self.tilemap.render(
+		// 	&mut graphics_context,
+		// 	&draw,
+		// );
+    //
+		// self.fluidmap.render(
+		// 	&mut graphics_context,
+		// 	&draw,
+		// );
+    //
+		// self.text.render(
+		// 	&mut graphics_context,
+		// 	&draw,
+		// );
 
 		self.queue.submit(Some(encoder.finish()));
 	}

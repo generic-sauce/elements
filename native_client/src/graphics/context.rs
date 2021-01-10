@@ -47,7 +47,7 @@ impl<'a> GraphicsContext<'a> {
 		load_op
 	}
 
-	pub(in crate::graphics) fn depth_load_op(&mut self) -> wgpu::LoadOp<DepthValue> {
+	pub(in crate::graphics) fn depth_load_op(&mut self) -> wgpu::LoadOp<f32> {
 		let load_op = match self.depth_cleared {
 			true => wgpu::LoadOp::Load,
 			false => wgpu::LoadOp::Clear(f32::MAX),

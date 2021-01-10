@@ -38,7 +38,9 @@ setup!(
 	Gamepad: "images/icons/gamepad.png",
 );
 
-pub type TextureIndex = usize;
+pub trait IntoTextureIndex {
+	fn into_texture_index(self) -> TextureIndex;
+}
 
 impl TextureId {
 	pub fn texture_count() -> usize {
@@ -51,13 +53,13 @@ impl TextureId {
 }
 
 impl IntoTextureIndex for TextureId {
-	fn into_texture_index(self) -> usize {
-		self as usize
+	fn into_texture_index(self) -> TextureIndex {
+		self as TextureIndex
 	}
 }
 
 impl IntoTextureIndex for Animation {
-	fn into_texture_index(self) -> usize {
+	fn into_texture_index(self) -> TextureIndex {
 		let texture_offset = TextureId::iter().count();
 		let animation_offset = AnimationId::iter()
 			.enumerate()

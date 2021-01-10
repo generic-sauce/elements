@@ -24,10 +24,6 @@ pub enum Flip {
 	Horizontal,
 }
 
-pub trait IntoTextureIndex {
-	fn into_texture_index(self) -> usize;
-}
-
 #[derive(Copy, Clone)]
 struct Vertex {
 	position: ViewVec,
@@ -42,21 +38,28 @@ pub struct Text {
 	pub string: String,
 }
 
-pub enum Command {
-	Triangles,
-	TileMap,
-	FluidMap,
+#[derive(Copy, Clone)]
+#[repr(usize)]
+pub enum DrawCommand {
+	Tilemap,
+	Fluidmap,
 	Text,
+	Triangles,
 }
 
-pub struct TriangleCommand {
-	texture_index: TextureIndex,
-	count: usize,
+pub const DRAW_COMMAND_COUNT: usize = 4;
+
+pub type VertexIndex = usize;
+
+#[derive(Copy, Clone)]
+pub struct TriangleDrawCommand {
+	pub texture_index: TextureIndex,
+	pub count: VertexIndex,
 }
 
 pub struct DrawTilemap {
-	size: TileVec,
-	data: Vec<u8>,
+	pub size: TileVec,
+	pub data: Vec<u8>,
 }
 
 impl DrawTilemap {
@@ -79,8 +82,8 @@ impl DrawTilemap {
 }
 
 pub struct DrawFluidmap {
-	size: FluidVec,
-	data: Vec<u8>,
+	pub size: FluidVec,
+	pub data: Vec<u8>,
 }
 
 impl DrawFluidmap {
@@ -110,12 +113,12 @@ impl DrawFluidmap {
 
 pub struct Draw {
 	clear_color: Option<Color>,
-	commands: Vec<Command>,
+	commands: Vec<DrawCommand>,
 	tilemap: Option<DrawTilemap>,
 	fluidmap: Option<DrawFluidmap>,
 	texts: Vec<Text>,
 	triangles: Vec<Vertex>,
-	triangle_commands: Vec<TriangleCommand>,
+	triangle_commands: Vec<TriangleDrawCommand>,
 	// unordered_triangles: Vec<Triangles>,
 }
 
@@ -147,7 +150,7 @@ impl Draw {
 		self.clear_color = Some(clear_color);
 	}
 
-	fn push_triangle_command(&mut self, texture_index: TextureIndex, count: usize) {
+	fn push_triangle_command(&mut self, texture_index: TextureIndex, count: VertexIndex) {
 		if let Some(prev) = self.triangle_commands.last_mut() {
 			if texture_index == prev.texture_index {
 				prev.count += count;
@@ -155,7 +158,8 @@ impl Draw {
 			}
 		}
 
-		self.triangle_commands.push(TriangleCommand {
+		self.commands.push(DrawCommand::Triangles);
+		self.triangle_commands.push(TriangleDrawCommand {
 			texture_index,
 			count,
 		});
@@ -190,7 +194,6 @@ impl Draw {
 		].iter().cloned());
 
 		self.push_triangle_command(texture_index, 6);
-		self.commands.push(Command::Triangles);
 	}
 
 	#[allow(unused)]
@@ -215,7 +218,6 @@ impl Draw {
 		].iter().cloned());
 
 		self.push_triangle_command(texture_index, 6);
-		self.commands.push(Command::Triangles);
 	}
 
 	pub fn tilemap(&mut self, tilemap: &TileMap) {
@@ -224,7 +226,7 @@ impl Draw {
 		}
 
 		self.tilemap = Some(DrawTilemap::new(tilemap));
-		self.commands.push(Command::TileMap);
+		self.commands.push(DrawCommand::Tilemap);
 	}
 
 	pub fn fluidmap(&mut self, fluidmap: &FluidMap) {
@@ -233,7 +235,7 @@ impl Draw {
 		}
 
 		self.fluidmap = Some(DrawFluidmap::new(fluidmap));
-		self.commands.push(Command::FluidMap);
+		self.commands.push(DrawCommand::Fluidmap);
 	}
 
 	fn circle_frac_iter(points: u32) -> impl Iterator<Item=(f32, f32)> {
@@ -294,7 +296,6 @@ impl Draw {
 
 		let texture_index = TextureId::White.into_texture_index();
 		self.push_triangle_command(texture_index, vertex_count);
-		self.commands.push(Command::Triangles);
 	}
 
 	#[allow(unused)]
@@ -316,6 +317,6 @@ impl Draw {
 		};
 
 		self.texts.push(text);
-		self.commands.push(Command::Text);
+		self.commands.push(DrawCommand::Text);
 	}
 }

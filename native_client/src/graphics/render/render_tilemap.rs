@@ -10,14 +10,14 @@ fn vertex_to_bytes_len() -> u64 {
 	(3 + 2) * std::mem::size_of::<f32>() as u64
 }
 
-fn vertices_to_bytes(vertices: &[Vertex], depth: DepthValue) -> Vec<u8> {
+fn vertices_to_bytes(vertices: &[Vertex]) -> Vec<u8> {
 	let vertices_size = vertices.len() * vertex_to_bytes_len() as usize;
 	let mut bytes = Vec::<u8>::with_capacity(vertices_size);
 
 	for vertex in vertices {
 		bytes.extend(vertex.position.x.to_le_bytes().iter());
 		bytes.extend(vertex.position.y.to_le_bytes().iter());
-		bytes.extend(depth.to_le_bytes().iter());
+		bytes.extend((0.4 as f32).to_le_bytes().iter());
 		bytes.extend(vertex.uv.x.to_le_bytes().iter());
 		bytes.extend(vertex.uv.y.to_le_bytes().iter());
 	}
@@ -229,7 +229,6 @@ impl RenderTilemap {
 					Vertex { position: s(v(0.0, 1.0)), uv: v(0.0, 1.0) },
 					Vertex { position: s(v(1.0, 1.0)), uv: v(1.0, 1.0) },
 				],
-				tilemap.depth_value,
 			)[..]
 		);
 

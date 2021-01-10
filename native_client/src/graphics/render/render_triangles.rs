@@ -15,7 +15,7 @@ impl RenderTriangles {
 	pub(in crate::graphics) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> RenderTriangles {
 		let texture_state = TextureState::new(device, queue);
 
-		let capacity = 128 as u64;
+		let capacity = 128 as u64; // smallest power of 2 to render a texture twice
 		let vertex_buffer = Self::create_vertex_buffer(device, capacity);
 
 		let vertex_buffer_desc = wgpu::VertexBufferDescriptor {
@@ -144,13 +144,22 @@ impl RenderTriangles {
 		}
 	}
 
+	pub(in crate::graphics) fn set_vertices(
+		&mut self,
+		context: &mut GraphicsContext,
+		draw: &RenderDraw
+	) {
+		self.enlarge_vertex_buffer(context.device, draw.triangle_data.len() as u64);
+		context.queue.write_buffer(&self.vertex_buffer, 0, &draw.triangle_data[..]);
+	}
+
 	pub(in crate::graphics) fn render(
 		&mut self,
 		context: &mut GraphicsContext,
-		draw: &RenderDraw,
+		texture_index: TextureIndex,
+		from: VertexIndex,
+		to: VertexIndex,
 	) {
-		self.enlarge_vertex_buffer(context.device, draw.vertex_data.len() as u64);
-
 		let color_load_op = context.color_load_op();
 		let depth_load_op = context.depth_load_op();
 		let mut render_pass = context.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -174,22 +183,11 @@ impl RenderTriangles {
 			}),
 		});
 
-		context.queue.write_buffer(&self.vertex_buffer, 0, &draw.vertex_data[..]);
-
 		render_pass.set_pipeline(&self.pipeline);
 
-		let mut begin = 0;
-		for (i, &count) in draw.vertex_counts.iter().enumerate() {
-			if count > 0 {
-				let end = begin + count as u64 * bytes_per_vertex();
-
-				render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(begin .. end));
-				render_pass.set_bind_group(0, &self.bind_groups[i], &[]);
-				render_pass.draw(0 .. count, 0 .. 1);
-
-				begin = end;
-			}
-		}
+		render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(from as u64 .. to as u64));
+		render_pass.set_bind_group(0, &self.bind_groups[texture_index], &[]);
+		render_pass.draw(0 .. (to - from) as u32, 0 .. 1);
 	}
 
 	fn create_vertex_buffer(device: &wgpu::Device, size: u64) -> wgpu::Buffer {

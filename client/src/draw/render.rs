@@ -2,12 +2,12 @@ use super::*;
 
 pub struct RenderDraw {
 	pub clear_color: Color,
-	pub commands: Vec<Command>,
+	pub commands: Vec<DrawCommand>,
 	pub tilemap: Option<DrawTilemap>,
 	pub fluidmap: Option<DrawFluidmap>,
 	pub texts: Vec<Text>,
 	pub triangle_data: Vec<u8>, // vertices for all textures in bytes
-	pub triangle_commands: Vec<TriangleCommand>,
+	pub triangle_commands: Vec<TriangleDrawCommand>,
 }
 
 impl RenderDraw {

@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+pub type TextureIndex = usize;
+
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct Animation {
 	pub animation_id: AnimationId,
@@ -18,7 +20,7 @@ impl Animation {
 		self.index = (self.index + 1) % (self.animation_id.frame_count() * self.animation_id.interval());
 	}
 
-	pub fn texture_index(&self) -> usize {
+	pub fn texture_index(&self) -> TextureIndex {
 		self.index / self.animation_id.interval()
 	}
 }
