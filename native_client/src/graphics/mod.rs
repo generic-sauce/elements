@@ -150,7 +150,10 @@ impl Graphics {
 			let index = &mut indices[*command as usize];
 			match command {
 				DrawCommand::Text => {
-
+					self.text.render(
+						&mut context,
+						&draw.texts[*index],
+					);
 				},
 				DrawCommand::Tilemap => {
 					self.tilemap.render(
