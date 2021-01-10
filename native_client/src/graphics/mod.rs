@@ -167,10 +167,13 @@ impl Graphics {
 					);
 				},
 				DrawCommand::Fluidmap => {
-
+					self.fluidmap.render(
+						&mut context,
+						&draw,
+					);
 				},
 				DrawCommand::Triangles => {
-					let count = draw.triangle_commands.len();
+					let count = draw.triangle_commands[*index].count;
 					self.triangles.render(
 						&mut context,
 						draw.triangle_commands[*index].texture_index,
@@ -181,7 +184,6 @@ impl Graphics {
 				},
 			}
 
-			dbg!(*command as usize, index.clone());
 			*index += 1;
 		}
 

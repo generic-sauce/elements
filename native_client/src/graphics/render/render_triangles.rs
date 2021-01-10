@@ -24,17 +24,17 @@ impl RenderTriangles {
 			attributes: &[
 				wgpu::VertexAttributeDescriptor {
 					offset: 0,
-					format: wgpu::VertexFormat::Float3,
+					format: wgpu::VertexFormat::Float2,
 					shader_location: 0
 				},
 				wgpu::VertexAttributeDescriptor {
-					offset: 3 * std::mem::size_of::<f32>() as u64,
+					offset: 2 * std::mem::size_of::<f32>() as u64,
 					format: wgpu::VertexFormat::Float2,
 					shader_location: 1
 				},
 				wgpu::VertexAttributeDescriptor {
-					offset: 5 * std::mem::size_of::<f32>() as u64,
-					format: wgpu::VertexFormat::Float3,
+					offset: 4 * std::mem::size_of::<f32>() as u64,
+					format: wgpu::VertexFormat::Float4,
 					shader_location: 2
 				},
 			]
