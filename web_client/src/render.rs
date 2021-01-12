@@ -3,13 +3,11 @@ use crate::prelude::*;
 #[derive(Serialize, Deserialize)]
 pub struct JsWebRenderDrawTilemap {
 	pub size: TileVec,
-	pub depth_value: DepthValue,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct JsWebRenderDrawFluidmap {
 	pub size: FluidVec,
-	pub depth_value: DepthValue,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -23,10 +21,11 @@ pub struct WebText {
 #[derive(Serialize, Deserialize)]
 pub struct JsWebRenderDraw {
 	pub clear_color: Color,
-	pub vertex_counts: Vec<u32>, // number of vertices per texture
 	pub tilemap: Option<JsWebRenderDrawTilemap>,
 	pub fluidmap: Option<JsWebRenderDrawFluidmap>,
 	pub texts: Vec<WebText>,
+	pub commands: Vec<DrawCommand>,
+	pub triangle_commands: Vec<TriangleDrawCommand>,
 }
 
 pub struct WebRenderDraw {
@@ -40,19 +39,19 @@ impl WebRenderDraw {
 	pub fn new(draw: Draw) -> WebRenderDraw {
 		// canvas vec cast because we only need aspect. kinda shady
 		let render_draw = RenderDraw::new(draw, CanvasVec::aspect().cast());
-		let RenderDraw { clear_color, vertex_data, vertex_counts, texts, tilemap, fluidmap } = render_draw;
+		let RenderDraw { clear_color, commands, tilemap, fluidmap, texts, triangle_data, triangle_commands } = render_draw;
 
 		let (tilemap, tilemap_data) = match tilemap {
-			Some(RenderDrawTilemap { data, size, depth_value }) => (
-				Some(JsWebRenderDrawTilemap { size, depth_value }),
+			Some(DrawTilemap { data, size }) => (
+				Some(JsWebRenderDrawTilemap { size }),
 				data[..].into()
 			),
 			None => (None, Uint8Array::new_with_length(0))
 		};
 
 		let (fluidmap, fluidmap_data) = match fluidmap {
-			Some(RenderDrawFluidmap { data, size, depth_value }) => (
-				Some(JsWebRenderDrawFluidmap { size, depth_value }),
+			Some(DrawFluidmap { data, size }) => (
+				Some(JsWebRenderDrawFluidmap { size }),
 				data[..].into()
 			),
 			None => (None, Uint8Array::new_with_length(0))
@@ -71,14 +70,15 @@ impl WebRenderDraw {
 
 		let js_web_render_draw = JsWebRenderDraw {
 			clear_color,
-			vertex_counts,
 			tilemap,
 			fluidmap,
 			texts: web_texts,
+			commands,
+			triangle_commands,
 		};
 		let js_web_render_draw = JsValue::from_serde(&js_web_render_draw).unwrap();
 
-		let vertex_data: Uint8Array = vertex_data[..].into();
+		let vertex_data: Uint8Array = triangle_data[..].into();
 
 		WebRenderDraw {
 			js_web_render_draw,

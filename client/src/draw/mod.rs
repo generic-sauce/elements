@@ -39,6 +39,7 @@ pub struct Text {
 }
 
 #[derive(Copy, Clone)]
+#[derive(Serialize, Deserialize)]
 #[repr(usize)]
 pub enum DrawCommand {
 	Tilemap,
@@ -52,6 +53,7 @@ pub const DRAW_COMMAND_COUNT: usize = 4;
 pub type VertexIndex = usize;
 
 #[derive(Copy, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct TriangleDrawCommand {
 	pub texture_index: TextureIndex,
 	pub count: VertexIndex,
@@ -114,11 +116,11 @@ impl DrawFluidmap {
 pub struct Draw {
 	clear_color: Option<Color>,
 	commands: Vec<DrawCommand>,
+	triangle_commands: Vec<TriangleDrawCommand>,
+	triangles: Vec<Vertex>,
 	tilemap: Option<DrawTilemap>,
 	fluidmap: Option<DrawFluidmap>,
 	texts: Vec<Text>,
-	triangles: Vec<Vertex>,
-	triangle_commands: Vec<TriangleDrawCommand>,
 	// unordered_triangles: Vec<Triangles>,
 }
 

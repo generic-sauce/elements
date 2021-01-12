@@ -21,10 +21,41 @@ export function render(draw) {
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
 	gl.clear(gl.COLOR_BUFFER_BIT)
 
-	fluidmap_mod.render(draw)
-	tilemap_mod.render(draw)
-	triangles_mod.render(draw)
-	text_mod.render(draw)
+	triangles_mod.set_vertices(draw.vertex_data)
+
+	let triangle_command_index = 0
+	let vertex_count = 0
+
+	let text_command_index = 0
+
+	for (let command of draw.commands) {
+		switch (command) {
+		case "Triangles":
+			let triangle_command = draw.triangle_commands[triangle_command_index]
+			let texture_index = triangle_command.texture_index
+			let count = triangle_command.count
+			let from = vertex_count
+			let to = vertex_count + count
+			vertex_count += count
+			++triangle_command_index
+
+			triangles_mod.render(texture_index, from, to)
+			break;
+		case "Text":
+			let text = draw.texts[text_command_index]
+			text_mod.render(text)
+			++text_command_index
+			break;
+		case "Tilemap":
+			tilemap_mod.render(draw)
+			break;
+		case "Fluidmap":
+			fluidmap_mod.render(draw)
+			break;
+		}
+	}
+
+	// text_mod.render(draw)
 }
 
 function update_canvas_size() {

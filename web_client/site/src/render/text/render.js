@@ -1,6 +1,6 @@
 import { state } from "./init"
 
-export function render(draw) {
+export function render(text) {
 	gl.useProgram(state.program)
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 
@@ -8,7 +8,7 @@ export function render(draw) {
 		const count = 2
 		const type = gl.FLOAT
 		const normalize = false
-		const stride = 7 * 4
+		const stride = 8 * 4
 		const offset = 0 * 4
 		gl.vertexAttribPointer(
 			state.locations.vertex_position,
@@ -25,7 +25,7 @@ export function render(draw) {
 		const count = 2
 		const type = gl.FLOAT
 		const normalize = false
-		const stride = 7 * 4
+		const stride = 8 * 4
 		const offset = 2 * 4
 		gl.vertexAttribPointer(
 			state.locations.vertex_uv,
@@ -39,10 +39,10 @@ export function render(draw) {
 	}
 
 	{ // vertex_color
-		const count = 3
+		const count = 4
 		const type = gl.FLOAT
 		const normalize = false
-		const stride = 7 * 4
+		const stride = 8 * 4
 		const offset = 4 * 4
 		gl.vertexAttribPointer(
 			state.locations.vertex_color,
@@ -55,10 +55,9 @@ export function render(draw) {
 		gl.enableVertexAttribArray(state.locations.vertex_color)
 	}
 
-	for (let i = 0; i < draw.texts.length; ++i) {
-		const text = draw.texts[i]
-		update_texture(text.left_bot, text.scale, text.color, text.string)
+	update_texture(text.left_bot, text.scale, text.color, text.string)
 
+	{
 		const offset = 0
 		const count = 4
 		gl.drawArrays(gl.TRIANGLE_STRIP, offset, count)
@@ -66,7 +65,6 @@ export function render(draw) {
 }
 
 function update_texture(left_bot, scale, color, text) {
-	// text = "#jöÖkp"
 	const text_canvas = document.createElement("canvas")
 	const ctx = text_canvas.getContext("2d")
 
@@ -92,12 +90,14 @@ function update_texture(left_bot, scale, color, text) {
 	const r = color.r
 	const g = color.g
 	const b = color.b
+	const a = color.a
+
 	// TODO: vertex positions also incorrect
 	const vertices = [
-		x + right, y + bot, 1.0, 0.0, r, g, b,
-		x + right, y + top, 1.0, 1.0, r, g, b,
-		x + left,  y + bot, 0.0, 0.0, r, g, b,
-		x + left,  y + top, 0.0, 1.0, r, g, b,
+		x + right, y + bot, 1.0, 0.0, r, g, b, a,
+		x + right, y + top, 1.0, 1.0, r, g, b, a,
+		x + left,  y + bot, 0.0, 0.0, r, g, b, a,
+		x + left,  y + top, 0.0, 1.0, r, g, b, a,
 	]
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)

@@ -1,29 +1,25 @@
 import { state } from "./init.js"
 
 export function render(draw) {
-	if (!draw.tilemap)
-		return
-
 	gl.useProgram(state.program)
 
 	update_tilemap_tex(draw)
 
-	const depth = draw.tilemap.depth_value
 	const vertices = [
-		-1.0, -1.0, depth, 0.0, 0.0,
-		 1.0, -1.0, depth, 1.0, 0.0,
-		-1.0,  1.0, depth, 0.0, 1.0,
-		 1.0,  1.0, depth, 1.0, 1.0,
+		-1.0, -1.0, 0.0, 0.0,
+		 1.0, -1.0, 1.0, 0.0,
+		-1.0,  1.0, 0.0, 1.0,
+		 1.0,  1.0, 1.0, 1.0,
 	]
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 
 	{ // vertex_position
-		const count = 3;
+		const count = 2;
 		const type = gl.FLOAT;
 		const normalize = false;
-		const stride = 5 * 4;
+		const stride = 4 * 4;
 		const offset = 0 * 4;
 		gl.vertexAttribPointer(
 			state.locations.vertex_position,
@@ -40,8 +36,8 @@ export function render(draw) {
 		const count = 2;
 		const type = gl.FLOAT;
 		const normalize = false;
-		const stride = 5 * 4;
-		const offset = 3 * 4;
+		const stride = 4 * 4;
+		const offset = 2 * 4;
 		gl.vertexAttribPointer(
 			state.locations.vertex_uv,
 			count,
