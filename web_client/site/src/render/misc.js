@@ -63,8 +63,6 @@ export function load_texture(url) {
 	const image = new Image()
 	image.onload = function() {
 		gl.bindTexture(gl.TEXTURE_2D, texture)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     gl.texImage2D(gl.TEXTURE_2D, level, dst_format, src_format, src_type, image)
 	}
 	image.src = url
