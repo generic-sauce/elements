@@ -54,9 +54,6 @@ void main() {
 
 	float alpha = smoothstep(r/4., r/5., d);
 
-	if (alpha < .5)
-		discard;
-
 	gl_FragColor = vec4(c, alpha);
 }
 `

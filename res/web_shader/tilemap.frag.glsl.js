@@ -132,9 +132,6 @@ void main() {
 		c.a = 0.;
 	}
 
-	if (c.a < .5)
-		discard;
-
-	gl_FragColor = vec4(c.rgb, 1);
+	gl_FragColor = c;
 }
 `
