@@ -94,10 +94,6 @@ impl<B: Backend> App<B> {
 		if !self.menu.kind.is_active() { return; }
 
 		if let Some(texture_id) = self.menu.background {
-			#[cfg(target_arch = "wasm32")]
-			draw.set_clear_color(Color::BLACK);
-
-			#[cfg(not(target_arch = "wasm32"))]
 			draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), texture_id, Flip::Normal, Some(Color::rgb(0.8, 0.8, 0.8)));
 		}
 

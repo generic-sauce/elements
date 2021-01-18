@@ -8,7 +8,6 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 	const SKY_COLOR_FADE_SPEED: f32 = 1.5;
 	const MAX_SKY_FACTOR: f32 = 1.0;
 
-	#[cfg(not(target_arch = "wasm32"))] // TODO generalize to web
 	{
 		let mut sky_color = Color::rgb(1.0, 1.0, 1.0);
 		match world.restart_state {
