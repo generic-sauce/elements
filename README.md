@@ -1,9 +1,11 @@
 # Elements
-Nice game with elements :3
+Elements is a competitive 1 vs 1 arena game inspired by the TV show "Avatar The Last Airbender"
 
+## Play and early version
+You can try this game online on [**our website**](https://generic-sauce.de)
 
-## Usage
-You can try this game online on [our website](https://generic-sauce.de). Have fun :D
+Chrome browser is recommended
+Have fun :D
 
 ## Installation of Native Client and Game Server
 ```bash
