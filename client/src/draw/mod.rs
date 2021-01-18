@@ -145,6 +145,7 @@ impl Draw {
 		}
 	}
 
+	#[allow(unused)]
 	pub fn set_clear_color(&mut self, clear_color: Color) {
 		if let Some(_) = self.clear_color {
 			panic!("clear color was set already");
@@ -222,6 +223,7 @@ impl Draw {
 		self.push_triangle_command(texture_index, 6);
 	}
 
+	#[allow(unused)]
 	pub fn tilemap(&mut self, tilemap: &TileMap) {
 		if let Some(_) = self.tilemap {
 			panic!("tilemap was drawn already");
@@ -231,6 +233,7 @@ impl Draw {
 		self.commands.push(DrawCommand::Tilemap);
 	}
 
+	#[allow(unused)]
 	pub fn fluidmap(&mut self, fluidmap: &FluidMap) {
 		if let Some(_) = self.fluidmap {
 			panic!("fluidmap was drawn already");
@@ -250,6 +253,7 @@ impl Draw {
 		i0.zip(i1)
 	}
 
+	#[allow(unused)]
 	pub fn circle(
 		&mut self,
 		center: impl IntoViewVec,
@@ -259,6 +263,7 @@ impl Draw {
 		self.arc(center, scale, color, 1.0, 0.0);
 	}
 
+	#[allow(unused)]
 	pub fn arc(
 		&mut self,
 		center: impl IntoViewVec,

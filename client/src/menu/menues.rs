@@ -141,6 +141,11 @@ impl<B: Backend> Menu<B> {
 	pub fn tutorial_menu() -> Menu<B> {
 		let mut elements = Menu::main_menu_items(2);
 		elements.extend(vec![
+			MenuElement::new_image(
+				ViewVec::new(0.5, 0.5).to_canvas(),
+				CanvasVec::new(16.0 / 9.0 * 0.666, 0.666),
+				TextureId::Controls,
+			),
 			MenuElement::new_label(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
 				CanvasVec::new(0.15, 0.15),
@@ -150,6 +155,20 @@ impl<B: Backend> Menu<B> {
 			),
 			MenuElement::new_label(
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.2),
+				CanvasVec::new(0.15, 0.15),
+				EXPLANATION_FONT_SIZE,
+				"Fluids will follow the cursor and keep their momentum when thrown.",
+				TextAlign::Center,
+			),
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.17),
+				CanvasVec::new(0.15, 0.15),
+				EXPLANATION_FONT_SIZE,
+				"Dodge enemy fluids or block them with walls. By the way you can walk on walls ;)",
+				TextAlign::Center,
+			),
+			MenuElement::new_label(
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.1),
 				CanvasVec::new(0.15, 0.15),
 				EXPLANATION_FONT_SIZE,
 				"Learn the player controls by playing simple exercises. This currently not implemented :|",

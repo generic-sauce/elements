@@ -52,10 +52,15 @@ pub struct Label {
 	pub font_size: f32,
 }
 
+pub struct Image {
+	pub texture_index: TextureIndex
+}
+
 pub enum MenuKind<B: Backend> {
 	Button(Button<B>),
 	EditField(EditField),
 	Label(Label),
+	Image(Image),
 }
 
 impl<B: Backend> MenuElement<B> {
@@ -97,7 +102,20 @@ impl<B: Backend> MenuElement<B> {
 			clicked: false,
 			color: Color::WHITE
 		}
+	}
 
+	pub fn new_image(position: CanvasVec, size: CanvasVec, texture_index: impl IntoTextureIndex) -> MenuElement<B> {
+		MenuElement {
+			name: "",
+			kind: MenuKind::Image(Image {
+				texture_index: texture_index.into_texture_index(),
+			}),
+			position,
+			size,
+			hovered: false,
+			clicked: false,
+			color: Color::WHITE
+		}
 	}
 
 	pub fn is_colliding(&self, pos: CanvasVec) -> bool {
@@ -131,7 +149,10 @@ impl<B: Backend> MenuElement<B> {
 			},
 			MenuKind::Label(label) => {
 				self.draw_label(draw, label, color, graphics_backend)
-			}
+			},
+			MenuKind::Image(image) => {
+				self.draw_image(draw, image, color)
+			},
 		}
 	}
 
@@ -166,7 +187,7 @@ impl<B: Backend> MenuElement<B> {
 		let text = edit_field.get_render_text();
 
 		let text_size = if !text.is_empty() {
-			 graphics_backend.get_text_size(text, *font_size)
+			graphics_backend.get_text_size(text, *font_size)
 		} else {
 			graphics_backend.get_text_size(&template_text, *font_size)
 		};
@@ -201,7 +222,6 @@ impl<B: Backend> MenuElement<B> {
 	fn draw_label(&self, draw: &mut Draw, label: &Label, color: Color, graphics_backend: &impl GraphicsBackend) {
 		let Label { text, font_size, align, .. } = label;
 
-
 		let text_size = graphics_backend.get_text_size(text, *font_size);
 		let text_pos = match align {
 			TextAlign::Left => CanvasVec::new(
@@ -212,6 +232,14 @@ impl<B: Backend> MenuElement<B> {
 		};
 
 		draw.text(text_pos, *font_size, color, text);
+	}
+
+	fn draw_image(&self, draw: &mut Draw, image: &Image, color: Color) {
+		let Image { texture_index } = *image;
+		let radius = self.size / 2.0;
+		let left_bot = self.position - radius;
+		let right_top = self.position + radius;
+		draw.texture(left_bot, right_top, texture_index, Flip::Normal, Some(color));
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character]) {

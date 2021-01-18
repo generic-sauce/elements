@@ -58,11 +58,12 @@ impl<B: Backend> App<B> {
 			match &mut element.kind {
 				MenuKind::Button(Button { on_click, ..}) => {
 					opt_on_click = Some(on_click.clone());
-				}
+				},
 				MenuKind::EditField( EditField { selected, .. } ) => {
 					*selected = true;
-				}
-				MenuKind::Label(_) => {}
+				},
+				MenuKind::Label(_) => {},
+				MenuKind::Image(_) => {},
 			}
 		}
 

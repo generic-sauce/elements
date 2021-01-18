@@ -36,6 +36,7 @@ setup!(
 	SkyBackground: "images/background/sky_background.png",
 	Globe: "images/icons/globe.png",
 	Gamepad: "images/icons/gamepad.png",
+	Controls: "images/controls.png",
 );
 
 pub trait IntoTextureIndex {
@@ -49,6 +50,12 @@ impl TextureId {
 		AnimationId::iter()
 			.map(AnimationId::frame_count)
 			.sum::<usize>()
+	}
+}
+
+impl IntoTextureIndex for TextureIndex {
+	fn into_texture_index(self) -> TextureIndex {
+		self
 	}
 }
 
