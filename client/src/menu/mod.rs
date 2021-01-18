@@ -103,7 +103,7 @@ impl<B: Backend> App<B> {
 		}
 
 		// draw cursor
-		draw.rectangle(self.cursor_position, self.cursor_position + CanvasVec::new(0.01, 0.01), Color::RED);
+		draw.circle(self.cursor_position, CURSOR_RADIUS, Color::RED);
 	}
 }
 

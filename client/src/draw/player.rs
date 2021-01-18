@@ -30,12 +30,8 @@ pub(in super) fn draw_players(draw: &mut Draw, world: &World) {
 
 pub(in super) fn draw_cursors(draw: &mut Draw, world: &World) {
 	for p in &world.players {
-		let radius = TILESIZE / 2;
-		let radius = GameVec::new(radius, radius);
-		let center = p.cursor_position();
-		let left_bot = center - radius;
-		let right_top = center + radius;
-		draw.rectangle(left_bot, right_top, Color::BLACK);
+		let position = p.cursor_position();
+		draw.circle(position, CURSOR_RADIUS, Color::BLACK);
 	}
 }
 

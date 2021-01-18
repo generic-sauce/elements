@@ -3,6 +3,7 @@ use crate::prelude::*;
 const VIEW_SIZE_TILE: TileVec = TileVec::new(128, 72);
 const VIEW_SIZE_GAME: GameVec = VIEW_SIZE_TILE.to_game();
 const VIEW_ASPECT: f32 = VIEW_SIZE_TILE.x as f32 / VIEW_SIZE_TILE.y as f32;
+pub const CURSOR_RADIUS: f32 = 0.6 / VIEW_SIZE_TILE.y as f32;
 
 /* from (0, 0) to (1, 1)
  * corresponds to the draw area
