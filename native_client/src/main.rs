@@ -10,8 +10,6 @@ mod prelude;
 
 use crate::prelude::*;
 
-const DEFAULT_CURSOR_POSITION: SubPixelVec = SubPixelVec::new(300.0, 300.0);
-
 fn main_loop(mut f: impl FnMut(), fps: u32) {
 	TimedLoop::with_fps(fps)
 		.for_each(move |_| f());
@@ -122,6 +120,9 @@ fn main() {
 
 	let mut graphics = Graphics::new(&window);
 
+	let mut focused = true;
+	window.set_cursor_visible(!focused);
+
 	event_loop.run(move |event, _window_target, control_flow| {
 		let next_frame_instant = Instant::now() + Duration::from_millis(1);
 		*control_flow = win::ControlFlow::WaitUntil(next_frame_instant);
@@ -133,12 +134,21 @@ fn main() {
 				*control_flow = win::ControlFlow::Exit;
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::CursorMoved { position, .. }, .. } => {
-				let cursor_position = SubPixelVec::new(position.x as f32, position.y as f32);
-				let cursor_move = cursor_position - DEFAULT_CURSOR_POSITION;
-				if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
-					peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
-					window.set_cursor_position(win::PhysicalPosition { x: DEFAULT_CURSOR_POSITION.x as f64, y: DEFAULT_CURSOR_POSITION.y as f64 }).unwrap();
+				if focused {
+					let cursor_position = SubPixelVec::new(position.x as f32, position.y as f32);
+					let window_size = window.inner_size();
+					let window_size = SubPixelVec::new(window_size.width as f32, window_size.height as f32);
+					let window_center = ViewVec::new(0.5, 0.5).to_subpixel(window_size);
+					let cursor_move = cursor_position - window_center;
+					if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
+						peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
+						window.set_cursor_position(win::PhysicalPosition { x: window_center.x as f64, y: window_center.y as f64 }).unwrap();
+					}
 				}
+			},
+			win::Event::WindowEvent { event: win::WindowEvent::Focused(new_focused), .. } => {
+				focused = new_focused;
+				window.set_cursor_visible(!focused);
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::Resized(size), .. } => {
 				graphics.resize(PixelVec::new(size.width, size.height));
