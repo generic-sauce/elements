@@ -5,6 +5,7 @@ services:
     image: "bruno1996/elements2-server"
     environment:
       RUST_BACKTRACE: full
+      ELEMENTS_IDENTITY_PASSPHRASE: $ELEMENTS_IDENTITY_PASSPHRASE
     volumes:
       - .:/root
     restart: "always"

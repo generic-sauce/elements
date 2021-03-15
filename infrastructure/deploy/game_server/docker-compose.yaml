@@ -7,6 +7,7 @@ services:
       - .:/root
     environment:
       RUST_BACKTRACE: full
+      ELEMENTS_IDENTITY_PASSPHRASE: $ELEMENTS_IDENTITY_PASSPHRASE
     restart: "always"
     network_mode: "host"
     container_name: "elements-game-server-0"
@@ -18,6 +19,7 @@ services:
       - .:/root
     environment:
       RUST_BACKTRACE: full
+      ELEMENTS_IDENTITY_PASSPHRASE: $ELEMENTS_IDENTITY_PASSPHRASE
     restart: "always"
     network_mode: "host"
     container_name: "elements-game-server-1"
@@ -29,6 +31,7 @@ services:
       - .:/root
     environment:
       RUST_BACKTRACE: full
+      ELEMENTS_IDENTITY_PASSPHRASE: $ELEMENTS_IDENTITY_PASSPHRASE
     restart: "always"
     network_mode: "host"
     container_name: "elements-game-server-2"

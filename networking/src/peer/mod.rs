@@ -156,7 +156,14 @@ fn tls_acceptor(identity_file: Option<&str>) -> Option<Arc<TlsAcceptor>> {
 	let mut file = File::open(identity_file?).ok()?;
 	let mut identity = vec![];
 	file.read_to_end(&mut identity).unwrap();
-	let identity = Identity::from_pkcs12(&identity, "test123").unwrap();  // TODO: replace passphrase
+	let passphrase = match std::env::var("ELEMENTS_IDENTITY_PASSPHRASE") {
+		Ok(var) => var,
+		Err(e) => match e {
+			std::env::VarError::NotPresent => String::from(""),
+			std::env::VarError::NotUnicode(_) => panic!("Identity passphrase is not unicode. Use a different passphrase"),
+		}
+	};
+	let identity = Identity::from_pkcs12(&identity, &passphrase).unwrap();  // TODO: replace passphrase
 
 	let acceptor = TlsAcceptor::new(identity).unwrap();
 	Some(Arc::new(acceptor))
