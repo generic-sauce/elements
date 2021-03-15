@@ -9,6 +9,9 @@
 # Intellij
 .idea
 
+# Visual Studio
+.vs
+
 # Perf
 /flamegraph.svg
 /perf.data
