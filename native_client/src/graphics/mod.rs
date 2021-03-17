@@ -60,7 +60,7 @@ impl Graphics {
 			power_preference: wgpu::PowerPreference::HighPerformance,
 			compatible_surface: Some(&surface)
 		}))
-			.unwrap();
+			.expect("Failed to connect to graphics backend. Make sure \"vulkan\", \"DirectX\" or \"Metal\" is correctly installed!");
 
 		let (device, queue) = futures::executor::block_on(adapter.request_device(
 			&wgpu::DeviceDescriptor {
