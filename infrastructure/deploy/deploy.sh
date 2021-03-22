@@ -42,7 +42,9 @@ echo "Building Game Server + Master Server: Done"
 ############## MASTER SERVER ##############
 cd "$MASTER_SERVER_PATH"
 
-rm -rf "$MASTER_SERVER_PATH/target"
+if [ -d "$MASTER_SERVER_PATH/target" ]; then
+	rm -rf "$MASTER_SERVER_PATH/target"
+fi
 mkdir -p "$MASTER_SERVER_PATH/target/release"
 
 cp "$ELEMENTS_ROOT_DIR/target/release/master_server" "$MASTER_SERVER_PATH/target/release/elements-master-server"
@@ -57,8 +59,12 @@ echo "Starting new master-server: Done"
 mkdir -p "$GAME_SERVER_PATH"
 cd "$GAME_SERVER_PATH"
 
-rm -rf "$GAME_SERVER_PATH/target"
-rm -rf "$GAME_SERVER_PATH/res"
+if [ -d "$GAME_SERVER_PATH/target" ]; then
+	rm -rf "$GAME_SERVER_PATH/target"
+fi
+if [ -d "$GAME_SERVER_PATH/res" ]; then
+	rm -rf "$GAME_SERVER_PATH/res"
+fi
 
 mkdir -p "$GAME_SERVER_PATH/target/release"
 
