@@ -20,3 +20,4 @@ cargo run --release menu
 cd game_server
 cargo run --release --no-default-features --features=game-server
 ```
+m
