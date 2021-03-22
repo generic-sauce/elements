@@ -4,12 +4,7 @@
 
 use rocket::config::*;
 use rocket::response::Redirect;
-use std::process::{Command, Stdio};
-use std::{str, thread};
-use rocket_contrib::json::Json;
-use std::sync::mpsc::{channel, Sender};
-use rocket::State;
-use std::sync::{Arc, Mutex};
+use std::thread;
 use rocket_contrib::serve::StaticFiles;
 
 fn main() {
