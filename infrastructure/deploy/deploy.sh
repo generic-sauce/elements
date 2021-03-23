@@ -11,12 +11,12 @@ ELEMENTS_BUILD_CONTAINER_NAME="elements-build-container"
 ############## CLEANUP OLD CONTAINER ##############
 cd "$MASTER_SERVER_PATH"
 echo "stopping old master container..."
-docker-compose down
+docker-compose down --timeout 1
 echo "stopping old master container: Done"
 
 cd "$GAME_SERVER_PATH"
 echo "stopping old game container..."
-docker-compose down
+docker-compose down --timeout 1
 echo "stopping old game container: Done"
 
 
