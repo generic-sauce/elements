@@ -13,6 +13,9 @@ pub use socket::*;
 mod tilemap_loader;
 pub use tilemap_loader::*;
 
+mod storage;
+pub use storage::*;
+
 use crate::prelude::*;
 
 pub struct WebBackend;
@@ -23,6 +26,7 @@ impl Backend for WebBackend {
     type AudioBackend = WebAudioBackend;
     type SocketBackend = WebSocketBackend;
     type TileMapLoaderBackend = WebTileMapLoaderBackend;
+	type StorageBackend = WebStorageBackend;
 
 	fn now() -> f64 {
 		date_now()
