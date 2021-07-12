@@ -1,5 +1,5 @@
 #![feature(drain_filter)]
-#![feature(const_fn)]
+#![feature(const_fn_trait_bound)]
 
 mod animation;
 mod vec;
