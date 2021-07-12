@@ -62,7 +62,7 @@ impl StorageBackend for NativeStorageBackend {
 				return Some(v.to_string());
 			}
 		}
-		
+
 		None
 	}
 }

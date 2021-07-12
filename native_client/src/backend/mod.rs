@@ -23,7 +23,7 @@ impl Backend for NativeBackend {
     type AudioBackend = NativeAudioBackend;
     type SocketBackend = NativeSocketBackend;
     type TileMapLoaderBackend = NativeTileMapLoaderBackend;
-	type StorageBackend = NativeStorageBackend;
+    type StorageBackend = NativeStorageBackend;
 
     fn now() -> f64 {
         std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.

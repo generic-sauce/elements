@@ -17,19 +17,26 @@ pub struct App<B: Backend> {
 	pub input_backend: B::InputBackend,
 	pub graphics_backend: B::GraphicsBackend,
 	pub audio_backend: B::AudioBackend,
+	pub storage_backend: B::StorageBackend,
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
 	pub menu: Menu<B>,
 }
 
 impl<B: Backend> App<B> {
-	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, menu: Menu<B>) -> App<B> {
+	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, storage_backend: B::StorageBackend, menu: Menu<B>) -> App<B> {
 		let mut audio_backend = B::AudioBackend::new();
 		audio_backend.set_music_volume(MUSIC_VOLUME);
+
+		if let Some(name) = storage_backend.get("name") {
+			println!("starting with name '{}'", name);
+		}
+
 		App {
 			input_backend,
 			graphics_backend,
 			audio_backend,
+			storage_backend,
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
 			menu,
