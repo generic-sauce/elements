@@ -30,7 +30,7 @@ echo "Pulling Repository: Done"
 # start build container, if not already running
 if [ ! "$( docker container inspect -f '{{.State.Status}}' "$ELEMENTS_BUILD_CONTAINER_NAME" )" == "running" ]; then
 	echo "starting build container"
-	docker run -v "$ELEMENTS_ROOT_DIR":"/root/elements" --rm -d --name "$ELEMENTS_BUILD_CONTAINER_NAME" bruno1996/elements2-server sleep infinity
+	docker run -v "$ELEMENTS_ROOT_DIR":"/root/elements" --rm -d --name "$ELEMENTS_BUILD_CONTAINER_NAME" bruno1996/elements2-server rustup update; sleep infinity
 fi
 
 # build
