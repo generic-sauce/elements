@@ -186,17 +186,17 @@ impl Graphics {
 		// 	&mut graphics_context,
 		// 	&draw,
 		// );
-    //
+	//
 		// self.tilemap.render(
 		// 	&mut graphics_context,
 		// 	&draw,
 		// );
-    //
+	//
 		// self.fluidmap.render(
 		// 	&mut graphics_context,
 		// 	&draw,
 		// );
-    //
+	//
 		// self.text.render(
 		// 	&mut graphics_context,
 		// 	&draw,

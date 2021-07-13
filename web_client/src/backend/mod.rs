@@ -21,11 +21,11 @@ use crate::prelude::*;
 pub struct WebBackend;
 
 impl Backend for WebBackend {
-    type InputBackend = WebInputBackend;
-    type GraphicsBackend = WebGraphicsBackend;
-    type AudioBackend = WebAudioBackend;
-    type SocketBackend = WebSocketBackend;
-    type TileMapLoaderBackend = WebTileMapLoaderBackend;
+	type InputBackend = WebInputBackend;
+	type GraphicsBackend = WebGraphicsBackend;
+	type AudioBackend = WebAudioBackend;
+	type SocketBackend = WebSocketBackend;
+	type TileMapLoaderBackend = WebTileMapLoaderBackend;
 	type StorageBackend = WebStorageBackend;
 
 	fn now() -> f64 {

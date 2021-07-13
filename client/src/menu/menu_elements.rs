@@ -166,7 +166,7 @@ impl<B: Backend> MenuElement<B> {
 		if image.is_some() {
 			text_pos.y -= 0.03;
 		}
-        draw.text(text_pos, *font_size, Color::WHITE, text);
+		draw.text(text_pos, *font_size, Color::WHITE, text);
 
 		if let Some(texture_id) = image {
 			let mut image_pos = center_position(left_bot, right_top, BUTTON_IMAGE_SIZE);
@@ -178,7 +178,7 @@ impl<B: Backend> MenuElement<B> {
 	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {
 		let EditField { cursor_blink_counter, cursor, selected, view_offset, template_text, font_size, .. } = edit_field;
 		draw.rectangle(self.position - self.size, self.position + self.size, color);
-        draw.rectangle(
+		draw.rectangle(
 			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
 			self.position + self.size - EDIT_FIELD_BORDER_WIDTH,
 			Color::rgb(0.0, 0.03, 0.15),
@@ -271,7 +271,7 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
-        if let MenuKind::EditField( EditField{ cursor, text, cursor_blink_counter, .. } ) = &mut self.kind {
+		if let MenuKind::EditField( EditField{ cursor, text, cursor_blink_counter, .. } ) = &mut self.kind {
 			if peripherals_state.key_firing(Key::Left) {
 				*cursor = cursor.checked_sub(1).unwrap_or(0);
 				*cursor_blink_counter = 0;

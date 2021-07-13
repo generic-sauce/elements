@@ -25,7 +25,7 @@ fn main() {
 			.launch();
 	});
 
-    rocket::ignite()
+	rocket::ignite()
 		.mount("/", StaticFiles::from("./static"))
 		.launch();
 }

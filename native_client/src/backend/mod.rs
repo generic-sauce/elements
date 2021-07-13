@@ -18,14 +18,14 @@ pub use storage::*;
 pub struct NativeBackend;
 
 impl Backend for NativeBackend {
-    type InputBackend = NativeInputBackend;
-    type GraphicsBackend = NativeGraphicsBackend;
-    type AudioBackend = NativeAudioBackend;
-    type SocketBackend = NativeSocketBackend;
-    type TileMapLoaderBackend = NativeTileMapLoaderBackend;
-    type StorageBackend = NativeStorageBackend;
+	type InputBackend = NativeInputBackend;
+	type GraphicsBackend = NativeGraphicsBackend;
+	type AudioBackend = NativeAudioBackend;
+	type SocketBackend = NativeSocketBackend;
+	type TileMapLoaderBackend = NativeTileMapLoaderBackend;
+	type StorageBackend = NativeStorageBackend;
 
-    fn now() -> f64 {
-        std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.
-    }
+	fn now() -> f64 {
+		std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.
+	}
 }
