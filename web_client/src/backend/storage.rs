@@ -1,19 +1,13 @@
 use crate::prelude::*;
 
-use web_sys::Storage;
-
 pub struct WebStorageBackend;
-
-fn storage() -> Storage {
-	web_sys::window().unwrap().local_storage().unwrap().unwrap()
-}
 
 impl StorageBackend for WebStorageBackend {
 	fn set(&mut self, key: &str, value: &str) {
-		storage().set(key, value).unwrap();
+		set_localstorage(key.to_string(), value.to_string());
 	}
 
 	fn get(&self, key: &str) -> Option<String> {
-		storage().get(key).unwrap()
+		get_localstorage(key.to_string())
 	}
 }

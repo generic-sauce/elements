@@ -28,6 +28,9 @@ extern {
 	#[wasm_bindgen(js_name = "gamepad_state")]
 	fn gamepad_state_js(i: usize) -> JsValue;
 
+	pub fn set_localstorage(key: String, value: String);
+	pub fn get_localstorage(key: String) -> Option<String>;
+
 	fn peripherals_events_js() -> JsValue;
 
 	pub fn date_now() -> f64;

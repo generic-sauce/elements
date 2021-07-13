@@ -21,6 +21,8 @@ self.handle_audio_command = function(cmd) {
 	});
 }
 
+self.storage = 'uninit';
+
 self.date_now = Date.now
 
 
@@ -38,6 +40,8 @@ self.onmessage = function(e) {
 		self.gamepad_states = msg.states;
 	} else if (msg.type == "peripherals-event") {
 		self.peripherals_events.push(msg.ev)
+	} else if (msg.type == "init_localstorage") {
+		self.storage = msg.data;
 	} else {
 		console.log("received invalid message at worker/mod.js", msg);
 	}
@@ -56,6 +60,30 @@ self.js_init = function(texture_filenames) {
 		type: "init-response",
 		texture_filenames,
 	});
+}
+
+self.set_localstorage = function(key, value) {
+	if (self.storage == 'uninit') {
+		console.log("storage used before initialization")
+		return;
+	}
+
+	self.storage[key] = value;
+
+	self.postMessage({
+		type: "set_localstorage",
+		key,
+		value
+	});
+}
+
+self.get_localstorage = function(key) {
+	if (self.storage == 'uninit') {
+		console.log("storage used before initialization")
+		return;
+	}
+
+	return self.storage[key];
 }
 
 self.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {

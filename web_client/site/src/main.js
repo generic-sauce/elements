@@ -27,6 +27,8 @@ window.onload = function() {
 			});
 		} else if (msg.type == "audio-command") {
 			audiomod.handle_command(msg.cmd)
+		} else if (msg.type == "set_localstorage") {
+			localStorage.setItem(msg.key, msg.value);
 		} else {
 			console.log("invalid message received at main.js", msg)
 		}
@@ -52,4 +54,16 @@ window.onload = function() {
 	requestAnimationFrame(draw_fn)
 
 	setInterval(send_gamepad_update, 1000/120)
+
+	// init localstorage
+	var data = {};
+	for (var i = 0; i < localStorage.length; i++){
+		const key = localStorage.key(i);
+		data[key] = localStorage.getItem(key);
+	}
+
+	window.worker.postMessage({
+		type: "init_localstorage",
+		data,
+	});
 }
