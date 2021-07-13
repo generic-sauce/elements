@@ -28,6 +28,9 @@ impl<B: Backend> App<B> {
 		let mut audio_backend = B::AudioBackend::new();
 		audio_backend.set_music_volume(MUSIC_VOLUME);
 
+		let s = format!("starting with name {}", storage_backend.get("name").unwrap_or("[None]".to_string()));
+		B::print(&s);
+
 		App {
 			input_backend,
 			graphics_backend,

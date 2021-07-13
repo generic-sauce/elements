@@ -25,4 +25,5 @@ pub trait Backend: 'static {
 	type TileMapLoaderBackend: TileMapLoaderBackend;
 	type StorageBackend: StorageBackend;
 	fn now() -> f64;
+	fn print(s: &str);
 }
