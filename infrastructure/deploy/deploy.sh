@@ -30,12 +30,12 @@ echo "Pulling Repository: Done"
 # start build container, if not already running
 if [ ! "$( docker container inspect -f '{{.State.Status}}' "$ELEMENTS_BUILD_CONTAINER_NAME" )" == "running" ]; then
 	echo "starting build container"
-	docker run -v "$ELEMENTS_ROOT_DIR":"/root/elements" --rm -d --name "$ELEMENTS_BUILD_CONTAINER_NAME" bruno1996/elements2-server rustup update; sleep infinity
+	docker run -v "$ELEMENTS_ROOT_DIR":"/root/elements" --rm -d --name "$ELEMENTS_BUILD_CONTAINER_NAME" bruno1996/elements2-server sleep infinity
 fi
 
 # build
 echo "Building Game Server + Master Server..."
-docker exec -w /root/elements $ELEMENTS_BUILD_CONTAINER_NAME /root/.cargo/bin/cargo build --release --package master_server --package game_server
+docker exec -w /root/elements $ELEMENTS_BUILD_CONTAINER_NAME /root/.cargo/bin/rustup update; /root/.cargo/bin/cargo build --release --package master_server --package game_server
 echo "Building Game Server + Master Server: Done"
 
 
