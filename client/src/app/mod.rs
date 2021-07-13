@@ -28,10 +28,6 @@ impl<B: Backend> App<B> {
 		let mut audio_backend = B::AudioBackend::new();
 		audio_backend.set_music_volume(MUSIC_VOLUME);
 
-		if let Some(name) = storage_backend.get("name") {
-			println!("starting with name '{}'", name);
-		}
-
 		App {
 			input_backend,
 			graphics_backend,
