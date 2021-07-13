@@ -7,7 +7,6 @@ import * as audiomod from "./audio.js"
 window.onload = function() {
 	document.addEventListener("click", function () {
 		document.body.requestPointerLock();
-		document.body.requestFullscreen();
 	});
 
 	window.draw = null
