@@ -1,24 +1,36 @@
 use crate::prelude::*;
 
-// packages received by the master server
 #[derive(Serialize, Deserialize, Clone)]
-pub enum MasterServerPacket {
+pub enum MasterServerPacket { // packets received by the master server
 	GameServerStatusUpdate {
 		domain_name: String,
 		num_players: u32,
 		port: u16
 	},
-	LoginRequestPacket { name: String }, // sent by a client to login to the master server; also used to rename yourself
-	PlayerListRequestPacket,
+	LoginRequest(/*name: */ String), // sent by a client to login to the master server; also used to rename yourself
+	JoinLobby(/*lobby_id: */ usize),
+	LeaveLobby, // sent from client to master server to indicate that it leaves it's lobby. this also closes the lobby if it was the last player
+	LobbyListRequest, // sent from client to master server to receive a LobbyListResponsePacket
+	StartGame, // sent from lobby owner to master server to indicate start of the game
 }
 
 impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize, Clone)]
-pub enum MasterClientPacket {
-	GameRedirection(/* domain name */ String, /* port */ u16),
-	LoginResponsePacket(/* session id */ u32), // master servers response to the LoginRequestPacket
-	PlayerListResponsePacket(Vec<(/* username */ String, /* session id */ u32)>),
+pub struct LobbyInfo {
+	pub lobby_id: u32,
+	pub name: String,
+	/* tile_map */
+	/* number_of_players */
+	/* game_mode */
+	/* ... */
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub enum MasterClientPacket { // packets sent from master server to client
+	GoToGameServer(/* domain name */ String, /* port */ u16),
+	LoginResponse, // master servers response to the LoginRequestPacket
+	LobbyListResponse(Vec<LobbyInfo>), // sent from master server to client in order to inform about existing lobbies
 }
 
 impl Packet for MasterClientPacket {}
