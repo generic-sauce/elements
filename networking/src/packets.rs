@@ -9,22 +9,16 @@ pub enum MasterServerPacket {
 		port: u16
 	},
 	LoginRequestPacket { name: String }, // sent by a client to login to the master server; also used to rename yourself
-	// PlayerListRequestPacket, // TODO add
+	PlayerListRequestPacket,
 }
 
 impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct NameAndSessionId {
-	name: String,
-	session_id: u32,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
 pub enum MasterClientPacket {
-	GameRedirection(String, u16),
-	LoginResponsePacket { session_id: u32 }, // master servers response to the LoginRequestPacket
-	PlayerListResponsePacket(Vec<NameAndSessionId>),
+	GameRedirection(/* domain name */ String, /* port */ u16),
+	LoginResponsePacket(/* session id */ u32), // master servers response to the LoginRequestPacket
+	PlayerListResponsePacket(Vec<(/* username */ String, /* session id */ u32)>),
 }
 
 impl Packet for MasterClientPacket {}

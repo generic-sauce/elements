@@ -72,6 +72,10 @@ impl MasterServer {
 					PeerEvent::ReceivedPacket(MasterServerPacket::LoginRequestPacket { name }, peer) => {
 						self.apply_client_request(peer, name);
 					}
+					PeerEvent::ReceivedPacket(MasterServerPacket::PlayerListRequestPacket, peer) => {
+						let v = self.clients.iter().map(|x| (x.name.clone(), x.session_id)).collect();
+						self.peer_manager.send_to(peer, &MasterClientPacket::PlayerListResponsePacket(v));
+					}
 					PeerEvent::NewPeer(_) => {},
 					PeerEvent::Disconnect(peer) => {
 						for removed_peer in self.game_servers.drain_filter(|gs| gs.peer == peer) {
@@ -132,17 +136,18 @@ impl MasterServer {
 	}
 
 	fn apply_client_request(&mut self, peer: PeerHandle, name: String) {
-		if let Some(client) = self.clients.iter_mut().find(|c| c.peer == peer) {
+		if let Some(client) = self.clients.iter_mut().find(|c| c.peer == peer) { // change name, needs no LoginResponsePacket!
 			client.name = name;
 			client.last_request_counter = 0;
 			if matches!(client.state, ClientState::Disconnected) {
 				println!("INFO: reactivating client: {}", client.name);
 				client.state = ClientState::Ready;
 			}
-		} else {
+		} else { // add new client
 			let sess_id = self.alloc_session_id();
 			println!("INFO: new client connected: {}#{}", name, sess_id);
 			self.clients.push(ClientInfo::new(peer, &name, sess_id));
+			self.peer_manager.send_to(peer, &MasterClientPacket::LoginResponsePacket(sess_id));
 		}
 		self.check_game_start();
 	}
