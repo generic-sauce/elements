@@ -63,8 +63,8 @@ export function render(draw) {
 }
 
 function update_canvas_size() {
-	canvas.width = window.innerWidth
-	canvas.height = window.innerHeight
+	canvas.width = window.innerWidth / 2
+	canvas.height = window.innerHeight / 2
 
 	let ratio = (canvas.width / canvas.height) / (16 / 9)
 	if (ratio > 1.0) {

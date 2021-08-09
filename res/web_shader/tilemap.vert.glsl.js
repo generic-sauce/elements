@@ -6,6 +6,6 @@ varying vec2 uv;
 
 void main() {
 	uv = vertex_uv;
-	gl_Position = vec4(vertex_position, 0, 1);
+	gl_Position = vec4(vertex_position + vec2(.0001), 0, 1);
 }
 `
