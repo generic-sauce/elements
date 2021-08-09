@@ -1,5 +1,5 @@
 const rust = import("../node_modules/elements/web_client.js") // TODO use web/pkg-path without linking
-rust.then(rust => rust.client_main())
+rust.then(rust => rust.bootstrap())
 
 self.gamepad_states = [default_gamepad_state(), default_gamepad_state()];
 
@@ -85,6 +85,8 @@ self.get_localstorage = function(key) {
 
 	return self.storage[key];
 }
+
+self.is_initialized = () => storage != 'uninit';
 
 self.js_render = function(draw, tilemap_data, fluidmap_data, vertex_data) {
 	draw.tilemap_data = tilemap_data

@@ -7,6 +7,7 @@ use crate::prelude::*;
 #[wasm_bindgen]
 extern {
 	pub fn setInterval(closure: &Closure<dyn FnMut()>, time_ms: f64);
+	pub fn setTimeout(closure: &Closure<dyn FnMut()>, time_ms: f64);
 	pub fn prompt(txt: &str) -> String;
 	pub fn alert(txt: &str);
 
@@ -30,6 +31,8 @@ extern {
 
 	pub fn set_localstorage(key: String, value: String);
 	pub fn get_localstorage(key: String) -> Option<String>;
+
+	pub fn is_initialized() -> bool;
 
 	fn peripherals_events_js() -> JsValue;
 

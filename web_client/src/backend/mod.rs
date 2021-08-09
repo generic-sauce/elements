@@ -31,4 +31,8 @@ impl Backend for WebBackend {
 	fn now() -> f64 {
 		date_now()
 	}
+
+	fn print(s: &str) {
+		log(s);
+	}
 }

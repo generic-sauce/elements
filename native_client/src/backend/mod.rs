@@ -28,4 +28,8 @@ impl Backend for NativeBackend {
 	fn now() -> f64 {
 		std::time::UNIX_EPOCH.elapsed().unwrap().as_micros() as f64 / 1000.
 	}
+
+	fn print(s: &str) {
+		println!("{}", s);
+	}
 }
