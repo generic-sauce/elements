@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 use std::fs::File;
 use std::io::ErrorKind;
+use std::path::PathBuf;
 
 pub struct NativeStorageBackend {
 	cache: HashMap<String, String>,
@@ -29,10 +30,14 @@ impl NativeStorageBackend {
 	}
 }
 
-static CONFIG_FILE: &'static str = "elements.cfg";
+fn config_file() -> PathBuf {
+	let mut p = dirs::config_dir().unwrap();
+	p.push("elements.cfg");
+	p
+}
 
 fn read() -> String {
-	match File::open(CONFIG_FILE) {
+	match File::open(config_file()) {
 		Ok(mut x) => {
 			let mut s = String::new();
 			x.read_to_string(&mut s).unwrap();
@@ -43,9 +48,9 @@ fn read() -> String {
 	}
 }
 
-// overwrites CONFIG_FILE with contents x
+// overwrites config_file() with contents x
 fn write(x: String) {
-	let mut f = File::create(CONFIG_FILE).unwrap();
+	let mut f = File::create(config_file()).unwrap();
 	f.write_all(x.as_bytes()).unwrap();
 }
 
