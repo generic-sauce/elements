@@ -19,11 +19,22 @@ pub enum MasterServerPacket { // packets received by the master server
 impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct LobbyInfo {
+pub struct ShortLobbyInfo { // obtainable for each lobby
 	pub lobby_id: u32,
 	pub name: String,
-	/* tile_map */
+	/* tile_map icon */
 	/* number_of_players */
+	/* game_mode */
+	/* ... */
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct LongLobbyInfo { // obtained only for the lobby where you are in
+	pub lobby_id: u32,
+	pub name: String,
+	pub player_names: Vec<String>,
+	pub your_player_index: u32,
+	/* full tile_map */
 	/* game_mode */
 	/* ... */
 }
@@ -32,7 +43,8 @@ pub struct LobbyInfo {
 pub enum MasterClientPacket { // packets sent from master server to client
 	GoToGameServer(/* domain name */ String, /* port */ u16),
 	LoginResponse, // master servers response to the LoginRequestPacket
-	LobbyListResponse(Vec<LobbyInfo>), // sent from master server to client in order to inform about existing lobbies
+	LobbyListResponse(Vec<ShortLobbyInfo>), // sent from master server to client in order to inform about existing lobbies
+	LobbyInfoUpdate(LongLobbyInfo), // sent from master server to all clients within a lobby (when they create/join OR when some other player joins/leaves OR when a lobby setting is changed)
 }
 
 impl Packet for MasterClientPacket {}

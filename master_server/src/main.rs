@@ -61,6 +61,27 @@ impl MasterServer {
 		v.iter().zip(0u32..).find(|(old_id, new_id)| *old_id != new_id).unwrap().1
 	}
 
+	pub fn send_lobby_info(&mut self, lobby_id: u32) {
+		let idx = self.lobbies.iter().position(|x| x.lobby_id == lobby_id).unwrap();
+		let l = &mut self.lobbies[idx];
+
+		let mut player_names = Vec::new();
+		for &p in &l.players {
+			let client_info = &self.clients.iter().find(|x| x.peer == p).unwrap();
+			player_names.push(client_info.name.clone());
+		}
+
+		for (&p, your_player_index) in l.players.iter().zip(0u32..) {
+			let packet = MasterClientPacket::LobbyInfoUpdate(LongLobbyInfo {
+				lobby_id,
+				name: l.name.clone(),
+				player_names: player_names.clone(),
+				your_player_index,
+			});
+			self.peer_manager.send_to(p, &packet);
+		}
+	}
+
 	pub fn run(&mut self) {
 		println!("INFO: master server started. Listening on port {}", DEFAULT_MASTER_SERVER_PORT);
 		for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
@@ -84,13 +105,18 @@ impl MasterServer {
 							name: lobby_name,
 							players: vec![peer],
 						});
+
+						self.send_lobby_info(lobby_id);
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::JoinLobby(lobby_id), peer) => {
 						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue 'packet_loop; } // ignore packet if player is already in lobby
 
 						if let Some(d) = self.lobbies.iter_mut().find(|d| d.lobby_id == lobby_id) {
 							d.players.push(peer);
+							let id = d.lobby_id;
+							self.send_lobby_info(id);
 						}
+
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => {
 						if let Some(lobby_idx) = self.lobbies.iter().position(|l| l.players.contains(&peer)) {
@@ -100,11 +126,14 @@ impl MasterServer {
 
 							if l.players.is_empty() { // empty lobby will be deleted
 								self.lobbies.remove(lobby_idx);
+							} else { // the remaining players will be informed
+								let id = l.lobby_id;
+								self.send_lobby_info(id);
 							}
 						}
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::LobbyListRequest, peer) => {
-						let v = self.lobbies.iter().map(| x | LobbyInfo {
+						let v = self.lobbies.iter().map(| x | ShortLobbyInfo {
 							lobby_id: x.lobby_id,
 							name: x.name.clone(),
 						}).collect();
