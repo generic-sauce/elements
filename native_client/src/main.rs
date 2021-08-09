@@ -138,7 +138,7 @@ fn main() {
 					let cursor_position = SubPixelVec::new(position.x as f32, position.y as f32);
 					let window_size = window.inner_size();
 					let window_size = SubPixelVec::new(window_size.width as f32, window_size.height as f32);
-					let window_center = ViewVec::new(0.5, 0.5).to_subpixel(window_size);
+					let window_center = ViewVec::new(0.5, 0.5).to_subpixel(window_size).trunc();
 					let cursor_move = cursor_position - window_center;
 					if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
 						peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
