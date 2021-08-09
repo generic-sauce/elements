@@ -106,7 +106,9 @@ fn main() {
 		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend::new(draw_sender);
-		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, NativeStorageBackend, runnable.build_menu());
+		let storage_backend = NativeStorageBackend;
+		let menu = runnable.build_menu(&storage_backend);
+		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, menu);
 		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});
 

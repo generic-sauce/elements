@@ -8,9 +8,9 @@ pub enum Runnable<B: Backend> {
 }
 
 impl<B: Backend> Runnable<B> {
-	pub fn build_menu(&self) -> Menu<B> {
+	pub fn build_menu(&self, storage_backend: &B::StorageBackend) -> Menu<B> {
 		match self {
-			Runnable::Menu => Menu::online_menu(),
+			Runnable::Menu => Menu::online_menu(storage_backend),
 			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),
 			Runnable::Local(_) => Menu::in_game_menu(Box::new(create_local_menu)),
 			Runnable::ServerConnector(_) => Menu::new(),

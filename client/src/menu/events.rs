@@ -39,7 +39,7 @@ pub fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runn
 
 pub fn create_online_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
 	*runnable = Runnable::Menu;
-	app.menu = Menu::online_menu();
+	app.menu = Menu::online_menu(&app.storage_backend);
 }
 
 pub fn unpause<B: Backend>(app: &mut App<B>, _runnable: &mut Runnable<B>) {
