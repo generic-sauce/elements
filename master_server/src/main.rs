@@ -17,29 +17,21 @@ pub struct MasterServer {
 pub struct LobbyData {
 	lobby_id: u32,
 	name: String,
-	players: Vec<PeerHandle>, // players[0] is the owner /* should I use PeerHandle here? */
+	players: Vec<PeerHandle>, // players[0] is the owner
 }
 
 pub struct GameServerInfo {
 	pub peer: PeerHandle,
-	pub domain_name: String,
 	pub num_players: u32,
 	pub state: GameServerState,
+	pub domain_name: String,
 	pub port: u16,
 }
 
 pub struct ClientInfo {
 	pub peer: PeerHandle,
 	pub name: String,
-	pub state: ClientState,
 	pub last_request_counter: u32,
-	pub current_lobby_id: Option</*lobby_id: */ u32>,
-}
-
-pub enum ClientState {
-	Ready,
-	InGame,
-	Disconnected,
 }
 
 pub enum GameServerState {
@@ -83,9 +75,30 @@ impl MasterServer {
 					PeerEvent::ReceivedPacket(MasterServerPacket::LoginRequest(name), peer) => {
 						self.apply_login_request(peer, name);
 					}
-					PeerEvent::ReceivedPacket(MasterServerPacket::CreateLobby(lobby_name), peer) => unimplemented!(),
-					PeerEvent::ReceivedPacket(MasterServerPacket::JoinLobby(lobby_id), peer) => unimplemented!(),
-					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => unimplemented!(),
+					PeerEvent::ReceivedPacket(MasterServerPacket::CreateLobby(lobby_name), peer) => {
+						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue; } // ignore packet if player is already in lobby
+
+						let lobby_id = self.alloc_lobby_id();
+						self.lobbies.push(LobbyData {
+							lobby_id,
+							name: lobby_name,
+							players: vec![peer],
+						});
+					}
+					PeerEvent::ReceivedPacket(MasterServerPacket::JoinLobby(lobby_id), peer) => {
+						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue; } // ignore packet if player is already in lobby
+
+						if let Some(d) = self.lobbies.iter_mut().find(|d| d.lobby_id == lobby_id) {
+							d.players.push(peer);
+						}
+					}
+					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => {
+						for l in self.lobbies.iter_mut() {
+							if let Some(i) = l.players.iter().position(|&x| x == peer) {
+								l.players.remove(i);
+							}
+						}
+					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::LobbyListRequest, peer) => {
 						let v = self.lobbies.iter().map(| x | LobbyInfo {
 							lobby_id: x.lobby_id,
@@ -93,7 +106,20 @@ impl MasterServer {
 						}).collect();
 						self.peer_manager.send_to(peer, &MasterClientPacket::LobbyListResponse(v));
 					}
-					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => unimplemented!(),
+					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => {
+						if let Some(game_server) = self.game_servers.iter_mut().find(|x| matches!(x.state, GameServerState::Ready)) {
+							if let Some(idx) = self.lobbies.iter().position(|l| l.players[0] == peer) {
+								let players = self.lobbies.remove(idx).players;
+								for p in players {
+									self.peer_manager.send_to(p, &MasterClientPacket::GoToGameServer(game_server.domain_name.clone(), game_server.port));
+								}
+								game_server.state = GameServerState::AwaitingGame(0);
+								println!("INFO: initiating game on game server {}:{}", &game_server.domain_name, game_server.port);
+							}
+						} else {
+							println!("no free game server!");
+						}
+					}
 
 					// other events
 					PeerEvent::NewPeer(_) => {},
@@ -108,7 +134,6 @@ impl MasterServer {
 				}
 			}
 
-			self.check_clients();
 			self.check_awaiting_servers();
 		}
 	}
@@ -122,16 +147,6 @@ impl MasterServer {
 					println!("WARN: players did not connect. making Game Server available again.");
 					server.state = GameServerState::Ready;
 				}
-			}
-		}
-	}
-
-	fn check_clients(&mut self) {
-		for client in self.clients.iter_mut().filter(|c| matches!(c.state, ClientState::Ready)) {
-			client.last_request_counter += 1;
-			if client.last_request_counter >= CLIENT_REQUEST_TIMEOUT {
-				client.state = ClientState::Disconnected;
-				println!("INFO: client disconnected:  {}", client.name);
 			}
 		}
 	}
@@ -151,7 +166,6 @@ impl MasterServer {
 		} else {
 			println!("INFO: new game server connected: {}:{}", domain_name, port);
 			self.game_servers.push(GameServerInfo::new(peer, domain_name, num_players, port));
-			self.check_game_start();
 		}
 	}
 
@@ -159,35 +173,10 @@ impl MasterServer {
 		if let Some(client) = self.clients.iter_mut().find(|c| c.peer == peer) { // change name, needs no LoginResponsePacket!
 			client.name = name;
 			client.last_request_counter = 0;
-			if matches!(client.state, ClientState::Disconnected) {
-				println!("INFO: reactivating client: {}", client.name);
-				client.state = ClientState::Ready;
-			}
 		} else { // add new client
 			println!("INFO: new client connected: {}", name);
 			self.clients.push(ClientInfo::new(peer, &name));
 			self.peer_manager.send_to(peer, &MasterClientPacket::LoginResponse);
-		}
-		self.check_game_start();
-	}
-
-	fn check_game_start(&mut self) {
-		let mut ready_clients: Vec<&mut ClientInfo> = self.clients.iter_mut().filter(|c| matches!(c.state, ClientState::Ready)).collect();
-		if ready_clients.len() >= 2 {
-			if let Some(game_server) = self.game_servers.iter_mut().find(|gs| matches!(gs.state, GameServerState::Ready)) {
-				MasterServer::initiate_game(&mut self.peer_manager, game_server, &mut ready_clients[0..2]);
-			} else {
-				// TODO: no server could be found
-			}
-		}
-	}
-
-	fn initiate_game(peer_manager: &mut PeerManager, game_server: &mut GameServerInfo, clients: &mut [&mut ClientInfo]) {
-		println!("INFO: initiating game with players: {}, {}\t server addr: {}:{}", clients[0].name, clients[1].name, &game_server.domain_name, game_server.port);
-		for client in clients {
-			peer_manager.send_to(client.peer, &MasterClientPacket::GoToGameServer(game_server.domain_name.clone(), game_server.port));
-			game_server.state = GameServerState::AwaitingGame(0);
-			client.state = ClientState::InGame;
 		}
 	}
 }
@@ -197,9 +186,7 @@ impl ClientInfo {
 		ClientInfo {
 			peer,
 			name: String::from(name),
-			state: ClientState::Ready,
 			last_request_counter: 0,
-			current_lobby_id: None,
 		}
 	}
 }

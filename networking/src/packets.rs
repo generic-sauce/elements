@@ -13,6 +13,7 @@ pub enum MasterServerPacket { // packets received by the master server
 	LeaveLobby, // sent from client to master server to indicate that it leaves it's lobby. this also closes the lobby if it was the last player
 	LobbyListRequest, // sent from client to master server to receive a LobbyListResponsePacket
 	StartGame, // sent from lobby owner to master server to indicate start of the game
+	// ChangeLobbySettings(...), // sent from lobby owner to master server to change map/game-mode/...
 }
 
 impl Packet for MasterServerPacket {}
