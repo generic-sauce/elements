@@ -225,34 +225,6 @@ impl FloorIfInt for f64 {
 	}
 }
 
-pub trait Trunc {
-	fn trunc(self) -> Self;
-}
-
-impl Trunc for i32 {
-	fn trunc(self) -> i32 {
-		self
-	}
-}
-
-impl Trunc for u32 {
-	fn trunc(self) -> u32 {
-		self
-	}
-}
-
-impl Trunc for f32 {
-	fn trunc(self) -> f32 {
-		self.trunc()
-	}
-}
-
-impl Trunc for f64 {
-	fn trunc(self) -> f64 {
-		self.trunc()
-	}
-}
-
 impl<T: Primitive, P> Vec2t<T, P> {
 	#[allow(unused)]
 	pub fn clamped(self, min: T, max: T) -> Vec2t<T, P> {
@@ -299,11 +271,10 @@ impl<T: Primitive, P> Vec2t<T, P> {
 		self * self_weight + other * other_weight / (self_weight + other_weight)
 	}
 
-	pub fn trunc(self) -> Vec2t<T, P> {
-		return Vec2t {
-			x: self.x.trunc(),
-			y: self.y.trunc(),
-			_p: PhantomData
-		}
+}
+
+impl<P> Vec2t<f32, P> {
+	pub fn trunc(self) -> Vec2t<f32, P> {
+		Vec2t::new(self.x.trunc(), self.y.trunc())
 	}
 }
