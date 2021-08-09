@@ -123,11 +123,14 @@ fn main() {
 	let mut focused = true;
 	window.set_cursor_visible(!focused);
 
+	let mut mouse_update_fix = SubPixelVec::new(0.0, 0.0);
+
 	event_loop.run(move |event, _window_target, control_flow| {
 		let next_frame_instant = Instant::now() + Duration::from_millis(1);
 		*control_flow = win::ControlFlow::WaitUntil(next_frame_instant);
 
 		let mut peripherals_update: Option<PeripheralsUpdate> = None;
+
 
 		match event {
 			win::Event::WindowEvent { event: win::WindowEvent::CloseRequested, .. } => {
@@ -141,9 +144,10 @@ fn main() {
 					let window_center = ViewVec::new(0.5, 0.5).to_subpixel(window_size).trunc();
 					let cursor_move = cursor_position - window_center;
 					if cursor_move.x != 0.0 || cursor_move.y != 0.0 {
-						peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move));
+						peripherals_update = Some(PeripheralsUpdate::MouseMove(cursor_move - mouse_update_fix));
 						window.set_cursor_position(win::PhysicalPosition { x: window_center.x as f64, y: window_center.y as f64 }).unwrap();
 					}
+					mouse_update_fix = cursor_move;
 				}
 			},
 			win::Event::WindowEvent { event: win::WindowEvent::Focused(new_focused), .. } => {
