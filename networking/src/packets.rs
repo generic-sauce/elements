@@ -4,7 +4,7 @@ use crate::prelude::*;
 pub enum MasterServerPacket { // packets received by the master server
 	GameServerStatusUpdate {
 		domain_name: String,
-		num_players: u32,
+		num_players: u32, // TODO this seems outdated
 		port: u16
 	},
 	LoginRequest(/* username: */ String), // sent by a client to login to the master server; also used to rename yourself

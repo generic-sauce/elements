@@ -64,7 +64,7 @@ impl MasterServer {
 	pub fn run(&mut self) {
 		println!("INFO: master server started. Listening on port {}", DEFAULT_MASTER_SERVER_PORT);
 		for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
-			for ev in self.peer_manager.tick::<MasterServerPacket>() {
+			'packet_loop: for ev in self.peer_manager.tick::<MasterServerPacket>() {
 				match ev {
 					// received packets from game servers
 					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port }, peer) => {
@@ -76,7 +76,7 @@ impl MasterServer {
 						self.apply_login_request(peer, name);
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::CreateLobby(lobby_name), peer) => {
-						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue; } // ignore packet if player is already in lobby
+						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue 'packet_loop; } // ignore packet if player is already in lobby
 
 						let lobby_id = self.alloc_lobby_id();
 						self.lobbies.push(LobbyData {
@@ -86,16 +86,20 @@ impl MasterServer {
 						});
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::JoinLobby(lobby_id), peer) => {
-						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue; } // ignore packet if player is already in lobby
+						if self.lobbies.iter().any(|d| d.players.contains(&peer)) { continue 'packet_loop; } // ignore packet if player is already in lobby
 
 						if let Some(d) = self.lobbies.iter_mut().find(|d| d.lobby_id == lobby_id) {
 							d.players.push(peer);
 						}
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => {
-						for l in self.lobbies.iter_mut() {
-							if let Some(i) = l.players.iter().position(|&x| x == peer) {
-								l.players.remove(i);
+						if let Some(lobby_idx) = self.lobbies.iter().position(|l| l.players.contains(&peer)) {
+							let l = &mut self.lobbies[lobby_idx];
+							let peer_idx = l.players.iter().position(|&x| x == peer).unwrap();
+							l.players.remove(peer_idx);
+
+							if l.players.is_empty() { // empty lobby will be deleted
+								self.lobbies.remove(lobby_idx);
 							}
 						}
 					}
@@ -129,6 +133,16 @@ impl MasterServer {
 						}
 						for removed_client in self.clients.drain_filter(|gs| gs.peer == peer) {
 							println!("INFO: client disconnected: {}", removed_client.name);
+						}
+
+						if let Some(lobby_idx) = self.lobbies.iter().position(|l| l.players.contains(&peer)) {
+							let l = &mut self.lobbies[lobby_idx];
+							let peer_idx = l.players.iter().position(|&x| x == peer).unwrap();
+							l.players.remove(peer_idx);
+
+							if l.players.is_empty() { // empty lobby will be deleted
+								self.lobbies.remove(lobby_idx);
+							}
 						}
 					}
 				}
