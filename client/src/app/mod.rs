@@ -4,6 +4,9 @@ pub use runnable::*;
 mod event_handler;
 pub use event_handler::*;
 
+mod online_menu_state;
+pub use online_menu_state::*;
+
 use crate::prelude::*;
 
 pub const DEFAULT_CURSOR_POSITION: CanvasVec = CanvasVec::new(0.5 * 16.0 / 9.0, 0.5);
@@ -90,13 +93,13 @@ impl<B: Backend> App<B> {
 				}
 			};
 			if winner_found {
-				*runnable = Runnable::OnlineMenu;
+				*runnable = Runnable::OnlineMenu(OnlineMenuState::new());
 				self.menu = Menu::online_menu(&self.storage_backend);
 			}
 		}
 		if let Runnable::ServerConnector(server_connector) = runnable {
 			if server_connector.request_failed {
-				*runnable = Runnable::OnlineMenu;
+				*runnable = Runnable::OnlineMenu(OnlineMenuState::new());
 				self.menu = Menu::online_menu(&self.storage_backend);  // TODO: change to failed info
 			} else if let Some((ip, port)) = &server_connector.game_ip {
 				// TODO: merge with create_client()

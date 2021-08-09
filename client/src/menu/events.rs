@@ -38,7 +38,7 @@ pub fn create_server_connector<B: Backend>(app: &mut App<B>, runnable: &mut Runn
 }
 
 pub fn create_online_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
-	*runnable = Runnable::OnlineMenu;
+	*runnable = Runnable::OnlineMenu(OnlineMenuState::new());
 	app.menu = Menu::online_menu(&app.storage_backend);
 }
 

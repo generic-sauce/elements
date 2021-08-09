@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub enum Runnable<B: Backend> {
 	Menu, // TODO: extract all menues later
-	OnlineMenu,
+	OnlineMenu(OnlineMenuState),
 	Local(Local<B>),
 	Client(Client<B>),
 	ServerConnector(ServerConnector<B>),
@@ -11,7 +11,7 @@ pub enum Runnable<B: Backend> {
 impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&self, storage_backend: &B::StorageBackend) -> Menu<B> {
 		match self {
-			Runnable::Menu|Runnable::OnlineMenu => Menu::online_menu(storage_backend),
+			Runnable::Menu|Runnable::OnlineMenu(_) => Menu::online_menu(storage_backend),
 			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),
 			Runnable::Local(_) => Menu::in_game_menu(Box::new(create_local_menu)),
 			Runnable::ServerConnector(_) => Menu::new(),
@@ -21,7 +21,7 @@ impl<B: Backend> Runnable<B> {
 	pub fn tick(&mut self, app: &mut App<B>) {
 		match self {
 			Runnable::Menu => {},
-			Runnable::OnlineMenu => {
+			Runnable::OnlineMenu(_) => {
 				let player_name_edit_field = app.menu.get_element_by_name("player_name").unwrap();
 				match &player_name_edit_field.kind {
 					MenuKind::EditField(edit_field) => {
@@ -41,7 +41,7 @@ impl<B: Backend> Runnable<B> {
 	pub fn draw(&mut self, app: &mut App<B>, draw: &mut Draw) {
 		match self {
 			Runnable::Menu => {},
-			Runnable::OnlineMenu => {},
+			Runnable::OnlineMenu(_) => {},
 			Runnable::Local(local) => local.draw(app, draw),
 			Runnable::Client(client) => client.draw(app, draw),
 			Runnable::ServerConnector(server_connector) => server_connector.draw(app, draw),
