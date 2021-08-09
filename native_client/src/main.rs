@@ -88,7 +88,7 @@ fn main() {
 
 	thread::spawn(move || {
 		let mut runnable = match matches.subcommand_name() {
-			Some("menu") => Runnable::Menu,
+			Some("menu") => Runnable::OnlineMenu,
 			Some("connect") => {
 				let matches = matches.subcommand_matches("connect").unwrap();
 				let ip = matches.value_of("server-ip").unwrap();
