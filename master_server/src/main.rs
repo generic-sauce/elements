@@ -26,6 +26,7 @@ pub struct ClientInfo {
 	pub name: String,
 	pub state: ClientState,
 	pub last_request_counter: u32,
+	pub session_id: u32,
 }
 
 pub enum ClientState {
@@ -54,6 +55,12 @@ impl MasterServer {
 		}
 	}
 
+	fn alloc_session_id(&self) -> u32 {
+		let mut v: Vec<_> = self.clients.iter().map(|x| x.session_id).collect();
+		v.sort_unstable();
+		v.iter().zip(0u32..).find(|(old_sess, new_sess)| *old_sess != new_sess).unwrap().1
+	}
+
 	pub fn run(&mut self) {
 		println!("INFO: master server started. Listening on port {}", DEFAULT_MASTER_SERVER_PORT);
 		for _info in TimedLoop::with_fps(MASTER_SERVER_FPS) {
@@ -62,7 +69,7 @@ impl MasterServer {
 					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port }, peer) => {
 						self.apply_game_server_status_update(peer, domain_name, num_players, port);
 					}
-					PeerEvent::ReceivedPacket(MasterServerPacket::ClientRequest { name }, peer) => {
+					PeerEvent::ReceivedPacket(MasterServerPacket::LoginRequestPacket { name }, peer) => {
 						self.apply_client_request(peer, name);
 					}
 					PeerEvent::NewPeer(_) => {},
@@ -133,8 +140,9 @@ impl MasterServer {
 				client.state = ClientState::Ready;
 			}
 		} else {
-			println!("INFO: new client connected: {}", name);
-			self.clients.push(ClientInfo::new(peer, &name));
+			let sess_id = self.alloc_session_id();
+			println!("INFO: new client connected: {}#{}", name, sess_id);
+			self.clients.push(ClientInfo::new(peer, &name, sess_id));
 		}
 		self.check_game_start();
 	}
@@ -161,10 +169,11 @@ impl MasterServer {
 }
 
 impl ClientInfo {
-	fn new(peer: PeerHandle, name: &str) -> ClientInfo {
+	fn new(peer: PeerHandle, name: &str, session_id: u32) -> ClientInfo {
 		ClientInfo {
 			peer,
 			name: String::from(name),
+			session_id,
 			state: ClientState::Ready,
 			last_request_counter: 0,
 		}

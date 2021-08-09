@@ -26,7 +26,7 @@ impl<B: Backend> ServerConnector<B> {
 	pub fn tick(&mut self, _app: &mut App<B>) {
 		if !self.socket.is_open() { return; }
 		if !self.request_send_counter >= REQUEST_SEND_INTERVAL {
-			match self.socket.send(&MasterServerPacket::ClientRequest { name: self.player_name.clone() }) {
+			match self.socket.send(&MasterServerPacket::LoginRequestPacket { name: self.player_name.clone() }) {
 				Ok(()) => {},
 				Err(_e) => self.request_failed = true,
 			}

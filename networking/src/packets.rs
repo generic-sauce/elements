@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+// packages received by the master server
 #[derive(Serialize, Deserialize, Clone)]
 pub enum MasterServerPacket {
 	GameServerStatusUpdate {
@@ -7,14 +8,23 @@ pub enum MasterServerPacket {
 		num_players: u32,
 		port: u16
 	},
-	ClientRequest { name: String },
+	LoginRequestPacket { name: String }, // sent by a client to login to the master server; also used to rename yourself
+	// PlayerListRequestPacket, // TODO add
 }
 
 impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct NameAndSessionId {
+	name: String,
+	session_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub enum MasterClientPacket {
 	GameRedirection(String, u16),
+	LoginResponsePacket { session_id: u32 }, // master servers response to the LoginRequestPacket
+	PlayerListResponsePacket(Vec<NameAndSessionId>),
 }
 
 impl Packet for MasterClientPacket {}
@@ -23,7 +33,7 @@ impl Packet for MasterClientPacket {}
 
 #[derive(Clone)]
 pub enum NativeCSPacket<P: Packet> { // Native Client To Server Packet
-Payload(P),
+	Payload(P),
 	Heartbeat,
 }
 
