@@ -50,7 +50,6 @@ fn write(x: String) {
 }
 
 impl StorageBackend for NativeStorageBackend {
-	// this doesn't scale for large files, but for now thats fine.
 	fn set(&mut self, key: &str, value: &str) {
 		assert!(!key.contains(':'));
 		let s_in = read();
