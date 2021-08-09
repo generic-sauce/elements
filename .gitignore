@@ -33,6 +33,3 @@ identity.pfx
 
 # web
 /web_client/site/dist
-
-# our config
-elements.cfg
