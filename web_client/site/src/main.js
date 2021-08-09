@@ -45,6 +45,7 @@ window.onload = function() {
 		send_gamepad_update()
 		if (window.draw) {
 			render_mod.render(window.draw)
+			delete window.draw
 		}
 		send_gamepad_update()
 
