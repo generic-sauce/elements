@@ -62,7 +62,7 @@ impl<B: Backend> Menu<B> {
 		elements
 	}
 
-	pub fn online_menu() -> Menu<B> {
+	pub fn online_menu(storage_backend: &B::StorageBackend) -> Menu<B> {
 		let mut elements = Menu::main_menu_items(0);
 		elements.extend(vec![
 			MenuElement::new_label(
@@ -85,7 +85,7 @@ impl<B: Backend> Menu<B> {
 				"player_name",
 				CanvasVec::new(0.9 * ASPECT_RATIO, 0.95),
 				CanvasVec::new(0.15, 0.022),
-				"",
+				storage_backend.get("username").unwrap_or_else(String::new),
 				DEFAULT_BUTTON_COLOR,
 				"Your Name"
 			),

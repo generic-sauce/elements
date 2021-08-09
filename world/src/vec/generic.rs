@@ -200,6 +200,7 @@ pub trait FloorIfInt {
 	fn floor_if_int(arg: f64) -> f64;
 }
 
+
 impl FloorIfInt for i32 {
 	fn floor_if_int(arg: f64) -> f64 {
 		arg.floor()
@@ -268,5 +269,12 @@ impl<T: Primitive, P> Vec2t<T, P> {
 
 	pub fn mix(self, other: Vec2t<T, P>, self_weight: T, other_weight: T) -> Vec2t<T, P> {
 		self * self_weight + other * other_weight / (self_weight + other_weight)
+	}
+
+}
+
+impl<P> Vec2t<f32, P> {
+	pub fn trunc(self) -> Vec2t<f32, P> {
+		Vec2t::new(self.x.trunc(), self.y.trunc())
 	}
 }

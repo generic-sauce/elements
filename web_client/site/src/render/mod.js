@@ -23,7 +23,9 @@ export function init(texture_filenames) {
 export function render(draw) {
 	let clear = draw.clear_color
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
-	gl.clear(gl.COLOR_BUFFER_BIT)
+	// gl.clear(gl.COLOR_BUFFER_BIT)
+	
+	console.log("render")
 
 	triangles_mod.set_vertices(draw.vertex_data)
 
@@ -58,8 +60,6 @@ export function render(draw) {
 			break;
 		}
 	}
-
-	// text_mod.render(draw)
 }
 
 function update_canvas_size() {

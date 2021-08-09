@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+#[derive(Debug)]
 pub enum PeripheralsUpdate {
 	KeyPress(Key),
 	KeyRelease(Key),
@@ -7,7 +8,7 @@ pub enum PeripheralsUpdate {
 	MouseMove(SubPixelVec),
 }
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum Character {
 	Char(char),
 	Backspace,

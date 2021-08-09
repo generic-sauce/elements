@@ -32,11 +32,13 @@ fn client_main() {
 	let texture_filenames = JsValue::from_serde(&texture_filenames).unwrap();
 	js_init(texture_filenames);
 
-	let mut runnable = Runnable::Menu;
+	let mut runnable = Runnable::OnlineMenu;
 
 	let input_backend = WebInputBackend;
 	let graphics_backend = WebGraphicsBackend::new();
-	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, WebStorageBackend, runnable.build_menu());
+	let storage_backend = WebStorageBackend;
+	let menu = runnable.build_menu(&storage_backend);
+	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, storage_backend, menu);
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }
 

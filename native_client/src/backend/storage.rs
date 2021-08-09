@@ -3,7 +3,31 @@ use crate::prelude::*;
 use std::fs::File;
 use std::io::ErrorKind;
 
-pub struct NativeStorageBackend;
+pub struct NativeStorageBackend {
+	cache: HashMap<String, String>,
+}
+
+impl NativeStorageBackend {
+	pub fn new() -> NativeStorageBackend {
+		let mut cache = HashMap::new();
+		let s_in = read();
+
+		for x in s_in.split('\n') {
+			if x.is_empty() { continue; }
+
+			match &x.split(":").collect::<Vec<_>>()[..] {
+				&[k, v] => {
+					cache.insert(k.to_string(), v.to_string());
+				},
+				_ => panic!("hey")
+			}
+
+		}
+		NativeStorageBackend {
+			cache
+		}
+	}
+}
 
 static CONFIG_FILE: &'static str = "elements.cfg";
 
@@ -26,7 +50,6 @@ fn write(x: String) {
 }
 
 impl StorageBackend for NativeStorageBackend {
-	// this doesn't scale for large files, but for now thats fine.
 	fn set(&mut self, key: &str, value: &str) {
 		assert!(!key.contains(':'));
 		let s_in = read();
@@ -45,24 +68,13 @@ impl StorageBackend for NativeStorageBackend {
 		s_out.push(':');
 		s_out.push_str(value);
 
+		self.cache.insert(key.to_string(), value.to_string());
+
 		write(s_out);
 	}
 
 	fn get(&self, key: &str) -> Option<String> {
 		assert!(!key.contains(':'));
-
-		for x in read().split('\n') {
-			if x.is_empty() { continue; }
-
-			let vec: Vec<_> = x.split(':').collect();
-			assert!(vec.len() == 2);
-			let (k, v) = (vec[0], vec[1]);
-
-			if k == key {
-				return Some(v.to_string());
-			}
-		}
-
-		None
+		self.cache.get(key).map(|v| v.to_string())
 	}
 }

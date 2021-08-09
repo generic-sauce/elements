@@ -76,7 +76,7 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: &str, color: Color, template_text: &str) -> MenuElement<B> {
+	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: String, color: Color, template_text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
 			kind: MenuKind::EditField( EditField::new(text, template_text) ),
@@ -285,9 +285,9 @@ impl<B: Backend> MenuElement<B> {
 }
 
 impl EditField {
-	fn new(text: &str, template_text: &str) -> EditField {
+	fn new(text: String, template_text: &str) -> EditField {
 		EditField {
-			text: String::from(text),
+			text,
 			template_text: String::from(template_text),
 			selected: false,
 			cursor: 0,
