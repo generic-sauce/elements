@@ -32,7 +32,7 @@ fn client_main() {
 	let texture_filenames = JsValue::from_serde(&texture_filenames).unwrap();
 	js_init(texture_filenames);
 
-	let mut runnable = Runnable::OnlineMenu;
+	let mut runnable = Runnable::OnlineMenu(OnlineMenuState::new());
 
 	let input_backend = WebInputBackend;
 	let graphics_backend = WebGraphicsBackend::new();
