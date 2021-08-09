@@ -33,6 +33,7 @@ pub struct ClientInfo {
 	pub name: String,
 	pub state: ClientState,
 	pub last_request_counter: u32,
+	pub current_lobby_id: Option</*lobby_id: */ u32>,
 }
 
 pub enum ClientState {
@@ -82,8 +83,9 @@ impl MasterServer {
 					PeerEvent::ReceivedPacket(MasterServerPacket::LoginRequest(name), peer) => {
 						self.apply_login_request(peer, name);
 					}
-					PeerEvent::ReceivedPacket(MasterServerPacket::JoinLobby(lobby_id), peer) => {}//TODO
-					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => {}//TODO
+					PeerEvent::ReceivedPacket(MasterServerPacket::CreateLobby(lobby_name), peer) => unimplemented!(),
+					PeerEvent::ReceivedPacket(MasterServerPacket::JoinLobby(lobby_id), peer) => unimplemented!(),
+					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => unimplemented!(),
 					PeerEvent::ReceivedPacket(MasterServerPacket::LobbyListRequest, peer) => {
 						let v = self.lobbies.iter().map(| x | LobbyInfo {
 							lobby_id: x.lobby_id,
@@ -91,7 +93,7 @@ impl MasterServer {
 						}).collect();
 						self.peer_manager.send_to(peer, &MasterClientPacket::LobbyListResponse(v));
 					}
-					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => {}//TODO
+					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => unimplemented!(),
 
 					// other events
 					PeerEvent::NewPeer(_) => {},
@@ -197,6 +199,7 @@ impl ClientInfo {
 			name: String::from(name),
 			state: ClientState::Ready,
 			last_request_counter: 0,
+			current_lobby_id: None,
 		}
 	}
 }
