@@ -58,7 +58,10 @@ impl MasterServer {
 	fn alloc_lobby_id(&self) -> u32 {
 		let mut v: Vec<_> = self.lobbies.iter().map(|x| x.lobby_id).collect();
 		v.sort_unstable();
-		v.iter().zip(0u32..).find(|(old_id, new_id)| *old_id != new_id).unwrap().1
+		v.iter().zip(0u32..)
+			.find(|(old_id, new_id)| *old_id != new_id)
+			.map(|(_, new)| new)
+			.unwrap_or(v.len() as u32)
 	}
 
 	pub fn send_lobby_info(&mut self, lobby_id: u32) {
