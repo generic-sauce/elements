@@ -56,9 +56,9 @@ pub enum MenuKind<B: Backend> {
 }
 
 impl<B: Backend> MenuElement<B> {
-	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, image: Option<TextureId>, on_click: OnEvent<B>) -> MenuElement<B> {
+	pub fn new_button(name: String, position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, image: Option<TextureId>, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
-			name: String::new(),
+			name,
 			kind: MenuKind::Button(Button { text, on_click, font_size, image } ),
 			position,
 			size,
@@ -76,9 +76,9 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn new_label(position: CanvasVec, size: CanvasVec, font_size: f32, text: &str, align: TextAlign) -> MenuElement<B> {
+	pub fn new_label(name: String, position: CanvasVec, size: CanvasVec, font_size: f32, text: &str, align: TextAlign) -> MenuElement<B> {
 		MenuElement {
-			name: String::new(),
+			name,
 			kind: MenuKind::Label(Label {
 				text: text.to_string(),
 				align,
@@ -90,9 +90,9 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn new_image(position: CanvasVec, size: CanvasVec, texture_index: impl IntoTextureIndex) -> MenuElement<B> {
+	pub fn new_image(name: String, position: CanvasVec, size: CanvasVec, texture_index: impl IntoTextureIndex) -> MenuElement<B> {
 		MenuElement {
-			name: String::new(),
+			name,
 			kind: MenuKind::Image(Image {
 				texture_index: texture_index.into_texture_index(),
 			}),

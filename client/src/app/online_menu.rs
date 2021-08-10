@@ -26,7 +26,7 @@ impl<B: Backend> OnlineMenu<B> {
 	}
 
 	fn tick_username_field(app: &mut App<B>) {
-		let e = app.menu_cache.edit_field.get("player_name").unwrap();
+		let e = app.menu_cache.edit_field.get("onlinemenu_playername").unwrap();
 		if app.storage_backend.get("username").unwrap_or_else(String::new) != e.text {
 			app.storage_backend.set("username", &e.text);
 		}

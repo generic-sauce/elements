@@ -78,9 +78,10 @@ impl<B: Backend> Menu<B> {
 		}
 
 		if let Some(element) = self.get_selected_element(&app.menu_cache) {
-			let edit_field_cache = app.menu_cache.edit_field.get_mut(&element.name).unwrap(); // TODO: this will crash, if other elements can be selected
-			element.apply_text(&app.peripherals_state.text, edit_field_cache);
-			element.apply_key_events(&app.peripherals_state, edit_field_cache);
+			if let Some(edit_field_cache) = app.menu_cache.edit_field.get_mut(&element.name) {
+				element.apply_text(&app.peripherals_state.text, edit_field_cache);
+				element.apply_key_events(&app.peripherals_state, edit_field_cache);
+			}
 		}
 
 		for element in &mut self.elements {
