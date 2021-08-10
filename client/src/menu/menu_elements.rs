@@ -14,12 +14,10 @@ pub const DEFAULT_BUTTON_COLOR: Color = Color::rgb(0.08, 0.26, 0.42);
 pub const BUTTON_IMAGE_SIZE: CanvasVec = CanvasVec::new(0.04, 0.04);
 
 pub struct MenuElement<B: Backend> {
-	pub name: &'static str,
+	pub name: String,
 	pub kind: MenuKind<B>,
 	pub position: CanvasVec,
 	pub size: CanvasVec,
-	pub hovered: bool,
-	pub clicked: bool,
 	pub color: Color,
 }
 
@@ -31,13 +29,7 @@ pub struct Button<B: Backend> {
 }
 
 pub struct EditField {
-	pub text: String,
 	pub template_text: String,
-	pub selected: bool,
-	pub cursor: usize,
-	pub cursor_blink_counter: u32,
-	pub view_offset: usize,
-	pub view_limit: usize,
 	pub font_size: f32,
 }
 
@@ -66,31 +58,27 @@ pub enum MenuKind<B: Backend> {
 impl<B: Backend> MenuElement<B> {
 	pub fn new_button(position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, image: Option<TextureId>, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
-			name: "",
+			name: String::new(),
 			kind: MenuKind::Button(Button { text, on_click, font_size, image } ),
 			position,
 			size,
-			hovered: false,
-			clicked: false,
 			color,
 		}
 	}
 
-	pub fn new_edit_field(name: &'static str, position: CanvasVec, size: CanvasVec, text: String, color: Color, template_text: &str) -> MenuElement<B> {
+	pub fn new_edit_field(name: String, position: CanvasVec, size: CanvasVec, color: Color, template_text: &str) -> MenuElement<B> {
 		MenuElement {
 			name,
-			kind: MenuKind::EditField( EditField::new(text, template_text) ),
+			kind: MenuKind::EditField( EditField::new(template_text) ),
 			position,
 			size,
-			hovered: false,
-			clicked: false,
 			color,
 		}
 	}
 
 	pub fn new_label(position: CanvasVec, size: CanvasVec, font_size: f32, text: &str, align: TextAlign) -> MenuElement<B> {
 		MenuElement {
-			name: "",
+			name: String::new(),
 			kind: MenuKind::Label(Label {
 				text: text.to_string(),
 				align,
@@ -98,22 +86,18 @@ impl<B: Backend> MenuElement<B> {
 			}),
 			position,
 			size,
-			hovered: false,
-			clicked: false,
 			color: Color::WHITE
 		}
 	}
 
 	pub fn new_image(position: CanvasVec, size: CanvasVec, texture_index: impl IntoTextureIndex) -> MenuElement<B> {
 		MenuElement {
-			name: "",
+			name: String::new(),
 			kind: MenuKind::Image(Image {
 				texture_index: texture_index.into_texture_index(),
 			}),
 			position,
 			size,
-			hovered: false,
-			clicked: false,
 			color: Color::WHITE
 		}
 	}
@@ -123,17 +107,20 @@ impl<B: Backend> MenuElement<B> {
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
 	}
 
-	pub fn tick(&mut self, graphics_backend: &impl GraphicsBackend) {
-		if let MenuKind::EditField (edit_field) = &mut self.kind {
-			edit_field.cursor_blink_counter = (edit_field.cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
+	pub fn tick(&mut self, graphics_backend: &impl GraphicsBackend, menu_cache: &mut MenuCache) {
+		if let Some(edit_field_cache) = menu_cache.edit_field.get_mut(&self.name) {
+			edit_field_cache.cursor_blink_counter = (edit_field_cache.cursor_blink_counter + 1) % EDIT_FIELD_CURSOR_BLINK_INTERVAL;
 
 			// view offset
-			edit_field.adapt_view(graphics_backend, self.size);
+			if let MenuKind::EditField(edit_field) = &mut self.kind {
+				edit_field.adapt_view(graphics_backend, self.size, edit_field_cache);
+			}
 		}
 	}
 
-	pub fn draw(&mut self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend) {
-		let color = if self.clicked {
+	pub fn draw(&self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend, menu_cache: &MenuCache) {
+		let clicked = Some(&self.name) == menu_cache.clicked_element.as_ref();
+		let color = if clicked {
 			self.color * 2.0
 		} else if self.is_colliding(cursor_pos) {
 			self.color * 1.5
@@ -145,7 +132,8 @@ impl<B: Backend> MenuElement<B> {
 				self.draw_button(draw, button, color, graphics_backend)
 			},
 			MenuKind::EditField (edit_field) => {
-				self.draw_edit_field(draw, edit_field, color, graphics_backend)
+				let edit_field_cache = menu_cache.edit_field.get(&self.name).unwrap();
+				self.draw_edit_field(draw, edit_field, edit_field_cache, menu_cache, color, graphics_backend)
 			},
 			MenuKind::Label(label) => {
 				self.draw_label(draw, label, color, graphics_backend)
@@ -175,8 +163,10 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, color: Color, graphics_backend: &impl GraphicsBackend) {
-		let EditField { cursor_blink_counter, cursor, selected, view_offset, template_text, font_size, .. } = edit_field;
+	fn draw_edit_field(&self, draw: &mut Draw, edit_field: &EditField, edit_field_cache: &EditFieldCache, menu_cache: &MenuCache, color: Color, graphics_backend: &impl GraphicsBackend) {
+		let EditField { template_text, font_size, .. } = edit_field;
+		let EditFieldCache { cursor_blink_counter, cursor, view_offset, .. } = edit_field_cache;
+		let selected = Some(&self.name) == menu_cache.selected_element.as_ref();
 		draw.rectangle(self.position - self.size, self.position + self.size, color);
 		draw.rectangle(
 			self.position - self.size + EDIT_FIELD_BORDER_WIDTH,
@@ -184,7 +174,7 @@ impl<B: Backend> MenuElement<B> {
 			Color::rgb(0.0, 0.03, 0.15),
 		);
 
-		let text = edit_field.get_render_text();
+		let text = edit_field.get_render_text(edit_field_cache);
 
 		let text_size = if !text.is_empty() {
 			graphics_backend.get_text_size(text, *font_size)
@@ -197,14 +187,14 @@ impl<B: Backend> MenuElement<B> {
 			center_position(self.position.y - self.size.y, self.position.y + self.size.y, text_size.y)
 		);
 
-		if edit_field.text.is_empty() {
+		if edit_field_cache.text.is_empty() {
 			draw.text(text_pos, *font_size, Color::gray(0.04), &template_text);
 		} else {
 			draw.text(text_pos, *font_size, Color::WHITE, text);
 		}
 
 		// draw cursor
-		if *selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
+		if selected && *cursor_blink_counter < EDIT_FIELD_CURSOR_BLINK_INTERVAL / 2 {
 			let subtext = &text[0..get_byte_pos(text, *cursor - view_offset)];
 			let text_width = graphics_backend.get_text_size(subtext, *font_size).x;
 			let left_bot = CanvasVec::new(
@@ -242,117 +232,109 @@ impl<B: Backend> MenuElement<B> {
 		draw.texture(left_bot, right_top, texture_index, Flip::Normal, Some(color));
 	}
 
-	pub fn apply_text(&mut self, event_text: &[Character]) {
-		if let MenuKind::EditField ( EditField { text, cursor, cursor_blink_counter, .. } ) = &mut self.kind {
-			for character in event_text {
-				match character {
-					Character::Char(c) => {
-						text.insert(get_byte_pos(text, *cursor), *c);
-						*cursor += 1;
-						*cursor_blink_counter = 0;
-					},
-					Character::Backspace => {
-						if *cursor != 0 {
-							text.drain(get_byte_pos(text, *cursor - 1)..get_byte_pos(text, *cursor));
-							*cursor = (*cursor - 1).max(0);
-						}
-						*cursor_blink_counter = 0;
-					},
-					Character::Delete => {
-						if *cursor < text.chars().count() {
-							text.drain(get_byte_pos(text, *cursor)..get_byte_pos(text, *cursor + 1));
-						}
-						*cursor_blink_counter = 0;
-					},
-					_ => {},
-				}
+	pub fn apply_text(&mut self, event_text: &[Character], edit_field: &mut EditFieldCache) {
+		let EditFieldCache { text, cursor, cursor_blink_counter, .. } = edit_field;
+		for character in event_text {
+			match character {
+				Character::Char(c) => {
+					text.insert(get_byte_pos(text, *cursor), *c);
+					*cursor += 1;
+					*cursor_blink_counter = 0;
+				},
+				Character::Backspace => {
+					if *cursor != 0 {
+						text.drain(get_byte_pos(text, *cursor - 1)..get_byte_pos(text, *cursor));
+						*cursor = (*cursor - 1).max(0);
+					}
+					*cursor_blink_counter = 0;
+				},
+				Character::Delete => {
+					if *cursor < text.chars().count() {
+						text.drain(get_byte_pos(text, *cursor)..get_byte_pos(text, *cursor + 1));
+					}
+					*cursor_blink_counter = 0;
+				},
+				_ => {},
 			}
 		}
 	}
 
-	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState) {
-		if let MenuKind::EditField( EditField{ cursor, text, cursor_blink_counter, .. } ) = &mut self.kind {
-			if peripherals_state.key_firing(Key::Left) {
-				*cursor = cursor.checked_sub(1).unwrap_or(0);
-				*cursor_blink_counter = 0;
-			}
-			if peripherals_state.key_firing(Key::Right) {
-				*cursor = (*cursor + 1).min(text.len());
-				*cursor_blink_counter = 0;
-			}
+	pub fn apply_key_events(&mut self, peripherals_state: &PeripheralsState, edit_field: &mut EditFieldCache) {
+		let EditFieldCache { cursor, text, cursor_blink_counter, .. } = edit_field;
+		if peripherals_state.key_firing(Key::Left) {
+			*cursor = cursor.checked_sub(1).unwrap_or(0);
+			*cursor_blink_counter = 0;
+		}
+		if peripherals_state.key_firing(Key::Right) {
+			*cursor = (*cursor + 1).min(text.len());
+			*cursor_blink_counter = 0;
 		}
 	}
 }
 
 impl EditField {
-	fn new(text: String, template_text: &str) -> EditField {
+	fn new(template_text: &str) -> EditField {
 		EditField {
-			text,
 			template_text: String::from(template_text),
-			selected: false,
-			cursor: 0,
-			cursor_blink_counter: 0,
-			view_offset: 0,
-			view_limit: 0,
 			font_size: EDIT_FIELD_TEXT_SIZE,
 		}
 	}
 
-	fn adapt_view(&mut self, graphics_backend: &impl GraphicsBackend, size: CanvasVec) {
+	fn adapt_view(&self, graphics_backend: &impl GraphicsBackend, size: CanvasVec, edit_field: &mut EditFieldCache) {
 		let allowed_width = size.x * 2.0 - EDIT_FIELD_BORDER_WIDTH * 2.0;
 
 		// if text is not right aligned -> decrease view offset
-		while graphics_backend.get_text_size(self.get_text_post_view_offset(), self.font_size).x <= allowed_width - 0.03 {
-			if self.view_offset == 0 {
+		while graphics_backend.get_text_size(self.get_text_post_view_offset(edit_field), self.font_size).x <= allowed_width - 0.03 {
+			if edit_field.view_offset == 0 {
 				break;
 			}
-			self.view_offset -= 1;
+			edit_field.view_offset -= 1;
 		}
 
 		// test if cursor is left out of view range
 		// -> decrease view offset
-		if self.cursor < self.view_offset {
-			self.view_offset = self.cursor;
+		if edit_field.cursor < edit_field.view_offset {
+			edit_field.view_offset = edit_field.cursor;
 		} else {
 			// test if cursor is right out of view range
 			// -> increase view offset
-			while self.get_cursor_render_offset(graphics_backend) > allowed_width {
-				self.view_offset += 1;
+			while self.get_cursor_render_offset(edit_field, graphics_backend) > allowed_width {
+				edit_field.view_offset += 1;
 			}
 		}
 
 
 		// view limit
-		self.view_limit = self.view_limit.min(self.text.len());
-		while graphics_backend.get_text_size(self.get_render_text(), self.font_size).x <= allowed_width {
-			if self.view_limit == self.text.len() {
+		edit_field.view_limit = edit_field.view_limit.min(edit_field.text.len());
+		while graphics_backend.get_text_size(self.get_render_text(edit_field), self.font_size).x <= allowed_width {
+			if edit_field.view_limit == edit_field.text.len() {
 				break;
 			}
-			self.view_limit += 1;
+			edit_field.view_limit += 1;
 		}
-		while graphics_backend.get_text_size(self.get_render_text(), self.font_size).x > allowed_width {
-			if self.view_limit == 0 {
+		while graphics_backend.get_text_size(self.get_render_text(edit_field), self.font_size).x > allowed_width {
+			if edit_field.view_limit == 0 {
 				break;
 			}
-			self.view_limit -= 1;
+			edit_field.view_limit -= 1;
 		}
 	}
 
-	fn get_render_text(&self) -> &str {
-		&self.text[get_byte_pos(&self.text, self.view_offset)..get_byte_pos(&self.text, self.view_limit)]
+	fn get_render_text<'a>(&self, edit_field: &'a EditFieldCache) -> &'a str {
+		&edit_field.text[get_byte_pos(&edit_field.text, edit_field.view_offset)..get_byte_pos(&edit_field.text, edit_field.view_limit)]
 	}
 
-	fn get_cursor_render_offset(&self, graphics_backend: &impl GraphicsBackend) -> f32 {
-		graphics_backend.get_text_size(self.get_pre_cursor_text(), self.font_size).x
+	fn get_cursor_render_offset(&self, edit_field_cache: &EditFieldCache, graphics_backend: &impl GraphicsBackend) -> f32 {
+		graphics_backend.get_text_size(self.get_pre_cursor_text(edit_field_cache), self.font_size).x
 	}
 
 	// text after view offset but before cursor
-	fn get_pre_cursor_text(&self) -> &str {
-		&self.text[get_byte_pos(&self.text, self.view_offset)..get_byte_pos(&self.text, self.cursor)]
+	fn get_pre_cursor_text<'a>(&self, edit_field_cache: &'a EditFieldCache) -> &'a str {
+		&edit_field_cache.text[get_byte_pos(&edit_field_cache.text, edit_field_cache.view_offset)..get_byte_pos(&edit_field_cache.text, edit_field_cache.cursor)]
 	}
 
-	fn get_text_post_view_offset(&self) -> &str {
-		&self.text[get_byte_pos(&self.text, self.view_offset)..]
+	fn get_text_post_view_offset<'a>(&self, edit_field: &'a EditFieldCache) -> &'a str {
+		&edit_field.text[get_byte_pos(&edit_field.text, edit_field.view_offset)..]
 	}
 }
 

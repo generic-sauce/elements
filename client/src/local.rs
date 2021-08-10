@@ -10,6 +10,7 @@ pub enum LocalMode<B: Backend> {
 
 pub struct Local<B: Backend> {
 	pub mode: LocalMode<B>,
+	pub active: bool,
 }
 
 impl<B: Backend> Local<B> {
@@ -18,7 +19,8 @@ impl<B: Backend> Local<B> {
 			mode: LocalMode::LoadingTileMap {
 				loader: B::TileMapLoaderBackend::new(DEFAULT_TILEMAP),
 				best_of_n
-			}
+			},
+			active: false, // TODO set
 		}
 	}
 
@@ -30,7 +32,7 @@ impl<B: Backend> Local<B> {
 				}
 			},
 			LocalMode::InGame(world) => {
-				if !app.menu.kind.is_active() {
+				if !self.active {
 					for (i, player) in world.players.iter_mut().enumerate() {
 						player.input.update_gamepad(&app.input_backend.gamepad(i as u32));
 					}

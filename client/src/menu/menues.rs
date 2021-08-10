@@ -8,7 +8,6 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements: Vec::new(),
 			background: None,
-			kind: MenuMode::Normal,
 		}
 	}
 
@@ -62,7 +61,7 @@ impl<B: Backend> Menu<B> {
 		elements
 	}
 
-	pub fn online_menu(storage_backend: &B::StorageBackend) -> Menu<B> {
+	pub fn online_menu() -> Menu<B> {
 		let mut elements = Menu::main_menu_items(0);
 		elements.extend(vec![
 			MenuElement::new_label(
@@ -82,10 +81,9 @@ impl<B: Backend> Menu<B> {
 				Box::new(create_server_connector)
 			),
 			MenuElement::new_edit_field(
-				"player_name",
+				"player_name".to_string(),
 				CanvasVec::new(0.9 * ASPECT_RATIO, 0.95),
 				CanvasVec::new(0.15, 0.022),
-				storage_backend.get("username").unwrap_or_else(String::new),
 				DEFAULT_BUTTON_COLOR,
 				"Your Name"
 			),
@@ -97,10 +95,10 @@ impl<B: Backend> Menu<B> {
 				TextAlign::Center,
 			),
 		]);
+
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
-			kind: MenuMode::Normal,
 		}
 	}
 
@@ -134,7 +132,6 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
-			kind: MenuMode::Normal,
 		}
 	}
 
@@ -178,7 +175,6 @@ impl<B: Backend> Menu<B> {
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
-			kind: MenuMode::Normal,
 		}
 	}
 
@@ -203,7 +199,6 @@ impl<B: Backend> Menu<B> {
 				),
 			),
 			background: Some(TextureId::SkyBackground),
-			kind: MenuMode::Normal,
 		}
 	}
 
@@ -237,7 +232,6 @@ impl<B: Backend> Menu<B> {
 				),
 			),
 			background: None,
-			kind: MenuMode::InGame { active: false },
 		}
 	}
 }

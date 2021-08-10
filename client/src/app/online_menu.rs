@@ -26,14 +26,9 @@ impl<B: Backend> OnlineMenu<B> {
 	}
 
 	fn tick_username_field(app: &mut App<B>) {
-		let player_name_edit_field = app.menu.get_element_by_name("player_name").unwrap();
-		match &player_name_edit_field.kind {
-			MenuKind::EditField(edit_field) => {
-				if app.storage_backend.get("username").unwrap_or_else(String::new) != edit_field.text {
-					app.storage_backend.set("username", &edit_field.text);
-				}
-			},
-			_ => panic!("player_name menu element should be edit field")
+		let e = app.menu_cache.edit_field.get("player_name").unwrap();
+		if app.storage_backend.get("username").unwrap_or_else(String::new) != e.text {
+			app.storage_backend.set("username", &e.text);
 		}
 	}
 }

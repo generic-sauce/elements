@@ -22,6 +22,7 @@ pub enum ClientMode {
 pub struct Client<B: Backend> {
 	pub socket: B::SocketBackend,
 	pub mode: ClientMode,
+	pub active: bool,
 }
 
 impl<B: Backend> Client<B> {
@@ -29,6 +30,7 @@ impl<B: Backend> Client<B> {
 		Client {
 			socket: B::SocketBackend::new(server_ip, port),
 			mode: ClientMode::Lobby,
+			active: false, // TODO actually set this thing to true sometimes
 		}
 	}
 
@@ -60,7 +62,7 @@ impl<B: Backend> Client<B> {
 				}
 
 				// handle inputs
-				if !app.menu.kind.is_active() {
+				if !self.active {
 					world.players[*player_id].input.update_gamepad(&app.input_backend.gamepad(0));
 					world.players[*player_id].input.update_peripherals(&app.peripherals_state);
 				} else {

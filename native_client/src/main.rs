@@ -109,8 +109,7 @@ fn main() {
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend::new(draw_sender);
 		let storage_backend = NativeStorageBackend::new();
-		let menu = runnable.build_menu(&storage_backend);
-		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, menu, DEFAULT_MASTER_HOSTNAME);
+		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, DEFAULT_MASTER_HOSTNAME);
 		if matches!(runnable, Runnable::OnlineMenu(_)) {
 			app.master_socket.send(&MasterServerPacket::LobbyListRequest).expect("Could not send lobby list request");
 		}

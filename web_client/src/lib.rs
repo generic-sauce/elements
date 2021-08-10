@@ -39,8 +39,7 @@ fn client_main() {
 	let input_backend = WebInputBackend;
 	let graphics_backend = WebGraphicsBackend::new();
 	let storage_backend = WebStorageBackend;
-	let menu = runnable.build_menu(&storage_backend);
-	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, storage_backend, menu, DEFAULT_MASTER_HOSTNAME);
+	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, storage_backend, DEFAULT_MASTER_HOSTNAME);
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }
 
