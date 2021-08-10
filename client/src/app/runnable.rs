@@ -12,7 +12,7 @@ pub enum Runnable<B: Backend> { // the model (w.r.t. MVC) of our app
 impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&mut self, app: &mut App<B>) -> (Menu<B>, Option<OnEvent<B>>) {
 		let mut menu = match self {
-			Runnable::OnlineMenu(_) => Menu::online_menu(),
+			Runnable::OnlineMenu(online_menu) => Menu::online_menu(&online_menu.lobbies),
 			Runnable::LocalMenu => Menu::local_menu(),
 			Runnable::TutorialMenu => Menu::tutorial_menu(),
 			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),

@@ -17,10 +17,18 @@ impl<B: Backend> OnlineMenu<B> {
 	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) {
 		OnlineMenu::tick_username_field(app);
 
+		self.lobbies = vec![
+			ShortLobbyInfo { lobby_id: 0, name: "my first lobby".to_string() },
+			ShortLobbyInfo { lobby_id: 0, name: "lobby of doggy".to_string() },
+			ShortLobbyInfo { lobby_id: 0, name: "best lobby".to_string() },
+			ShortLobbyInfo { lobby_id: 0, name: "very long lobby name, probably will break".to_string() },
+		];
+
 		for p in packets {
 			match p {
-				MasterClientPacket::LobbyListResponse(lobby_infos) => { self.lobbies = lobby_infos; }
-				_ => eprintln!("WARN: Got invalid packet from master server"),
+				MasterClientPacket::LobbyListResponse(lobby_infos) => { self.lobbies = lobby_infos; },
+				MasterClientPacket::LobbyInfoUpdate(lobby_info) => { unimplemented!() }, // TODO
+				_ => eprintln!("WARN: Got invalid packet from master server: {:?}", p),
 			}
 		}
 	}

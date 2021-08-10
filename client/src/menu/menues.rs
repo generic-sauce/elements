@@ -17,7 +17,7 @@ impl<B: Backend> Menu<B> {
 				"main_online_button".to_string(),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - MENU_BUTTONS_HEIGHT),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
-				"Online",
+				"Online".to_string(),
 				Color::hex("153962"),
 				MAIN_BUTTON_FONT_SIZE,
 				Some(TextureId::Globe),
@@ -27,7 +27,7 @@ impl<B: Backend> Menu<B> {
 				"main_local_button".to_string(),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 3.0)),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
-				"Local",
+				"Local".to_string(),
 				Color::hex("153962"),
 				MAIN_BUTTON_FONT_SIZE,
 				Some(TextureId::Gamepad),
@@ -37,7 +37,7 @@ impl<B: Backend> Menu<B> {
 				"main_tutorial_button".to_string(),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, 1.0 - (MENU_BUTTONS_HEIGHT * 5.0)),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
-				"Tutorial",
+				"Tutorial".to_string(),
 				Color::hex("153962"),
 				MAIN_BUTTON_FONT_SIZE,
 				Some(TextureId::Icon),
@@ -47,7 +47,7 @@ impl<B: Backend> Menu<B> {
 				"main_quit_button".to_string(),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
 				CanvasVec::new(MENU_BUTTONS_WIDTH, MENU_BUTTONS_HEIGHT),
-				"Quit",
+				"Quit".to_string(),
 				Color::hex("0c2542"),
 				NORMAL_BUTTON_FONT_SIZE,
 				None,
@@ -66,7 +66,7 @@ impl<B: Backend> Menu<B> {
 		elements
 	}
 
-	pub fn online_menu() -> Menu<B> {
+	pub fn online_menu(lobbies: &Vec<ShortLobbyInfo>) -> Menu<B> {
 		let mut elements = Menu::main_menu_items(0);
 		elements.extend(vec![
 			MenuElement::new_label(
@@ -77,6 +77,7 @@ impl<B: Backend> Menu<B> {
 				"Online",
 				TextAlign::Center,
 			),
+			/*
 			MenuElement::new_button(
 				"onlinemenu_play_button".to_string(),
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
@@ -87,6 +88,7 @@ impl<B: Backend> Menu<B> {
 				None,
 				Box::new(create_server_connector)
 			),
+			 */
 			MenuElement::new_edit_field(
 				"onlinemenu_playername".to_string(),
 				CanvasVec::new(0.9 * ASPECT_RATIO, 0.95),
@@ -94,6 +96,7 @@ impl<B: Backend> Menu<B> {
 				DEFAULT_BUTTON_COLOR,
 				"Your Name"
 			),
+			/*
 			MenuElement::new_label(
 				"onlinemenu_description".to_string(),
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.2),
@@ -102,7 +105,25 @@ impl<B: Backend> Menu<B> {
 				"Play online against other players. You need an internet connection for this :D",
 				TextAlign::Center,
 			),
+			 */
 		]);
+
+		for (i, lobby) in lobbies.iter().enumerate() {
+			let lobby_id = lobby.lobby_id;
+			let element = MenuElement::new_button(
+				format!("onlinemenu_lobby{}", i),
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.7-(i as f32)*0.08),
+				CanvasVec::new(0.25, 0.035),
+				lobby.name.clone(),
+				Color::hex("006699"),
+				LOBBY_BUTTON_FONT_SIZE,
+				None,
+				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
+					app.master_socket.send(&MasterServerPacket::JoinLobby(lobby_id)).unwrap();
+				} ),
+			);
+			elements.push(element);
+		}
 
 		Menu {
 			elements,
@@ -125,7 +146,7 @@ impl<B: Backend> Menu<B> {
 				"localmenu_play_button".to_string(),
 				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.15, 0.05),
-				"Play",
+				"Play".to_string(),
 				Color::hex("2f6f10"),
 				GO_BUTTON_FONT_SIZE,
 				None,
@@ -213,7 +234,7 @@ impl<B: Backend> Menu<B> {
 					"ingame_resume_button".to_string(),
 					CanvasVec::new(0.5 * ASPECT_RATIO, 0.6),
 					CanvasVec::new(0.15, 0.05),
-					"Resume",
+					"Resume".to_string(),
 					Color::hex("2f6f10"),
 					GO_BUTTON_FONT_SIZE,
 					None,
@@ -223,7 +244,7 @@ impl<B: Backend> Menu<B> {
 					"ingame_quit_button".to_string(),
 					CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
 					CanvasVec::new(0.15, 0.05),
-					"Quit",
+					"Quit".to_string(),
 					Color::hex("b52f1c"),
 					GO_BUTTON_FONT_SIZE,
 					None,
