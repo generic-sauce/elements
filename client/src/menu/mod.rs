@@ -91,7 +91,7 @@ impl<B: Backend> Menu<B> {
 		opt_on_click
 	}
 
-	pub fn init_cache(&self, menu_cache: &mut MenuCache, storage_backend: &B::StorageBackend) {
+	pub fn init_cache(&self, menu_cache: &mut MenuCache) {
 		for element in &self.elements {
 			if element.name.is_empty() {
 				panic!("ERROR: menu element with empty name!");
@@ -100,7 +100,7 @@ impl<B: Backend> Menu<B> {
 				MenuKind::EditField(_) => {
 					if !menu_cache.edit_field.contains_key(&element.name) {
 						menu_cache.edit_field.insert(element.name.clone(), EditFieldCache {
-							text: storage_backend.get("username").unwrap_or_else(String::new),
+							text: String::new(),
 							cursor: 0,
 							cursor_blink_counter: 0,
 							view_offset: 0,
