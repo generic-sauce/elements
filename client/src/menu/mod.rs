@@ -21,6 +21,7 @@ pub struct MenuCache {
 	pub selected_element: Option<String>, // by name, edit field that is selected
 	pub hovered_element: Option<String>, // by name
 	pub edit_field: HashMap<String, EditFieldCache>,
+	pub list_view: HashMap<String, ListViewCache>
 }
 
 impl MenuCache {
@@ -30,6 +31,7 @@ impl MenuCache {
 			selected_element: None,
 			hovered_element: None,
 			edit_field: HashMap::new(),
+			list_view: HashMap::new(),
 		}
 	}
 }
@@ -40,6 +42,10 @@ pub struct EditFieldCache {
 	pub cursor_blink_counter: u32,
 	pub view_offset: usize,
 	pub view_limit: usize,
+}
+
+pub struct ListViewCache {
+	pub scroll_position: usize,
 }
 
 impl<B: Backend> Menu<B> {
@@ -59,7 +65,7 @@ impl<B: Backend> Menu<B> {
 		app.check_menu_active(runnable);
 		if !runnable.is_active() { return None; } // dont tick, if inactive
 
-		let hovered_element = self.elements.iter().filter(|e| !matches!(e.kind, MenuKind::Image(_)|MenuKind::Label(_)) ).find(|e| e.is_colliding(app.cursor_position));
+		let hovered_element = self.elements.iter().filter(|e| !matches!(e.kind, MenuKind::Image(_)|MenuKind::Label(_)|MenuKind::Panel) ).rfind(|e| e.is_colliding(app.cursor_position));
 		let opt_name = hovered_element.map(|x| x.name.clone());
 		app.menu_cache.hovered_element = opt_name.clone();
 
@@ -130,7 +136,7 @@ impl<B: Backend> App<B> {
 
 		// draw elements
 		for element in &menu.elements {
-			element.draw(draw, self.cursor_position, &self.graphics_backend, &self.menu_cache);
+			element.draw(draw, &self.graphics_backend, &self.menu_cache);
 		}
 
 		// draw cursor

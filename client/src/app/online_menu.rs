@@ -52,7 +52,7 @@ impl<B: Backend> OnlineMenu<B> {
 		}
 	}
 
-	pub fn build_menu(&self) -> Menu<B> {
+	pub fn build_menu(&self, menu_cache: &MenuCache) -> Menu<B> {
 		let lobbies = &self.lobbies[..];
 
 		let mut elements = Menu::main_menu_items(0);
@@ -106,11 +106,11 @@ impl<B: Backend> OnlineMenu<B> {
 			),
 			MenuElement::new_button(
 				"onlinemenu_refreshlobby".to_string(),
-				CanvasVec::new(0.2 * ASPECT_RATIO, 0.3),
-				CanvasVec::new(0.25, 0.05),
+				CanvasVec::new(0.23 * ASPECT_RATIO, 0.08),
+				CanvasVec::new(0.1 * ASPECT_RATIO, 0.03),
 				"Refresh".to_string(),
 				Color::hex("2f6f10"),
-				GO_BUTTON_FONT_SIZE,
+				LOBBY_BUTTON_FONT_SIZE,
 				None,
 				Box::new(move |_app: &mut App<B>, runnable: &mut Runnable<B>| {
 					if let Runnable::OnlineMenu(online_menu) = runnable {
@@ -131,27 +131,34 @@ impl<B: Backend> OnlineMenu<B> {
 			 */
 		]);
 
-		for (i, lobby) in lobbies.iter().enumerate() {
+		// create lobby list view
+		let mut content = Vec::new();
+		let mut events: Vec<OnEvent<B>> = Vec::new();
+		for lobby in lobbies {
+			content.push(vec![lobby.name.clone(), format!("{}", lobby.lobby_id)]);
+
 			let lobby_id = lobby.lobby_id;
-			let element = MenuElement::new_button(
-				format!("onlinemenu_lobby{}", i),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.7-(i as f32)*0.08),
-				CanvasVec::new(0.25, 0.035),
-				lobby.name.clone(),
-				Color::hex("006699"),
-				LOBBY_BUTTON_FONT_SIZE,
-				None,
-				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
-					app.master_socket.send(&MasterServerPacket::JoinLobby(lobby_id)).unwrap();
-				} ),
-			);
-			elements.push(element);
+			events.push(Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
+				app.master_socket.send(&MasterServerPacket::JoinLobby(lobby_id)).unwrap();
+			} ))
 		}
+
+		let lobby_list_view_elements = MenuElement::new_list_view_elements(
+			"onlinemenu_lobbies".to_string(),
+			CanvasVec::new(0.38 * ASPECT_RATIO, 0.45),
+			CanvasVec::new(0.25 * ASPECT_RATIO, 0.32),
+			vec![0.01*ASPECT_RATIO, 0.3*ASPECT_RATIO],
+			vec!["Lobby-Name".to_string(), "Lobby-Id".to_string()],
+			content,
+			events,
+			menu_cache,
+		);
+
+		elements.extend(lobby_list_view_elements);
 
 		Menu {
 			elements,
 			background: Some(TextureId::SkyBackground),
 		}
 	}
-
 }

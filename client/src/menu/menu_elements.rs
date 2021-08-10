@@ -13,6 +13,9 @@ pub const EXPLANATION_FONT_SIZE: f32 = 0.03;
 pub const SUBTITLE_FONT_SIZE: f32 = 0.05;
 pub const DEFAULT_BUTTON_COLOR: Color = Color::rgb(0.08, 0.26, 0.42);
 pub const BUTTON_IMAGE_SIZE: CanvasVec = CanvasVec::new(0.04, 0.04);
+pub const LIST_VIEW_HEADER_SIZE: f32 = 0.04;
+pub const LIST_VIEW_CONTENT_SIZE: f32 = 0.03;
+pub const LIST_VIEW_BUTTON_SIZE: f32 = 0.03;
 
 pub struct MenuElement<B: Backend> {
 	pub name: String,
@@ -49,11 +52,18 @@ pub struct Image {
 	pub texture_index: TextureIndex
 }
 
+pub struct ListView<B: Backend> {
+	pub header: Vec<String>,
+	pub content: Vec<Vec<String>>,
+	pub on_click_events: Vec<OnEvent<B>>,
+}
+
 pub enum MenuKind<B: Backend> {
 	Button(Button<B>),
 	EditField(EditField),
 	Label(Label),
 	Image(Image),
+	Panel,
 }
 
 impl<B: Backend> MenuElement<B> {
@@ -103,6 +113,149 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
+	pub fn new_panel(name: String, position: CanvasVec, size: CanvasVec, color: Color) -> MenuElement<B> {
+		MenuElement {
+			name,
+			kind: MenuKind::Panel,
+			position,
+			size,
+			color
+		}
+	}
+
+	pub fn new_list_view_elements(name: String, position: CanvasVec, size: CanvasVec, spacing: Vec<f32>, header: Vec<String>, content: Vec<Vec<String>>, on_click_events: Vec<OnEvent<B>>, menu_cache: &MenuCache) -> Vec<MenuElement<B>> {
+		let mut elements = vec![
+			MenuElement {
+				name: format!("{}:headerpanel", name),
+				kind: MenuKind::Panel,
+				position: CanvasVec::new(position.x, position.y + size.y - LIST_VIEW_HEADER_SIZE/2.0),
+				size: CanvasVec::new(size.x, LIST_VIEW_HEADER_SIZE),
+				color: Color::gray(0.2),
+			}
+		];
+
+		assert_eq!(spacing.len(), header.len());
+
+		// add header
+		for (i, space) in spacing.iter().enumerate() {
+			elements.push(
+				MenuElement {
+					name: format!("{}:header{}", name, i),
+					kind: MenuKind::Label(Label {
+						text: header[i].clone(),
+						align: TextAlign::Left,
+						font_size: LIST_VIEW_HEADER_SIZE,
+					}),
+					position: CanvasVec::new(position.x + space, position.y + size.y - LIST_VIEW_HEADER_SIZE/2.0),
+					size: CanvasVec::new(size.x, LIST_VIEW_HEADER_SIZE),
+					color: Color::WHITE
+				}
+			)
+		}
+
+		assert_eq!(on_click_events.len(), content.len());
+		let max_num_lines = ((size.y*2.0 - LIST_VIEW_HEADER_SIZE) / LIST_VIEW_CONTENT_SIZE) as usize;
+
+		let num_to_skip = menu_cache.list_view.get(&name).map(|lvc| lvc.scroll_position).unwrap_or(0) as usize;
+
+		for row_index in 0..max_num_lines {
+			let entry_index = row_index + num_to_skip;
+			if let Some(line) = content.get(entry_index) {
+				assert_eq!(line.len(), spacing.len());
+				for (column_index, space) in spacing.iter().enumerate() {
+					let content = line[column_index].clone();
+					elements.push(
+						MenuElement {
+							name: format!("{}:content{}_{}", name, entry_index, column_index),
+							kind: MenuKind::Label(Label {
+								text: content,
+								align: TextAlign::Left,
+								font_size: LIST_VIEW_CONTENT_SIZE,
+							}),
+							position: CanvasVec::new(position.x + space, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*(row_index+1) as f32),
+							size: CanvasVec::new(size.x, LIST_VIEW_CONTENT_SIZE),
+							color: Color::WHITE
+						}
+					);
+				}
+				elements.push(
+					MenuElement {
+						name: format!("{}:content_field{}", name, entry_index),
+						kind: MenuKind::Button(Button {
+							text: String::new(),
+							on_click: on_click_events[entry_index].clone(),
+							font_size: LIST_VIEW_CONTENT_SIZE,
+							image: None
+						}),
+						position: CanvasVec::new(position.x, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*(row_index+1) as f32),
+						size: CanvasVec::new(size.x, LIST_VIEW_CONTENT_SIZE/2.0),
+						color: Color::gray(0.3 + (entry_index%2) as f32*0.02),
+					}
+				)
+			} else {
+				elements.push(
+					MenuElement {
+						name: format!("{}:content_field_empty{}", name, entry_index),
+						kind: MenuKind::Button(Button {
+							text: String::new(),
+							on_click: Box::new(|_, _| {}),
+							font_size: LIST_VIEW_CONTENT_SIZE,
+							image: None
+						}),
+						position: CanvasVec::new(position.x, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*(row_index+1) as f32),
+						size: CanvasVec::new(size.x, LIST_VIEW_CONTENT_SIZE/2.0),
+						color: Color::gray(0.3 + (entry_index%2) as f32*0.02),
+					}
+				)
+			}
+		}
+
+		let name_copy = name.clone();
+		let content_len = content.len();
+
+		elements.push(
+			MenuElement {
+				name: format!("{}:down", name),
+				kind: MenuKind::Button(Button {
+					text: "v".to_string(),
+					on_click: Box::new(move |app: &mut App<B>, _| {
+						app.menu_cache.list_view.entry(name_copy.clone())
+							.or_insert(ListViewCache { scroll_position: 0 });
+
+						app.menu_cache.list_view.entry(name_copy.clone())
+							.and_modify(|lvc| lvc.scroll_position = (lvc.scroll_position+1).min(content_len.checked_sub(1).unwrap_or(0)));
+					}),
+					font_size: LIST_VIEW_HEADER_SIZE,
+					image: None
+				}),
+				position: CanvasVec::new(position.x + size.x - LIST_VIEW_BUTTON_SIZE, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*max_num_lines as f32 + LIST_VIEW_BUTTON_SIZE - LIST_VIEW_CONTENT_SIZE/2.0),
+				size: CanvasVec::new(LIST_VIEW_BUTTON_SIZE, LIST_VIEW_BUTTON_SIZE),
+				color: Color::gray(0.2),
+			}
+		);
+
+		elements.push(
+			MenuElement {
+				name: format!("{}:up", name),
+				kind: MenuKind::Button(Button {
+					text: "^".to_string(),
+					on_click: Box::new(move |app: &mut App<B>, _| {
+						app.menu_cache.list_view.entry(name.clone())
+							.and_modify(|lvc| lvc.scroll_position = lvc.scroll_position.checked_sub(1).unwrap_or(0))
+							.or_insert(ListViewCache { scroll_position: 0 });
+					}),
+					font_size: LIST_VIEW_HEADER_SIZE,
+					image: None
+				}),
+				position: CanvasVec::new(position.x + size.x - LIST_VIEW_BUTTON_SIZE, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*max_num_lines as f32 + LIST_VIEW_BUTTON_SIZE*3.0 - LIST_VIEW_CONTENT_SIZE/2.0),
+				size: CanvasVec::new(LIST_VIEW_BUTTON_SIZE, LIST_VIEW_BUTTON_SIZE),
+				color: Color::gray(0.2),
+			}
+		);
+
+		elements
+	}
+
 	pub fn is_colliding(&self, pos: CanvasVec) -> bool {
 		pos.x >= self.position.x - self.size.x && pos.x <= self.position.x + self.size.x &&
 		pos.y >= self.position.y - self.size.y && pos.y <= self.position.y + self.size.y
@@ -119,11 +272,12 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn draw(&self, draw: &mut Draw, cursor_pos: CanvasVec, graphics_backend: &impl GraphicsBackend, menu_cache: &MenuCache) {
+	pub fn draw(&self, draw: &mut Draw, graphics_backend: &impl GraphicsBackend, menu_cache: &MenuCache) {
 		let clicked = Some(&self.name) == menu_cache.clicked_element.as_ref();
+		let hovered = Some(&self.name) == menu_cache.hovered_element.as_ref();
 		let color = if clicked {
 			self.color * 2.0
-		} else if self.is_colliding(cursor_pos) {
+		} else if hovered {
 			self.color * 1.5
 		} else {
 			self.color
@@ -140,8 +294,11 @@ impl<B: Backend> MenuElement<B> {
 				self.draw_label(draw, label, color, graphics_backend)
 			},
 			MenuKind::Image(image) => {
-				self.draw_image(draw, image, color)
+				self.draw_image(draw, image)
 			},
+			MenuKind::Panel => {
+				self.draw_panel(draw, color)
+			}
 		}
 	}
 
@@ -225,12 +382,18 @@ impl<B: Backend> MenuElement<B> {
 		draw.text(text_pos, *font_size, color, text);
 	}
 
-	fn draw_image(&self, draw: &mut Draw, image: &Image, color: Color) {
+	fn draw_image(&self, draw: &mut Draw, image: &Image) {
 		let Image { texture_index } = *image;
 		let radius = self.size / 2.0;
 		let left_bot = self.position - radius;
 		let right_top = self.position + radius;
-		draw.texture(left_bot, right_top, texture_index, Flip::Normal, Some(color));
+		draw.texture(left_bot, right_top, texture_index, Flip::Normal, None);
+	}
+
+	fn draw_panel(&self, draw: &mut Draw, color: Color) {
+		let left_bot = self.position - self.size;
+		let right_top = self.position + self.size;
+		draw.rectangle(left_bot, right_top, color);
 	}
 
 	pub fn apply_text(&mut self, event_text: &[Character], edit_field: &mut EditFieldCache) {
