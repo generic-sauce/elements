@@ -1,3 +1,5 @@
+pub static DEFAULT_MASTER_SERVER_HOSTNAME: &str = "generic-sauce.de";
+
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use serde_derive::*;
 pub use bincode::{serialize, deserialize};

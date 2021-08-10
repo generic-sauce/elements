@@ -134,7 +134,7 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 	let mut packet_send_counter = 0;
 
 	let mut master_socket = domain_name.map(|d| {
-		let master_socket = NativeSocketBackend::new("generic-sauce.de", DEFAULT_MASTER_SERVER_PORT);
+		let master_socket = NativeSocketBackend::new(DEFAULT_MASTER_SERVER_HOSTNAME, DEFAULT_MASTER_SERVER_PORT);
 		(d, master_socket)
 	});
 
