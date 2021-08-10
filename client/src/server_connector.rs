@@ -33,7 +33,8 @@ impl<B: Backend> ServerConnector<B> {
 			self.request_send_counter = 0;
 		}
 		self.request_send_counter += 1;
-		if let Some(MasterClientPacket::GoToGameServer(game_ip, port)) = self.socket.tick() {
+		self.socket.tick();
+		if let Some(MasterClientPacket::GoToGameServer(game_ip, port)) = self.socket.recv() {
 			self.game_ip = Some((game_ip, port));
 		}
 	}

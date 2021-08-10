@@ -176,7 +176,10 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 
 		// master server networking
 		if let Some((domain_name, socket)) = &mut master_socket {
-			socket.tick::<()>();
+			socket.tick();
+			while let Some(_) = socket.recv::<()>() {
+				eprintln!("WARN: invalid packet from master server");
+			}
 
 			if packet_send_counter == 0 {
 				update_master_server(socket, cnt as u32, port, domain_name);

@@ -10,6 +10,8 @@ mod prelude;
 
 use crate::prelude::*;
 
+const DEFAULT_MASTER_HOSTNAME: &str = "generic-sauce.de";
+
 fn main_loop(mut f: impl FnMut(), fps: u32) {
 	TimedLoop::with_fps(fps)
 		.for_each(move |_| f());
@@ -88,7 +90,7 @@ fn main() {
 
 	thread::spawn(move || {
 		let mut runnable = match matches.subcommand_name() {
-			Some("menu") => Runnable::OnlineMenu(OnlineMenuState::new()),
+			Some("menu") => Runnable::OnlineMenu(OnlineMenu::new()),
 			Some("connect") => {
 				let matches = matches.subcommand_matches("connect").unwrap();
 				let ip = matches.value_of("server-ip").unwrap();
@@ -108,7 +110,7 @@ fn main() {
 		let graphics_backend = NativeGraphicsBackend::new(draw_sender);
 		let storage_backend = NativeStorageBackend::new();
 		let menu = runnable.build_menu(&storage_backend);
-		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, menu);
+		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, menu, DEFAULT_MASTER_HOSTNAME);
 		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});
 

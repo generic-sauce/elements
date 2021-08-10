@@ -36,7 +36,8 @@ impl<B: Backend> Client<B> {
 		match &mut self.mode {
 			ClientMode::Lobby => {
 				if !self.socket.is_open() { return; }
-				match self.socket.tick() {
+				self.socket.tick();
+				match self.socket.recv() {
 					Some(GameSCPacket::Go { your_player_id, tilemap_image}) => {
 						self.mode = ClientMode::InGame {
 							player_id: your_player_id,
@@ -49,10 +50,13 @@ impl<B: Backend> Client<B> {
 			},
 			ClientMode::InGame { player_id, world } => {
 				// receive packets
-				match self.socket.tick() {
-					Some(GameSCPacket::WorldUpdate(update)) => apply_update_within_app(world, update, app),
-					Some(_) => println!("received non-WorldUpdate packet while in ClientMode::InGame"),
-					None => {},
+				self.socket.tick();
+				loop {
+					match self.socket.recv() {
+						Some(GameSCPacket::WorldUpdate(update)) => apply_update_within_app(world, update, app),
+						Some(_) => println!("received non-WorldUpdate packet while in ClientMode::InGame"),
+						None => break,
+					}
 				}
 
 				// handle inputs

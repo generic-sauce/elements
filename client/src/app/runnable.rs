@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub enum Runnable<B: Backend> {
 	Menu, // TODO: extract all menues later
-	OnlineMenu(OnlineMenuState),
+	OnlineMenu(OnlineMenu<B>),
 	Local(Local<B>),
 	Client(Client<B>),
 	ServerConnector(ServerConnector<B>),
@@ -19,19 +19,13 @@ impl<B: Backend> Runnable<B> {
 	}
 
 	pub fn tick(&mut self, app: &mut App<B>) {
+		let mut packets = Vec::new();
+		while let Some(p) = app.master_socket.recv() {
+			packets.push(p);
+		}
 		match self {
 			Runnable::Menu => {},
-			Runnable::OnlineMenu(_) => {
-				let player_name_edit_field = app.menu.get_element_by_name("player_name").unwrap();
-				match &player_name_edit_field.kind {
-					MenuKind::EditField(edit_field) => {
-						if app.storage_backend.get("username").unwrap_or_else(String::new) != edit_field.text {
-							app.storage_backend.set("username", &edit_field.text);
-						}
-					},
-					_ => panic!("player_name menu element should be edit field")
-				}
-			},
+			Runnable::OnlineMenu(online_menu) => online_menu.tick(app, packets),
 			Runnable::Local(local) => local.tick(app),
 			Runnable::Client(client) => client.tick(app),
 			Runnable::ServerConnector(server_connector) => server_connector.tick(app),

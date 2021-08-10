@@ -28,12 +28,14 @@ impl SocketBackend for NativeSocketBackend {
 		send_packet(&mut self.socket, &NativeCSPacket::Payload(packet.clone())) // TODO: maybe fix this clone, see https://serde.rs/lifetimes.html
 	}
 
-	fn tick<P: Packet>(&mut self) -> Option<P> {
+	fn tick(&mut self) {
 		if self.last_sent_time.elapsed().as_secs() >= HEARTBEAT_TIME_SECS as u64 {
 			self.last_sent_time = Instant::now();
 			send_packet(&mut self.socket, &NativeCSPacket::<()>::Heartbeat).unwrap();
 		}
+	}
 
+	fn recv<P: Packet>(&mut self) -> Option<P> {
 		recv_packet::<P>(&mut self.socket)
 			.map(|(x, _)| x)
 	}

@@ -4,8 +4,8 @@ pub use runnable::*;
 mod event_handler;
 pub use event_handler::*;
 
-mod online_menu_state;
-pub use online_menu_state::*;
+mod online_menu;
+pub use online_menu::*;
 
 use crate::prelude::*;
 
@@ -24,12 +24,15 @@ pub struct App<B: Backend> {
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
 	pub menu: Menu<B>,
+	pub master_socket: B::SocketBackend, // used for communication with master server
 }
 
 impl<B: Backend> App<B> {
-	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, storage_backend: B::StorageBackend, menu: Menu<B>) -> App<B> {
+	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, storage_backend: B::StorageBackend, menu: Menu<B>, master_server_ip: &str) -> App<B> {
 		let mut audio_backend = B::AudioBackend::new();
 		audio_backend.set_music_volume(MUSIC_VOLUME);
+
+		let master_socket = B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT);
 
 		App {
 			input_backend,
@@ -39,6 +42,7 @@ impl<B: Backend> App<B> {
 			cursor_position: DEFAULT_CURSOR_POSITION,
 			peripherals_state: PeripheralsState::new(),
 			menu,
+			master_socket,
 		}
 	}
 
@@ -62,6 +66,8 @@ impl<B: Backend> App<B> {
 		self.input_backend.tick();
 		self.update_cursor();
 
+		self.tick_master_socket();
+
 		runnable.tick(self);
 
 		self.tick_menu(runnable);
@@ -76,6 +82,10 @@ impl<B: Backend> App<B> {
 		self.draw_menu(&mut draw);
 
 		self.graphics_backend.submit(draw);
+	}
+
+	fn tick_master_socket(&mut self) {
+		self.master_socket.tick();
 	}
 
 	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {
@@ -93,13 +103,13 @@ impl<B: Backend> App<B> {
 				}
 			};
 			if winner_found {
-				*runnable = Runnable::OnlineMenu(OnlineMenuState::new());
+				*runnable = Runnable::OnlineMenu(OnlineMenu::new());
 				self.menu = Menu::online_menu(&self.storage_backend);
 			}
 		}
 		if let Runnable::ServerConnector(server_connector) = runnable {
 			if server_connector.request_failed {
-				*runnable = Runnable::OnlineMenu(OnlineMenuState::new());
+				*runnable = Runnable::OnlineMenu(OnlineMenu::new());
 				self.menu = Menu::online_menu(&self.storage_backend);  // TODO: change to failed info
 			} else if let Some((ip, port)) = &server_connector.game_ip {
 				// TODO: merge with create_client()

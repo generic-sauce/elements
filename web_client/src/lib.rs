@@ -8,6 +8,8 @@ mod render;
 mod js;
 mod backend;
 
+const DEFAULT_MASTER_HOSTNAME: &str = "generic-sauce.de";
+
 fn main_loop(f: impl FnMut() + 'static, fps: u32) {
 	let cb = Closure::<dyn FnMut()>::wrap(Box::new(f));
 	let leaked_cb = Box::leak(Box::new(cb)); // TODO
@@ -32,13 +34,13 @@ fn client_main() {
 	let texture_filenames = JsValue::from_serde(&texture_filenames).unwrap();
 	js_init(texture_filenames);
 
-	let mut runnable = Runnable::OnlineMenu(OnlineMenuState::new());
+	let mut runnable = Runnable::OnlineMenu(OnlineMenu::new());
 
 	let input_backend = WebInputBackend;
 	let graphics_backend = WebGraphicsBackend::new();
 	let storage_backend = WebStorageBackend;
 	let menu = runnable.build_menu(&storage_backend);
-	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, storage_backend, menu);
+	let mut app = App::<WebBackend>::new(graphics_backend, input_backend, storage_backend, menu, DEFAULT_MASTER_HOSTNAME);
 	main_loop(move || app.tick_draw(&mut runnable), 60);
 }
 
