@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub struct LobbyMenu<B: Backend> {
 	pub long_lobby_info: LongLobbyInfo,
-	_p: PhantomData<B>,
+	pub _p: PhantomData<B>,
 }
 
 impl<B: Backend> LobbyMenu<B> {

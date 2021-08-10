@@ -14,7 +14,7 @@ impl<B: Backend> OnlineMenu<B> {
 		}
 	}
 
-	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) {
+	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) -> Option<LongLobbyInfo>{
 		OnlineMenu::tick_username_field(app);
 
 		self.lobbies = vec![
@@ -24,13 +24,17 @@ impl<B: Backend> OnlineMenu<B> {
 			ShortLobbyInfo { lobby_id: 0, name: "very long lobby name, probably will break".to_string() },
 		];
 
+		let mut opt_lobby_info = None;
+
 		for p in packets {
 			match p {
-				MasterClientPacket::LobbyListResponse(lobby_infos) => { self.lobbies = lobby_infos; },
-				MasterClientPacket::LobbyInfoUpdate(lobby_info) => { unimplemented!() }, // TODO
+				MasterClientPacket::LobbyListResponse(lobby_infos) => self.lobbies = lobby_infos,
+				MasterClientPacket::LobbyInfoUpdate(lobby_info) => opt_lobby_info = Some(lobby_info),
 				_ => eprintln!("WARN: Got invalid packet from master server: {:?}", p),
 			}
-		}
+		};
+
+		opt_lobby_info
 	}
 
 	fn tick_username_field(app: &mut App<B>) {

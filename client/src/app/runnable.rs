@@ -32,7 +32,13 @@ impl<B: Backend> Runnable<B> {
 			packets.push(p);
 		}
 		match self {
-			Runnable::OnlineMenu(online_menu) => online_menu.tick(app, packets),
+			Runnable::OnlineMenu(online_menu) => {
+				if let Some(long_lobby_info) = online_menu.tick(app, packets) {
+					*self = Runnable::LobbyMenu(LobbyMenu {
+						long_lobby_info, _p: PhantomData
+					});
+				}
+			},
 			Runnable::LocalMenu => {},
 			Runnable::LobbyMenu(_) => {},
 			Runnable::TutorialMenu => {},

@@ -96,6 +96,18 @@ impl<B: Backend> Menu<B> {
 				DEFAULT_BUTTON_COLOR,
 				"Your Name"
 			),
+			MenuElement::new_button(
+				"onlinemenu_createlobby".to_string(),
+				CanvasVec::new(0.8 * ASPECT_RATIO, 0.3),
+				CanvasVec::new(0.25, 0.05),
+				"Create Lobby".to_string(),
+				Color::hex("2f6f10"),
+				GO_BUTTON_FONT_SIZE,
+				None,
+				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
+					app.master_socket.send(&MasterServerPacket::CreateLobby("LobbyName".to_string())).unwrap(); // TODO add edit field
+				} ),
+			),
 			/*
 			MenuElement::new_label(
 				"onlinemenu_description".to_string(),
