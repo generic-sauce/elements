@@ -67,8 +67,11 @@ impl<B: Backend> App<B> {
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
 		if self.should_send_login && self.master_socket.is_open() {
 			let username = self.storage_backend.get("username").unwrap_or_else(String::new);
-			self.master_socket.send(&MasterServerPacket::Login(username)).expect("can't login to master server");
-			self.should_send_login = false;
+			if let Err(_) = self.master_socket.send(&MasterServerPacket::Login(username)) {
+				eprintln!("can't login to master server");
+			} else {
+				self.should_send_login = false;
+			}
 		}
 
 		self.peripherals_state.reset();
