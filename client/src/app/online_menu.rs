@@ -86,7 +86,7 @@ impl<B: Backend> OnlineMenu<B> {
 			MenuElement::new_edit_field(
 				"onlinemenu_createlobby_name".to_string(),
 				CanvasVec::new(0.8 * ASPECT_RATIO, 0.4),
-				CanvasVec::new(0.25, 0.05),
+				CanvasVec::new(0.15, 0.022),
 				DEFAULT_BUTTON_COLOR,
 				"Lobby Name"
 			),
