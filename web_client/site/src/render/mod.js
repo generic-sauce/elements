@@ -12,7 +12,7 @@ export function init(texture_filenames) {
 	gl.blendEquation(gl.FUNC_ADD)
 
 	onresize = update_canvas_size
-	update_canvas_size()
+	update_canvas_quality(0.618)
 
 	fluidmap_mod.init()
 	tilemap_mod.init()
@@ -24,8 +24,6 @@ export function render(draw) {
 	let clear = draw.clear_color
 	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
 	// gl.clear(gl.COLOR_BUFFER_BIT)
-	
-	console.log("render")
 
 	triangles_mod.set_vertices(draw.vertex_data)
 
@@ -62,9 +60,16 @@ export function render(draw) {
 	}
 }
 
+function update_canvas_quality(quality) {
+	window.canvas_quality = quality
+	let inverse = 1 / quality
+	window.canvas.style.transform = "scale("+inverse+", "+inverse+") translate(0, "+(quality/-2+0.5)*100+"%)";
+	update_canvas_size()
+}
+
 function update_canvas_size() {
-	canvas.width = window.innerWidth / 2
-	canvas.height = window.innerHeight / 2
+	canvas.width = window.innerWidth * window.canvas_quality
+	canvas.height = window.innerHeight * window.canvas_quality
 
 	let ratio = (canvas.width / canvas.height) / (16 / 9)
 	if (ratio > 1.0) {
