@@ -38,6 +38,12 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 	draw_cursors(draw, world);
 	draw_healthbars(draw, world);
 	draw_trophy(draw, world, app);
+
+	draw.texture(TileVec::new(30, 7), TileVec::new(38, 15), TextureId::Bush, Flip::Normal, None);
+	draw.texture(TileVec::new(40, 5), TileVec::new(48, 13), TextureId::Bush1, Flip::Normal, None);
+	draw.texture(TileVec::new(50, 1), TileVec::new(58, 9), TextureId::HangingBush, Flip::Normal, None);
+	draw.texture(TileVec::new(59, 4), TileVec::new(67, 11), TextureId::Grass, Flip::Normal, None);
+	draw.texture(TileVec::new(89, 2), TileVec::new(97, 10), TextureId::Grass1, Flip::Normal, None);
 }
 
 fn trophy_position_curve(mix: f32) -> f32 {

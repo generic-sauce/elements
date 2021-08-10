@@ -37,6 +37,11 @@ setup!(
 	Globe: "images/icons/globe.png",
 	Gamepad: "images/icons/gamepad.png",
 	Controls: "images/controls.png",
+	Bush: "images/bush.png",
+	Bush1: "images/bush1.png",
+	HangingBush: "images/hanging_bush.png",
+	Grass: "images/grass.png",
+	Grass1: "images/grass1.png",
 );
 
 pub trait IntoTextureIndex {
