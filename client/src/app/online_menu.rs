@@ -21,7 +21,7 @@ impl<B: Backend> OnlineMenu<B> {
 	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) -> Option<LongLobbyInfo>{
 		self.tick_username_field(app);
 
-		if self.should_send_lobby_list_request {
+		if self.should_send_lobby_list_request && app.master_socket.is_open() {
 			app.master_socket.send(&MasterServerPacket::LobbyListRequest).expect("Could not send lobby list request");
 			self.should_send_lobby_list_request = false;
 		}
@@ -100,6 +100,11 @@ impl<B: Backend> OnlineMenu<B> {
 				GO_BUTTON_FONT_SIZE,
 				None,
 				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
+					if !app.master_socket.is_open() {
+						eprintln!("can't open lobby, you have no connection to the master server!");
+						return;
+					}
+
 					let new_lobby_name = &app.menu_cache.edit_field.get("onlinemenu_createlobby_name").unwrap().text;
 					app.master_socket.send(&MasterServerPacket::CreateLobby(new_lobby_name.to_string())).unwrap();
 				} ),
@@ -142,6 +147,11 @@ impl<B: Backend> OnlineMenu<B> {
 				LOBBY_BUTTON_FONT_SIZE,
 				None,
 				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
+					if !app.master_socket.is_open() {
+						eprintln!("can't join lobby, you have no connection to the master server!");
+						return;
+					}
+
 					app.master_socket.send(&MasterServerPacket::JoinLobby(lobby_id)).unwrap();
 				} ),
 			);
