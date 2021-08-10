@@ -111,6 +111,9 @@ fn main() {
 		let storage_backend = NativeStorageBackend::new();
 		let menu = runnable.build_menu(&storage_backend);
 		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, menu, DEFAULT_MASTER_HOSTNAME);
+		if matches!(runnable, Runnable::OnlineMenu(_)) {
+			app.master_socket.send(&MasterServerPacket::LobbyListRequest).expect("Could not send lobby list request");
+		}
 		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});
 

@@ -1,20 +1,28 @@
 use crate::prelude::*;
 
 pub struct OnlineMenu<B: Backend> {
-	pub name_and_session_ids: Vec<(/* username */ String, /* session_id */ u32)>,
+	pub lobbies: Vec<ShortLobbyInfo>,
 	_p: PhantomData<B>,
 }
 
 impl<B: Backend> OnlineMenu<B> {
 	pub fn new() -> OnlineMenu<B> {
+
 		OnlineMenu {
-			name_and_session_ids: Vec::new(),
+			lobbies: Vec::new(),
 			_p: PhantomData,
 		}
 	}
 
-	pub fn tick(&self, app: &mut App<B>, packets: Vec<MasterClientPacket>) {
+	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) {
 		OnlineMenu::tick_username_field(app);
+
+		for p in packets {
+			match p {
+				MasterClientPacket::LobbyListResponse(lobby_infos) => { self.lobbies = lobby_infos; }
+				_ => eprintln!("WARN: Got invalid packet from master server"),
+			}
+		}
 	}
 
 	fn tick_username_field(app: &mut App<B>) {
