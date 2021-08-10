@@ -14,9 +14,9 @@ export function init(texture_filenames) {
 	onresize = update_canvas_size
 	update_canvas_quality(0.618)
 
+	triangles_mod.init(texture_filenames)
 	fluidmap_mod.init()
 	tilemap_mod.init()
-	triangles_mod.init(texture_filenames)
 	text_mod.init()
 }
 
