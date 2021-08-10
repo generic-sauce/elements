@@ -91,16 +91,16 @@ impl<B: Backend> Menu<B> {
 		opt_on_click
 	}
 
-	pub fn init_cache(&self, menu_cache: &mut MenuCache) {
+	pub fn init_cache(&self, menu_cache: &mut MenuCache, storage_backend: &B::StorageBackend) {
 		for element in &self.elements {
+			if element.name.is_empty() {
+				panic!("ERROR: menu element with empty name!");
+			}
 			match element.kind {
 				MenuKind::EditField(_) => {
-					if element.name.is_empty() {
-						panic!("ERROR: edit field with empty name!");
-					}
 					if !menu_cache.edit_field.contains_key(&element.name) {
 						menu_cache.edit_field.insert(element.name.clone(), EditFieldCache {
-							text: "".to_string(),
+							text: storage_backend.get("username").unwrap_or_else(String::new),
 							cursor: 0,
 							cursor_blink_counter: 0,
 							view_offset: 0,
