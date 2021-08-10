@@ -12,7 +12,7 @@ pub enum Runnable<B: Backend> { // the model (w.r.t. MVC) of our app
 impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&mut self, app: &mut App<B>) -> (Menu<B>, Option<OnEvent<B>>) {
 		let mut menu = match self {
-			Runnable::OnlineMenu(online_menu) => Menu::online_menu(&online_menu.lobbies),
+			Runnable::OnlineMenu(online_menu) => online_menu.build_menu(),
 			Runnable::LobbyMenu(l) => l.build_menu(),
 			Runnable::LocalMenu => Menu::local_menu(),
 			Runnable::TutorialMenu => Menu::tutorial_menu(),
@@ -22,7 +22,7 @@ impl<B: Backend> Runnable<B> {
 
 		let opt_on_click = menu.calc_element_properties(app, self);
 
-		menu.init_cache(&mut app.menu_cache, &app.storage_backend);
+		menu.init_cache(&mut app.menu_cache);
 		(menu, opt_on_click)
 	}
 

@@ -66,98 +66,6 @@ impl<B: Backend> Menu<B> {
 		elements
 	}
 
-	pub fn online_menu(lobbies: &Vec<ShortLobbyInfo>) -> Menu<B> {
-		let mut elements = Menu::main_menu_items(0);
-		elements.extend(vec![
-			MenuElement::new_label(
-				"onlinemenu_title".to_string(),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
-				CanvasVec::new(0.15, 0.15),
-				SUBTITLE_FONT_SIZE,
-				"Online",
-				TextAlign::Center,
-			),
-			/*
-			MenuElement::new_button(
-				"onlinemenu_play_button".to_string(),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.4),
-				CanvasVec::new(0.15, 0.05),
-				"Play",
-				Color::hex("2f6f10"),
-				GO_BUTTON_FONT_SIZE,
-				None,
-				Box::new(create_server_connector)
-			),
-			 */
-			MenuElement::new_edit_field(
-				"onlinemenu_playername".to_string(),
-				CanvasVec::new(0.9 * ASPECT_RATIO, 0.95),
-				CanvasVec::new(0.15, 0.022),
-				DEFAULT_BUTTON_COLOR,
-				"Your Name"
-			),
-			MenuElement::new_button(
-				"onlinemenu_createlobby".to_string(),
-				CanvasVec::new(0.8 * ASPECT_RATIO, 0.3),
-				CanvasVec::new(0.25, 0.05),
-				"Create Lobby".to_string(),
-				Color::hex("2f6f10"),
-				GO_BUTTON_FONT_SIZE,
-				None,
-				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
-					app.master_socket.send(&MasterServerPacket::CreateLobby("LobbyName".to_string())).unwrap(); // TODO add edit field
-				} ),
-			),
-			MenuElement::new_button(
-				"onlinemenu_refreshlobby".to_string(),
-				CanvasVec::new(0.2 * ASPECT_RATIO, 0.3),
-				CanvasVec::new(0.25, 0.05),
-				"Refresh".to_string(),
-				Color::hex("2f6f10"),
-				GO_BUTTON_FONT_SIZE,
-				None,
-				Box::new(move |_app: &mut App<B>, runnable: &mut Runnable<B>| {
-					if let Runnable::OnlineMenu(online_menu) = runnable {
-						online_menu.lobbies.clear();
-						online_menu.should_send_lobby_list_request = true;
-					}
-				} ),
-			),
-			/*
-			MenuElement::new_label(
-				"onlinemenu_description".to_string(),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.2),
-				CanvasVec::new(0.15, 0.15),
-				EXPLANATION_FONT_SIZE,
-				"Play online against other players. You need an internet connection for this :D",
-				TextAlign::Center,
-			),
-			 */
-		]);
-
-		for (i, lobby) in lobbies.iter().enumerate() {
-			let lobby_id = lobby.lobby_id;
-			let element = MenuElement::new_button(
-				format!("onlinemenu_lobby{}", i),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.7-(i as f32)*0.08),
-				CanvasVec::new(0.25, 0.035),
-				lobby.name.clone(),
-				Color::hex("006699"),
-				LOBBY_BUTTON_FONT_SIZE,
-				None,
-				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
-					app.master_socket.send(&MasterServerPacket::JoinLobby(lobby_id)).unwrap();
-				} ),
-			);
-			elements.push(element);
-		}
-
-		Menu {
-			elements,
-			background: Some(TextureId::SkyBackground),
-		}
-	}
-
 	pub fn local_menu() -> Menu<B> {
 		let mut elements = Menu::main_menu_items(1);
 		elements.extend(vec![
@@ -240,10 +148,6 @@ impl<B: Backend> Menu<B> {
 			elements,
 			background: Some(TextureId::SkyBackground),
 		}
-	}
-
-	pub fn server_connector_menu() -> Menu<B> {
-		unimplemented!()
 	}
 
 	pub fn in_game_menu(quit_action: OnEvent<B>) -> Menu<B> {
