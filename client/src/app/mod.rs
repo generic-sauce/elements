@@ -112,14 +112,6 @@ impl<B: Backend> App<B> {
 				*runnable = Runnable::OnlineMenu(OnlineMenu::new());
 			}
 		}
-		if let Runnable::ServerConnector(server_connector) = runnable {
-			if server_connector.request_failed {
-				*runnable = Runnable::OnlineMenu(OnlineMenu::new());
-			} else if let Some((ip, port)) = &server_connector.game_ip {
-				// TODO: merge with create_client()
-				*runnable = Runnable::Client(Client::new(ip, *port));
-			}
-		}
 	}
 
 	fn handle(&mut self, handler: &AppEventHandler) {
