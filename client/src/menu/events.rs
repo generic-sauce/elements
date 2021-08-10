@@ -20,7 +20,7 @@ pub fn unpause<B: Backend>(_app: &mut App<B>, runnable: &mut Runnable<B>) {
 	runnable.toggle_active();
 }
 
-pub fn create_online_menu<B: Backend>(_app: &mut App<B>, runnable: &mut Runnable<B>) {
+pub fn create_online_menu<B: Backend>(app: &mut App<B>, runnable: &mut Runnable<B>) {
 	*runnable = Runnable::OnlineMenu(OnlineMenu::new());
 }
 

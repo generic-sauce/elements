@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 pub struct OnlineMenu<B: Backend> {
 	pub lobbies: Vec<ShortLobbyInfo>,
+	pub should_send_lobby_list_request: bool,
 	_p: PhantomData<B>,
 }
 
@@ -10,6 +11,7 @@ impl<B: Backend> OnlineMenu<B> {
 
 		OnlineMenu {
 			lobbies: Vec::new(),
+			should_send_lobby_list_request: true,
 			_p: PhantomData,
 		}
 	}
@@ -17,12 +19,10 @@ impl<B: Backend> OnlineMenu<B> {
 	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) -> Option<LongLobbyInfo>{
 		OnlineMenu::tick_username_field(app);
 
-		self.lobbies = vec![
-			ShortLobbyInfo { lobby_id: 0, name: "my first lobby".to_string() },
-			ShortLobbyInfo { lobby_id: 0, name: "lobby of doggy".to_string() },
-			ShortLobbyInfo { lobby_id: 0, name: "best lobby".to_string() },
-			ShortLobbyInfo { lobby_id: 0, name: "very long lobby name, probably will break".to_string() },
-		];
+		if self.should_send_lobby_list_request {
+			app.master_socket.send(&MasterServerPacket::LobbyListRequest).expect("Could not send lobby list request");
+			self.should_send_lobby_list_request = false;
+		}
 
 		let mut opt_lobby_info = None;
 

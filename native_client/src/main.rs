@@ -110,9 +110,6 @@ fn main() {
 		let graphics_backend = NativeGraphicsBackend::new(draw_sender);
 		let storage_backend = NativeStorageBackend::new();
 		let mut app = App::<NativeBackend>::new(graphics_backend, input_backend, storage_backend, DEFAULT_MASTER_HOSTNAME);
-		if matches!(runnable, Runnable::OnlineMenu(_)) {
-			app.master_socket.send(&MasterServerPacket::LobbyListRequest).expect("Could not send lobby list request");
-		}
 		main_loop(move || app.tick_draw(&mut runnable), 60);
 	});
 

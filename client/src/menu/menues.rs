@@ -108,6 +108,21 @@ impl<B: Backend> Menu<B> {
 					app.master_socket.send(&MasterServerPacket::CreateLobby("LobbyName".to_string())).unwrap(); // TODO add edit field
 				} ),
 			),
+			MenuElement::new_button(
+				"onlinemenu_refreshlobby".to_string(),
+				CanvasVec::new(0.2 * ASPECT_RATIO, 0.3),
+				CanvasVec::new(0.25, 0.05),
+				"Refresh".to_string(),
+				Color::hex("2f6f10"),
+				GO_BUTTON_FONT_SIZE,
+				None,
+				Box::new(move |_app: &mut App<B>, runnable: &mut Runnable<B>| {
+					if let Runnable::OnlineMenu(online_menu) = runnable {
+						online_menu.lobbies.clear();
+						online_menu.should_send_lobby_list_request = true;
+					}
+				} ),
+			),
 			/*
 			MenuElement::new_label(
 				"onlinemenu_description".to_string(),
