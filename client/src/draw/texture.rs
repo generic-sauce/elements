@@ -40,7 +40,6 @@ setup!(
 	Bush0: "images/bush0.png",
 	BushFlowers0: "images/bush_flowers0.png",
 	FloatingBush0: "images/floating_bush0.png",
-	Grass0: "images/grass1.png",
 	GrassStraws0: "images/grass_straws0.png",
 	HangingBush0: "images/hanging_bush0.png",
 	Mountains0: "images/mountains0.png",
