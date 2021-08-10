@@ -7,7 +7,6 @@ pub enum Runnable<B: Backend> { // the model (w.r.t. MVC) of our app
 	TutorialMenu,
 	Local(Local<B>), // In-game in a local game
 	Client(Client<B>), // In-game in a network game
-	ServerConnector(ServerConnector<B>), // TODO obsolete
 }
 
 impl<B: Backend> Runnable<B> {
@@ -18,7 +17,6 @@ impl<B: Backend> Runnable<B> {
 			Runnable::TutorialMenu => Menu::tutorial_menu(),
 			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),
 			Runnable::Local(_) => Menu::in_game_menu(Box::new(create_local_menu)),
-			Runnable::ServerConnector(_) => Menu::new(),
 		};
 
 		let opt_on_click = menu.calc_element_properties(app, self);
@@ -38,7 +36,6 @@ impl<B: Backend> Runnable<B> {
 			Runnable::TutorialMenu => {},
 			Runnable::Local(local) => local.tick(app),
 			Runnable::Client(client) => client.tick(app),
-			Runnable::ServerConnector(server_connector) => server_connector.tick(app),
 		}
 	}
 
@@ -49,7 +46,6 @@ impl<B: Backend> Runnable<B> {
 			Runnable::TutorialMenu => {},
 			Runnable::Local(local) => local.draw(app, draw),
 			Runnable::Client(client) => client.draw(app, draw),
-			Runnable::ServerConnector(server_connector) => server_connector.draw(app, draw),
 		}
 	}
 

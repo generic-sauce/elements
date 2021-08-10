@@ -8,7 +8,6 @@ mod app;
 mod backend;
 mod draw;
 mod menu;
-mod server_connector;
 mod local;
 
 pub enum ClientMode {
