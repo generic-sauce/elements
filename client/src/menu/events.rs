@@ -12,7 +12,7 @@ pub fn create_local<B: Backend>(best_of_n: u32) -> OnEvent<B> {
 	})
 }
 
-pub fn create_server_connector<B: Backend>(_app: &mut App<B>, _runnable: &mut Runnable<B>) {
+pub fn send_join_lobby_packet<B: Backend>(_app: &mut App<B>, _runnable: &mut Runnable<B>) {
 	unimplemented!()
 }
 

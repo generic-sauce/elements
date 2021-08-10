@@ -4,6 +4,7 @@ use std::ops::{Add, Sub, Mul};
 pub const MAIN_BUTTON_FONT_SIZE: f32 = 0.03;
 pub const NORMAL_BUTTON_FONT_SIZE: f32 = 0.04;
 pub const GO_BUTTON_FONT_SIZE: f32 = 0.05;
+pub const LOBBY_BUTTON_FONT_SIZE: f32 = 0.03;
 const EDIT_FIELD_TEXT_SIZE: f32 = 0.03;
 const EDIT_FIELD_BORDER_WIDTH: f32 = 0.004;
 const EDIT_FIELD_CURSOR_WIDTH: f32 = 0.002;
@@ -22,7 +23,7 @@ pub struct MenuElement<B: Backend> {
 }
 
 pub struct Button<B: Backend> {
-	pub text: &'static str,
+	pub text: String,
 	pub on_click: OnEvent<B>,
 	pub font_size: f32,
 	pub image: Option<TextureId>,
@@ -56,7 +57,7 @@ pub enum MenuKind<B: Backend> {
 }
 
 impl<B: Backend> MenuElement<B> {
-	pub fn new_button(name: String, position: CanvasVec, size: CanvasVec, text: &'static str, color: Color, font_size: f32, image: Option<TextureId>, on_click: OnEvent<B>) -> MenuElement<B> {
+	pub fn new_button(name: String, position: CanvasVec, size: CanvasVec, text: String, color: Color, font_size: f32, image: Option<TextureId>, on_click: OnEvent<B>) -> MenuElement<B> {
 		MenuElement {
 			name,
 			kind: MenuKind::Button(Button { text, on_click, font_size, image } ),
