@@ -5,7 +5,10 @@ mod event_handler;
 pub use event_handler::*;
 
 mod online_menu;
+mod lobby_menu;
+
 pub use online_menu::*;
+pub use lobby_menu::*;
 
 use crate::prelude::*;
 

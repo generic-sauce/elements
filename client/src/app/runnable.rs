@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub enum Runnable<B: Backend> { // the model (w.r.t. MVC) of our app
 	OnlineMenu(OnlineMenu<B>),
-	// LobbyMenu, // TODO add later
+	LobbyMenu(LobbyMenu<B>),
 	LocalMenu,
 	TutorialMenu,
 	Local(Local<B>), // In-game in a local game
@@ -13,6 +13,7 @@ impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&mut self, app: &mut App<B>) -> (Menu<B>, Option<OnEvent<B>>) {
 		let mut menu = match self {
 			Runnable::OnlineMenu(_) => Menu::online_menu(),
+			Runnable::LobbyMenu(l) => l.build_menu(),
 			Runnable::LocalMenu => Menu::local_menu(),
 			Runnable::TutorialMenu => Menu::tutorial_menu(),
 			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),
@@ -33,6 +34,7 @@ impl<B: Backend> Runnable<B> {
 		match self {
 			Runnable::OnlineMenu(online_menu) => online_menu.tick(app, packets),
 			Runnable::LocalMenu => {},
+			Runnable::LobbyMenu(_) => {},
 			Runnable::TutorialMenu => {},
 			Runnable::Local(local) => local.tick(app),
 			Runnable::Client(client) => client.tick(app),
@@ -43,6 +45,7 @@ impl<B: Backend> Runnable<B> {
 		match self {
 			Runnable::OnlineMenu(_) => {},
 			Runnable::LocalMenu => {},
+			Runnable::LobbyMenu(_) => {},
 			Runnable::TutorialMenu => {},
 			Runnable::Local(local) => local.draw(app, draw),
 			Runnable::Client(client) => client.draw(app, draw),
