@@ -59,7 +59,7 @@ impl<B: Backend> Menu<B> {
 		app.check_menu_active(runnable);
 		if !runnable.is_active() { return None; } // dont tick, if inactive
 
-		let hovered_element = self.elements.iter().find(|e| e.is_colliding(app.cursor_position));
+		let hovered_element = self.elements.iter().filter(|e| !matches!(e.kind, MenuKind::Image(_)|MenuKind::Label(_)) ).find(|e| e.is_colliding(app.cursor_position));
 		let opt_name = hovered_element.map(|x| x.name.clone());
 		app.menu_cache.hovered_element = opt_name.clone();
 
