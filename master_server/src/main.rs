@@ -93,7 +93,7 @@ impl MasterServer {
 					}
 
 					// received packets from clients
-					PeerEvent::ReceivedPacket(MasterServerPacket::LoginRequest(name), peer) => {
+					PeerEvent::ReceivedPacket(MasterServerPacket::Login(name), peer) => {
 						self.apply_login_request(peer, name);
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::CreateLobby(lobby_name), peer) => {
@@ -219,7 +219,6 @@ impl MasterServer {
 		} else { // add new client
 			println!("INFO: new client connected: {}", name);
 			self.clients.push(ClientInfo::new(peer, &name));
-			self.peer_manager.send_to(peer, &MasterClientPacket::LoginResponse);
 		}
 	}
 }

@@ -7,7 +7,7 @@ pub enum MasterServerPacket { // packets received by the master server
 		num_players: u32, // TODO this seems outdated
 		port: u16
 	},
-	LoginRequest(/* username: */ String), // sent by a client to login to the master server; also used to rename yourself
+	Login(/* username: */ String), // sent by a client to login to the master server; also used to rename yourself
 	CreateLobby(/* lobby_name: */ String /*, settings */), // sent by a client to the master server to open a lobby (should only be sent, when you are not yet in a lobby)
 	JoinLobby(/* lobby_id: */ u32),
 	LeaveLobby, // sent from client to master server to indicate that it leaves it's lobby. this also closes the lobby if it was the last player
@@ -42,7 +42,6 @@ pub struct LongLobbyInfo { // obtained only for the lobby where you are in
 #[derive(Serialize, Deserialize, Clone)]
 pub enum MasterClientPacket { // packets sent from master server to client
 	GoToGameServer(/* domain name */ String, /* port */ u16),
-	LoginResponse, // master servers response to the LoginRequestPacket
 	LobbyListResponse(Vec<ShortLobbyInfo>), // sent from master server to client in order to inform about existing lobbies
 	LobbyInfoUpdate(LongLobbyInfo), // sent from master server to all clients within a lobby (when they create/join OR when some other player joins/leaves OR when a lobby setting is changed)
 }
