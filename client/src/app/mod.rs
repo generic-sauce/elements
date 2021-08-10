@@ -28,7 +28,7 @@ pub struct App<B: Backend> {
 	pub peripherals_state: PeripheralsState,
 	pub menu_cache: MenuCache,
 	pub master_socket: B::SocketBackend, // used for communication with master server
-	pub is_logged_in: bool, // if set to false, you should send a MasterServerPacket::Login to the master server
+	pub should_send_login: bool, // if set to true, you should send a MasterServerPacket::Login to the master server
 }
 
 impl<B: Backend> App<B> {
@@ -47,7 +47,7 @@ impl<B: Backend> App<B> {
 			peripherals_state: PeripheralsState::new(),
 			menu_cache: MenuCache::new(),
 			master_socket,
-			is_logged_in: false,
+			should_send_login: true,
 		}
 	}
 
@@ -65,10 +65,10 @@ impl<B: Backend> App<B> {
 	}
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
-		if !self.is_logged_in && self.master_socket.is_open() {
+		if self.should_send_login && self.master_socket.is_open() {
 			let username = self.storage_backend.get("username").unwrap_or_else(String::new);
 			self.master_socket.send(&MasterServerPacket::Login(username)).expect("can't login to master server");
-			self.is_logged_in = true;
+			self.should_send_login = false;
 		}
 
 		self.peripherals_state.reset();
