@@ -92,6 +92,7 @@ fn js_to_rust_key(js_key: &str) -> Option<Key> {
 		"Space" => Key::Space,
 		"ArrowRight" => Key::Right,
 		"ArrowLeft" => Key::Left,
+		"Escape" => Key::Escape,
 		_ => None?,
 	})
 }
