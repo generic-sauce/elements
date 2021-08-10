@@ -28,7 +28,7 @@ pub struct App<B: Backend> {
 	pub peripherals_state: PeripheralsState,
 	pub menu_cache: MenuCache,
 	pub master_socket: B::SocketBackend, // used for communication with master server
-	pub is_logged_in: bool,
+	pub is_logged_in: bool, // if set to false, you should send a MasterServerPacket::Login to the master server
 }
 
 impl<B: Backend> App<B> {

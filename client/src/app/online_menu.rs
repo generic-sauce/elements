@@ -46,8 +46,9 @@ impl<B: Backend> OnlineMenu<B> {
 		}
 
 		let e = app.menu_cache.edit_field.get("onlinemenu_playername").unwrap();
-		if app.storage_backend.get("username").unwrap_or_else(String::new) != e.text {
+		if app.storage_backend.get("username").unwrap_or_else(String::new) != e.text { // update name
 			app.storage_backend.set("username", &e.text);
+			app.is_logged_in = false;
 		}
 	}
 
