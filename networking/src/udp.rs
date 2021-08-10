@@ -15,7 +15,7 @@ pub fn send_packet_to(socket: &mut UdpSocket, p: &impl Packet, target: SocketAdd
 	let n: u32 = packet_bytes.len() as u32;
 	let mut bytes = ser(&n);
 	bytes.extend(packet_bytes);
-	socket.send_to(&bytes[..], target).unwrap();
+	socket.send_to(&bytes[..], target).expect("send_packet_to crashed in socket.send_to");
 }
 
 pub fn recv_packet<P: Packet>(socket: &mut UdpSocket) -> Option<(P, SocketAddr)> {
@@ -28,12 +28,22 @@ pub fn recv_bytes(socket: &mut UdpSocket) -> Option<(Vec<u8>, SocketAddr)> {
 	let mut n_bytes = [0u8; 4];
 	assert_eq!(match socket.peek(&mut n_bytes[..]) {
 		Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return None,
-		err => err.unwrap(),
+		Ok(x) => x,
+		Err(e) => {
+			eprintln!("recv_bytes received error in socket.peek: {:?}", e);
+			return None;
+		}
 	}, 4);
 	let n: u32 = deser(&n_bytes[..]);
 	let mut bytes = vec![0u8; (n + 4) as usize];
 
-	let (n_full, addr) = socket.recv_from(&mut bytes[..]).unwrap();
+	let (n_full, addr) = match socket.recv_from(&mut bytes[..]) {
+		Ok(x) => x,
+		Err(e) => {
+			eprintln!("recv_bytes received error in socket.recv_from: {:?}", e);
+			return None;
+		}
+	};
 	assert_eq!(n_full, (n + 4) as usize);
 	bytes.drain(..4);
 	assert_eq!(bytes.len(), n as usize);

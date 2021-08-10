@@ -28,8 +28,10 @@ impl<B: Backend> Runnable<B> {
 
 	pub fn tick(&mut self, app: &mut App<B>) {
 		let mut packets = Vec::new();
-		while let Some(p) = app.master_socket.recv() {
-			packets.push(p);
+		if app.master_socket.is_open() {
+			while let Some(p) = app.master_socket.recv() {
+				packets.push(p);
+			}
 		}
 		match self {
 			Runnable::OnlineMenu(online_menu) => {

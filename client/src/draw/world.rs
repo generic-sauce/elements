@@ -32,12 +32,25 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	}
 
+	draw.texture(CanvasVec::right_bot(-1.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::Mountains1, Flip::Normal, None);
+	draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(0.8, 0.7), TextureId::Mountains0, Flip::Normal, None);
+
+	draw.texture(TileVec::new(30, 9), TileVec::new(38, 17), TextureId::Bush0, Flip::Normal, None);
+	draw.texture(TileVec::new(40, 9), TileVec::new(48, 17), TextureId::BushFlowers0, Flip::Normal, None);
+	draw.texture(TileVec::new(52, 6), TileVec::new(68, 14), TextureId::WideBush0, Flip::Normal, None);
+	draw.texture(TileVec::new(90, 6), TileVec::new(94, 10), TextureId::Stone0, Flip::Normal, None);
+	draw.texture(TileVec::new(110, 6), TileVec::new(114, 10), TextureId::Stone1, Flip::Normal, None);
+
 	draw.fluidmap(&world.fluidmap);
 	draw_players(draw, world);
 	draw.tilemap(&world.tilemap);
 	draw_cursors(draw, world);
 	draw_healthbars(draw, world);
 	draw_trophy(draw, world, app);
+
+	draw.texture(TileVec::new(31, 3), TileVec::new(47, 11), TextureId::HangingBush0, Flip::Normal, None);
+	draw.texture(TileVec::new(11, 0), TileVec::new(19, 8), TextureId::GrassStraws0, Flip::Normal, None);
+	draw.texture(TileVec::new(12, 19), TileVec::new(20, 27), TextureId::FloatingBush0, Flip::Normal, None);
 }
 
 fn trophy_position_curve(mix: f32) -> f32 {
