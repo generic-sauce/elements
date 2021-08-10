@@ -13,6 +13,24 @@ impl<B: Backend> LobbyMenu<B> {
 		}
 	}
 
+	pub fn tick(&mut self, packets: Vec<MasterClientPacket>) -> Option<(String, u16)> {
+		let mut opt_ret = None;
+
+		for p in packets {
+			match p {
+				MasterClientPacket::LobbyInfoUpdate(x) => {
+					self.long_lobby_info = x;
+				},
+				MasterClientPacket::GoToGameServer(domain, port) => {
+					opt_ret = Some((domain, port));
+				},
+				MasterClientPacket::LobbyListResponse(_) => {}
+			}
+		}
+
+		opt_ret
+	}
+
 	pub fn build_menu(&self) -> Menu<B> {
 		let mut elements = Menu::main_menu_items(0);
 		// TODO
@@ -50,8 +68,9 @@ impl<B: Backend> LobbyMenu<B> {
 			Color::hex("2f6f10"),
 			0.05,
 			None,
-			Box::new(|app: &mut App<B>, _| {
+			Box::new(|app: &mut App<B>, runnable: &mut Runnable<B>| {
 				app.master_socket.send(&MasterServerPacket::LeaveLobby).unwrap();
+				*runnable = Runnable::OnlineMenu(OnlineMenu::new());
 			}),
 		));
 

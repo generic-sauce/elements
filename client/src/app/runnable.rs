@@ -40,7 +40,11 @@ impl<B: Backend> Runnable<B> {
 				}
 			},
 			Runnable::LocalMenu => {},
-			Runnable::LobbyMenu(_) => {},
+			Runnable::LobbyMenu(x) => {
+				if let Some((domain, port)) = x.tick(packets) {
+					*self = Runnable::Client(Client::new(&domain, port));
+				}
+			},
 			Runnable::TutorialMenu => {},
 			Runnable::Local(local) => local.tick(app),
 			Runnable::Client(client) => client.tick(app),
