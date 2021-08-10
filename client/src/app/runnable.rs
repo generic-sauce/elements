@@ -23,7 +23,7 @@ impl<B: Backend> Runnable<B> {
 
 		let opt_on_click = menu.calc_element_properties(app, self);
 
-		menu.init_cache(&mut app.menu_cache);
+		menu.init_cache(&mut app.menu_cache, &app.storage_backend);
 		(menu, opt_on_click)
 	}
 
