@@ -32,7 +32,10 @@ impl<B: Backend> App<B> {
 		let mut audio_backend = B::AudioBackend::new();
 		audio_backend.set_music_volume(MUSIC_VOLUME);
 
-		let master_socket = B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT);
+		let mut master_socket = B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT);
+
+		let username = storage_backend.get("username").unwrap_or_else(String::new);
+		master_socket.send(&MasterServerPacket::LoginRequest(username)).expect("can't login to master server");
 
 		App {
 			input_backend,
