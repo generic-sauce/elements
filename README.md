@@ -30,4 +30,3 @@ git config -f .lfsconfig lfs.url https://github.com/generic-sauce/elements.git/i
 git push sauce
 rm .lfsconfig
 ```
-
