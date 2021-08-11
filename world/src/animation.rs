@@ -153,6 +153,6 @@ setup!(
 	RedPlayerRun: "images/player_red", "player_run", "png", 4, 6, WrapMode::Reset,
 	RedPlayerJump: "images/player_red", "player_jump", "png", 2, 6, WrapMode::Reset,
 	RedPlayerFall: "images/player_red", "player_fall", "png", 2, 6, WrapMode::Reset,
-	RedPlayerFallSlow: "images/player_red", "player_fall_slow", "png", 6, 6, WrapMode::Reset,
+	RedPlayerFallSlow: "images/player_red", "player_fall_slow", "png", 2, 6, WrapMode::Reset,
 	Bird: "images", "bird", "png", 6, 10, WrapMode::Reverse,
 );

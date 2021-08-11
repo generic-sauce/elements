@@ -8,7 +8,7 @@ pub(super) struct TextureState {
 impl TextureState {
 	pub(super) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> TextureState {
 		let textures: Vec<_> = texture_filenames_iter()
-			.map(|filepath| image::open(&filepath).unwrap().flipv().into_rgba8())
+			.map(|filepath| image::open(&filepath).unwrap_or_else(|e| panic!("Failed to load {}: {}", filepath, e)).flipv().into_rgba8())
 			.map(move |image| {
 				let size: PixelVec = image.dimensions().into();
 				let texture = create_texture(device, size);
