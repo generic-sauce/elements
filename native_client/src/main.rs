@@ -88,7 +88,6 @@ fn main() {
 
 	thread::spawn(move || {
 		let mut runnable = match matches.subcommand_name() {
-			Some("menu") => Runnable::OnlineMenu(OnlineMenu::new()),
 			Some("connect") => {
 				let matches = matches.subcommand_matches("connect").unwrap();
 				let ip = matches.value_of("server-ip").unwrap();
@@ -102,7 +101,7 @@ fn main() {
 				let best_of = matches.value_of("best_of").map(|n| n.parse::<u32>().expect("Value of best of is invalid!")).unwrap_or(0);
 				Runnable::Local(Local::new(best_of))
 			},
-			_ => Runnable::Local(Local::new(0)),
+			_ => Runnable::OnlineMenu(OnlineMenu::new()),
 		};
 		let input_backend = NativeInputBackend::new(peripherals_receiver);
 		let graphics_backend = NativeGraphicsBackend::new(draw_sender);

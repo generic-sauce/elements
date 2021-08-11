@@ -19,6 +19,7 @@ pub struct LobbyData {
 	name: String,
 	players: Vec<PeerHandle>, // players[0] is the owner
 	max_no_players: u32,
+	map_id: u8,
 }
 
 pub struct GameServerInfo {
@@ -81,6 +82,7 @@ impl MasterServer {
 				name: l.name.clone(),
 				player_names: player_names.clone(),
 				your_player_index,
+				map_id: l.map_id,
 			});
 			if let Err(x) = self.peer_manager.send_to(p, &packet) {
 				eprintln!("master-server: can't send MasterClientPacket::LobbyInfoUpdate to some client \"{}\"", x);
@@ -111,6 +113,7 @@ impl MasterServer {
 							name: lobby_name,
 							players: vec![peer],
 							max_no_players: 2,
+							map_id: 0,
 						});
 
 						self.send_lobby_info(lobby_id);
@@ -145,6 +148,7 @@ impl MasterServer {
 							name: x.name.clone(),
 							no_players: x.players.len() as u32,
 							max_no_players: x.max_no_players,
+							map_id: x.map_id,
 						}).collect();
 						if let Err(x) = self.peer_manager.send_to(peer, &MasterClientPacket::LobbyListResponse(v)) {
 							eprintln!("can't send LobbyListResponse to some client! error: {}", x);
@@ -164,6 +168,14 @@ impl MasterServer {
 							}
 						} else {
 							println!("no free game server!");
+						}
+					}
+					PeerEvent::ReceivedPacket(MasterServerPacket::ChangeLobbySettings(settings), peer) => {
+						if let Some(d) = self.lobbies.iter_mut().find(|d| d.players.contains(&peer)) {
+							d.map_id = settings.map_id;
+
+							let id = d.lobby_id;
+							self.send_lobby_info(id);
 						}
 					}
 

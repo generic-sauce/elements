@@ -1,8 +1,9 @@
 use crate::prelude::*;
 
 impl PeerManager {
-	pub fn tick_native<R: Packet>(&mut self) -> Result<Vec<PeerEvent<R>>, SocketErr> {
+	pub fn tick_native<R: Packet>(&mut self) -> (Vec<PeerEvent<R>>, Vec<SocketErr>) {
 		let mut events = Vec::new();
+		let mut errs = Vec::new();
 
 		// recv-packets
 		'recvloop: loop {
@@ -23,7 +24,13 @@ impl PeerManager {
 						}
 					);
 
-					let packet = deser::<NativeCSPacket<R>>(&bytes)?;
+					let packet = match deser::<NativeCSPacket<R>>(&bytes) {
+						Ok(x) => x,
+						Err(x) => {
+							errs.push(x);
+							continue 'recvloop;
+						}
+					};
 
 					let handle = match handle {
 						Some(h) => { // if peer existed before: update last_recv_time
@@ -50,7 +57,10 @@ impl PeerManager {
 					}
 				},
 				Ok(None) => break 'recvloop,
-				Err(x) => return Err(x),
+				Err(x) => {
+					errs.push(x);
+					break 'recvloop;
+				}
 			};
 		}
 
@@ -72,6 +82,6 @@ impl PeerManager {
 			}
 		}
 
-		Ok(events)
+		(events, errs)
 	}
 }
