@@ -6,8 +6,6 @@ pub use tilemap_image::*;
 
 use crate::prelude::*;
 
-use rand::prelude::SliceRandom;
-
 pub const WALL_LIFETIME: u32 = 40;
 pub const WALL_IGNORE_FRIENDLY_FLUIDS_TIME: u32 = 10;
 
@@ -118,8 +116,8 @@ impl TileMap {
 		}
 	}
 
-	pub fn get_spawn_position(&self, team: u8) -> TileVec {
-		*self.spawn_points[team as usize].choose(&mut rand::thread_rng()).unwrap()
+	pub fn get_spawn_positions(&self, team: u8) -> &Vec<TileVec> {
+		&self.spawn_points[team as usize]
 	}
 
 	pub fn reset(&mut self, handler: &mut impl EventHandler) {

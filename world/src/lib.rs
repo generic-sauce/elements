@@ -65,11 +65,15 @@ pub enum GameResult {
 
 fn new_players(teams: &[u8], tilemap: &TileMap) -> Vec<Player> {
 	let mut players = Vec::new();
+    let mut next_spawn_position_index = [0, 0];
 
 	for t in teams {
+		let spawn_positions = tilemap.get_spawn_positions(*t);
+		let spawn_position = spawn_positions[next_spawn_position_index[*t as usize] as usize];
+		next_spawn_position_index[*t as usize] = (next_spawn_position_index[*t as usize] + 1) % spawn_positions.len();
 		players.push(match t {
-			0 => Player::new(tilemap.get_spawn_position(*t).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
-			1 => Player::new(tilemap.get_spawn_position(*t).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
+			0 => Player::new(spawn_position.into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
+			1 => Player::new(spawn_position.into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
 			_ => panic!("team out of range in new_players()"),
 		});
 	}
