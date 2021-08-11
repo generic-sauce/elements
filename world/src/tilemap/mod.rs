@@ -6,6 +6,8 @@ pub use tilemap_image::*;
 
 use crate::prelude::*;
 
+use rand::prelude::SliceRandom;
+
 pub const WALL_LIFETIME: u32 = 40;
 pub const WALL_IGNORE_FRIENDLY_FLUIDS_TIME: u32 = 10;
 
@@ -20,7 +22,7 @@ pub enum Tile {
 pub struct TileMap {
 	pub tiles: Vec<Tile>,
 	pub size: TileVec,
-	pub spawn_points: [Vec<GameVec>; 2],
+	pub spawn_points: [Vec<TileVec>; 2],
 	pub details: Vec<(GameVec, DetailType)>
 }
 
@@ -52,11 +54,11 @@ impl TileMap {
 					[255, 255, 255, 255] => Tile::Void,
 					[0, 0, 0, 255] => Tile::Ground,
 					[0, 0, 255, 255] => {
-						spawn_points[0].push(GameVec::from(TileVec::new(x, y)));
+						spawn_points[0].push(TileVec::new(x, y));
 						Tile::Void
 					}
 					[255, 0, 0, 255] => {
-						spawn_points[1].push(GameVec::from(TileVec::new(x, y)));
+						spawn_points[1].push(TileVec::new(x, y));
 						Tile::Void
 					}
 					[0, 128, 0, 255] => {
@@ -114,6 +116,10 @@ impl TileMap {
 			spawn_points,
 			details,
 		}
+	}
+
+	pub fn get_spawn_position(&self, team: u8) -> TileVec {
+		*self.spawn_points[team as usize].choose(&mut rand::thread_rng()).unwrap()
 	}
 
 	pub fn reset(&mut self, handler: &mut impl EventHandler) {

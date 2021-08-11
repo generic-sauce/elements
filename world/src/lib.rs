@@ -63,13 +63,13 @@ pub enum GameResult {
 	Tie,
 }
 
-fn new_players(teams: &[u8]) -> Vec<Player> {
+fn new_players(teams: &[u8], tilemap: &TileMap) -> Vec<Player> {
 	let mut players = Vec::new();
 
 	for t in teams {
 		players.push(match t {
-			0 => Player::new(TileVec::new(37, 39).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
-			1 => Player::new(TileVec::new(88, 40).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
+			0 => Player::new(tilemap.get_spawn_position(*t).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
+			1 => Player::new(tilemap.get_spawn_position(*t).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
 			_ => panic!("team out of range in new_players()"),
 		});
 	}
@@ -79,7 +79,7 @@ fn new_players(teams: &[u8]) -> Vec<Player> {
 
 impl World {
 	pub fn reset(&mut self, handler: &mut impl EventHandler) {
-		self.players = new_players(&self.teams[..]);
+		self.players = new_players(&self.teams[..], &self.tilemap);
 		self.tilemap.reset(handler);
 		self.fluidmap = FluidMap::new(self.tilemap.size);
 		self.frame_id = 0;
@@ -90,7 +90,7 @@ impl World {
 		let tilemap = TileMap::new(tilemap_image);
 
 		World {
-			players: new_players(teams),
+			players: new_players(teams, &tilemap),
 			teams: teams.iter().cloned().collect(),
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
