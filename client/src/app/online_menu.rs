@@ -140,7 +140,7 @@ impl<B: Backend> OnlineMenu<B> {
 		let mut content = Vec::new();
 		let mut events: Vec<OnEvent<B>> = Vec::new();
 		for lobby in lobbies {
-			content.push(vec![lobby.name.clone(), format!("{}/{}", lobby.no_players, lobby.max_no_players)]);
+			content.push(vec![lobby.name.clone(), format!("{} / {}", lobby.no_players, lobby.max_no_players)]);
 
 			let lobby_id = lobby.lobby_id;
 			events.push(Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
@@ -157,8 +157,8 @@ impl<B: Backend> OnlineMenu<B> {
 			"onlinemenu_lobbies".to_string(),
 			CanvasVec::new(0.38 * ASPECT_RATIO, 0.45),
 			CanvasVec::new(0.25 * ASPECT_RATIO, 0.32),
-			vec![0.01*ASPECT_RATIO, 0.3*ASPECT_RATIO],
-			vec!["Lobby-Name".to_string(), "Lobby-Id".to_string()],
+			vec![0.01*ASPECT_RATIO, 0.35*ASPECT_RATIO],
+			vec!["Lobby-Name".to_string(), "# Players".to_string()],
 			content,
 			events,
 			menu_cache,
