@@ -140,7 +140,7 @@ impl<B: Backend> OnlineMenu<B> {
 		let mut content = Vec::new();
 		let mut events: Vec<OnEvent<B>> = Vec::new();
 		for lobby in lobbies {
-			content.push(vec![lobby.name.clone(), format!("{}", lobby.lobby_id)]);
+			content.push(vec![lobby.name.clone(), format!("{}/{}", lobby.no_players, lobby.max_no_players)]);
 
 			let lobby_id = lobby.lobby_id;
 			events.push(Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
