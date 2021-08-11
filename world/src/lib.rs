@@ -51,7 +51,7 @@ pub struct World {
 	pub tilemap: TileMap,
 	pub fluidmap: FluidMap,
 	pub frame_id: u32,
-	pub kills: [u32; 2], // indexed by team 0 or team 1
+	pub wins: [u32; 2], // number of wins, indexed by team 0 or team 1
 	pub restart_state: RestartState,
 	pub best_of_n: u32,
 	pub bird: Animation,
@@ -95,7 +95,7 @@ impl World {
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
 			frame_id: 0,
-			kills: [0, 0],
+			wins: [0, 0],
 			restart_state: RestartState::Game,
 			best_of_n,
 			bird: Animation::new(AnimationId::Bird),
@@ -105,12 +105,13 @@ impl World {
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
 		self.bird.tick();
 
+		let dead = [self.team_dead(0), self.team_dead(1)];
 		// sub-tick
 		match &mut self.restart_state {
 			RestartState::Game => {
 				self.tick_impl(handler);
-				for player_dead in &self.player_dead() {
-					if *player_dead {
+				for team in 0..2 {
+					if dead[team] {
 						self.restart_state = RestartState::new_restart();
 						handler.game_ended();
 					}
@@ -121,15 +122,15 @@ impl World {
 				*counter += 1;
 				*tick_value += get_frame_tick_probability(*counter);
 				if *counter == FIGHT_END_COUNT {
-					for i in 0..self.players.len() {
-						if self.players[i].health == 0 {
-							let winner_id = 1 - i;
+					for team in 0..2 {
+						if dead[team] {
+							let winner_id = 1 - team;
 							if matches!(*winner, Winner::One(_)) {
 								*winner = Winner::Both;
 							} else {
 								*winner = Winner::One(winner_id as u32);
 							}
-							self.kills[winner_id] += 1;
+							self.wins[winner_id as usize] += 1;
 						}
 					}
 				} else if *counter > TROPHY_END_COUNT {
@@ -237,10 +238,11 @@ impl World {
 		}
 	}
 
-	pub fn player_dead(&self) -> Vec<bool> {
+	pub fn team_dead(&self, team: u8) -> bool {
 		self.players.iter()
-			.map(|x| x.health == 0)
-			.collect()
+			.enumerate()
+			.filter(|(i, _)| self.teams[*i] == team)
+			.all(|(_, x)| x.health == 0)
 	}
 
 	pub fn is_game_over(&self) -> GameResult {
@@ -251,7 +253,7 @@ impl World {
 		match self.restart_state {
 			RestartState::Game => {
 				let mut game_result = GameResult::None;
-				for winner in self.kills.iter().enumerate().filter(|(_, kill)| **kill >= (self.best_of_n+1) / 2).map(|(index, _)| index) {
+				for winner in self.wins.iter().enumerate().filter(|(_, win)| **win >= (self.best_of_n+1) / 2).map(|(index, _)| index) {
 					match game_result {
 						GameResult::None => { game_result = GameResult::Winner(winner as u8)},
 						GameResult::Winner(_) => { game_result = GameResult::Tie },

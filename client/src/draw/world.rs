@@ -15,12 +15,12 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 				let rdc = FIGHT_END_COUNT as f32;
 				let counter = counter as f32;
 				let factor = ((rdc - counter.min(rdc)*SKY_COLOR_FADE_SPEED) / rdc).max(0.0).min(MAX_SKY_FACTOR); // factor goes from 1.0 -> 0.0
-				if world.player_dead()[0] {
+				if world.team_dead(0) {
 					sky_color.r *= 1.0 + factor*0.7;
 					sky_color.b /= 1.0 + factor*2.5;
 					sky_color.g /= 1.0 + factor*1.7;
 				}
-				if world.player_dead()[1] {
+				if world.team_dead(1) {
 					sky_color.r /= 1.0 + factor*2.0;
 					sky_color.b *= 1.0 + factor*0.7;
 					sky_color.g /= 1.0 + factor*1.3;
@@ -95,7 +95,7 @@ fn draw_trophy<B: Backend>(draw: &mut Draw, world: &World, app: &App<B>) {
 	// status trophies
 	let text_size = 0.037;
 	for i in 0..2 {
-		let text = format!("{} x", world.kills[i]);
+		let text = format!("{} x", world.wins[i]);
 		let text_offset = app.graphics_backend.get_text_size(&text, text_size).x * 0.5 + 0.02;
 		draw.text(WINNER_POSITIONS[i] - ViewVec::new(text_offset, 0.03), text_size, Color::WHITE, &text);
 		draw.texture(WINNER_POSITIONS[i] - trophy_size, WINNER_POSITIONS[i] + trophy_size, TextureId::Trophy, Flip::Normal, None);
