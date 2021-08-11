@@ -1,59 +1,12 @@
 import { state } from "./init"
+import { state as triangles_state } from "../triangles/init"
+import { bind_vao } from "../triangles/render"
 
 export function render(text) {
-	gl.useProgram(state.program)
+	gl.useProgram(triangles_state.program)
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
 
-	{ // vertex_position
-		const count = 2
-		const type = gl.FLOAT
-		const normalize = false
-		const stride = 8 * 4
-		const offset = 0 * 4
-		gl.vertexAttribPointer(
-			state.locations.vertex_position,
-			count,
-			type,
-			normalize,
-			stride,
-			offset
-		)
-		gl.enableVertexAttribArray(state.locations.vertex_position)
-	}
-
-	{ // vertex_uv
-		const count = 2
-		const type = gl.FLOAT
-		const normalize = false
-		const stride = 8 * 4
-		const offset = 2 * 4
-		gl.vertexAttribPointer(
-			state.locations.vertex_uv,
-			count,
-			type,
-			normalize,
-			stride,
-			offset
-		)
-		gl.enableVertexAttribArray(state.locations.vertex_uv)
-	}
-
-	{ // vertex_color
-		const count = 4
-		const type = gl.FLOAT
-		const normalize = false
-		const stride = 8 * 4
-		const offset = 4 * 4
-		gl.vertexAttribPointer(
-			state.locations.vertex_color,
-			count,
-			type,
-			normalize,
-			stride,
-			offset
-		)
-		gl.enableVertexAttribArray(state.locations.vertex_color)
-	}
+	bind_vao()
 
 	update_texture(text.left_bot, text.scale, text.color, text.string)
 

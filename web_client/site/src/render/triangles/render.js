@@ -10,10 +10,7 @@ export function set_vertices(vertex_data) {
 	gl.bufferData(gl.ARRAY_BUFFER, vertex_data, gl.STATIC_DRAW)
 }
 
-export function render(texture_index, from, to) {
-	gl.useProgram(state.program)
-	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
-
+export function bind_vao() {
 	{ // vertex_position
 		const count = 2
 		const type = gl.FLOAT
@@ -64,6 +61,13 @@ export function render(texture_index, from, to) {
 		)
 		gl.enableVertexAttribArray(state.locations.vertex_color)
 	}
+}
+
+export function render(texture_index, from, to) {
+	gl.useProgram(state.program)
+	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)
+
+	bind_vao()
 
 	gl.bindTexture(gl.TEXTURE_2D, state.textures[texture_index])
 	gl.drawArrays(gl.TRIANGLES, from, to - from)
