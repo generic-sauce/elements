@@ -124,19 +124,17 @@ impl<B: Backend> MenuElement<B> {
 	}
 
 	pub fn new_list_view_elements(name: String, position: CanvasVec, size: CanvasVec, spacing: Vec<f32>, header: Vec<String>, content: Vec<Vec<String>>, opt_on_click_events: Option<Vec<OnEvent<B>>>, menu_cache: &MenuCache) -> Vec<MenuElement<B>> {
+		// add header
 		let mut elements = vec![
 			MenuElement {
 				name: format!("{}:headerpanel", name),
 				kind: MenuKind::Panel,
 				position: CanvasVec::new(position.x, position.y + size.y - LIST_VIEW_HEADER_SIZE/2.0),
 				size: CanvasVec::new(size.x, LIST_VIEW_HEADER_SIZE),
-				color: Color::gray(0.2),
+				color: Color::rgb(0.2, 0.4, 0.6),
 			}
 		];
-
 		assert_eq!(spacing.len(), header.len());
-
-		// add header
 		for (i, space) in spacing.iter().enumerate() {
 			elements.push(
 				MenuElement {
@@ -190,7 +188,7 @@ impl<B: Backend> MenuElement<B> {
 						}),
 						position: CanvasVec::new(position.x, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*(row_index+1) as f32),
 						size: CanvasVec::new(size.x, LIST_VIEW_CONTENT_SIZE/2.0),
-						color: Color::gray(0.3 + (entry_index%2) as f32*0.02),
+						color: Color::rgb(0.2, 0.4, 0.6)*(0.8+((entry_index%2) as f32*0.02)),
 					}
 				)
 			} else {
@@ -205,7 +203,7 @@ impl<B: Backend> MenuElement<B> {
 						}),
 						position: CanvasVec::new(position.x, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*(row_index+1) as f32),
 						size: CanvasVec::new(size.x, LIST_VIEW_CONTENT_SIZE/2.0),
-						color: Color::gray(0.3 + (entry_index%2) as f32*0.02),
+						color: Color::rgb(0.2, 0.4, 0.6)*(0.8+((entry_index%2) as f32*0.02)),
 					}
 				)
 			}
@@ -231,7 +229,7 @@ impl<B: Backend> MenuElement<B> {
 				}),
 				position: CanvasVec::new(position.x + size.x - LIST_VIEW_BUTTON_SIZE, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*max_num_lines as f32 + LIST_VIEW_BUTTON_SIZE - LIST_VIEW_CONTENT_SIZE/2.0),
 				size: CanvasVec::new(LIST_VIEW_BUTTON_SIZE, LIST_VIEW_BUTTON_SIZE),
-				color: Color::gray(0.2),
+				color: Color::rgb(0.2, 0.4, 0.6),
 			}
 		);
 
@@ -250,7 +248,7 @@ impl<B: Backend> MenuElement<B> {
 				}),
 				position: CanvasVec::new(position.x + size.x - LIST_VIEW_BUTTON_SIZE, position.y + size.y - LIST_VIEW_HEADER_SIZE - LIST_VIEW_CONTENT_SIZE*max_num_lines as f32 + LIST_VIEW_BUTTON_SIZE*3.0 - LIST_VIEW_CONTENT_SIZE/2.0),
 				size: CanvasVec::new(LIST_VIEW_BUTTON_SIZE, LIST_VIEW_BUTTON_SIZE),
-				color: Color::gray(0.2),
+				color: Color::rgb(0.2, 0.4, 0.6),
 			}
 		);
 
