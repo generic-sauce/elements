@@ -16,6 +16,7 @@ export function init(texture_filenames) {
 	state.locations.vertex_uv = gl.getAttribLocation(state.program, 'vertex_uv')
 	state.locations.vertex_color = gl.getAttribLocation(state.program, 'vertex_color')
 	state.locations.tex = gl.getUniformLocation(state.program, 'tex')
+	state.locations.v = gl.getUniformLocation(state.program, 'v')
 	state.buffer = gl.createBuffer()
 	state.textures = textures
 }

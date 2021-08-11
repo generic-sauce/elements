@@ -1,5 +1,9 @@
 import { state } from "./init.js"
 
+export function set_view_matrix(v) {
+	gl.uniformMatrix3fv(state.locations.v, false, v);
+}
+
 export function set_vertices(vertex_data) {
 	gl.useProgram(state.program)
 	gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer)

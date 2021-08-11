@@ -32,7 +32,7 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 		draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::SkyBackground, Flip::Normal, Some(sky_color));
 	}
 
-	draw.texture(CanvasVec::right_bot(-1.0, 0.0), ViewVec::new(1.0, 1.0), TextureId::Mountains1, Flip::Normal, None);
+	draw.texture(CanvasVec::right_bot(-1.0, 0.0).to_view(), ViewVec::new(1.0, 1.0), TextureId::Mountains1, Flip::Normal, None);
 	draw.texture(ViewVec::new(0.0, 0.0), ViewVec::new(0.8, 0.7), TextureId::Mountains0, Flip::Normal, None);
 
 	draw.texture(TileVec::new(30, 9), TileVec::new(38, 17), TextureId::Bush0, Flip::Normal, None);
@@ -53,6 +53,13 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 	draw.texture(TileVec::new(12, 19), TileVec::new(20, 27), TextureId::FloatingBush0, Flip::Normal, None);
 
 	draw.texture(ViewVec::new(0.4, 0.6), ViewVec::new(0.43, 0.63), world.bird, Flip::Normal, None);
+
+	let camera_left_bot = ViewVec::new(0.0, 0.0);
+	let camera_zoom = 1.0;
+	draw.set_camera(Camera {
+		left_bot: camera_left_bot,
+		zoom: camera_zoom,
+	});
 }
 
 fn trophy_position_curve(mix: f32) -> f32 {
