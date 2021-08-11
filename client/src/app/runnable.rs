@@ -28,9 +28,17 @@ impl<B: Backend> Runnable<B> {
 
 	pub fn tick(&mut self, app: &mut App<B>) {
 		let mut packets = Vec::new();
-		if app.master_socket.is_open() {
-			while let Some(p) = app.master_socket.recv() {
-				packets.push(p);
+		if let Some(s) = &mut app.master_socket {
+			loop {
+				match s.recv() {
+					Ok(Some(x)) => packets.push(x),
+					Ok(None) => break,
+					Err(x) => {
+						eprintln!("Runnable::tick() packet receiving failed due to \"{}\"", x);
+						break;
+					}
+
+				}
 			}
 		}
 		match self {
@@ -44,7 +52,10 @@ impl<B: Backend> Runnable<B> {
 			Runnable::LocalMenu => {},
 			Runnable::LobbyMenu(x) => {
 				if let Some((domain, port)) = x.tick(packets) {
-					*self = Runnable::Client(Client::new(&domain, port));
+					match Client::new(&domain, port) {
+						Ok(c) => *self = Runnable::Client(c),
+						Err(x) => eprintln!("Runnable::tick(): can't open client due to \"{}\"", x),
+					}
 				}
 			},
 			Runnable::TutorialMenu => {},

@@ -21,9 +21,14 @@ impl<B: Backend> OnlineMenu<B> {
 	pub fn tick(&mut self, app: &mut App<B>, packets: Vec<MasterClientPacket>) -> Option<LongLobbyInfo>{
 		self.tick_username_field(app);
 
-		if self.should_send_lobby_list_request && app.master_socket.is_open() {
-			app.master_socket.send(&MasterServerPacket::LobbyListRequest).expect("Could not send lobby list request");
-			self.should_send_lobby_list_request = false;
+		if let Some(s) = &mut app.master_socket {
+			if self.should_send_lobby_list_request {
+				if let Err(x) = s.send(&MasterServerPacket::LobbyListRequest) {
+					eprintln!("OnlineMenu::tick(): can't send LobbyListRequest due do \"{}\"", x);
+				} else {
+					self.should_send_lobby_list_request = false;
+				}
+			}
 		}
 
 		let mut opt_lobby_info = None;
@@ -100,14 +105,13 @@ impl<B: Backend> OnlineMenu<B> {
 				GO_BUTTON_FONT_SIZE,
 				None,
 				Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
-					if !app.master_socket.is_open() {
-						eprintln!("can't open lobby, you have no connection to the master server!");
-						return;
-					}
-
 					let new_lobby_name = &app.menu_cache.edit_field.get("onlinemenu_createlobby_name").unwrap().text;
-					app.master_socket.send(&MasterServerPacket::CreateLobby(new_lobby_name.to_string())).unwrap();
-				} ),
+					if let Some(s) = &mut app.master_socket {
+						if let Err(x) = s.send(&MasterServerPacket::CreateLobby(new_lobby_name.to_string())) {
+							eprintln!("OnlineMenu: can't send CreateLobby packet due to \"{}\"", x);
+						}
+					}
+				}),
 			),
 			MenuElement::new_button(
 				"onlinemenu_refreshlobby".to_string(),
@@ -144,12 +148,11 @@ impl<B: Backend> OnlineMenu<B> {
 
 			let lobby_id = lobby.lobby_id;
 			events.push(Box::new(move |app: &mut App<B>, _runnable: &mut Runnable<B>| {
-				if !app.master_socket.is_open() {
-					eprintln!("can't join lobby, you have no connection to the master server!");
-					return;
+				if let Some(s) = &mut app.master_socket {
+					if let Err(x) = s.send(&MasterServerPacket::JoinLobby(lobby_id)) {
+						eprintln!("OnlineMenu: can't send JoinLobby packet due to \"{}\"", x);
+					}
 				}
-
-				app.master_socket.send(&MasterServerPacket::JoinLobby(lobby_id)).unwrap();
 			} ))
 		}
 

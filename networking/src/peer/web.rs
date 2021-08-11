@@ -1,23 +1,23 @@
 use crate::prelude::*;
 
 impl PeerManager {
-	pub fn tick_web<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
+	pub fn tick_web<R: Packet>(&mut self) -> Result<Vec<PeerEvent<R>>, SocketErr> {
 		let mut events = Vec::new();
 
 		// https-accept
 		if let Some(acceptor) = self.acceptor.as_mut() {
 			loop {
-				match self.https_listener.accept().map_err(|e| e.kind()) {
+				match self.https_listener.accept(){
 					Ok((stream, _)) => {
-						let tls_stream = acceptor.accept(stream).unwrap();
-						let mut tung = tungstenite::server::accept(tls_stream).unwrap();
-						tung.get_mut().get_mut().set_nonblocking(true).unwrap();
+						let tls_stream = acceptor.accept(stream)?;
+						let mut tung = tungstenite::server::accept(tls_stream)?;
+						tung.get_mut().get_mut().set_nonblocking(true)?;
 
 						let handle = add_peer(&mut self.peers, PeerKind::Https(tung));
 						events.push(PeerEvent::NewPeer(handle));
 					},
-					Err(ErrorKind::WouldBlock) => break,
-					Err(_) => panic!("listener.accept() failed"),
+					Err(x) if matches!(x.kind(), ErrorKind::WouldBlock) => break,
+					Err(x) => return Err(Box::new(x)),
 				}
 			}
 		}
@@ -26,8 +26,8 @@ impl PeerManager {
 		loop {
 			match self.http_listener.accept().map_err(|e| e.kind()) {
 				Ok((stream, _)) => {
-					let mut tung = tungstenite::server::accept(stream).unwrap();
-					tung.get_mut().set_nonblocking(true).unwrap();
+					let mut tung = tungstenite::server::accept(stream)?;
+					tung.get_mut().set_nonblocking(true)?;
 
 					let handle = add_peer(&mut self.peers, PeerKind::Http(tung));
 					events.push(PeerEvent::NewPeer(handle));
@@ -47,27 +47,27 @@ impl PeerManager {
 			};
 
 			match &mut peer.kind {
-				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)),
-				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)),
+				PeerKind::Http(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)?),
+				PeerKind::Https(s) => events.extend(tung_fetch_events(handle, s, &mut peer.alive)?),
 				_ => {},
 			}
 		}
 
-		events
+		Ok(events)
 	}
 }
 
-fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mut tungstenite::WebSocket<C>, alive: &mut bool) -> Vec<PeerEvent<P>> {
+fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mut tungstenite::WebSocket<C>, alive: &mut bool) -> Result<Vec<PeerEvent<P>>, SocketErr> {
 	let mut events = Vec::new();
 
 	if socket.can_write() {
 		loop {
 			match socket.read_message() {
 				Ok(Message::Binary(bytes)) => {
-					let p = deser::<P>(&bytes[..]);
+					let p = deser::<P>(&bytes[..])?;
 					events.push(PeerEvent::ReceivedPacket(p, handle));
 				},
-				Ok(Message::Text(_)) => panic!("text should not be sent!"),
+				Ok(Message::Text(_)) => return Err(strerr("tung_fetch_events: text should not be sent")),
 				Ok(Message::Close(_)) => {
 					events.push(PeerEvent::Disconnect(handle));
 					*alive = false;
@@ -80,7 +80,7 @@ fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mu
 					}
 					panic!("recv error (1)");
 				}
-				e @ Err(_) => { e.unwrap(); unreachable!(); },
+				Err(e) => return Err(Box::new(e)),
 			}
 		}
 	} else {
@@ -88,5 +88,5 @@ fn tung_fetch_events<P: Packet, C: Read + Write>(handle: PeerHandle, socket: &mu
 		*alive = false;
 	}
 
-	events
+	Ok(events)
 }

@@ -82,7 +82,9 @@ impl MasterServer {
 				player_names: player_names.clone(),
 				your_player_index,
 			});
-			self.peer_manager.send_to(p, &packet);
+			if let Err(x) = self.peer_manager.send_to(p, &packet) {
+				eprintln!("master-server: can't send MasterClientPacket::LobbyInfoUpdate to some client \"{}\"", x);
+			}
 		}
 	}
 
@@ -144,14 +146,18 @@ impl MasterServer {
 							no_players: x.players.len() as u32,
 							max_no_players: x.max_no_players,
 						}).collect();
-						self.peer_manager.send_to(peer, &MasterClientPacket::LobbyListResponse(v));
+						if let Err(x) = self.peer_manager.send_to(peer, &MasterClientPacket::LobbyListResponse(v)) {
+							eprintln!("can't send LobbyListResponse to some client! error: {}", x);
+						}
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => {
 						if let Some(game_server) = self.game_servers.iter_mut().find(|x| matches!(x.state, GameServerState::Ready)) {
 							if let Some(idx) = self.lobbies.iter().position(|l| l.players[0] == peer) {
 								let players = self.lobbies.remove(idx).players;
 								for p in players {
-									self.peer_manager.send_to(p, &MasterClientPacket::GoToGameServer(game_server.domain_name.clone(), game_server.port));
+									if let Err(x) = self.peer_manager.send_to(p, &MasterClientPacket::GoToGameServer(game_server.domain_name.clone(), game_server.port)) {
+										eprintln!("can't send GoToGameServer to some client! error: {}", x);
+									}
 								}
 								game_server.state = GameServerState::AwaitingGame(0);
 								println!("INFO: initiating game on game server {}:{}", &game_server.domain_name, game_server.port);

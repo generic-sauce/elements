@@ -27,16 +27,24 @@ pub struct App<B: Backend> {
 	pub cursor_position: CanvasVec,
 	pub peripherals_state: PeripheralsState,
 	pub menu_cache: MenuCache,
-	pub master_socket: B::SocketBackend, // used for communication with master server
+	pub master_socket: Option<B::SocketBackend>, // used for communication with master server
 	pub should_send_login: bool, // if set to true, you should send a MasterServerPacket::Login to the master server
 }
+
+// TODO automatically reconnect to master server
 
 impl<B: Backend> App<B> {
 	pub fn new(graphics_backend: B::GraphicsBackend, input_backend: B::InputBackend, storage_backend: B::StorageBackend, master_server_ip: &str) -> App<B> {
 		let mut audio_backend = B::AudioBackend::new();
 		audio_backend.set_music_volume(MUSIC_VOLUME);
 
-		let master_socket = B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT);
+		let master_socket = match B::SocketBackend::new(master_server_ip, DEFAULT_MASTER_SERVER_PORT) {
+			Ok(x) => Some(x),
+			Err(x) => {
+				eprintln!("app: can't connect to master server due to \"{}\"", x);
+				None
+			}
+		};
 
 		App {
 			input_backend,
@@ -65,12 +73,14 @@ impl<B: Backend> App<B> {
 	}
 
 	pub fn tick_draw(&mut self, runnable: &mut Runnable<B>) {
-		if self.should_send_login && self.master_socket.is_open() {
-			let username = self.storage_backend.get("username").unwrap_or_else(String::new);
-			if let Err(_) = self.master_socket.send(&MasterServerPacket::Login(username)) {
-				eprintln!("can't login to master server");
-			} else {
-				self.should_send_login = false;
+		if let Some(s) = &mut self.master_socket {
+			if self.should_send_login {
+				let username = self.storage_backend.get("username").unwrap_or_else(String::new);
+				if let Err(x) = s.send(&MasterServerPacket::Login(username)) {
+					eprintln!("can't login to master server due to \"{}\"", x);
+				} else {
+					self.should_send_login = false;
+				}
 			}
 		}
 
@@ -102,7 +112,9 @@ impl<B: Backend> App<B> {
 	}
 
 	fn tick_master_socket(&mut self) {
-		self.master_socket.tick();
+		if let Some(s) = &mut self.master_socket {
+			s.tick();
+		}
 	}
 
 	fn check_game_over(&mut self, runnable: &mut Runnable<B>) {

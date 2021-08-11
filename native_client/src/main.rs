@@ -95,7 +95,7 @@ fn main() {
 				let port = matches.value_of("port")
 					.map(|p| p.parse::<u16>().expect("Port argument seems not to be a valid port!"))
 					.unwrap_or(DEFAULT_GAME_SERVER_PORT);
-				Runnable::Client(Client::new(&ip, port))
+				Runnable::Client(Client::new(&ip, port).unwrap())
 			},
 			Some("local") => {
 				let matches = matches.subcommand_matches("local").unwrap();

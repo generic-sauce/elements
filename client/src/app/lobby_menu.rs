@@ -71,7 +71,11 @@ impl<B: Backend> LobbyMenu<B> {
 				0.05,
 				None,
 				Box::new(|app: &mut App<B>, _| {
-					app.master_socket.send(&MasterServerPacket::StartGame).unwrap();
+					if let Some(s) = &mut app.master_socket {
+						if let Err(x) = s.send(&MasterServerPacket::StartGame) {
+							eprintln!("can't send StartGame packet due to \"{}\"", x);
+						}
+					}
 				}),
 			));
 		}
@@ -85,8 +89,15 @@ impl<B: Backend> LobbyMenu<B> {
 			0.05,
 			None,
 			Box::new(|app: &mut App<B>, runnable: &mut Runnable<B>| {
-				app.master_socket.send(&MasterServerPacket::LeaveLobby).unwrap();
-				*runnable = Runnable::OnlineMenu(OnlineMenu::new());
+				if let Some(s) = &mut app.master_socket {
+					if let Err(x) = s.send(&MasterServerPacket::LeaveLobby) {
+						eprintln!("LobbyMenu: can't send LeaveLobby packet due to \"{}\"", x);
+					} else {
+						*runnable = Runnable::OnlineMenu(OnlineMenu::new());
+					}
+				} else {
+					eprintln!("can't leave lobby: master socket is None");
+				}
 			}),
 		));
 

@@ -25,28 +25,28 @@ pub struct Client<B: Backend> {
 }
 
 impl<B: Backend> Client<B> {
-	pub fn new(server_ip: &str, port: u16) -> Client<B> {
-		Client {
-			socket: B::SocketBackend::new(server_ip, port),
+	pub fn new(server_ip: &str, port: u16) -> Result<Client<B>, SocketErr> {
+		Ok(Client {
+			socket: B::SocketBackend::new(server_ip, port)?,
 			mode: ClientMode::Lobby,
 			active: false, // TODO actually set this thing to true sometimes
-		}
+		})
 	}
 
 	pub fn tick(&mut self, app: &mut App<B>) {
 		match &mut self.mode {
 			ClientMode::Lobby => {
-				if !self.socket.is_open() { return; }
 				self.socket.tick();
 				match self.socket.recv() {
-					Some(GameSCPacket::Go { your_player_id, tilemap_image}) => {
+					Ok(Some(GameSCPacket::Go { your_player_id, tilemap_image})) => {
 						self.mode = ClientMode::InGame {
 							player_id: your_player_id,
 							world: World::new(0, &tilemap_image),
 						};
 					}
-					Some(_) => println!("received non-Go packet while in ClientMode::Lobby"),
-					None => {},
+					Ok(Some(_)) => println!("received non-Go packet while in ClientMode::Lobby"),
+					Ok(None) => {},
+					Err(x) => eprintln!("client::tick: lobby: can't socket.recv(): \"{}\"", x),
 				}
 			},
 			ClientMode::InGame { player_id, world } => {
@@ -54,9 +54,10 @@ impl<B: Backend> Client<B> {
 				self.socket.tick();
 				loop {
 					match self.socket.recv() {
-						Some(GameSCPacket::WorldUpdate(update)) => apply_update_within_app(world, update, app),
-						Some(_) => println!("received non-WorldUpdate packet while in ClientMode::InGame"),
-						None => break,
+						Ok(Some(GameSCPacket::WorldUpdate(update))) => apply_update_within_app(world, update, app),
+						Ok(Some(_)) => println!("received non-WorldUpdate packet while in ClientMode::InGame"),
+						Ok(None) => break,
+						Err(x) => eprintln!("client::tick: in-game: can't socket.recv(): \"{}\"", x),
 					}
 				}
 
@@ -69,7 +70,9 @@ impl<B: Backend> Client<B> {
 				}
 
 				// send packets
-				self.socket.send(&GameCSPacket::InputState(world.players[*player_id].input.clone())).unwrap(); // TODO: fix clone
+				if let Err(x) = self.socket.send(&GameCSPacket::InputState(world.players[*player_id].input.clone())) { // TODO: fix clone
+					eprintln!("client: can't send GameCSPacket::InputState due to \"{}\"", x);
+				}
 
 				// tick world
 				tick_within_app(world, app);

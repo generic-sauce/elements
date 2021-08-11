@@ -7,12 +7,12 @@ pub struct WebSocketBackend {
 }
 
 impl SocketBackend for WebSocketBackend {
-	fn new(server_ip: &str, port: u16) -> Self {
+	fn new(server_ip: &str, port: u16) -> Result<Self, SocketErr> {
 		let ip_string = match server_ip.starts_with("http://") {
 			true => format!("ws://{}:{}", server_ip.trim_start_matches("http://"), port),
 			false => format!("wss://{}:{}", server_ip, port+1),
 		};
-		let socket = WebSocket::new(&ip_string).unwrap();
+		let socket = WebSocket::new(&ip_string).map_err(|_| strerr("WebSocket::new() failed"))?; // TODO better error management
 		socket.set_binary_type(web_sys::BinaryType::Arraybuffer);
 
 		// message-closure
@@ -26,34 +26,34 @@ impl SocketBackend for WebSocketBackend {
 		}));
 		socket.set_onmessage(Some(msg_closure.as_ref().dyn_ref().unwrap()));
 
-		WebSocketBackend {
+		Ok(WebSocketBackend {
 			socket,
 			msg_receiver,
 			_msg_closure: msg_closure,
+		})
+	}
+
+	fn send(&mut self, packet: &impl Packet) -> Result<(), SocketErr> {
+		if !matches!(self.socket.ready_state(), WebSocket::OPEN) {
+			return Err(strerr("ERR: websocket-send: ready_state is not open!"));
 		}
-	}
 
-	fn is_open(&self) -> bool {
-		self.socket.ready_state() == WebSocket::OPEN
-	}
-
-	fn send(&mut self, packet: &impl Packet) -> std::io::Result<()> {
-		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
-
-		let input_bytes = ser(packet);
-		self.socket.send_with_u8_array(&input_bytes[..]).unwrap();
+		let input_bytes = ser(packet)?;
+		self.socket.send_with_u8_array(&input_bytes[..]).map_err(|_| strerr("WebSocket::send_with_u8_array failed"))?; // TODO better error management
 		Ok(())
 	}
 
 	fn tick(&mut self) { }
 
-	fn recv<P: Packet>(&mut self) -> Option<P> {
-		assert_eq!(self.socket.ready_state(), WebSocket::OPEN);
+	fn recv<P: Packet>(&mut self) -> Result<Option<P>, SocketErr> {
+		if !matches!(self.socket.ready_state(), WebSocket::OPEN) {
+			return Err(strerr("ERR: websocket-recv: ready_state is not open!"));
+		}
 
 		let bytes = match self.msg_receiver.try_recv() {
-			Err(TryRecvError::Empty) => return None,
+			Err(TryRecvError::Empty) => return Ok(None),
 			x => x.unwrap(),
 		};
-		Some(deser::<P>(&bytes[..]))
+		Ok(Some(deser::<P>(&bytes[..])?))
 	}
 }

@@ -73,28 +73,36 @@ impl PeerManager {
 	pub fn tick<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
 		let mut events = Vec::new();
 
-		events.extend(self.tick_native());
-		events.extend(self.tick_web());
+		match self.tick_native() {
+			Ok(x) => events.extend(x),
+			Err(x) => eprintln!("PeerManager::tick_native-error: {}", x),
+		};
+		match self.tick_web() {
+			Ok(x) => events.extend(x),
+			Err(x) => eprintln!("PeerManager::tick_web-error: {}", x),
+		};
 
 		events
 	}
 
-	pub fn send_to(&mut self, handle: PeerHandle, p: &impl Packet) {
+	pub fn send_to(&mut self, handle: PeerHandle, p: &impl Packet) -> Result<(), SocketErr> {
 		let opt = self.peers.get_mut(handle.index)
 			.filter(|p| p.alive)
 			.filter(|p| p.generation == handle.generation)
 			.map(|p| &mut p.kind);
 
 		match opt {
-			Some(PeerKind::Native { addr, .. }) => send_packet_to(&mut self.udp_socket, p, *addr),
+			Some(PeerKind::Native { addr, .. }) => send_packet_to(&mut self.udp_socket, p, *addr)?,
 			Some(PeerKind::Http(socket)) => {
-				if socket.can_write() { socket.write_message(Message::Binary(ser(p))).unwrap(); }
+				if socket.can_write() { socket.write_message(Message::Binary(ser(p)?))?; }
 			},
 			Some(PeerKind::Https(socket)) => {
-				if socket.can_write() { socket.write_message(Message::Binary(ser(p))).unwrap(); }
+				if socket.can_write() { socket.write_message(Message::Binary(ser(p)?))?; }
 			},
 			None => println!("send_to: Peer does not exist!"),
 		}
+
+		Ok(())
 	}
 
 	pub fn get_udp_ip(&self, handle: PeerHandle) -> Option<SocketAddr> {
