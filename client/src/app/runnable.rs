@@ -13,7 +13,7 @@ impl<B: Backend> Runnable<B> {
 	pub fn build_menu(&mut self, app: &mut App<B>) -> (Menu<B>, Option<OnEvent<B>>) {
 		let mut menu = match self {
 			Runnable::OnlineMenu(online_menu) => online_menu.build_menu(&app.menu_cache),
-			Runnable::LobbyMenu(l) => l.build_menu(),
+			Runnable::LobbyMenu(l) => l.build_menu(&app.menu_cache),
 			Runnable::LocalMenu => Menu::local_menu(),
 			Runnable::TutorialMenu => Menu::tutorial_menu(),
 			Runnable::Client(_) => Menu::in_game_menu(Box::new(create_online_menu)),

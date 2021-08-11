@@ -123,7 +123,7 @@ impl<B: Backend> MenuElement<B> {
 		}
 	}
 
-	pub fn new_list_view_elements(name: String, position: CanvasVec, size: CanvasVec, spacing: Vec<f32>, header: Vec<String>, content: Vec<Vec<String>>, on_click_events: Vec<OnEvent<B>>, menu_cache: &MenuCache) -> Vec<MenuElement<B>> {
+	pub fn new_list_view_elements(name: String, position: CanvasVec, size: CanvasVec, spacing: Vec<f32>, header: Vec<String>, content: Vec<Vec<String>>, opt_on_click_events: Option<Vec<OnEvent<B>>>, menu_cache: &MenuCache) -> Vec<MenuElement<B>> {
 		let mut elements = vec![
 			MenuElement {
 				name: format!("{}:headerpanel", name),
@@ -153,9 +153,10 @@ impl<B: Backend> MenuElement<B> {
 			)
 		}
 
-		assert_eq!(on_click_events.len(), content.len());
+		if let Some(on_click_events) = &opt_on_click_events {
+			assert_eq!(on_click_events.len(), content.len());
+		}
 		let max_num_lines = ((size.y*2.0 - LIST_VIEW_HEADER_SIZE) / LIST_VIEW_CONTENT_SIZE) as usize;
-
 		let num_to_skip = menu_cache.list_view.get(&name).map(|lvc| lvc.scroll_position).unwrap_or(0) as usize;
 
 		for row_index in 0..max_num_lines {
@@ -183,7 +184,7 @@ impl<B: Backend> MenuElement<B> {
 						name: format!("{}:content_field{}", name, entry_index),
 						kind: MenuKind::Button(Button {
 							text: String::new(),
-							on_click: on_click_events[entry_index].clone(),
+							on_click: opt_on_click_events.as_ref().map(|e| e[entry_index].clone()).unwrap_or(Box::new(|_, _| {})).clone(),
 							font_size: LIST_VIEW_CONTENT_SIZE,
 							image: None
 						}),

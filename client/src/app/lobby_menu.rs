@@ -31,7 +31,7 @@ impl<B: Backend> LobbyMenu<B> {
 		opt_ret
 	}
 
-	pub fn build_menu(&self) -> Menu<B> {
+	pub fn build_menu(&self, menu_cache: &MenuCache) -> Menu<B> {
 		let mut elements = Vec::new();
 		elements.push(MenuElement::new_label(
 			"lobbymenu_title".to_string(),
@@ -41,25 +41,19 @@ impl<B: Backend> LobbyMenu<B> {
 			&self.long_lobby_info.name,
 			TextAlign::Left,
 		));
-		elements.push(MenuElement::new_label(
-			"lobbymenu_playernames_title".to_string(),
-			CanvasVec::new(0.25 * ASPECT_RATIO, 0.77),
-			CanvasVec::new(0.15, 0.15),
-			0.06,
-			"Players:",
-			TextAlign::Left,
-		));
-		// TODO
-		for (i, name) in self.long_lobby_info.player_names.iter().enumerate() {
-			elements.push(MenuElement::new_label(
-				format!("lobbymenu_playername{}", i),
-				CanvasVec::new(0.25 * ASPECT_RATIO, 0.67 - (i as f32) * 0.08),
-				CanvasVec::new(0.15, 0.15),
-				0.05,
-				name,
-				TextAlign::Left,
-			));
-		}
+		let content = self.long_lobby_info.player_names.iter().map(|n| vec![n.to_string()]).collect();
+		let list_view = MenuElement::new_list_view_elements(
+			"lobbymenu_playernames".to_string(),
+			CanvasVec::new(0.25 * ASPECT_RATIO, 0.5),
+			CanvasVec::new(0.2 * ASPECT_RATIO, 0.2),
+			vec![0.01],
+			vec!["Players".to_string()],
+			content,
+			None,
+			menu_cache,
+		);
+
+		elements.extend(list_view);
 
 		if self.long_lobby_info.your_player_index == 0 { // if you are the lobby owner
 			elements.push(MenuElement::new_button(
