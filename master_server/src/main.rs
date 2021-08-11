@@ -171,7 +171,7 @@ impl MasterServer {
 						}
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::ChangeLobbySettings(settings), peer) => {
-						if let Some(d) = self.lobbies.iter_mut().find(|d| d.players.contains(&peer)) {
+						if let Some(d) = self.lobbies.iter_mut().find(|d| d.players[0] == peer) {
 							d.map_id = settings.map_id;
 
 							let id = d.lobby_id;
