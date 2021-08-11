@@ -5,7 +5,6 @@ static AVAILABLE_MAPS: &'static[&'static str] = &["map01.png", "map02.png", "map
 pub struct LobbyMenu<B: Backend> {
 	pub long_lobby_info: LongLobbyInfo,
 	show_map_choose_menu: bool,
-	pub tilemap_name: String,
 	pub _p: PhantomData<B>,
 }
 
@@ -14,7 +13,6 @@ impl<B: Backend> LobbyMenu<B> {
 		LobbyMenu {
 			long_lobby_info,
 			show_map_choose_menu: false,
-			tilemap_name: String::from(AVAILABLE_MAPS[0]),
 			_p: PhantomData,
 		}
 	}
@@ -56,7 +54,7 @@ impl<B: Backend> LobbyMenu<B> {
 				CanvasVec::new(0.8 * ASPECT_RATIO, 0.4),
 				CanvasVec::new(0.1, 0.03),
 				0.04,
-				&format!("Map: {}", self.tilemap_name),
+				&format!("Map: {}", AVAILABLE_MAPS[self.long_lobby_info.map_id as usize]),
 				TextAlign::Center,
 			));
 		}
@@ -74,18 +72,22 @@ impl<B: Backend> LobbyMenu<B> {
 
 			// map list view
 			let content = AVAILABLE_MAPS.iter().map(|m| vec![m.to_string()]).collect();
-			let events = AVAILABLE_MAPS.iter().map(|m| Box::new(move |app: &mut App<B>, runnable: &mut Runnable<B>| {
-				match runnable {
-					Runnable::LobbyMenu(lm) => {
-						lm.choose_map(m);
-					},
-					_ => panic!("lobbymenu_changemap button clicked, but runnable is not LobbyMenu"),
-				}
-				/*
+			let events = (0..AVAILABLE_MAPS.len()).map(|m| Box::new(move |app: &mut App<B>, runnable: &mut Runnable<B>| {
 				if let Some(s) = &mut app.master_socket {
-					match s.send(&MasterServePacket::Change)
+					match s.send(&MasterServerPacket::ChangeLobbySettings(LobbySettings { map_id: m as u8 })) {
+						Ok(()) => {
+							match runnable {
+								Runnable::LobbyMenu(lm) => {
+									lm.choose_map(m as u8);
+								},
+								_ => panic!("lobbymenu_changemap button clicked, but runnable is not LobbyMenu"),
+							}
+						},
+						Err(x) => {
+							eprintln!("can't send ChangeLobbySettings due to \"{}\"", x);
+						}
+					}
 				}
-				 */
 			}) as OnEvent<B>).collect();
 			let map_list_view = MenuElement::new_list_view_elements(
 				"lobbymenu_maps".to_string(),
@@ -184,8 +186,8 @@ impl<B: Backend> LobbyMenu<B> {
 		}
 	}
 
-	fn choose_map(&mut self, map: &str) {
+	fn choose_map(&mut self, map_id: u8) {
 		self.show_map_choose_menu = false;
-		self.tilemap_name = map.to_string();
+		self.long_lobby_info.map_id = map_id;
 	}
 }
