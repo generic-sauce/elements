@@ -43,6 +43,6 @@ impl TileMap {
 		handler.tilemap_changed();
 
 		// This exists to generate a compiler error whenever a field will be added to TileMap.
-		let Self { tiles: _, size: _ } = self;
+		let Self { tiles: _, size: _, spawn_points: _, details: _ } = self;
 	}
 }

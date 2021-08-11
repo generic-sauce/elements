@@ -13,11 +13,4 @@ export function init() {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-
-	state.program = create_program("text", vert_src, frag_src)
-	state.locations = {}
-	state.locations.vertex_position = gl.getAttribLocation(state.program, 'vertex_position')
-	state.locations.vertex_uv = gl.getAttribLocation(state.program, 'vertex_uv')
-	state.locations.vertex_color = gl.getAttribLocation(state.program, 'vertex_color')
-	state.locations.tex = gl.getUniformLocation(state.program, 'tex')
 }
