@@ -8,6 +8,7 @@ impl FluidMap {
 		for (i, player) in players.iter().enumerate() {
 			if player.grab_cooldown.is_some() { continue; }
 			if f.team != teams[i] { continue; }
+			if matches!(f.state, FluidState::AtHand(_)) { continue; }
 
 			let cursor = player.cursor_position();
 			let condition = (cursor - f.position).as_short_as(CURSOR_GRAB_DIST) ||
