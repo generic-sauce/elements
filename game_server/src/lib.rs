@@ -22,11 +22,12 @@ pub struct Server {
 
 impl Server {
 	pub fn new(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> Server {
-		let tilemap_image = load_tilemap_image(DEFAULT_TILEMAP);
 
 		println!("INFO: Server starting on port {}. Waiting for players.", port);
 
-		let (peer_manager, peers) = waiting_for_players(port, domain_name, identity_file);
+		let (peer_manager, peers, packet) = waiting_for_players(port, domain_name, identity_file);
+
+		let tilemap_image = load_tilemap_image(AVAILABLE_MAPS[packet.map_id as usize]);
 
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
@@ -131,7 +132,9 @@ pub fn game_server_cli_args() -> ArgMatches<'static> {
 		.get_matches()
 }
 
-fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> (PeerManager, [PeerHandle; 2]) {
+// waits for all players to join, and for some MasterToGameServerGoPacket to be received
+fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> (PeerManager, [PeerHandle; 2], MasterToGameServerGoPacket) {
+	let mut go_packet: Option<MasterToGameServerGoPacket> = None;
 	let mut peer_manager = PeerManager::new(port, port+1, identity_file);
 
 	let mut silent_frames = 0;
@@ -181,16 +184,21 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 					panic!("WARN: Missing second player. Timeout! Shutting down...");
 				}
 			},
-			_ => break, // enough players joined!
+			_ => { // enough players joined!
+				if go_packet.is_some() { break; }
+				else { println!("WARN: waiting for MasterToGameServerGoPacket"); }
+			},
 		}
 
 		// master server networking
 		if let Some((domain_name, socket)) = &mut master_socket {
 			socket.tick();
 			loop {
-				match socket.recv::<()>() {
+				match socket.recv::<MasterToGameServerGoPacket>() {
 					Ok(None) => break,
-					Ok(Some(_)) => eprintln!("game-server: waiting_for_players: WARN: invalid packet from master server"),
+					Ok(Some(x)) => {
+						go_packet = Some(x);
+					}
 					Err(x) => eprintln!("game-server: waiting_for_players: error: {}", x),
 				}
 			}
@@ -206,7 +214,7 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 	let peers = peer_manager.get_peer_handles();
 	let peers = [peers[0], peers[1]];
 
-	(peer_manager, peers)
+	(peer_manager, peers, go_packet.expect("this is a bug. waiting_for_players finished without receiving a MasterToGameServerGoPacket"))
 }
 
 fn update_master_server(socket: &mut NativeSocketBackend, num_players: u32, port: u16, domain_name: &str) {

@@ -16,6 +16,13 @@ pub enum MasterServerPacket { // packets received by the master server
 	ChangeLobbySettings(LobbySettings), // sent from lobby owner to master server to change map/game-mode/...
 }
 
+// TODO should contain the information which peers are to be accepted by the game server!
+#[derive(Serialize, Deserialize, Clone)]
+pub struct MasterToGameServerGoPacket {
+	pub map_id: u8,
+}
+
+impl Packet for MasterToGameServerGoPacket {}
 impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

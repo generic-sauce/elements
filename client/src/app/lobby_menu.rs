@@ -1,7 +1,5 @@
 use crate::prelude::*;
 
-static AVAILABLE_MAPS: &'static[&'static str] = &["map01.png", "map02.png", "map03.png", "map04.png"];
-
 pub struct LobbyMenu<B: Backend> {
 	pub long_lobby_info: LongLobbyInfo,
 	show_map_choose_menu: bool,

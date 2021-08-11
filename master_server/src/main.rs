@@ -157,14 +157,18 @@ impl MasterServer {
 					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => {
 						if let Some(game_server) = self.game_servers.iter_mut().find(|x| matches!(x.state, GameServerState::Ready)) {
 							if let Some(idx) = self.lobbies.iter().position(|l| l.players[0] == peer) {
-								let players = self.lobbies.remove(idx).players;
-								for p in players {
+								let lobby = self.lobbies.remove(idx);
+								for &p in &lobby.players {
 									if let Err(x) = self.peer_manager.send_to(p, &MasterClientPacket::GoToGameServer(game_server.domain_name.clone(), game_server.port)) {
 										eprintln!("can't send GoToGameServer to some client! error: {}", x);
 									}
 								}
 								game_server.state = GameServerState::AwaitingGame(0);
 								println!("INFO: initiating game on game server {}:{}", &game_server.domain_name, game_server.port);
+
+								if let Err(x) = self.peer_manager.send_to(game_server.peer, &MasterToGameServerGoPacket { map_id: lobby.map_id }) {
+									eprintln!("WARN: can't send MasterToGameServerGoPacket due to \"{}\"", x);
+								}
 							}
 						} else {
 							println!("no free game server!");

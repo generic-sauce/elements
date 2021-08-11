@@ -1,4 +1,5 @@
 pub static DEFAULT_MASTER_SERVER_HOSTNAME: &str = "generic-sauce.de";
+pub static AVAILABLE_MAPS: &'static[&'static str] = &["map01.png", "map02.png", "map03.png", "map04.png"];
 
 pub use serde::{Serialize, Serializer, Deserialize, Deserializer, de::DeserializeOwned};
 pub use serde_derive::*;
