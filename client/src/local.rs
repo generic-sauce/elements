@@ -28,7 +28,7 @@ impl<B: Backend> Local<B> {
 		match &mut self.mode {
 			LocalMode::LoadingTileMap { loader, best_of_n } => {
 				if let Some(image) = loader.poll() {
-					self.mode = LocalMode::InGame(World::new(*best_of_n, &image));
+					self.mode = LocalMode::InGame(World::new(*best_of_n, &image, &[0, 1]));
 				}
 			},
 			LocalMode::InGame(world) => {

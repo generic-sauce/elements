@@ -38,10 +38,10 @@ impl<B: Backend> Client<B> {
 			ClientMode::Lobby => {
 				self.socket.tick();
 				match self.socket.recv() {
-					Ok(Some(GameSCPacket::Go { your_player_id, tilemap_image})) => {
+					Ok(Some(GameSCPacket::Go { your_player_id, tilemap_image, teams})) => {
 						self.mode = ClientMode::InGame {
 							player_id: your_player_id,
-							world: World::new(0, &tilemap_image),
+							world: World::new(0, &tilemap_image, &teams[..]),
 						};
 					}
 					Ok(Some(_)) => println!("received non-Go packet while in ClientMode::Lobby"),

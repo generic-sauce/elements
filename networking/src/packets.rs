@@ -2,9 +2,8 @@ use crate::prelude::*;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum MasterServerPacket { // packets received by the master server
-	GameServerStatusUpdate {
+	GameServerReady { // sent by the game server to inform the master server that it is ready
 		domain_name: String,
-		num_players: u32, // TODO this seems outdated
 		port: u16
 	},
 	Login(/* username: */ String), // sent by a client to login to the master server; also used to rename yourself
@@ -20,6 +19,8 @@ pub enum MasterServerPacket { // packets received by the master server
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MasterToGameServerGoPacket {
 	pub map_id: u8,
+	pub teams: Vec<u8>, // teams[i] returns the team of the i'th player
+	// TODO make configurable in the lobby
 }
 
 impl Packet for MasterToGameServerGoPacket {}
@@ -43,6 +44,7 @@ pub struct LongLobbyInfo { // sent from master server to clients: obtained only 
 	pub lobby_id: u32,
 	pub name: String,
 	pub player_names: Vec<String>,
+	pub teams: Vec<u8>,
 	pub your_player_index: u32,
 	pub map_id: u8,
 	/* full tile_map */

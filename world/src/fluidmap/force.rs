@@ -9,12 +9,12 @@ const fn free_drag(x: i32) -> i32 { x * 255 / 256 }
 const fn hand_drag(x: i32) -> i32 { x * 24 / 32 }
 
 impl FluidMap {
-	pub(in super) fn apply_forces(&self, mut f: Fluid, t: &TileMap, players: &[Player; 2], frame_id: u32) -> Fluid {
+	pub(in super) fn apply_forces(&self, mut f: Fluid, t: &TileMap, players: &[Player], frame_id: u32) -> Fluid {
 		// gravity
 		let mut velocity = f.velocity - GameVec::new(0, FLUID_GRAVITY);
 
-		if let FluidState::AtHand = f.state {
-			let cursor = players[f.owner].cursor_position();
+		if let FluidState::AtHand(pl) = f.state {
+			let cursor = players[pl as usize].cursor_position();
 			apply_cursor_steering(&mut velocity, &f, cursor);
 		}
 
@@ -22,7 +22,7 @@ impl FluidMap {
 		let velocity = velocity.map(
 			match f.state {
 				FluidState::Free => free_drag,
-				FluidState::AtHand => hand_drag,
+				FluidState::AtHand(_) => hand_drag,
 			}
 		);
 
@@ -33,7 +33,8 @@ impl FluidMap {
 		);
 
 		// position offset
-		let neighbours: Vec<_> = self.neighbours_with_owner(&f)
+		let neighbours: Vec<_> = self.neighbours(&f)
+			.filter(|n| f.team == n.team)
 			.filter(|n| ((n.ignore_counter == 0 && f.ignore_counter == 0) || f.id == n.id) && (f.position - n.position).as_short_as(DESIRED_FLUID_DIST))
 			.collect();
 

@@ -79,7 +79,7 @@ impl DrawTilemap {
 			.map(|t| match t {
 				Tile::Void => 0,
 				Tile::Ground => 1,
-				Tile::Wall { owner, .. } => 2 + owner as u8,
+				Tile::Wall { team, .. } => 2 + team,
 			})
 			.collect();
 
@@ -108,7 +108,7 @@ impl DrawFluidmap {
 
 			let cell_index = 4 * (cell_id.x + cell_id.y * size.x as i32) as usize;
 			data[cell_index+3] = 255;
-			data[cell_index+2] = (fluid.owner * 255) as u8;
+			data[cell_index+2] = (fluid.team * 255) as u8;
 			data[cell_index+1] = local_position.1 as u8;
 			data[cell_index]   = local_position.0 as u8;
 		}

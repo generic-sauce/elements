@@ -13,7 +13,7 @@ pub const WALL_IGNORE_FRIENDLY_FLUIDS_TIME: u32 = 10;
 pub enum Tile {
 	Void,
 	Ground,
-	Wall { owner: usize, remaining_lifetime: u32 },
+	Wall { team: u8, remaining_lifetime: u32 },
 }
 
 #[derive(Serialize, Deserialize)]

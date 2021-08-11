@@ -46,11 +46,12 @@ pub fn get_frame_tick_probability(counter: u32) -> f32 {
 
 #[derive(Serialize, Deserialize)]
 pub struct World {
-	pub players: [Player; 2],
+	pub players: Vec<Player>,
+	pub teams: Vec<u8>, // teams[i] returns the team of the i'th player
 	pub tilemap: TileMap,
 	pub fluidmap: FluidMap,
 	pub frame_id: u32,
-	pub kills: [u32; 2],
+	pub kills: [u32; 2], // indexed by team 0 or team 1
 	pub restart_state: RestartState,
 	pub best_of_n: u32,
 	pub bird: Animation,
@@ -62,27 +63,35 @@ pub enum GameResult {
 	Tie,
 }
 
-fn new_players() -> [Player; 2] {
-	[
-		Player::new(TileVec::new(37, 39).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
-		Player::new(TileVec::new(88, 40).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
-	]
+fn new_players(teams: &[u8]) -> Vec<Player> {
+	let mut players = Vec::new();
+
+	for t in teams {
+		players.push(match t {
+			0 => Player::new(TileVec::new(37, 39).into(), AnimationId::BluePlayerIdle, PlayerDirection::Right),
+			1 => Player::new(TileVec::new(88, 40).into(), AnimationId::RedPlayerIdle, PlayerDirection::Left),
+			_ => panic!("team out of range in new_players()"),
+		});
+	}
+
+	players
 }
 
 impl World {
 	pub fn reset(&mut self, handler: &mut impl EventHandler) {
-		self.players = new_players();
+		self.players = new_players(&self.teams[..]);
 		self.tilemap.reset(handler);
 		self.fluidmap = FluidMap::new(self.tilemap.size);
 		self.frame_id = 0;
 		self.restart_state = RestartState::Game;
 	}
 
-	pub fn new(best_of_n: u32, tilemap_image: &TileMapImage) -> World {
+	pub fn new(best_of_n: u32, tilemap_image: &TileMapImage, teams: &[u8]) -> World {
 		let tilemap = TileMap::new(tilemap_image);
 
 		World {
-			players: new_players(),
+			players: new_players(teams),
+			teams: teams.iter().cloned().collect(),
 			fluidmap: FluidMap::new(tilemap.size),
 			tilemap,
 			frame_id: 0,
@@ -163,7 +172,7 @@ impl World {
 			self.fluidmap.spawn_counter = FLUID_SPAWN_DIST;
 		}
 
-		for i in 0..2 {
+		for i in 0..self.players.len() {
 			let p = &self.players[i];
 
 			let calc_spawn_pos = |from: GameVec, to: GameVec| {
@@ -179,8 +188,8 @@ impl World {
 			let position = calc_spawn_pos(p.cursor_position(), p.center_position());
 
 			self.fluidmap.add_fluid(Fluid {
-				state: FluidState::AtHand,
-				owner: i,
+				state: FluidState::AtHand(i as u8),
+				team: self.teams[i],
 				velocity: 0.into(),
 				position,
 				reference_position: position,
@@ -201,22 +210,23 @@ impl World {
 
 	fn despawn_walls(&mut self, handler: &mut impl EventHandler) {
 		for tile in self.tilemap.tiles.iter_mut() {
-			if let Tile::Wall { remaining_lifetime, owner } = tile {
+			if let Tile::Wall { remaining_lifetime, team } = tile {
 				*tile = remaining_lifetime.checked_sub(1)
-					.map(|lifetime| Tile::Wall { remaining_lifetime: lifetime, owner: *owner })
+					.map(|lifetime| Tile::Wall { remaining_lifetime: lifetime, team: *team })
 					.unwrap_or_else(|| { handler.tilemap_changed(); Tile::Void });
 			}
 		}
 	}
 
 	fn check_damage(&mut self, handler: &mut impl EventHandler) {
-		for i in 0..2 {
+		for i in 0..self.players.len() {
+			let team = self.teams[i];
 			let mut dmg = 0;
 			let t = &self.tilemap;
 			let pl = &self.players;
 			for v in self.fluidmap.grid.iter_mut() {
 				dmg += v.drain_filter(|x|
-					x.owner != i && pl[i].collides_fluid(x.position, FLUID_DAMAGE_RADIUS, t)
+					x.team != team && pl[i].collides_fluid(x.position, FLUID_DAMAGE_RADIUS, t)
 				).map(|f| f.damage())
 				.sum::<i32>();
 			}
@@ -227,8 +237,10 @@ impl World {
 		}
 	}
 
-	pub fn player_dead(&self) -> [bool; 2] {
-		[self.players[0].health == 0, self.players[1].health == 0]
+	pub fn player_dead(&self) -> Vec<bool> {
+		self.players.iter()
+			.map(|x| x.health == 0)
+			.collect()
 	}
 
 	pub fn is_game_over(&self) -> GameResult {

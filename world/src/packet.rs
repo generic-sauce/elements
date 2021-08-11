@@ -11,6 +11,7 @@ pub enum GameSCPacket { // Server -> Client
 	Go {
 		your_player_id: usize,
 		tilemap_image: TileMapImage,
+		teams: Vec<u8>,
 	}
 }
 

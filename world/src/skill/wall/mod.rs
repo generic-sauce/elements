@@ -41,7 +41,7 @@ impl World {
 
 		let refill_amount = match tile {
 			Tile::Void => WALL_LIFETIME,
-			Tile::Wall { owner, remaining_lifetime } if owner == p => {
+			Tile::Wall { team, remaining_lifetime } if team == self.teams[p] => {
 				WALL_LIFETIME - remaining_lifetime
 			},
 			_ => {
@@ -52,7 +52,7 @@ impl World {
 
 		self.alloc_wall_lifetime(p, refill_amount)?;
 
-		self.tilemap.set(pos_tile, Tile::Wall { owner: p, remaining_lifetime: WALL_LIFETIME });
+		self.tilemap.set(pos_tile, Tile::Wall { team: self.teams[p], remaining_lifetime: WALL_LIFETIME });
 
 		handler.tilemap_changed();
 		self.players[p].wall_mode = WallMode::InProgress { last_drawn_tile: pos_tile };
@@ -66,7 +66,7 @@ impl World {
 		// allocate free_wall
 		if pl.free_wall_lifetime < amount {
 			'outer: for inner_v in self.fluidmap.grid.iter_mut() {
-				while let Some(i) = inner_v.iter().position(|x| x.owner == p && matches!(x.state, FluidState::AtHand)) {
+				while let Some(i) = inner_v.iter().position(|x| x.state == FluidState::AtHand(p as u8)) {
 					inner_v.swap_remove(i);
 					pl.free_wall_lifetime += WALLS_PER_FLUID * WALL_LIFETIME;
 					if pl.free_wall_lifetime >= amount { break 'outer; }

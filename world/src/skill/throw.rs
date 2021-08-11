@@ -6,7 +6,7 @@ const THROW_THREE_DISTANCE: i32 = TILESIZE*2;
 impl World {
 	pub(in super) fn handle_throw(&mut self, p: usize) {
 		self.fluidmap.iter_mut_notranslate()
-			.filter(|x| x.owner == p && matches!(x.state, FluidState::AtHand))
+			.filter(|x| x.state == FluidState::AtHand(p as u8))
 			.for_each(|f| f.state = FluidState::Free);
 
 		self.players[p].grab_cooldown = Some(GRAB_COOLDOWN);
@@ -15,7 +15,7 @@ impl World {
 	pub(in super) fn handle_throw3(&mut self, p: usize) {
 		let player = &self.players[p];
 		let mut v: Vec<&mut Fluid> = self.fluidmap.iter_mut_notranslate()
-			.filter(|x| x.owner == p && matches!(x.state, FluidState::AtHand))
+			.filter(|x| x.state == FluidState::AtHand(p as u8))
 			.collect();
 		v.sort_by_cached_key(|f| (f.position - player.cursor_position()).length_squared());
 		if v.is_empty() { return; }

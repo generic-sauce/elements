@@ -74,9 +74,9 @@ fn route(velocity: i32, pos: i32) -> i32 {
 
 fn check_solid(position: GameVec, f: &Fluid, t: &TileMap) -> bool {
 	let tile = t.get(position.to_tile());
-	if let Tile::Wall { owner, remaining_lifetime } = tile {
-		if owner == f.owner
-			&& f.state == FluidState::AtHand
+	if let Tile::Wall { team, remaining_lifetime } = tile {
+		if team == f.team
+			&& matches!(f.state, FluidState::AtHand(_))
 			&& (WALL_LIFETIME - remaining_lifetime) <= WALL_IGNORE_FRIENDLY_FLUIDS_TIME {
 				return false;
 		}

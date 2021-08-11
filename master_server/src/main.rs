@@ -9,7 +9,7 @@ pub const CLIENT_REQUEST_TIMEOUT: u32 = 5 * MASTER_SERVER_FPS;
 
 pub struct MasterServer {
 	pub peer_manager: PeerManager,
-	pub game_servers: Vec<GameServerInfo>,
+	pub game_servers: Vec<GameServerInfo>, // list of ready game server: game_servers will be popped when the games starts but will rejoin afterwards
 	pub clients: Vec<ClientInfo>,
 	pub lobbies: Vec<LobbyData>,
 }
@@ -18,14 +18,13 @@ pub struct LobbyData {
 	lobby_id: u32,
 	name: String,
 	players: Vec<PeerHandle>, // players[0] is the owner
+	teams: Vec<u8>,
 	max_no_players: u32,
 	map_id: u8,
 }
 
 pub struct GameServerInfo {
 	pub peer: PeerHandle,
-	pub num_players: u32,
-	pub state: GameServerState,
 	pub domain_name: String,
 	pub port: u16,
 }
@@ -34,17 +33,6 @@ pub struct ClientInfo {
 	pub peer: PeerHandle,
 	pub name: String,
 	pub last_request_counter: u32,
-}
-
-pub enum GameServerState {
-	Ready, // TODO: make game servers disconnect
-	/*
-	 * This state is set, if this master server redirected clients to this game server,
-	 * but the game server did not acknowledged until now.
-	 * The u32 saves the number of frames, since this GameServer is
-	 */
-	AwaitingGame(u32),
-	InGame,
 }
 
 impl MasterServer {
@@ -83,6 +71,7 @@ impl MasterServer {
 				player_names: player_names.clone(),
 				your_player_index,
 				map_id: l.map_id,
+				teams: l.teams.clone(),
 			});
 			if let Err(x) = self.peer_manager.send_to(p, &packet) {
 				eprintln!("master-server: can't send MasterClientPacket::LobbyInfoUpdate to some client \"{}\"", x);
@@ -96,8 +85,8 @@ impl MasterServer {
 			'packet_loop: for ev in self.peer_manager.tick::<MasterServerPacket>() {
 				match ev {
 					// received packets from game servers
-					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerStatusUpdate { domain_name, num_players, port }, peer) => {
-						self.apply_game_server_status_update(peer, domain_name, num_players, port);
+					PeerEvent::ReceivedPacket(MasterServerPacket::GameServerReady{ domain_name, port }, peer) => {
+						self.apply_game_server_ready(peer, domain_name, port);
 					}
 
 					// received packets from clients
@@ -112,6 +101,7 @@ impl MasterServer {
 							lobby_id,
 							name: lobby_name,
 							players: vec![peer],
+							teams: vec![0],
 							max_no_players: 2,
 							map_id: 0,
 						});
@@ -126,7 +116,6 @@ impl MasterServer {
 							let id = d.lobby_id;
 							self.send_lobby_info(id);
 						}
-
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::LeaveLobby, peer) => {
 						if let Some(lobby_idx) = self.lobbies.iter().position(|l| l.players.contains(&peer)) {
@@ -155,23 +144,28 @@ impl MasterServer {
 						}
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::StartGame, peer) => {
-						if let Some(game_server) = self.game_servers.iter_mut().find(|x| matches!(x.state, GameServerState::Ready)) {
-							if let Some(idx) = self.lobbies.iter().position(|l| l.players[0] == peer) {
+						if let Some(idx) = self.lobbies.iter().position(|l| l.players[0] == peer) {
+							if let Some(game_server) = self.game_servers.pop() {
 								let lobby = self.lobbies.remove(idx);
 								for &p in &lobby.players {
 									if let Err(x) = self.peer_manager.send_to(p, &MasterClientPacket::GoToGameServer(game_server.domain_name.clone(), game_server.port)) {
 										eprintln!("can't send GoToGameServer to some client! error: {}", x);
 									}
 								}
-								game_server.state = GameServerState::AwaitingGame(0);
 								println!("INFO: initiating game on game server {}:{}", &game_server.domain_name, game_server.port);
 
-								if let Err(x) = self.peer_manager.send_to(game_server.peer, &MasterToGameServerGoPacket { map_id: lobby.map_id }) {
+								let packet = MasterToGameServerGoPacket {
+									map_id: lobby.map_id,
+									teams: (0..lobby.players.len()).map(|x| (x % 2) as u8).collect::<Vec<_>>() // TODO make configurable in the lobby
+								};
+								if let Err(x) = self.peer_manager.send_to(game_server.peer, &packet) {
 									eprintln!("WARN: can't send MasterToGameServerGoPacket due to \"{}\"", x);
 								}
+							} else {
+								eprintln!("no game server is ready!");
 							}
 						} else {
-							println!("no free game server!");
+							eprintln!("some non-host (or someone not even in a lobby) wants to StartGame.. foolish!");
 						}
 					}
 					PeerEvent::ReceivedPacket(MasterServerPacket::ChangeLobbySettings(settings), peer) => {
@@ -205,40 +199,12 @@ impl MasterServer {
 					}
 				}
 			}
-
-			self.check_awaiting_servers();
 		}
 	}
 
-	fn check_awaiting_servers(&mut self) {
-		for server in self.game_servers.iter_mut() {
-			if let GameServerState::AwaitingGame(frames) = &mut server.state {
-				*frames += 1;
-				if *frames > AWAITING_TIMEOUT {
-					// clients did not connect in 5 seconds -> make this server available again
-					println!("WARN: players did not connect. making Game Server available again.");
-					server.state = GameServerState::Ready;
-				}
-			}
-		}
-	}
-
-	fn apply_game_server_status_update(&mut self, peer: PeerHandle, domain_name: String, num_players: u32, port: u16) {
-		if let Some(game_server) = self.game_servers.iter_mut().find(|gs| gs.peer == peer) {
-			game_server.num_players = num_players;
-			if num_players == 2 {
-				game_server.state = GameServerState::InGame;
-			} else if matches!(game_server.state, GameServerState::InGame) {
-				game_server.state = GameServerState::Ready;
-			}
-			if game_server.port != port {
-				eprintln!("WARN: game server changing port {} -> {}", game_server.port, port);
-			}
-			game_server.port = port;
-		} else {
-			println!("INFO: new game server connected: {}:{}", domain_name, port);
-			self.game_servers.push(GameServerInfo::new(peer, domain_name, num_players, port));
-		}
+	fn apply_game_server_ready(&mut self, peer: PeerHandle, domain_name: String, port: u16) {
+		if self.game_servers.iter().find(|x| x.peer == peer).is_some() { return; }
+		self.game_servers.push(GameServerInfo::new(peer, domain_name, port));
 	}
 
 	fn apply_login_request(&mut self, peer: PeerHandle, name: String) {
@@ -263,12 +229,10 @@ impl ClientInfo {
 }
 
 impl GameServerInfo {
-	pub fn new(peer: PeerHandle, domain_name: String, num_players: u32, port: u16) -> GameServerInfo {
+	pub fn new(peer: PeerHandle, domain_name: String, port: u16) -> GameServerInfo {
 		GameServerInfo {
 			peer,
 			domain_name,
-			num_players,
-			state: GameServerState::Ready,
 			port,
 		}
 	}

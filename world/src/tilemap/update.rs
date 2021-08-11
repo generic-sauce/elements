@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TileMapUpdateWall {
-	owner: usize,
+	team: u8,
 	remaining_lifetime: u32,
 	position: TileVec,
 }
@@ -16,10 +16,10 @@ impl TileMap {
 	pub fn update(&self) -> TileMapUpdate {
 		let iter = self.iter()
 			.filter_map(|position| {
-				if let Tile::Wall{ owner, remaining_lifetime } = self.get(position) {
+				if let Tile::Wall{ team, remaining_lifetime } = self.get(position) {
 					Some(
 						TileMapUpdateWall {
-							owner,
+							team,
 							remaining_lifetime,
 							position,
 						}
@@ -38,7 +38,7 @@ impl TileMap {
 			}
 		}
 		for x in u.walls {
-			*self.get_mut(x.position) = Tile::Wall { remaining_lifetime: x.remaining_lifetime, owner: x.owner};
+			*self.get_mut(x.position) = Tile::Wall { remaining_lifetime: x.remaining_lifetime, team: x.team};
 		}
 		handler.tilemap_changed();
 

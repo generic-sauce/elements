@@ -15,14 +15,14 @@ pub const MAX_IGNORE_COUNTER: u32 = 20;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FluidState {
-	AtHand,
+	AtHand(u8), // the player index you're at
 	Free,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Fluid {
 	pub state: FluidState,
-	pub owner: usize,
+	pub team: u8,
 	pub velocity: GameVec,
 	pub position: GameVec,
 	pub reference_position: GameVec,
@@ -101,10 +101,6 @@ impl FluidMap {
 		iproduct!(-1..2, -1..2)
 			.flat_map(move |t| self.index(fluid_tile + t))
 			.filter(move |n| (f.position - n.position).as_short_as(FLUID_AFFECT_DIST))
-	}
-
-	pub fn neighbours_with_owner<'s>(&'s self, f: &'s Fluid) -> impl Iterator<Item=&Fluid> + 's {
-		self.neighbours(f).filter(move |n| n.owner == f.owner)
 	}
 
 	pub fn add_fluid(&mut self, fluid: Fluid) {
