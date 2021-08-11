@@ -8,7 +8,7 @@ pub enum MasterServerPacket { // packets received by the master server
 		port: u16
 	},
 	Login(/* username: */ String), // sent by a client to login to the master server; also used to rename yourself
-	CreateLobby(/* lobby_name: */ String /*, settings */), // sent by a client to the master server to open a lobby (should only be sent, when you are not yet in a lobby)
+	CreateLobby(/* lobby_name: */ String), // sent by a client to the master server to open a lobby (should only be sent, when you are not yet in a lobby); the settings are set after creating the lobby
 	JoinLobby(/* lobby_id: */ u32),
 	LeaveLobby, // sent from client to master server to indicate that it leaves it's lobby. this also closes the lobby if it was the last player
 	LobbyListRequest, // sent from client to master server to receive a LobbyListResponsePacket
@@ -22,6 +22,8 @@ impl Packet for MasterServerPacket {}
 pub struct ShortLobbyInfo { // obtainable for each lobby
 	pub lobby_id: u32,
 	pub name: String,
+	pub no_players: u32,
+	pub max_no_players: u32,
 	/* tile_map icon */
 	/* number_of_players */
 	/* game_mode */
