@@ -27,7 +27,7 @@ impl Server {
 
 		let (peer_manager, peers, packet) = waiting_for_players(port, domain_name, identity_file);
 
-		let tilemap_image = load_tilemap_image(AVAILABLE_MAPS[packet.map_id as usize]);
+		let tilemap_image = load_tilemap_image(&format!("map/{}", AVAILABLE_MAPS[packet.map_id as usize]));
 
 		let mut server = Server {
 			world: World::new(0, &tilemap_image),
