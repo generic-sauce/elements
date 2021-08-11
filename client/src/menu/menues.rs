@@ -71,7 +71,7 @@ impl<B: Backend> Menu<B> {
 		elements.extend(vec![
 			MenuElement::new_label(
 				"localmenu_title".to_string(),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.83),
 				CanvasVec::new(0.15, 0.15),
 				SUBTITLE_FONT_SIZE,
 				"Local",
@@ -113,7 +113,7 @@ impl<B: Backend> Menu<B> {
 			),
 			MenuElement::new_label(
 				"tutorial_title".to_string(),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.83),
 				CanvasVec::new(0.15, 0.15),
 				SUBTITLE_FONT_SIZE,
 				"Tutorial",

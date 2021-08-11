@@ -59,7 +59,7 @@ impl<B: Backend> OnlineMenu<B> {
 		elements.extend(vec![
 			MenuElement::new_label(
 				"onlinemenu_title".to_string(),
-				CanvasVec::new(0.5 * ASPECT_RATIO, 0.8),
+				CanvasVec::new(0.5 * ASPECT_RATIO, 0.83),
 				CanvasVec::new(0.15, 0.15),
 				SUBTITLE_FONT_SIZE,
 				"Online",
