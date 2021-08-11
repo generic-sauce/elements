@@ -51,6 +51,8 @@ pub fn draw_world<B: Backend>(world: &World, draw: &mut Draw, app: &App<B>) {
 	draw.texture(TileVec::new(31, 3), TileVec::new(47, 11), TextureId::HangingBush0, Flip::Normal, None);
 	draw.texture(TileVec::new(11, 0), TileVec::new(19, 8), TextureId::GrassStraws0, Flip::Normal, None);
 	draw.texture(TileVec::new(12, 19), TileVec::new(20, 27), TextureId::FloatingBush0, Flip::Normal, None);
+
+	draw.texture(ViewVec::new(0.4, 0.6), ViewVec::new(0.43, 0.63), world.bird, Flip::Normal, None);
 }
 
 fn trophy_position_curve(mix: f32) -> f32 {

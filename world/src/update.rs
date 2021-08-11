@@ -35,6 +35,6 @@ impl World {
 		self.best_of_n = u.best_of_n;
 
 		// This exists to generate a compiler error whenever a field will be added to World.
-		let Self { players: _, tilemap: _, fluidmap: _, frame_id: _, kills: _, restart_state: _, best_of_n: _ } = self;
+		let Self { players: _, tilemap: _, fluidmap: _, frame_id: _, kills: _, restart_state: _, best_of_n: _, bird: _ } = self;
 	}
 }

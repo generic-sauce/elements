@@ -53,6 +53,7 @@ pub struct World {
 	pub kills: [u32; 2],
 	pub restart_state: RestartState,
 	pub best_of_n: u32,
+	pub bird: Animation,
 }
 
 pub enum GameResult {
@@ -87,11 +88,14 @@ impl World {
 			frame_id: 0,
 			kills: [0, 0],
 			restart_state: RestartState::Game,
-			best_of_n
+			best_of_n,
+			bird: Animation::new(AnimationId::Bird),
 		}
 	}
 
 	pub fn tick(&mut self, handler: &mut impl EventHandler) {
+		self.bird.tick();
+
 		// sub-tick
 		match &mut self.restart_state {
 			RestartState::Game => {
