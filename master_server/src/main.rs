@@ -18,6 +18,7 @@ pub struct LobbyData {
 	lobby_id: u32,
 	name: String,
 	players: Vec<PeerHandle>, // players[0] is the owner
+	max_no_players: u32,
 }
 
 pub struct GameServerInfo {
@@ -107,6 +108,7 @@ impl MasterServer {
 							lobby_id,
 							name: lobby_name,
 							players: vec![peer],
+							max_no_players: 2,
 						});
 
 						self.send_lobby_info(lobby_id);
@@ -139,6 +141,8 @@ impl MasterServer {
 						let v = self.lobbies.iter().map(| x | ShortLobbyInfo {
 							lobby_id: x.lobby_id,
 							name: x.name.clone(),
+							no_players: x.players.len() as u32,
+							max_no_players: x.max_no_players,
 						}).collect();
 						self.peer_manager.send_to(peer, &MasterClientPacket::LobbyListResponse(v));
 					}
