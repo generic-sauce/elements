@@ -1,5 +1,11 @@
 use crate::prelude::*;
 
+mod vec;
+pub use vec::*;
+
+mod camera;
+pub use camera::*;
+
 mod player;
 use player::*;
 
@@ -57,6 +63,7 @@ pub type VertexIndex = usize;
 pub struct TriangleDrawCommand {
 	pub texture_index: TextureIndex,
 	pub count: VertexIndex,
+	pub camera_mode: CameraMode,
 }
 
 pub struct DrawTilemap {
@@ -114,6 +121,7 @@ impl DrawFluidmap {
 }
 
 pub struct Draw {
+	camera: Option<Camera>,
 	clear_color: Option<Color>,
 	commands: Vec<DrawCommand>,
 	triangle_commands: Vec<TriangleDrawCommand>,
@@ -126,6 +134,7 @@ pub struct Draw {
 
 impl Draw {
 	pub fn new() -> Draw {
+		let camera = None;
 		let clear_color = None;
 		let commands = Vec::new();
 		let tilemap = None;
@@ -135,6 +144,7 @@ impl Draw {
 		let triangle_commands = Vec::new();
 
 		Draw {
+			camera,
 			clear_color,
 			commands,
 			tilemap,
@@ -153,9 +163,17 @@ impl Draw {
 		self.clear_color = Some(clear_color);
 	}
 
-	fn push_triangle_command(&mut self, texture_index: TextureIndex, count: VertexIndex) {
+	#[allow(unused)]
+	pub fn set_camera(&mut self, camera: Camera) {
+		if let Some(_) = self.camera {
+			panic!("camera was set already");
+		}
+		self.camera = Some(camera);
+	}
+
+	fn push_triangle_command(&mut self, texture_index: TextureIndex, count: VertexIndex, camera_mode: CameraMode) {
 		if let Some(prev) = self.triangle_commands.last_mut() {
-			if texture_index == prev.texture_index {
+			if texture_index == prev.texture_index && camera_mode == prev.camera_mode {
 				prev.count += count;
 				return;
 			}
@@ -165,21 +183,25 @@ impl Draw {
 		self.triangle_commands.push(TriangleDrawCommand {
 			texture_index,
 			count,
+			camera_mode,
 		});
 	}
 
 	#[allow(unused)]
-	pub fn texture(
+	pub fn texture<T: IntoDrawVec>(
 		&mut self,
-		left_bot: impl IntoViewVec,
-		right_top: impl IntoViewVec,
+		left_bot: T,
+		right_top: T,
 		texture_index: impl IntoTextureIndex,
 		flip: Flip,
 		color: Option<Color>,
 	) {
 		let texture_index = texture_index.into_texture_index();
-		let left_bot = left_bot.to_view();
+		let left_bot = left_bot.to_draw();
+		let camera_mode = left_bot.camera_mode;
+		let left_bot = left_bot.vec;
 		let right_top = right_top.to_view();
+
 		let color = color.unwrap_or(Color::WHITE);
 		let (left_uv, right_uv) = match flip {
 			Flip::Normal => (0.0, 1.0),
@@ -196,18 +218,20 @@ impl Draw {
 			Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(left_uv, 1.0),  color },
 		].iter().cloned());
 
-		self.push_triangle_command(texture_index, 6);
+		self.push_triangle_command(texture_index, 6, camera_mode);
 	}
 
 	#[allow(unused)]
-	pub fn rectangle(
+	pub fn rectangle<T: IntoDrawVec>(
 		&mut self,
-		left_bot: impl IntoViewVec,
-		right_top: impl IntoViewVec,
+		left_bot: T,
+		right_top: T,
 		color: Color,
 	) {
 		let texture_index = TextureId::White.into_texture_index();
-		let left_bot = left_bot.to_view();
+		let left_bot = left_bot.to_draw();
+		let camera_mode = left_bot.camera_mode;
+		let left_bot = left_bot.vec;
 		let right_top = right_top.to_view();
 
 		self.triangles.extend([
@@ -220,7 +244,7 @@ impl Draw {
 			Vertex { position: v(left_bot.x, right_top.y), uv: TextureVec::new(0.0, 1.0), color },
 		].iter().cloned());
 
-		self.push_triangle_command(texture_index, 6);
+		self.push_triangle_command(texture_index, 6, camera_mode);
 	}
 
 	#[allow(unused)]
@@ -256,7 +280,7 @@ impl Draw {
 	#[allow(unused)]
 	pub fn circle(
 		&mut self,
-		center: impl IntoViewVec,
+		center: impl IntoDrawVec,
 		scale: f32,
 		color: Color,
 	) {
@@ -266,14 +290,16 @@ impl Draw {
 	#[allow(unused)]
 	pub fn arc(
 		&mut self,
-		center: impl IntoViewVec,
+		center: impl IntoDrawVec,
 		scale: f32,
 		color: Color,
 		arc_size: f32,
 		arc_offset: f32,
 	) {
 		let points = 32;
-		let center = center.to_view();
+		let center = center.to_draw();
+		let camera_mode = center.camera_mode;
+		let center = center.vec;
 		let center_uv = TextureVec::new(0.5, 0.5);
 		let arc_offset = arc_offset * std::f32::consts::PI * 2.0;
 
@@ -302,7 +328,7 @@ impl Draw {
 		}
 
 		let texture_index = TextureId::White.into_texture_index();
-		self.push_triangle_command(texture_index, vertex_count);
+		self.push_triangle_command(texture_index, vertex_count, camera_mode);
 	}
 
 	#[allow(unused)]

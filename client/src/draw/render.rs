@@ -1,6 +1,7 @@
 use super::*;
 
 pub struct RenderDraw {
+	pub camera: Camera,
 	pub clear_color: Color,
 	pub commands: Vec<DrawCommand>,
 	pub tilemap: Option<DrawTilemap>,
@@ -12,13 +13,15 @@ pub struct RenderDraw {
 
 impl RenderDraw {
 	pub fn new(draw: Draw, window_size: SubPixelVec) -> RenderDraw {
-		let Draw { clear_color, commands, tilemap, fluidmap, texts, triangles, triangle_commands } = draw;
+		let Draw { camera, clear_color, commands, tilemap, fluidmap, texts, triangles, triangle_commands } = draw;
 
+		let camera = camera.unwrap_or(Camera { left_bot: ViewVec::new(0.0, 0.0), zoom: 1.0 });
 		let clear_color = clear_color.unwrap_or(Color::BLACK);
 
 		let triangle_data = vertices_to_bytes(window_size, &triangles[..]);
 
 		RenderDraw {
+			camera,
 			clear_color,
 			commands,
 			tilemap,

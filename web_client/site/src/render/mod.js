@@ -20,9 +20,24 @@ export function init(texture_filenames) {
 	text_mod.init()
 }
 
+function create_view_matrix(camera) {
+	// we need the transposed matrix
+	return [
+		camera.zoom, 0, 0,
+		0, camera.zoom, 0,
+		camera.left_bot[0] * 2.0, camera.left_bot[1] * 2.0, 1,
+	]
+}
+
+let normal_camera = {
+	left_bot: [0, 0],
+	zoom: 1,
+}
+let normal_view_matrix = create_view_matrix(normal_camera)
+
 export function render(draw) {
 	let clear = draw.clear_color
-	gl.clearColor(clear.r, clear.g, clear.b, clear.a)
+	// gl.clearColor(clear.r, clear.g, clear.b, clear.a)
 	// gl.clear(gl.COLOR_BUFFER_BIT)
 
 	triangles_mod.set_vertices(draw.vertex_data)
@@ -31,6 +46,19 @@ export function render(draw) {
 	let vertex_count = 0
 
 	let text_command_index = 0
+
+	let view_matrix = normal_view_matrix
+	let transformed_view_matrix = create_view_matrix(draw.camera)
+
+	let camera_mode = ""
+	function change_camera_mode(mode) {
+		if (mode != camera_mode) {
+			console.assert(mode == "Normal" || mode == "Transformed", "unknown camera mode '" + camera_mode + "'")
+			view_matrix = mode == "Normal" ? normal_view_matrix : transformed_view_matrix
+			camera_mode = mode
+			return true
+		}
+	}
 
 	for (let command of draw.commands) {
 		switch (command) {
@@ -42,6 +70,9 @@ export function render(draw) {
 			let to = vertex_count + count
 			vertex_count += count
 			++triangle_command_index
+
+			if (change_camera_mode(triangle_command.camera_mode))
+				triangles_mod.set_view_matrix(view_matrix)
 
 			triangles_mod.render(texture_index, from, to)
 			break;

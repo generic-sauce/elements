@@ -20,6 +20,7 @@ pub struct WebText {
 
 #[derive(Serialize, Deserialize)]
 pub struct JsWebRenderDraw {
+	pub camera: Camera,
 	pub clear_color: Color,
 	pub tilemap: Option<JsWebRenderDrawTilemap>,
 	pub fluidmap: Option<JsWebRenderDrawFluidmap>,
@@ -39,7 +40,7 @@ impl WebRenderDraw {
 	pub fn new(draw: Draw) -> WebRenderDraw {
 		// canvas vec cast because we only need aspect. kinda shady
 		let render_draw = RenderDraw::new(draw, CanvasVec::aspect().cast());
-		let RenderDraw { clear_color, commands, tilemap, fluidmap, texts, triangle_data, triangle_commands } = render_draw;
+		let RenderDraw { camera, clear_color, commands, tilemap, fluidmap, texts, triangle_data, triangle_commands } = render_draw;
 
 		let (tilemap, tilemap_data) = match tilemap {
 			Some(DrawTilemap { data, size }) => (
@@ -69,6 +70,7 @@ impl WebRenderDraw {
 		);
 
 		let js_web_render_draw = JsWebRenderDraw {
+			camera,
 			clear_color,
 			tilemap,
 			fluidmap,
