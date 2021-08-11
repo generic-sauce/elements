@@ -42,7 +42,7 @@ impl World {
 	pub fn tick_fluidmap(&mut self) {
 		let iter = self.fluidmap.iter()
 			.cloned()
-			.map(|f| self.fluidmap.apply_grab(f, &self.players))
+			.map(|f| self.fluidmap.apply_grab(f, &self.teams[..], &self.players))
 			.map(|f| self.fluidmap.apply_forces(f, &self.tilemap, &self.players, self.frame_id))
 			.map(|f| FluidMap::move_fluid_by_velocity(f, &self.tilemap))
 			.map(|mut f| {
