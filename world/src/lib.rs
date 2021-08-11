@@ -159,7 +159,7 @@ impl World {
 	}
 
 	fn tick_players(&mut self) {
-		for p in 0..2 {
+		for p in 0..self.players.len() {
 			self.tick_player(p);
 		}
 	}

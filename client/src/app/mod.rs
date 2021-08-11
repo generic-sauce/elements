@@ -156,7 +156,7 @@ impl<B: Backend> App<B> {
 }
 
 pub fn tick_within_app<B: Backend>(world: &mut World, app: &mut App<B>) {
-	let mut handler = AppEventHandler::new();
+	let mut handler = AppEventHandler::new(world.players.len());
 	world.tick(&mut handler);
 	app.handle(&handler);
 
@@ -175,7 +175,7 @@ fn update_music_within_app<B: Backend>(world: &mut World, app: &mut App<B>) {
 }
 
 pub fn apply_update_within_app<B: Backend>(world: &mut World, update: WorldUpdate, app: &mut App<B>) {
-	let mut handler = AppEventHandler::new();
+	let mut handler = AppEventHandler::new(world.players.len());
 	world.apply_update(update, &mut handler);
 	app.handle(&handler);
 }

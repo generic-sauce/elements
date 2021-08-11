@@ -2,16 +2,16 @@ use crate::prelude::*;
 
 pub struct AppEventHandler {
 	pub tilemap_changed: bool,
-	pub damages: [i32; 2],
+	pub damages: Vec<i32>,
 	pub new_game_started: bool,
 	pub game_ended: bool,
 }
 
 impl AppEventHandler {
-	pub fn new() -> AppEventHandler {
+	pub fn new(no_players: usize) -> AppEventHandler {
 		AppEventHandler {
 			tilemap_changed: false,
-			damages: [0; 2],
+			damages: vec![0; no_players],
 			new_game_started: false,
 			game_ended: false,
 		}
