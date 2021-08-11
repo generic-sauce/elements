@@ -41,7 +41,9 @@ impl Server {
 				your_player_id: i,
 				tilemap_image: tilemap_image.clone(),
 			};
-			server.peer_manager.send_to(*p, &go);
+			if let Err(x) = server.peer_manager.send_to(*p, &go) {
+				eprintln!("game-server: error: can't send GameSCPacket::Go to some client \"{}\"", x);
+			}
 		}
 
 		server
@@ -87,7 +89,9 @@ impl Server {
 				if self.update_desire[i] >= 1000 {
 					self.update_desire[i] = 0;
 					let update = GameSCPacket::WorldUpdate(self.world.update());
-					self.peer_manager.send_to(self.peers[i], &update);
+					if let Err(x) = self.peer_manager.send_to(self.peers[i], &update) {
+						eprintln!("game-server: error: can't send GameSCPacket::WorldUpdate to some client! {}", x);
+					}
 				}
 			}
 
@@ -133,9 +137,15 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 	let mut silent_frames = 0;
 	let mut packet_send_counter = 0;
 
-	let mut master_socket = domain_name.map(|d| {
-		let master_socket = NativeSocketBackend::new(DEFAULT_MASTER_SERVER_HOSTNAME, DEFAULT_MASTER_SERVER_PORT);
-		(d, master_socket)
+	let mut master_socket: Option<(&str, NativeSocketBackend)> = domain_name.and_then(|d| {
+		let master_socket = match NativeSocketBackend::new(DEFAULT_MASTER_SERVER_HOSTNAME, DEFAULT_MASTER_SERVER_PORT) {
+			Ok(x) => x,
+			Err(x) => {
+				eprintln!("game server can't connect to master server: {}", x);
+				return None;
+			}
+		};
+		Some((d, master_socket))
 	});
 
 	match master_socket {
@@ -177,8 +187,12 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 		// master server networking
 		if let Some((domain_name, socket)) = &mut master_socket {
 			socket.tick();
-			while let Some(_) = socket.recv::<()>() {
-				eprintln!("WARN: invalid packet from master server");
+			loop {
+				match socket.recv::<()>() {
+					Ok(None) => break,
+					Ok(Some(_)) => eprintln!("game-server: waiting_for_players: WARN: invalid packet from master server"),
+					Err(x) => eprintln!("game-server: waiting_for_players: error: {}", x),
+				}
 			}
 
 			if packet_send_counter == 0 {

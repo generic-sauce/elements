@@ -16,10 +16,10 @@ pub trait Packet: Serialize + DeserializeOwned + Clone {}
 
 impl Packet for () {}
 
-pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
-	serialize(p).unwrap()
+pub fn ser<P: Serialize>(p: &P) -> Result<Vec<u8>, SocketErr> {
+	Ok(serialize(p)?)
 }
 
-pub fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
-	deserialize(bytes).unwrap() // TODO: this crashes if server packet is malformed
+pub fn deser<P: DeserializeOwned>(bytes: &[u8]) -> Result<P, SocketErr> {
+	Ok(deserialize(bytes)?) // TODO: this crashes if server packet is malformed
 }
