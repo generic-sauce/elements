@@ -21,3 +21,12 @@ cd game_server
 cargo run --release --no-default-features --features=game-server
 ```
 
+## Push with git lfs
+```bash
+git add <files>
+git commit
+git push
+git config -f .lfsconfig lfs.url https://github.com/generic-sauce/elements.git/info/lfs
+git push sauce
+rm .lfsconfig
+```
