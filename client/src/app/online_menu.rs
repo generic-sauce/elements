@@ -160,7 +160,7 @@ impl<B: Backend> OnlineMenu<B> {
 			vec![0.01*ASPECT_RATIO, 0.35*ASPECT_RATIO],
 			vec!["Lobby-Name".to_string(), "# Players".to_string()],
 			content,
-			events,
+			Some(events),
 			menu_cache,
 		);
 
