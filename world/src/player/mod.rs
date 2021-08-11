@@ -76,7 +76,7 @@ impl World {
 	pub fn tick_player(&mut self, p: usize) {
 		let pl = &mut self.players[p];
 		pl.animation.tick();
-		pl.select_animation(p, &self.tilemap);
+		pl.select_animation(self.teams[p], &self.tilemap);
 		pl.apply_forces(&self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
 
@@ -105,11 +105,13 @@ impl Player {
 		}
 	}
 
-	fn select_animation(&mut self, player_id: usize, t: &TileMap) {
-		let (run, idle, jump, fall, fall_slow) = if player_id == 0 {
+	fn select_animation(&mut self, team: u8, t: &TileMap) {
+		let (run, idle, jump, fall, fall_slow) = if team == 0 {
 			(AnimationId::BluePlayerRun, AnimationId::BluePlayerIdle, AnimationId::BluePlayerJump, AnimationId::BluePlayerFall, AnimationId::BluePlayerFallSlow)
-		} else {
+		} else if team == 1 {
 			(AnimationId::RedPlayerRun, AnimationId::RedPlayerIdle, AnimationId::RedPlayerJump, AnimationId::RedPlayerFall, AnimationId::RedPlayerFallSlow)
+		} else {
+			panic!("select_animation team out of range!");
 		};
 
 		let animation_id = if self.is_grounded(t) {
