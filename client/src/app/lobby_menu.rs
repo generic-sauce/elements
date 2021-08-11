@@ -41,10 +41,7 @@ impl<B: Backend> LobbyMenu<B> {
 			&self.long_lobby_info.name,
 			TextAlign::Left,
 		));
-		let mut content = Vec::new();
-		for name in &self.long_lobby_info.player_names {
-			content.push(vec![name.to_string()]);
-		}
+		let content = self.long_lobby_info.player_names.iter().map(|n| vec![n.to_string()]).collect();
 		let list_view = MenuElement::new_list_view_elements(
 			"lobbymenu_playernames".to_string(),
 			CanvasVec::new(0.25 * ASPECT_RATIO, 0.5),
