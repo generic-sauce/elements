@@ -13,17 +13,18 @@ pub enum MasterServerPacket { // packets received by the master server
 	LeaveLobby, // sent from client to master server to indicate that it leaves it's lobby. this also closes the lobby if it was the last player
 	LobbyListRequest, // sent from client to master server to receive a LobbyListResponsePacket
 	StartGame, // sent from lobby owner to master server to indicate start of the game
-	// ChangeLobbySettings(...), // sent from lobby owner to master server to change map/game-mode/...
+	ChangeLobbySettings(LobbySettings), // sent from lobby owner to master server to change map/game-mode/...
 }
 
 impl Packet for MasterServerPacket {}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ShortLobbyInfo { // obtainable for each lobby
+pub struct ShortLobbyInfo { // sent from master server to clients: obtainable for each lobby
 	pub lobby_id: u32,
 	pub name: String,
 	pub no_players: u32,
 	pub max_no_players: u32,
+	pub map_id: u8,
 	/* tile_map icon */
 	/* number_of_players */
 	/* game_mode */
@@ -31,14 +32,20 @@ pub struct ShortLobbyInfo { // obtainable for each lobby
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct LongLobbyInfo { // obtained only for the lobby where you are in
+pub struct LongLobbyInfo { // sent from master server to clients: obtained only for the lobby where you are in
 	pub lobby_id: u32,
 	pub name: String,
 	pub player_names: Vec<String>,
 	pub your_player_index: u32,
+	pub map_id: u8,
 	/* full tile_map */
 	/* game_mode */
 	/* ... */
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct LobbySettings { // sent from client to master server to define settings; the master server answers to all players with a LobbyInfoUpdate
+	pub map_id: u8,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
