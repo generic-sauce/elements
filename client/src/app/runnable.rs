@@ -44,9 +44,7 @@ impl<B: Backend> Runnable<B> {
 		match self {
 			Runnable::OnlineMenu(online_menu) => {
 				if let Some(long_lobby_info) = online_menu.tick(app, packets) {
-					*self = Runnable::LobbyMenu(LobbyMenu {
-						long_lobby_info, _p: PhantomData
-					});
+					*self = Runnable::LobbyMenu(LobbyMenu::from_lobby_info(long_lobby_info));
 				}
 			},
 			Runnable::LocalMenu => {},
