@@ -21,5 +21,5 @@ pub fn ser<P: Serialize>(p: &P) -> Vec<u8> {
 }
 
 pub fn deser<P: DeserializeOwned>(bytes: &[u8]) -> P {
-	deserialize(bytes).unwrap()
+	deserialize(bytes).unwrap() // TODO: this crashes if server packet is malformed
 }
