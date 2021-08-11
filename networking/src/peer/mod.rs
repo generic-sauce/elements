@@ -73,14 +73,17 @@ impl PeerManager {
 	pub fn tick<R: Packet>(&mut self) -> Vec<PeerEvent<R>> {
 		let mut events = Vec::new();
 
-		match self.tick_native() {
-			Ok(x) => events.extend(x),
-			Err(x) => eprintln!("PeerManager::tick_native-error: {}", x),
-		};
-		match self.tick_web() {
-			Ok(x) => events.extend(x),
-			Err(x) => eprintln!("PeerManager::tick_web-error: {}", x),
-		};
+		let (evs, errs) = self.tick_native();
+		events.extend(evs);
+		for err in errs {
+			eprintln!("PeerManager::tick_native error: {}", err);
+		}
+
+		let (evs, errs) = self.tick_web();
+		events.extend(evs);
+		for err in errs {
+			eprintln!("PeerManager::tick_web error: {}", err);
+		}
 
 		events
 	}
