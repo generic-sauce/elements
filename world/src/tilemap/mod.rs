@@ -20,27 +20,99 @@ pub enum Tile {
 pub struct TileMap {
 	pub tiles: Vec<Tile>,
 	pub size: TileVec,
+	pub spawn_points: [Vec<GameVec>; 2],
+	pub details: Vec<(GameVec, DetailType)>
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum DetailType {
+	Bush0,
+	BushFlowers0,
+	FloatingBush0,
+	GrassStraws0,
+	HangingBush0,
+	Mountains0,
+	Mountains1,
+	Stone0,
+	Stone1,
+	WideBush0,
 }
 
 impl TileMap {
 	pub fn new(src: &TileMapImage) -> TileMap {
 		let TileMapImage { pixels, size } = src;
 		let mut tiles = Vec::with_capacity((size.x * size.y) as usize);
+		let mut spawn_points = [Vec::new(), Vec::new()];
+
+		let mut details = Vec::new();
 
 		for y in 0..size.y {
 			for x in 0..size.x {
 				let tile = match pixels[x as usize][y as usize] {
 					[255, 255, 255, 255] => Tile::Void,
 					[0, 0, 0, 255] => Tile::Ground,
+					[0, 0, 255, 255] => {
+						spawn_points[0].push(GameVec::from(TileVec::new(x, y)));
+						Tile::Void
+					}
+					[255, 0, 0, 255] => {
+						spawn_points[1].push(GameVec::from(TileVec::new(x, y)));
+						Tile::Void
+					}
+					[0, 128, 0, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Bush0));
+						Tile::Void
+					}
+					[0, 179, 0, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::BushFlowers0));
+						Tile::Void
+					}
+					[0, 230, 0, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::FloatingBush0));
+						Tile::Void
+					}
+					[26, 255, 26, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::GrassStraws0));
+						Tile::Void
+					}
+					[77, 255, 77, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::HangingBush0));
+						Tile::Ground
+					}
+					[128, 64, 0, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Mountains0));
+						Tile::Void
+					}
+					[179, 89, 0, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Mountains1));
+						Tile::Void
+					}
+					[230, 115, 0, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Stone0));
+						Tile::Void
+					}
+					[255, 140, 26, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Stone1));
+						Tile::Void
+					}
+					[255, 166, 77, 255] => {
+						details.push((GameVec::from(TileVec::new(x, y)), DetailType::WideBush0));
+						Tile::Void
+					}
 					c => panic!("tile color out of range! {:?}", c),
 				};
 				tiles.push(tile);
 			}
 		}
 
+		assert!(!spawn_points[0].is_empty(), "no team 0 spawnpoint found in map");
+		assert!(!spawn_points[1].is_empty(), "no team 1 spawnpoint found in map");
+
 		TileMap {
 			tiles,
 			size: *size,
+			spawn_points,
+			details,
 		}
 	}
 
