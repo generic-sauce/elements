@@ -170,7 +170,7 @@ fn update_music_within_app<B: Backend>(world: &mut World, app: &mut App<B>) {
 			critical_level += 1;
 		}
 	}
-	let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level];
+	let sound_id = [SoundId::APart, SoundId::BPart, SoundId::DPart][critical_level.min(2)];
 	app.audio_backend.queue_music(sound_id);
 }
 
