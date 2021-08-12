@@ -55,6 +55,7 @@ float xor(float a, float b) {
 }
 
 vec4 ground_color(vec2 uv) {
+	return vec4(.47, .43, .36, 1);
 	// tweaks
 	const float density = 2.;
 	const float grass_scale = .7;
