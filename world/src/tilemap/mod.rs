@@ -9,21 +9,16 @@ use crate::prelude::*;
 pub const WALL_LIFETIME: u32 = 40;
 pub const WALL_IGNORE_FRIENDLY_FLUIDS_TIME: u32 = 10;
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize)]
 pub enum Tile {
 	Void,
 	Ground,
 	Wall { team: u8, remaining_lifetime: u32 },
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct TileMap {
-	pub tiles: Vec<Tile>,
-	pub size: TileVec,
-	pub spawn_points: [Vec<TileVec>; 2],
-	pub details: Vec<(GameVec, DetailType)>
-}
-
+#[derive(PartialEq, Eq)]
+#[derive(Copy, Clone)]
 #[derive(Serialize, Deserialize)]
 pub enum DetailType {
 	Bush0,
@@ -36,6 +31,22 @@ pub enum DetailType {
 	Stone0,
 	Stone1,
 	WideBush0,
+}
+
+#[derive(PartialEq, Eq)]
+#[derive(Copy, Clone)]
+#[derive(Serialize, Deserialize)]
+pub struct Detail {
+	pub left_bot: TileVec,
+	pub kind: DetailType,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TileMap {
+	pub tiles: Vec<Tile>,
+	pub size: TileVec,
+	pub spawn_points: [Vec<TileVec>; 2],
+	pub details: Vec<Detail>
 }
 
 impl TileMap {
@@ -60,43 +71,43 @@ impl TileMap {
 						Tile::Void
 					}
 					[0, 128, 0, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Bush0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::Bush0 });
 						Tile::Void
 					}
 					[0, 179, 0, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::BushFlowers0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::BushFlowers0 } );
 						Tile::Void
 					}
 					[0, 230, 0, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::FloatingBush0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::FloatingBush0 } );
 						Tile::Void
 					}
 					[26, 255, 26, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::GrassStraws0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::GrassStraws0 } );
 						Tile::Void
 					}
 					[77, 255, 77, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::HangingBush0));
-						Tile::Ground
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::HangingBush0 } );
+						Tile::Void
 					}
 					[128, 64, 0, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Mountains0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::Mountains0 } );
 						Tile::Void
 					}
 					[179, 89, 0, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Mountains1));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::Mountains1 } );
 						Tile::Void
 					}
 					[230, 115, 0, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Stone0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::Stone0 } );
 						Tile::Void
 					}
 					[255, 140, 26, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::Stone1));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::Stone1 } );
 						Tile::Void
 					}
 					[255, 166, 77, 255] => {
-						details.push((GameVec::from(TileVec::new(x, y)), DetailType::WideBush0));
+						details.push(Detail { left_bot: TileVec::new(x, y), kind: DetailType::WideBush0 } );
 						Tile::Void
 					}
 					c => panic!("tile color out of range! {:?}", c),
@@ -161,4 +172,4 @@ impl Tile {
 	pub fn is_solid(self) -> bool {
 		!matches!(self, Tile::Void)
 	}
-}
+	}

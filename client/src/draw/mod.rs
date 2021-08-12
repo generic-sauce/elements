@@ -248,6 +248,32 @@ impl Draw {
 	}
 
 	#[allow(unused)]
+	pub fn tilemap_detail_background(&mut self, tilemap: &TileMap) {
+		for detail in &tilemap.details {
+			if detail.kind.to_layer() == TextureLayer::Background {
+				let origin = detail.kind.to_origin();
+				let left_bot = detail.left_bot - origin;
+				let right_top = left_bot + detail.kind.to_size();
+				let texture_index = detail.kind.to_texture_id().into_texture_index();
+				self.texture(left_bot, right_top, texture_index, Flip::Normal, None);
+			}
+		}
+	}
+
+	#[allow(unused)]
+	pub fn tilemap_detail_foreground(&mut self, tilemap: &TileMap) {
+		for detail in &tilemap.details {
+			if detail.kind.to_layer() == TextureLayer::Foreground {
+				let origin = detail.kind.to_origin();
+				let left_bot = detail.left_bot - origin;
+				let right_top = left_bot + detail.kind.to_size();
+				let texture_index = detail.kind.to_texture_id().into_texture_index();
+				self.texture(left_bot, right_top, texture_index, Flip::Normal, None);
+			}
+		}
+	}
+
+	#[allow(unused)]
 	pub fn tilemap(&mut self, tilemap: &TileMap) {
 		if let Some(_) = self.tilemap {
 			panic!("tilemap was drawn already");
