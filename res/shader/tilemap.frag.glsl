@@ -56,7 +56,7 @@ float xor(float a, float b) {
 }
 
 vec4 ground_color(vec2 uv) {
-	return vec4(.26, .2, .14, 1);
+	return vec4(.47, .43, .36, 1);
 }
 
 void main() {
