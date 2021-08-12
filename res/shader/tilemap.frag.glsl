@@ -56,66 +56,7 @@ float xor(float a, float b) {
 }
 
 vec4 ground_color(vec2 uv) {
-	// tweaks
-	const float density = 2.;
-	const float grass_scale = .7;
-	const int igrass_thickness = 3;
-	const float grass_thickness = float(igrass_thickness);
-	const float dirt_grass_threshold = .2;
-
-	// colors
-	vec3 dirt0 = vec3(75, 50, 27) / 255. * 1.1;
-	vec3 dirt1 = vec3(229, 187, 128) / 255. * .7;
-	vec3 grass0 = vec3(123, 231, 118) / 255. * .8;
-	vec3 grass1 = vec3(15, 75, 32) / 255.;
-
-	// consts
-	vec2 size = tilemap_size();
-	vec2 aspect = vec2(size.x / size.y, 1);
-	vec2 px = 1. / size;
-	vec2 pxx = vec2(px.x, 0);
-	vec2 pxy = vec2(0, px.y);
-
-	// grid cell local uv
-	vec2 lv = fract(uv * size);
-
-	float sum = 0.;
-	float all = 1.;
-	for (int i = 1; i < igrass_thickness + 1; ++i) {
-		float t = ground(uv + pxy * float(i));
-		all *= t;
-		sum += all;
-	}
-	float any = step(.001, sum);
-
-	float grass_portion = 0.;
-	grass_portion += lv.y + (grass_thickness - sum);
-	grass_portion += (1. - lv.x) * (1. - ground(uv + pxy * sum - pxx));
-	grass_portion += lv.x * (1. - ground(uv + pxy * sum + pxx));
-	grass_portion *= (grass_scale / grass_thickness);
-	grass_portion *= 1. - all;
-
-	float n_dirt = round_n21(uv * aspect * density);
-	float n_grass = mix(n_dirt, .0, grass_portion);
-
-	float dirt_color_ratio = floor(n_dirt * 4.) / 4.;
-	float grass_color_ratio = floor(n_grass / dirt_grass_threshold * 4.) / 4.;
-
-	vec3 dirt_color = mix(dirt0, dirt1, vec3(dirt_color_ratio));
-	vec3 grass_color = mix(grass0, grass1, vec3(grass_color_ratio));
-
-	vec3 c = mix(grass_color, dirt_color, step(dirt_grass_threshold, n_grass));
-
-	float left = ground(uv - pxx);
-	float right = ground(uv + pxx);
-	float a = 1.;
-	a *= (1. - any);
-	a *= xor(left, right);
-	a -= left * step(0., (1. - lv.y) - lv.x);
-	a -= right * step(0., (1. - lv.y) - (1. - lv.x));
-	a = 1. - a;
-
-	return vec4(c, a);
+	return vec4(.26, .2, .14, 1);
 }
 
 void main() {
