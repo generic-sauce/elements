@@ -40,7 +40,7 @@ fn create_swap_chain(device: &wgpu::Device, surface: &wgpu::Surface, window_size
 		format: SURFACE_FORMAT,
 		width: window_size.x,
 		height: window_size.y,
-		present_mode: wgpu::PresentMode::Immediate,
+		present_mode: wgpu::PresentMode::Fifo,
 	};
 
 	device.create_swap_chain(surface, &swap_chain_desc)
