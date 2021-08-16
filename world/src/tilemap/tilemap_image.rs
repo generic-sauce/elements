@@ -8,7 +8,7 @@ pub struct TileMapImage {
 	pub size: TileVec,
 }
 
-pub const DEFAULT_TILEMAP: &'static str = "map/map04.png";
+pub const DEFAULT_TILEMAP: &'static str = "map/map05.png";
 
 
 #[cfg(not(target_arch = "wasm32"))]
