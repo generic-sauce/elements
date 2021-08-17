@@ -7,6 +7,7 @@ const UPDATE_DESIRE_PER_FRAME: u32 = 350;
 const GAME_FPS: u32 = 60;
 
 const JOIN_FPS: u32 = 10;
+const WAITING_FOR_PLAYERS_TIMEOUT_SECS: u32 = 10;
 
 pub struct Server {
 	world: World,
@@ -88,6 +89,11 @@ impl Server {
 				}
 			}
 
+			let current_handles = self.peer_manager.get_peer_handles();
+			if self.peers.iter().all(|x| !current_handles.contains(x)) { // close the server when the last player has quit
+				println!("all players are disconnected! stopping game server");
+				std::process::exit(0);
+			}
 		}
 	}
 }
@@ -123,6 +129,7 @@ pub fn game_server_cli_args() -> ArgMatches<'static> {
 fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Option<&str>) -> (PeerManager, Vec<PeerHandle>, MasterToGameServerGoPacket) {
 	let mut go_packet: Option<MasterToGameServerGoPacket> = None;
 	let mut peer_manager = PeerManager::new(port, port+1, identity_file);
+	let mut timeout_counter = 0;
 
 	let mut master_socket = NativeSocketBackend::new(DEFAULT_MASTER_SERVER_HOSTNAME, DEFAULT_MASTER_SERVER_PORT).expect("can't connect to master server");
 
@@ -132,6 +139,7 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 	}).expect("can't send GameServerReady packet");
 
 	for _ in TimedLoop::with_fps(JOIN_FPS) {
+		timeout_counter += 1;
 		let evs = peer_manager.tick::<()>();
 
 		for ev in evs {
@@ -159,9 +167,16 @@ fn waiting_for_players(port: u16, domain_name: Option<&str>, identity_file: Opti
 		loop {
 			match master_socket.recv::<MasterToGameServerGoPacket>() {
 				Ok(None) => break,
-				Ok(Some(x)) => { go_packet = Some(x); },
+				Ok(Some(x)) => {
+					go_packet = Some(x);
+					println!("INFO: game server received go packet!");
+				},
 				Err(x) => eprintln!("game-server: waiting_for_players: error: {}", x),
 			}
+		}
+
+		if timeout_counter > WAITING_FOR_PLAYERS_TIMEOUT_SECS * JOIN_FPS {
+			panic!("waiting_for_players() timed out!");
 		}
 	}
 	unreachable!()
