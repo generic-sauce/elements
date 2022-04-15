@@ -12,11 +12,9 @@ apt install libssl-dev libudev-dev pkg-config
 
 git clone https://github.com/generic-sauce/elements.git
 
-# native client compilation
-cd native_client
-cargo run --release menu
+# run native client
+cargo run --release --package native_client
 
-# game server compilation
-cd game_server
-cargo run --release --no-default-features --features=game-server
+# run game server compilation
+cargo run --release --package game_server -- -d localhost
 ```
