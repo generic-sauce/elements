@@ -165,7 +165,7 @@ pub fn key_from_mouse(key_code: win::MouseButton) -> Key {
 		win::MouseButton::Left => Key::LeftMouse,
 		win::MouseButton::Right => Key::RightMouse,
 		win::MouseButton::Middle => Key::MiddleMouse,
-		win::MouseButton::Other(id) => Key::OtherMouse(id),
+		win::MouseButton::Other(id) => Key::OtherMouse(id as u8),
 	}
 }
 

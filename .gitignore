@@ -19,6 +19,7 @@
 
 # Other
 /local/
+/log.txt
 
 # infrastructure
 /infrastructure/rocket-server/target
