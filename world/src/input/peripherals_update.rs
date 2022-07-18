@@ -193,7 +193,7 @@ impl From<char> for Character {
 		} else if c as u8 == 127 {
 			Character::Delete
 		} else {
-			println!("unknown char: {}", c as u32);
+			// println!("unknown char: {}", c as u32);
 			Character::Unknown
 		}
 	}
