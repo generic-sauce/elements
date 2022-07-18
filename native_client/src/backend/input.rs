@@ -14,28 +14,15 @@ impl NativeInputBackend {
 	}
 }
 
-pub struct NativeEventIterator<'a> {
-	pub peripherals_receiver: &'a Receiver<PeripheralsUpdate>,
-}
-
-impl<'a> Iterator for NativeEventIterator<'a> {
-	type Item = PeripheralsUpdate;
-
-	fn next(&mut self) -> Option<Self::Item> {
-		match self.peripherals_receiver.try_recv() {
-			Err(TryRecvError::Disconnected) => panic!("PeripheralsUpdate Sender disconnected!"),
-			Err(TryRecvError::Empty) => None,
-			Ok(update) => Some(update),
-		}
-	}
-}
-
 impl InputBackend for NativeInputBackend {
-	type EventIterator<'a> = NativeEventIterator<'a>;
-
-	fn events(&mut self) -> NativeEventIterator<'_> {
-		NativeEventIterator {
-			peripherals_receiver: &self.peripherals_receiver,
+	fn events(&mut self) -> Vec<PeripheralsUpdate> {
+		let mut out = Vec::new();
+		loop {
+			match self.peripherals_receiver.try_recv() {
+				Err(TryRecvError::Disconnected) => panic!("PeripheralsUpdate Sender disconnected!"),
+				Err(TryRecvError::Empty) => return out,
+				Ok(update) => out.push(update),
+			}
 		}
 	}
 

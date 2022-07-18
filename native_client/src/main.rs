@@ -1,6 +1,3 @@
-#![allow(incomplete_features)]
-#![feature(generic_associated_types)]
-
 mod backend;
 mod graphics;
 mod timer;
