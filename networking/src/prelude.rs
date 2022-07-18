@@ -25,6 +25,7 @@ pub use itertools::iproduct;
 #[cfg(not(target_arch = "wasm32"))] pub use tungstenite::Message;
 
 pub use crate::{*,
+	my_drain_filter::*,
 	packets::*,
 	constants::*,
 	socket_backend::*,

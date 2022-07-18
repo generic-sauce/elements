@@ -1,5 +1,3 @@
-#![feature(drain_filter)]
-
 use networking::prelude::*;
 use clap::{App as ClapApp, Arg};
 
@@ -180,10 +178,10 @@ impl MasterServer {
 					// other events
 					PeerEvent::NewPeer(_) => {},
 					PeerEvent::Disconnect(peer) => {
-						for removed_peer in self.game_servers.drain_filter(|gs| gs.peer == peer) {
+						for removed_peer in self.game_servers.my_drain_filter(|gs| gs.peer == peer) {
 							println!("INFO: game server disconnected: {}:{}", removed_peer.domain_name, removed_peer.port);
 						}
-						for removed_client in self.clients.drain_filter(|gs| gs.peer == peer) {
+						for removed_client in self.clients.my_drain_filter(|gs| gs.peer == peer) {
 							println!("INFO: client disconnected: {}", removed_client.name);
 						}
 

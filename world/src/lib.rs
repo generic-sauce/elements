@@ -1,5 +1,3 @@
-#![feature(drain_filter)]
-
 mod animation;
 mod vec;
 mod input;
@@ -208,7 +206,7 @@ impl World {
 	fn despawn_fluids(&mut self) {
 		let frame_id = self.frame_id;
 		for cell in self.fluidmap.grid.iter_mut() {
-			cell.drain_filter(|f| f.check_despawn(frame_id));
+			cell.my_drain_filter(|f| f.check_despawn(frame_id));
 		}
 	}
 
@@ -229,7 +227,7 @@ impl World {
 			let t = &self.tilemap;
 			let pl = &self.players;
 			for v in self.fluidmap.grid.iter_mut() {
-				dmg += v.drain_filter(|x|
+				dmg += v.my_drain_filter(|x|
 					x.team != team && pl[i].collides_fluid(x.position, FLUID_DAMAGE_RADIUS, t)
 				).map(|f| f.damage())
 				.sum::<i32>();
