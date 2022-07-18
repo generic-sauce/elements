@@ -8,6 +8,7 @@ use crate::prelude::*;
 extern {
 	pub fn setInterval(closure: &Closure<dyn FnMut()>, time_ms: f64);
 	pub fn setTimeout(closure: &Closure<dyn FnMut()>, time_ms: f64);
+	#[allow(unused)]
 	pub fn prompt(txt: &str) -> String;
 	pub fn alert(txt: &str);
 
