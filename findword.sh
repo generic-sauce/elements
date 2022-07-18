@@ -1,3 +1,3 @@
 #!/bin/bash
 
-grep "$1" $(find -name "*.rs")
+grep --color=always -nI "$1" $(find -name "*.rs" -a -not -wholename "*/target/*")
