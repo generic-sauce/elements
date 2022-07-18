@@ -37,13 +37,22 @@ pub(in super) fn draw_cursors(draw: &mut Draw, world: &World) {
 
 pub(in super) fn draw_healthbars(draw: &mut Draw, world: &World) {
 	for p in &world.players {
-		let mut size = GameVec::new(PLAYER_SIZE.x * 2, TILESIZE / 2);
-		let mut left_bot = p.left_bot;
-		left_bot.x -= PLAYER_SIZE.x / 2;
-		left_bot.y += PLAYER_SIZE.y + TILESIZE;
+		let size = GameVec::new(PLAYER_SIZE.x * 2, TILESIZE / 2);
+		let left_bot = p.left_bot + GameVec::new(-PLAYER_SIZE.x / 2, PLAYER_SIZE.y + TILESIZE);
+
+		// draw surrounding
+		let offset = GameVec::new(32, 32);
+		draw.rectangle(left_bot - offset, left_bot + size + offset, Color::GRAY);
+
+		// draw black background
 		draw.rectangle(left_bot, left_bot + size, Color::BLACK);
 
-		size.x = (size.x as f32 * (p.health as f32 / MAX_HEALTH as f32)) as i32;
-		draw.rectangle(left_bot, left_bot + size, Color::GREEN);
+		// draw delayed health
+		let delayed_health_size = GameVec::new((size.x as f32 * (p.health_delayed as f32 / MAX_HEALTH as f32)) as i32, size.y);
+		draw.rectangle(left_bot, left_bot + delayed_health_size, Color::WHITE);
+
+		// draw bar
+		let health_size = GameVec::new((size.x as f32 * (p.health as f32 / MAX_HEALTH as f32)) as i32, size.y);
+		draw.rectangle(left_bot, left_bot + health_size, Color::GREEN);
 	}
 }

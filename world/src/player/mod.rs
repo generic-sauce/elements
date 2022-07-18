@@ -63,6 +63,7 @@ pub struct Player {
 	pub velocity: GameVec,
 	pub cursor: GameVec,
 	pub health: i32,
+	pub health_delayed: i32, // used to draw healthbar
 	pub wall_mode: WallMode,
 	pub free_wall_lifetime: u32,
 	pub grab_cooldown: Option<u32>,
@@ -79,6 +80,14 @@ impl World {
 		pl.select_animation(self.teams[p], &self.tilemap);
 		pl.apply_forces(&self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
+		if pl.health_delayed > pl.health {
+			if pl.health <= 0 {
+				pl.health_delayed = 0;
+			} else {
+				pl.health_delayed -= 12;
+				pl.health_delayed = pl.health_delayed.max(pl.health); // make sure health_delayed is not smaller than health
+			}
+		}
 
 		pl.grab_cooldown = match pl.grab_cooldown {
 			None => None,
@@ -95,6 +104,7 @@ impl Player {
 			velocity: GameVec::new(0, 0),
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
+			health_delayed: MAX_HEALTH,
 			wall_mode: WallMode::NotWalling,
 			free_wall_lifetime: 0,
 			grab_cooldown: None,
