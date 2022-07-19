@@ -45,10 +45,15 @@ pub(in super) fn draw_healthbars(draw: &mut Draw, world: &World) {
 		draw.rectangle(left_bot - offset, left_bot + size + offset, Color::GRAY);
 
 		// draw black background
-		draw.rectangle(left_bot, left_bot + size, Color::BLACK);
+		if p.health <= 0 {
+			let ratio = p.health_bar_status.red_death_counter as f32 / RED_HEALTH_DEATH_DURATION as f32;
+			draw.rectangle(left_bot, left_bot + size, Color::RED * ratio);
+		} else {
+			draw.rectangle(left_bot, left_bot + size, Color::BLACK);
+		}
 
 		// draw delayed health
-		let delayed_health_size = GameVec::new((size.x as f32 * (p.health_delayed as f32 / MAX_HEALTH as f32)) as i32, size.y);
+		let delayed_health_size = GameVec::new((size.x as f32 * (p.health_bar_status.health_delayed as f32 / MAX_HEALTH as f32)) as i32, size.y);
 		draw.rectangle(left_bot, left_bot + delayed_health_size, Color::WHITE);
 
 		// draw bar

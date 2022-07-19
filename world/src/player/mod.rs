@@ -58,12 +58,19 @@ pub enum WallMode {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct HealthBarStatus {
+	pub health_delayed: i32,
+	pub health_delayed_counter: i32,
+	pub red_death_counter: i32,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
 	pub left_bot: GameVec,
 	pub velocity: GameVec,
 	pub cursor: GameVec,
 	pub health: i32,
-	pub health_delayed: i32, // used to draw healthbar
+	pub health_bar_status: HealthBarStatus, // used to draw healthbar
 	pub wall_mode: WallMode,
 	pub free_wall_lifetime: u32,
 	pub grab_cooldown: Option<u32>,
@@ -73,6 +80,34 @@ pub struct Player {
 	pub input: InputState,
 }
 
+const HEALTH_DELAY_SPEED: i32 = 15;
+const HEALTH_DELAY: i32 = 6;
+pub const RED_HEALTH_DEATH_DURATION: i32 = 25;
+
+impl HealthBarStatus {
+	pub fn tick(&mut self, health: i32) {
+		if health <= 0 {
+			self.health_delayed = 0;
+			self.red_death_counter -= 1;
+			return;
+		} else {
+			self.red_death_counter = RED_HEALTH_DEATH_DURATION;
+		}
+		if self.health_delayed_counter <= 0 {
+			if health < self.health_delayed {
+				self.health_delayed = health.max(self.health_delayed - HEALTH_DELAY_SPEED); // make sure health_delayed is not smaller than health
+				if self.health_delayed == health {
+					self.health_delayed_counter = HEALTH_DELAY;
+				}
+			}
+		} else {
+			if health < self.health_delayed {
+				self.health_delayed_counter -= 1;
+			}
+		}
+	}
+}
+
 impl World {
 	pub fn tick_player(&mut self, p: usize) {
 		let pl = &mut self.players[p];
@@ -80,14 +115,7 @@ impl World {
 		pl.select_animation(self.teams[p], &self.tilemap);
 		pl.apply_forces(&self.tilemap);
 		pl.move_by_velocity(&self.tilemap);
-		if pl.health_delayed > pl.health {
-			if pl.health <= 0 {
-				pl.health_delayed = 0;
-			} else {
-				pl.health_delayed -= 12;
-				pl.health_delayed = pl.health_delayed.max(pl.health); // make sure health_delayed is not smaller than health
-			}
-		}
+		pl.health_bar_status.tick(pl.health);
 
 		pl.grab_cooldown = match pl.grab_cooldown {
 			None => None,
@@ -104,7 +132,11 @@ impl Player {
 			velocity: GameVec::new(0, 0),
 			cursor: GameVec::new(0, 0),
 			health: MAX_HEALTH,
-			health_delayed: MAX_HEALTH,
+			health_bar_status: HealthBarStatus {
+				health_delayed_counter: HEALTH_DELAY,
+				health_delayed: MAX_HEALTH,
+				red_death_counter: RED_HEALTH_DEATH_DURATION,
+			},
 			wall_mode: WallMode::NotWalling,
 			free_wall_lifetime: 0,
 			grab_cooldown: None,
