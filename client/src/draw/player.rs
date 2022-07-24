@@ -46,7 +46,7 @@ pub(in super) fn draw_healthbars(draw: &mut Draw, world: &World) {
 
 		// draw black background
 		if p.health <= 0 {
-			let ratio = p.health_bar_status.red_death_counter as f32 / RED_HEALTH_DEATH_DURATION as f32;
+			let ratio = (p.health_bar_status.red_death_counter as f32 / RED_HEALTH_DEATH_DURATION as f32).max(0.0);
 			draw.rectangle(left_bot, left_bot + size, Color::RED * ratio);
 		} else {
 			draw.rectangle(left_bot, left_bot + size, Color::BLACK);
