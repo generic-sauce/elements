@@ -35,7 +35,7 @@ fi
 
 # build
 echo "Building Game Server + Master Server..."
-docker exec -w /root/elements $ELEMENTS_BUILD_CONTAINER_NAME /root/.cargo/bin/rustup update
+docker exec -w /root/elements $ELEMENTS_BUILD_CONTAINER_NAME /root/.cargo/bin/rustup update stable
 docker exec -w /root/elements $ELEMENTS_BUILD_CONTAINER_NAME /root/.cargo/bin/cargo build --release --package master_server --package game_server
 echo "Building Game Server + Master Server: Done"
 
